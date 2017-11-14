@@ -1,0 +1,5 @@
+bs4
+html5lib
+xlrd
+tables
+h5py

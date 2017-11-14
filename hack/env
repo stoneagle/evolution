@@ -1,0 +1,8 @@
+# Docker Compose运行项目名
+COMPOSE_PROJECT_NAME=
+# id -u
+DEV_UID=
+# 开发者账号
+DEV_USER=
+# 开发使用的端口
+DEV_PORT=

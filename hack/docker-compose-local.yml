@@ -1,0 +1,33 @@
+version: '2'
+services:
+  postgres:
+    image: postgres:9.6
+    container_name: airflow-local-postgres-${DEV_USER}
+    environment:
+      - POSTGRES_USER=airflow
+      - POSTGRES_PASSWORD=airflow
+      - POSTGRES_DB=airflow
+    networks:
+      - default
+  webserver:
+    image: puckel/docker-airflow:1.8.2-assets
+    container_name: airflow-local-server-${DEV_USER}
+    restart: always
+    depends_on:
+        - postgres
+    environment:
+        - LOAD_EX=n
+        - EXECUTOR=Local
+    volumes:
+        - ./dags:/usr/local/airflow/dags
+        # - ./config/airflow.cfg:/usr/local/airflow/airflow.cfg
+        # - ./requirements.txt:/requirements.txt
+    ports:
+        - "${DEV_PORT}:8080"
+    command: "/entrypoint.sh webserver"
+    networks:
+      - default
+networks:
+  default:
+    external:
+      name: ${DEV_USER}

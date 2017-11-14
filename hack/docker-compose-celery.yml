@@ -1,0 +1,83 @@
+version: '2'
+services:
+  redis:
+    image: redis:3.2.5 
+    networks:
+      - default
+  postgres:
+    image: postgres:9.6.1 
+    environment:
+      - POSTGRES_USER=airflow
+      - POSTGRES_PASSWORD=airflow
+      - POSTGRES_DB=airflow
+    networks:
+      - default
+  webserver:
+    image: puckel/docker-airflow:1.8.2-ts
+    restart: always
+    depends_on:
+        - postgres
+        - redis
+    environment:
+        - LOAD_EX=n
+        - FERNET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=
+        - EXECUTOR=Celery
+        # - POSTGRES_USER=airflow
+        # - POSTGRES_PASSWORD=airflow
+        # - POSTGRES_DB=airflow
+    volumes:
+        - ./dags:/usr/local/airflow/dags
+    ports:
+        - "${DEV_PORT}:8080"
+    command: webserver
+    networks:
+      - default
+  flower:
+    image: puckel/docker-airflow:1.8.2-ts
+    restart: always
+    depends_on:
+        - redis
+    environment:
+        - EXECUTOR=Celery
+    ports:
+        - "{$DEV_FLOWER_PORT}:5555"
+    command: flower
+    networks:
+      - default
+  scheduler:
+    image: puckel/docker-airflow:1.8.2-ts
+    restart: always
+    depends_on:
+        - webserver
+    volumes:
+        - ./dags:/usr/local/airflow/dags
+    environment:
+        - LOAD_EX=n
+        - FERNET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=
+        - EXECUTOR=Celery
+        # - POSTGRES_USER=airflow
+        # - POSTGRES_PASSWORD=airflow
+        # - POSTGRES_DB=airflow
+    command: scheduler
+    networks:
+      - default
+  worker:
+    image: puckel/docker-airflow:1.8.2-ts
+    restart: always
+    depends_on:
+        - scheduler
+    volumes:
+        - ./dags:/usr/local/airflow/dags
+    environment:
+        - FERNET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqDDho=
+        - EXECUTOR=Celery
+        # - POSTGRES_USER=airflow
+        # - POSTGRES_PASSWORD=airflow
+        # - POSTGRES_DB=airflow
+    command: worker
+    networks:
+      - default
+networks:
+  default:
+    external:
+      name: wuzhongyang 

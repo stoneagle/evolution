@@ -1,0 +1,28 @@
+FROM puckel/docker-airflow:1.8.2 
+
+USER root 
+
+# 添加信任KEY
+# RUN apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 40976EAF437D05B5 && \
+# apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 3B4FE6ACC0B21F32
+ 
+# 备份源
+# RUN mv /etc/apt/sources.list /etc/apt/sources.list.backup
+ 
+# 添加163源(异常Depends: zlib1g (= 1:1.2.8.dfsg-1ubuntu1) but 1:1.2.8.dfsg-2+b1)
+# RUN echo "deb http://mirrors.163.com/ubuntu/ trusty main restricted universe multiverse" > /etc/apt/sources.list && \
+# echo "deb http://mirrors.163.com/ubuntu/ trusty-security main restricted universe multiverse" >> /etc/apt/sources.list && \
+# echo "deb http://mirrors.163.com/ubuntu/ trusty-updates main restricted universe multiverse" >> /etc/apt/sources.list && \
+# echo "deb http://mirrors.163.com/ubuntu/ trusty-proposed main restricted universe multiverse" >> /etc/apt/sources.list && \
+# echo "deb http://mirrors.163.com/ubuntu/ trusty-backports main restricted universe multiverse" >> /etc/apt/sources.list && \
+# echo "deb-src http://mirrors.163.com/ubuntu/ trusty main restricted universe multiverse" >> /etc/apt/sources.list && \
+# echo "deb-src http://mirrors.163.com/ubuntu/ trusty-security main restricted universe multiverse" >> /etc/apt/sources.list && \
+# echo "deb-src http://mirrors.163.com/ubuntu/ trusty-updates main restricted universe multiverse" >> /etc/apt/sources.list && \
+# echo "deb-src http://mirrors.163.com/ubuntu/ trusty-proposed main restricted universe multiverse" >> /etc/apt/sources.list && \
+# echo "deb-src http://mirrors.163.com/ubuntu/ trusty-backports main restricted universe multiverse" >> /etc/apt/sources.list
+
+# 关联mysql
+RUN apt-get -y update && \ 
+apt-get -y install zlib1g-dev python-mysqldb libmysqlclient-dev libhdf5-serial-dev
+
+# pip install mysqlclient
