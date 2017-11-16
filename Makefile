@@ -5,13 +5,13 @@ USER := $(shell id -u)
 GROUP := $(shell id -g)
 
 run-local: 
-	cd hack && docker-compose -p "airflow-$(USER)" up -d
+	cd hack && docker-compose -f docker-compose-local.yml -p "airflow-$(USER)" up -d
 
 stop-local: 
-	cd hack && docker-compose -p "airflow-$(USER)" stop 
+	cd hack && docker-compose -f docker-compose-local.yml -p "airflow-$(USER)" stop 
 
 rm-local: 
-	cd hack && docker-compose -p "airflow-$(USER)" rm 
+	cd hack && docker-compose -f docker-compose-local.yml -p "airflow-$(USER)" rm 
 
 build-img:
 	cd hack/dockerfile && docker build -f ./Dockerfile-assets -t puckel/docker-airflow:1.8.2-assets .

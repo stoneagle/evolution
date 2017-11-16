@@ -7,6 +7,8 @@ services:
       - POSTGRES_USER=airflow
       - POSTGRES_PASSWORD=airflow
       - POSTGRES_DB=airflow
+    # volumes:
+    #   - /home/wuzhongyang/database/postgre:/var/lib/postgresql/data
     networks:
       - default
   webserver:
@@ -14,16 +16,17 @@ services:
     container_name: airflow-local-server-${DEV_USER}
     restart: always
     depends_on:
-        - postgres
+      - postgres
     environment:
-        - LOAD_EX=n
-        - EXECUTOR=Local
+      - LOAD_EX=n
+      - EXECUTOR=Local
     volumes:
-        - ./dags:/usr/local/airflow/dags
-        # - ./config/airflow.cfg:/usr/local/airflow/airflow.cfg
-        # - ./requirements.txt:/requirements.txt
+      - ./config/airflow.cfg:/root/airflow/airflow.cfg
+      - ../dags:/tmp/airflow/dags
+      - /home/wuzhongyang/database/hdf5:/tmp/hdf5
+      # - ./requirements.txt:/requirements.txt
     ports:
-        - "${DEV_PORT}:8080"
+      - "${DEV_PORT}:8080"
     command: "/entrypoint.sh webserver"
     networks:
       - default
