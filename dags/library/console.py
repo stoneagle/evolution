@@ -13,11 +13,26 @@ def write_head(ctype):
     sys.stdout.flush()
 
 
-def write_exec():
-    sys.stdout.write('#')
+def write_create():
+    sys.stdout.write('C')
+    sys.stdout.flush()
+
+
+def write_append():
+    sys.stdout.write('A')
+    sys.stdout.flush()
+
+
+def write_number(index, num):
+    sys.stdout.write("[" + index + " : " + num + "]\r\n")
     sys.stdout.flush()
 
 
 def write_pass():
-    sys.stdout.write('*')
+    sys.stdout.write('P')
+    sys.stdout.flush()
+
+
+def write_error():
+    sys.stdout.write('E')
     sys.stdout.flush()

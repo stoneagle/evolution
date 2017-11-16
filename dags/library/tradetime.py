@@ -1,11 +1,7 @@
 import calendar
-import time
 from library import conf
 from datetime import datetime, timedelta, date
 
-LAST_MONTH_LAST_DAY = get_last_day_of_last_month()
-LAST_WEEK_LAST_DAY = get_last_day_of_last_week()
-LAST_TRADE_DAY = get_last_of_trade_day()
 
 def get_last_day_of_last_month():
     # 获取上月最后一天
@@ -23,12 +19,12 @@ def get_last_day_of_last_month():
 
 def get_last_day_of_last_week():
     today = date.today()
-    d = datetime.now(TZ)
+    d = datetime.now(conf.TZ)
     return datetime(d.year, d.month, d.day, 16, 00, 00) - timedelta(days=today.weekday() + 1)
 
 
 def get_last_of_trade_day():
-    today = datetime.now(TZ)
+    today = datetime.now(conf.TZ)
     # 需要考虑一月一号的情况
     if today.hour < 16:
         trade_datetime = datetime(today.year, today.month, today.day, 16, 00, 00) - timedelta(days=1)
@@ -84,3 +80,7 @@ def get_start_date(tail_date_str, code, ktype):
     start_date = start_datetime.strftime('%Y-%m-%d')
     return start_date
 
+
+LAST_MONTH_LAST_DAY = get_last_day_of_last_month()
+LAST_WEEK_LAST_DAY = get_last_day_of_last_week()
+LAST_TRADE_DAY = get_last_of_trade_day()

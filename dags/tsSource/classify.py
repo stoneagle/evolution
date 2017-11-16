@@ -2,7 +2,8 @@ import pandas as pd
 import re
 import json
 import time
-from tsSource import cons, console
+from tsSource import cons
+from library import console
 from datetime import datetime
 from pandas.util.testing import _network_error_classes
 try:
@@ -69,6 +70,7 @@ def get_hot_classified(f):
 
 def _add_data(f, tag, name):
     row_df = get_detail(tag, name, retry_count=1, pause=1)
+    console.write_create()
     if row_df is not None:
         if f.get(tag) is not None:
             del f[tag]
@@ -135,7 +137,6 @@ def get_detail(tag, name, retry_count=3, pause=1):
         for _ in range(retry_count):
             time.sleep(pause)
             try:
-                console.write_exec()
                 request = Request(url % (p, tag))
                 text = urlopen(request, timeout=10).read()
                 text = text.decode('gbk')
