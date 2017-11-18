@@ -3,7 +3,7 @@ import re
 import json
 import time
 from tsSource import cons
-from library import console
+from library import count
 from datetime import datetime
 from pandas.util.testing import _network_error_classes
 try:
@@ -16,18 +16,14 @@ def get_industry_classified(f):
     "由于tushare的延时会导致ip被封，提取该方法至脚本中"
     url = 'http://vip.stock.finance.sina.com.cn/q/view/newSinaHy.php'
     df = _get_type_data(url)
-    console.write_head(cons.CLASSIFY_INDUSTRY)
     for row in df.values:
         try:
             if _check_refresh(f, row[0]) is False:
-                console.write_pass()
                 continue
             _add_data(f, row[0], row[1])
         except Exception as er:
-            print(row[0])
             print(str(er))
             break
-    console.write_tail(cons.CLASSIFY_INDUSTRY)
     return
 
 
@@ -35,42 +31,33 @@ def get_concept_classified(f):
     "由于tushare的延时会导致ip被封，提取该方法至脚本中"
     url = 'http://money.finance.sina.com.cn/q/view/newFLJK.php?param=class'
     df = _get_type_data(url)
-    console.write_head(cons.CLASSIFY_CONCEPT)
     for row in df.values:
         try:
             if _check_refresh(f, row[0]) is False:
-                console.write_pass()
                 continue
             _add_data(f, row[0], row[1])
         except Exception as er:
-            print(row[0])
             print(str(er))
             break
-    console.write_tail(cons.CLASSIFY_CONCEPT)
     return
 
 
 def get_hot_classified(f):
     "由于tushare的延时会导致ip被封，提取该方法至脚本中"
     df = _get_new_type_data()
-    console.write_head(cons.CLASSIFY_HOT)
     for row in df.values:
         try:
             if _check_refresh(f, row[0]) is False:
-                console.write_pass()
                 continue
             _add_data(f, row[0], row[1])
         except Exception as er:
-            print(row[0])
             print(str(er))
             break
-    console.write_tail(cons.CLASSIFY_HOT)
     return
 
 
 def _add_data(f, tag, name):
-    row_df = get_detail(tag, name, retry_count=1, pause=1)
-    console.write_create()
+    row_df = get_detail(tag, name, retry_count=1, pause=cons.REQUEST_BLANK)
     if row_df is not None:
         if f.get(tag) is not None:
             del f[tag]
@@ -78,6 +65,7 @@ def _add_data(f, tag, name):
         f.create_dataset(tag, (len(data), 1), data=data)
         f[tag].attrs[cons.CLASSIFY_NAME_ATTR] = name
         f[tag].attrs[cons.CLASSIFY_REFRESH_ATTR] = datetime.now().strftime('%Y-%m-%d')
+        count.inc_by_index("add")
 
 
 def _check_refresh(f, tag):
@@ -87,6 +75,7 @@ def _check_refresh(f, tag):
         last_datetime = datetime.strptime(last_datetime_str, '%Y-%m-%d')
         diff = d - last_datetime
         if diff.days < cons.CLASSIFY_REFRESH_DAYS_BLANK:
+            count.inc_by_index("pass")
             return False
     return True
 
@@ -127,7 +116,7 @@ def _get_type_data(url):
         print(str(er))
 
 
-def get_detail(tag, name, retry_count=3, pause=1):
+def get_detail(tag, name, retry_count=3, pause=cons.REQUEST_BLANK):
     url = 'http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?page=%s&num=1000&sort=symbol&asc=1&node=%s&symbol=&_s_r_a=page'
     dfc = pd.DataFrame()
     p = 0

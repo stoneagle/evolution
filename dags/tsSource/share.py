@@ -6,20 +6,21 @@ import time
 
 
 def _add_data(code, ktype, f, end_date):
-    df = ts.get_hist_data(code, ktype=ktype, pause=1, end=end_date)
+    df = ts.get_hist_data(code, ktype=ktype, pause=cons.REQUEST_BLANK, end=end_date)
     ret = False
     if df is not None and df.empty is not True:
         df = df[cons.SHARE_COLS]
         df = df.reset_index().sort_values(by=[cons.SHARE_DATE_INDEX])
         tool.create_df_dataset(f, ktype, df)
-        count.inc_by_index(ktype)
         ret = True
-        # f[ktype] = df_array
+        count.inc_by_index(ktype)
+    else:
+        count.inc_by_index("empty")
     return ret
 
 
 def _append_data(code, ktype, f, start_date, end_date):
-    df = ts.get_hist_data(code, ktype=ktype, pause=1, end=end_date, start=start_date)
+    df = ts.get_hist_data(code, ktype=ktype, pause=cons.REQUEST_BLANK, end=end_date, start=start_date)
     ret = False
     if df is not None and df.empty is not True:
         df = df[cons.SHARE_COLS]
@@ -32,8 +33,8 @@ def _append_data(code, ktype, f, start_date, end_date):
 
 def get_share_data(code, f):
     # 获取不同周期的数据
-    for ktype in ['M', 'W', 'D', '30', '5']:
-        time.sleep(1)
+    for ktype in ["M", "W", "D", "30", "5"]:
+        time.sleep(cons.REQUEST_BLANK)
         try:
             if f.get(ktype) is None:
                 # 如果股票不存在，则获取17年至今数据(M取上个月月底，W取上周日)
@@ -53,12 +54,12 @@ def get_share_data(code, f):
                     end_date = ttime.get_end_date(code, ktype)
                     # 如果开始日期大于等于结束日期，则不需要进行处理
                     if start_date >= end_date:
+                        count.inc_by_index("pass")
                         continue
                     else:
                         ret = _append_data(code, ktype, f, start_date, end_date)
-            # TODO 将异常结果落地
             if ret is not True:
-                error.add_row([code, ktype])
+                error.add_row([ktype, code])
         except Exception as er:
             print(str(er))
             continue

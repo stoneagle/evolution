@@ -24,7 +24,7 @@ def write_append():
 
 
 def write_number(index, num):
-    sys.stdout.write("[" + index + " : " + num + "]\r\n")
+    sys.stdout.write("[" + index + " : " + num + "]")
     sys.stdout.flush()
 
 

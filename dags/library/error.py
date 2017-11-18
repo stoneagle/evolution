@@ -1,24 +1,61 @@
 from library import conf, tool
+import random
 import pandas as pd
 import h5py
 
 
-batch = list()
+batch_dict = dict()
+# TODO 检查index是否存在
+index = ''
 
 
-def write_df_batch(g_name, d_name, data_frame):
+def set_index(current_index):
+    global index
+    index = current_index
+    return
+
+
+def write_batch():
+    global index
+    if index in batch_dict and batch_dict[index].empty is not True:
+        f = h5py.File(conf.HDF5_FILE_ERROR)
+        if f.get(index) is None:
+            tool.create_df_dataset(f, index, batch_dict[index])
+        else:
+            tool.append_df_dataset(f, index, batch_dict[index])
+        batch_dict[index].drop(batch_dict[index].index, inplace=True)
+    return
+
+
+def delete_batch(d_name):
     f = h5py.File(conf.HDF5_FILE_ERROR)
-    group_path = '/' + g_name
-    if f.get(group_path) is None:
-        f.create_group(group_path)
-    group_f = f[group_path]
+    if f.get(d_name) is not None:
+        del f[d_name]
+    return
 
-    if group_f.get(d_name) is None:
-        tool.create_df_dataset(group_f, d_name, data_frame.reset_index())
+
+def init_batch(columns):
+    global index
+    if index not in batch_dict:
+        batch_dict[index] = pd.DataFrame([], columns=columns)
+    return
+
+
+def add_row(list_row):
+    global index
+    default = ['A', 'B', 'C', 'D', 'E', 'F', 'G']
+    if index not in batch_dict:
+        batch_dict[index] = pd.DataFrame([list_row], columns=random.sample(default, len(list_row)))
     else:
-        tool.append_df_dataset(group_f, d_name, data_frame.reset_index())
+        df = pd.DataFrame([list_row], columns=batch_dict[index].columns)
+        batch_dict[index] = batch_dict[index].append(df)
     return
 
 
-def add_row(row):
-    return
+def get_batch():
+    global index
+    if index not in batch_dict:
+        ret = pd.DataFrame([], columns=['A'])
+    else:
+        ret = batch_dict[index]
+    return ret
