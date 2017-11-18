@@ -1,7 +1,7 @@
 import tushare as ts
 import time
 from tsSource import cons
-from library import tool, count
+from library import tool, count, conf
 from datetime import datetime, timedelta
 
 
@@ -36,4 +36,21 @@ def arrange_detail():
 
 
 def get_achievement():
+    # 获取个股的财报
+    return
+
+
+def get_quit(f):
+    # 获取终止上市和暂定上市的股票列表
+    if f.get(conf.HDF5_BASIC_QUIT_TERMINATE) is not None:
+        del f[conf.HDF5_BASIC_QUIT_TERMINATE]
+    df = ts.get_terminated()
+    df = df.drop("name", axis=1)
+    tool.create_df_dataset(f, conf.HDF5_BASIC_QUIT_TERMINATE, df)
+
+    if f.get(conf.HDF5_BASIC_QUIT_SUSPEND) is not None:
+        del f[conf.HDF5_BASIC_QUIT_SUSPEND]
+    df = ts.get_suspended()
+    df = df.drop("name", axis=1)
+    tool.create_df_dataset(f, conf.HDF5_BASIC_QUIT_SUSPEND, df)
     return
