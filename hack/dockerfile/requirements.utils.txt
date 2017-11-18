@@ -1,4 +1,7 @@
 bs4
+requests
+pandas
+lxml
 html5lib
 xlrd
 tables
