@@ -1,32 +1,50 @@
 import tushare as ts
 import time
 from tsSource import cons
-from library import tool, count, conf
+from library import tool, count, conf, error
 from datetime import datetime, timedelta
 
 
+# 闭市
+GET_DETAIL_CLOSE = "close"
+# 获取异常
+GET_DETAIL_OTHER = "other"
+
+
 def get_detail(f):
-    # 按周间隔获取
-    start_date = datetime.strptime("2016-08-12", "%Y-%m-%d")
+    # 按日间隔获取
+    start_date = datetime.strptime("2016-08-09", "%Y-%m-%d")
+    # 获取历史错误数据
+    history = error.get_file()
+    close_history = list()
+    if history is not None:
+        history["type"] = history["type"].str.decode("utf-8")
+        history["date"] = history["date"].str.decode("utf-8")
+        close_history = history[history["type"] == "close"]["date"].values
+
     while start_date <= datetime.now():
         try:
-            time.sleep(cons.REQUEST_BLANK)
             start_date_str = datetime.strftime(start_date, "%Y-%m-%d")
-            start_date = start_date + timedelta(days=7)
-            if f.get(start_date_str) is not None:
-                count.inc_by_index("pass")
-                continue
-            df = ts.get_stock_basics(start_date_str)
-            if df is not None and df.empty is not True:
-                df = df.drop("name", axis=1)
-                df = df.drop("area", axis=1)
-                df = df.drop("industry", axis=1)
-                tool.create_df_dataset(f, start_date_str, df.reset_index())
-                count.inc_by_index("get")
+            # 如果是周六日，已获取，或者闭盘的日子则跳过
+            if start_date.weekday() < 5 and f.get(start_date_str) is None and start_date not in close_history:
+                df = ts.get_stock_basics(start_date_str)
+                time.sleep(cons.REQUEST_BLANK)
+                if df is not None and df.empty is not True:
+                    df = df.drop("name", axis=1)
+                    df = df.drop("area", axis=1)
+                    df = df.drop("industry", axis=1)
+                    tool.create_df_dataset(f, start_date_str, df.reset_index())
+                    count.inc_by_index(conf.HDF5_COUNT_GET)
+            else:
+                count.inc_by_index(conf.HDF5_COUNT_PASS)
         except Exception as er:
-            # TODO 如果无法获取数据，则后退一天，两次后未获取则忽略
-            print(str(er))
-            continue
+            time.sleep(cons.REQUEST_BLANK)
+            if str(er) != "HTTP Error 404: Not Found":
+                error.add_row([GET_DETAIL_OTHER, start_date_str])
+                print(str(er))
+            else:
+                error.add_row([GET_DETAIL_CLOSE, start_date_str])
+        start_date = start_date + timedelta(days=1)
     return
 
 

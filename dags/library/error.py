@@ -27,6 +27,18 @@ def write_batch():
     return
 
 
+def merge_batch():
+    global index
+    if index in batch_dict and batch_dict[index].empty is not True:
+        f = h5py.File(conf.HDF5_FILE_ERROR)
+        if f.get(index) is None:
+            tool.create_df_dataset(f, index, batch_dict[index])
+        else:
+            tool.merge_df_dataset(f, index, batch_dict[index])
+        batch_dict[index].drop(batch_dict[index].index, inplace=True)
+    return
+
+
 def delete_batch(d_name):
     f = h5py.File(conf.HDF5_FILE_ERROR)
     if f.get(d_name) is not None:
@@ -34,11 +46,22 @@ def delete_batch(d_name):
     return
 
 
-def init_batch(columns):
+def init_batch(current_index):
+    set_index(current_index)
     global index
     if index not in batch_dict:
+        columns = conf.HDF5_ERROR_COLUMN_MAP.get(index, ["error"])
         batch_dict[index] = pd.DataFrame([], columns=columns)
     return
+
+
+def get_batch():
+    global index
+    if index not in batch_dict:
+        ret = pd.DataFrame([], columns=['A'])
+    else:
+        ret = batch_dict[index]
+    return ret
 
 
 def add_row(list_row):
@@ -52,10 +75,12 @@ def add_row(list_row):
     return
 
 
-def get_batch():
+def get_file():
     global index
-    if index not in batch_dict:
-        ret = pd.DataFrame([], columns=['A'])
+    f = h5py.File(conf.HDF5_FILE_ERROR)
+    if f.get(index) is not None:
+        columns = conf.HDF5_ERROR_COLUMN_MAP.get(index, ["error"])
+        ret = pd.DataFrame(f[index][:], columns=columns)
     else:
-        ret = batch_dict[index]
+        ret = None
     return ret

@@ -7,6 +7,7 @@ import time
 
 def _add_data(code, ktype, f, end_date):
     df = ts.get_hist_data(code, ktype=ktype, pause=cons.REQUEST_BLANK, end=end_date)
+    time.sleep(cons.REQUEST_BLANK)
     ret = False
     if df is not None and df.empty is not True:
         df = df[cons.SHARE_COLS]
@@ -21,6 +22,7 @@ def _add_data(code, ktype, f, end_date):
 
 def _append_data(code, ktype, f, start_date, end_date):
     df = ts.get_hist_data(code, ktype=ktype, pause=cons.REQUEST_BLANK, end=end_date, start=start_date)
+    time.sleep(cons.REQUEST_BLANK)
     ret = False
     if df is not None and df.empty is not True:
         df = df[cons.SHARE_COLS]
@@ -28,13 +30,14 @@ def _append_data(code, ktype, f, start_date, end_date):
         tool.append_df_dataset(f, ktype, df)
         count.inc_by_index(ktype)
         ret = True
+    else:
+        count.inc_by_index("empty")
     return ret
 
 
 def get_share_data(code, f):
     # 获取不同周期的数据
     for ktype in ["M", "W", "D", "30", "5"]:
-        time.sleep(cons.REQUEST_BLANK)
         try:
             if f.get(ktype) is None:
                 # 如果股票不存在，则获取17年至今数据(M取上个月月底，W取上周日)
@@ -61,6 +64,6 @@ def get_share_data(code, f):
             if ret is not True:
                 error.add_row([ktype, code])
         except Exception as er:
+            time.sleep(cons.REQUEST_BLANK)
             print(str(er))
-            continue
     return

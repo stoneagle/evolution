@@ -1,5 +1,4 @@
 # from __future__ import print_function
-# import airflow
 # from airflow.operators.python_operator import PythonOperator
 # from airflow.models import DAG
 # from datetime import timedelta
@@ -60,8 +59,7 @@ def get_share():
     f_classify = h5py.File(conf.HDF5_FILE_CLASSIFY, 'a')
     f = h5py.File(conf.HDF5_FILE_SHARE, 'a')
     # 初始化error记录
-    error.set_index(conf.HDF5_ERROR_SHARE_GET)
-    error.init_batch(['ktype', 'code'])
+    error.init_batch(conf.HDF5_ERROR_SHARE_GET)
     # 获取对应类别
     group_list = f_classify[conf.HDF5_CLASSIFY_INDUSTRY].keys()
     for classify_name in group_list:
@@ -88,23 +86,56 @@ def get_basic():
     """
     获取基本面数据
     """
+    # 初始化文件
     f = h5py.File(conf.HDF5_FILE_BASIC, 'a')
+    # 初始化error记录
+    error.init_batch(conf.HDF5_ERROR_DETAIL_GET)
+    # 初始化打点记录
+    console.write_head(conf.HDF5_BASIC_DETAIL)
     path = '/' + conf.HDF5_BASIC_DETAIL
     if f.get(path) is None:
         f.create_group(path)
     basic.get_detail(f[path])
+
+    # 记录错误内容
+    error.merge_batch()
+    # 展示打点结果
     count.show_result()
+    console.write_tail(conf.HDF5_BASIC_DETAIL)
     f.close()
     return
 
 
-def get_suspended():
+def get_quit():
     """
-    获取退市列表
+    获取退市、终止上市列表
     """
+    f = h5py.File(conf.HDF5_FILE_BASIC, 'a')
+    console.write_head(conf.HDF5_BASIC_QUIT)
+    path = '/' + conf.HDF5_BASIC_QUIT
+    if f.get(path) is None:
+        f.create_group(path)
+    basic.get_quit(f[path])
+    console.write_tail(conf.HDF5_BASIC_QUIT)
+    f.close()
+    return
 
 
 get_basic()
+
+
+def idea():
+    """
+    数据获取:
+        指数
+    数据清洗:
+        处理退市、已过期的股票，避免二次获取
+    量化策略结果:
+        概念均价
+        股票股东人数变化
+    """
+
+
 # airflow相关执行
 
 # # 先获取类别

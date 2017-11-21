@@ -8,6 +8,14 @@ HDF5_FILE_BASIC = HDF5_FILE_ROOT + '/basic.h5'
 HDF5_FILE_ERROR = HDF5_FILE_ROOT + '/error.h5'
 
 HDF5_ERROR_SHARE_GET = 'share_get'
+HDF5_ERROR_DETAIL_GET = 'detail_get'
+HDF5_ERROR_COLUMN_MAP = {
+    HDF5_ERROR_SHARE_GET: ['ktype', 'code'],
+    HDF5_ERROR_DETAIL_GET: ['type', 'date'],
+}
+
+HDF5_COUNT_GET = 'get'
+HDF5_COUNT_PASS = 'pass'
 
 HDF5_CLASSIFY_INDUSTRY = 'industry'
 HDF5_CLASSIFY_CONCEPT = 'concept'
