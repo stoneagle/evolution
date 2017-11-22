@@ -12,22 +12,28 @@ services:
     networks:
       - default
   webserver:
+    environment:
+      runmode: "prod"
     image: puckel/docker-airflow:1.8.2-assets
     container_name: airflow-local-server-${DEV_USER}
     restart: always
+    # user: "${DEV_UID}"
     depends_on:
       - postgres
     environment:
       - LOAD_EX=n
       - EXECUTOR=Local
     volumes:
+      - ./script/bash.sh:/bash.sh
       - ./config/airflow.cfg:/root/airflow/airflow.cfg
       - ../dags:/tmp/airflow/dags
+      - /etc/group:/etc/group
       - /home/wuzhongyang/database/hdf5:/tmp/hdf5
       # - ./requirements.txt:/requirements.txt
     ports:
       - "${DEV_PORT}:8080"
     command: "/entrypoint.sh webserver"
+    # command: "/bash.sh"
     networks:
       - default
 networks:
