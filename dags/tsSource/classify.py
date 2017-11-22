@@ -3,7 +3,7 @@ import re
 import json
 import time
 from tsSource import cons
-from library import count
+from library import count, console
 from datetime import datetime
 from pandas.util.testing import _network_error_classes
 try:
@@ -120,7 +120,6 @@ def get_detail(tag, name, retry_count=3, pause=cons.REQUEST_BLANK):
     url = 'http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?page=%s&num=1000&sort=symbol&asc=1&node=%s&symbol=&_s_r_a=page'
     dfc = pd.DataFrame()
     p = 0
-    num_limit = 100
     while(True):
         p = p + 1
         for _ in range(retry_count):
@@ -142,5 +141,5 @@ def get_detail(tag, name, retry_count=3, pause=cons.REQUEST_BLANK):
         df = pd.DataFrame(pd.read_json(js, dtype={'code': object}), columns=cons.THE_FIELDS)
         df.index.name = name
         dfc = pd.concat([dfc, df])
-        if df.shape[0] < num_limit:
-            return dfc
+        console.write_exec()
+        return dfc

@@ -9,9 +9,9 @@ def get_classify():
     """
     f = h5py.File(conf.HDF5_FILE_CLASSIFY, 'a')
     classify_list = [
-        conf.HDF5_CLASSIFY_HOT,
         conf.HDF5_CLASSIFY_CONCEPT,
-        conf.HDF5_CLASSIFY_INDUSTRY
+        conf.HDF5_CLASSIFY_INDUSTRY,
+        conf.HDF5_CLASSIFY_HOT,
     ]
     for ctype in classify_list:
         console.write_head(ctype)
@@ -38,30 +38,49 @@ def get_share():
     """
     根据类别获取share数据
     """
-    # 初始化相关文件
-    f_classify = h5py.File(conf.HDF5_CLASSIFY_HOT, 'a')
+    classify_list = [
+        # conf.HDF5_CLASSIFY_CONCEPT,
+        # conf.HDF5_CLASSIFY_INDUSTRY,
+        conf.HDF5_CLASSIFY_HOT,
+    ]
     f = h5py.File(conf.HDF5_FILE_SHARE, 'a')
-    # 初始化error记录
-    error.init_batch(conf.HDF5_ERROR_SHARE_GET)
-    # 获取对应类别
-    group_list = f_classify[conf.HDF5_CLASSIFY_INDUSTRY].keys()
-    for classify_name in group_list:
-        console.write_head(classify_name)
-        for row in f_classify[conf.HDF5_CLASSIFY_INDUSTRY + '/' + classify_name]:
-            code = row[0].astype(str)
-            # 按编码前3位分组，如果group不存在，则创建新分组
-            code_prefix = code[0:3]
-            code_group_path = '/' + code_prefix + '/' + code
-            if f.get(code_group_path) is None:
-                f.create_group(code_group_path)
-            share.get_share_data(code, f[code_group_path])
-        # 记录错误内容
-        error.write_batch()
-        # 输出获取情况
-        count.show_result()
-        console.write_tail(classify_name)
-    f.close()
+    f_classify = h5py.File(conf.HDF5_FILE_CLASSIFY, 'a')
+    for ctype in classify_list:
+        # 初始化相关文件
+        # 初始化error记录
+        error.init_batch(conf.HDF5_ERROR_SHARE_GET)
+
+        # TODO, 获取错误列表
+        # history = error.get_file()
+        # error_history = list()
+        # if history is not None:
+        #     history["ktype"] = history["ktype"].str.decode("utf-8")
+        #     history["code"] = history["code"].str.decode("utf-8")
+        #     error_history = history.values
+
+        # 获取对应类别
+        group_list = f_classify[ctype].keys()
+        for classify_name in group_list:
+            console.write_head(classify_name)
+            for row in f_classify[ctype + '/' + classify_name]:
+                code = row[0].astype(str)
+                # 按编码前3位分组，如果group不存在，则创建新分组
+                code_prefix = code[0:3]
+                code_group_path = '/' + code_prefix + '/' + code
+                if f.get(code_group_path) is None:
+                    f.create_group(code_group_path)
+
+                # 忽略停牌、退市、无法获取的情况
+                # 获取不同周期的数据
+                for ktype in ["M", "W", "D", "30", "5"]:
+                    share.get_share_data(code, f[code_group_path], ktype)
+            # 记录错误内容
+            error.write_batch()
+            # 输出获取情况
+            count.show_result()
+            console.write_tail(classify_name)
     f_classify.close()
+    f.close()
     return
 
 

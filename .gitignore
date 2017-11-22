@@ -1,2 +1,2 @@
-*/__pycache__
+dags/*/__pycache__/
 hack/.env

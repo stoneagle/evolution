@@ -13,6 +13,7 @@ def inc_by_index(index):
 
 def show_result():
     if len(count_dict) > 0:
+        console.write_blank()
         for index in count_dict:
             console.write_number(index, str(count_dict[index]))
     reset()
