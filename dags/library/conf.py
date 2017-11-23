@@ -7,8 +7,7 @@ RUN_MODE = os.environ.get("runmode")
 if RUN_MODE == "prod":
     HDF5_FILE_ROOT = '/tmp/hdf5'
 else:
-    HDF5_FILE_ROOT = '/tmp/hdf5'
-    # HDF5_FILE_ROOT = '/home/wuzhongyang/database/hdf5'
+    HDF5_FILE_ROOT = '/home/wuzhongyang/database/hdf5'
 
 HDF5_FILE_CLASSIFY = HDF5_FILE_ROOT + '/classify.h5'
 HDF5_FILE_SHARE = HDF5_FILE_ROOT + '/share.h5'
@@ -29,6 +28,7 @@ HDF5_CLASSIFY_INDUSTRY = 'industry'
 HDF5_CLASSIFY_CONCEPT = 'concept'
 HDF5_CLASSIFY_HOT = 'hot'
 HDF5_BASIC_DETAIL = 'detail'
+HDF5_BASIC_ST = 'st'
 HDF5_BASIC_QUIT = 'quit'
 HDF5_BASIC_QUIT_SUSPEND = 'suspend'
 HDF5_BASIC_QUIT_TERMINATE = 'terminate'

@@ -49,27 +49,35 @@ def get_detail(f):
     return
 
 
-def arrange_detail():
-    # 按个股整理至share文件下
-    return
-
-
 def get_achievement():
     # 获取个股的财报
     return
 
 
 def get_quit(f):
-    # 获取终止上市和暂定上市的股票列表
+    # TODO 需要删除之前股票的标签
+
+    # 获取终止上市的股票列表
     if f.get(conf.HDF5_BASIC_QUIT_TERMINATE) is not None:
         del f[conf.HDF5_BASIC_QUIT_TERMINATE]
     df = ts.get_terminated()
     df = df.drop("name", axis=1)
     tool.create_df_dataset(f, conf.HDF5_BASIC_QUIT_TERMINATE, df)
 
+    # 获取暂定上市的股票列表
     if f.get(conf.HDF5_BASIC_QUIT_SUSPEND) is not None:
         del f[conf.HDF5_BASIC_QUIT_SUSPEND]
     df = ts.get_suspended()
     df = df.drop("name", axis=1)
     tool.create_df_dataset(f, conf.HDF5_BASIC_QUIT_SUSPEND, df)
+    return
+
+
+def get_st(f):
+    # 获取风险警示板的股票列表
+    if f.get(conf.HDF5_BASIC_ST) is not None:
+        del f[conf.HDF5_BASIC_ST]
+    df = ts.get_st_classified()
+    df = df.drop("name", axis=1)
+    tool.create_df_dataset(f, conf.HDF5_BASIC_ST, df)
     return
