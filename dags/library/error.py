@@ -80,7 +80,7 @@ def get_file():
     f = h5py.File(conf.HDF5_FILE_ERROR)
     if f.get(index) is not None:
         columns = conf.HDF5_ERROR_COLUMN_MAP.get(index, ["error"])
-        ret = pd.DataFrame(f[index][:], columns=columns)
+        ret = tool.df_from_dataset(f, index, columns)
     else:
         ret = None
     return ret

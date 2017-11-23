@@ -55,8 +55,6 @@ def get_achievement():
 
 
 def get_quit(f):
-    # TODO 需要删除之前股票的标签
-
     # 获取终止上市的股票列表
     if f.get(conf.HDF5_BASIC_QUIT_TERMINATE) is not None:
         del f[conf.HDF5_BASIC_QUIT_TERMINATE]

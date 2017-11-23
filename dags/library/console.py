@@ -1,14 +1,28 @@
 import sys
 
 
-def write_tail(ctype):
-    write_msg = "Finish Getting data[" + ctype + "]\r\n"
+head_action = ""
+head_resource = ""
+head_detail = ""
+
+
+def write_tail():
+    global head_action
+    global head_resource
+    global head_detail
+    write_msg = "Finish " + head_action + " " + head_resource + "[" + head_detail + "]\r\n"
     sys.stdout.write(write_msg)
     sys.stdout.flush()
 
 
-def write_head(ctype):
-    write_msg = "Getting data[" + ctype + "]:\r\n"
+def write_head(action, resource, detail):
+    global head_action
+    global head_resource
+    global head_detail
+    head_action = action
+    head_resource = resource
+    head_detail = detail
+    write_msg = "Execing " + head_action + " " + head_resource + "[" + head_detail + "]\r\n"
     sys.stdout.write(write_msg)
     sys.stdout.flush()
 
