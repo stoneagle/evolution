@@ -1,6 +1,5 @@
 import tushare as ts
 import time
-from tsSource import cons
 from library import tool, count, conf, error, console
 from datetime import datetime, timedelta
 
@@ -28,7 +27,7 @@ def get_detail(f):
             # 如果是周六日，已获取，或者闭盘的日子则跳过
             if start_date.weekday() < 5 and start_date_str not in close_history and f.get(start_date_str) is None:
                 df = ts.get_stock_basics(start_date_str)
-                time.sleep(cons.REQUEST_BLANK)
+                time.sleep(conf.REQUEST_BLANK)
                 if df is not None and df.empty is not True:
                     df = df.drop("name", axis=1)
                     df = df.drop("area", axis=1)
@@ -39,7 +38,7 @@ def get_detail(f):
             else:
                 count.inc_by_index(conf.HDF5_COUNT_PASS)
         except Exception as er:
-            time.sleep(cons.REQUEST_BLANK)
+            time.sleep(conf.REQUEST_BLANK)
             if str(er) != "HTTP Error 404: Not Found":
                 error.add_row([GET_DETAIL_OTHER, start_date_str])
                 print(str(er))

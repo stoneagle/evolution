@@ -58,4 +58,8 @@ def operate_st(action_type):
 
 def arrange_classify_mean():
     # 整理分类均线
+    # 获取classify列表
+    # 按照列表顺序，获取code的各周线数据
+    # 按日期顺序，逐一添加至df中，并统计该日期的个数
+    # 总数除以数量，得到平均值
     return

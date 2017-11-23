@@ -3,6 +3,9 @@ import os
 
 TZ = timezone('Asia/Shanghai')
 
+# 请求间隔
+REQUEST_BLANK = 1
+
 RUN_MODE = os.environ.get("runmode")
 if RUN_MODE == "prod":
     HDF5_FILE_ROOT = '/tmp/hdf5'
@@ -27,6 +30,11 @@ HDF5_COUNT_PASS = 'pass'
 HDF5_CLASSIFY_INDUSTRY = 'industry'
 HDF5_CLASSIFY_CONCEPT = 'concept'
 HDF5_CLASSIFY_HOT = 'hot'
+
+HDF5_CLASSIFY_REFRESH_DAYS_BLANK = 7
+HDF5_CLASSIFY_NAME_ATTR = 'name'
+HDF5_CLASSIFY_REFRESH_ATTR = 'datetime'
+
 HDF5_CLASSIFY_DS_CODE = 'codelist'
 HDF5_CLASSIFY_DS_DETAIL = 'detail'
 HDF5_BASIC_DETAIL = 'detail'

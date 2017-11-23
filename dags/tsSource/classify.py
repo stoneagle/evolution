@@ -2,14 +2,16 @@ import pandas as pd
 import re
 import json
 import time
-from tsSource import cons
-from library import count, console
+from library import count, console, conf
 from datetime import datetime
 from pandas.util.testing import _network_error_classes
 try:
     from urllib.request import urlopen, Request
 except ImportError:
     from urllib2 import urlopen, Request
+
+THE_FIELDS = ['code', 'symbol', 'name', 'changepercent', 'trade', 'open', 'high', 'low', 'settlement', 'volume', 'turnoverratio']
+CLASSIFY_COLS = ['code']
 
 
 def get_industry_classified(f):
@@ -57,25 +59,39 @@ def get_hot_classified(f):
 
 
 def _add_data(f, tag, name):
-    row_df = get_detail(tag, name, retry_count=1, pause=cons.REQUEST_BLANK)
+    row_df = get_detail(tag, name, retry_count=1, pause=conf.REQUEST_BLANK)
     if row_df is not None:
-        if f.get(tag) is not None:
-            del f[tag]
+        # 判断该类别的组是否存在
+        cpath = './' + tag
+        if f.get(cpath) is None:
+            f.create_group(cpath)
+        f_c = f[cpath]
+
+        # 判断该类别的code list内容是否存在
+        if f_c.get(conf.HDF5_CLASSIFY_DS_CODE) is not None:
+            del f_c[conf.HDF5_CLASSIFY_DS_CODE]
+
+        # 获取code list并储存
         data = row_df['code'].values.astype('S').tolist()
-        f.create_dataset(tag, (len(data), 1), data=data)
-        f[tag].attrs[cons.CLASSIFY_NAME_ATTR] = name
-        f[tag].attrs[cons.CLASSIFY_REFRESH_ATTR] = datetime.now().strftime('%Y-%m-%d')
-        count.inc_by_index("add")
+        f_c.create_dataset(conf.HDF5_CLASSIFY_DS_CODE, (len(data), 1), data=data)
+        f_c[conf.HDF5_CLASSIFY_DS_CODE].attrs[conf.HDF5_CLASSIFY_NAME_ATTR] = name
+        f_c[conf.HDF5_CLASSIFY_DS_CODE].attrs[conf.HDF5_CLASSIFY_REFRESH_ATTR] = datetime.now().strftime('%Y-%m-%d')
+        count.inc_by_index(conf.HDF5_COUNT_GET)
 
 
 def _check_refresh(f, tag):
     d = datetime.now()
-    if f.get(tag) is not None and f[tag].attrs.get(cons.CLASSIFY_REFRESH_ATTR) is not None:
-        last_datetime_str = f[tag].attrs[cons.CLASSIFY_REFRESH_ATTR]
+    cpath = './' + tag
+    if f.get(cpath) is None:
+        return True
+    f_c = f[cpath]
+
+    if f_c.get(conf.HDF5_CLASSIFY_DS_CODE) is not None and f_c[conf.HDF5_CLASSIFY_DS_CODE].attrs.get(conf.HDF5_CLASSIFY_REFRESH_ATTR) is not None:
+        last_datetime_str = f_c[conf.HDF5_CLASSIFY_DS_CODE].attrs[conf.HDF5_CLASSIFY_REFRESH_ATTR]
         last_datetime = datetime.strptime(last_datetime_str, '%Y-%m-%d')
         diff = d - last_datetime
-        if diff.days < cons.CLASSIFY_REFRESH_DAYS_BLANK:
-            count.inc_by_index("pass")
+        if diff.days < conf.HDF5_CLASSIFY_REFRESH_DAYS_BLANK:
+            count.inc_by_index(conf.HDF5_COUNT_PASS)
             return False
     return True
 
@@ -116,7 +132,7 @@ def _get_type_data(url):
         print(str(er))
 
 
-def get_detail(tag, name, retry_count=3, pause=cons.REQUEST_BLANK):
+def get_detail(tag, name, retry_count=3, pause=conf.REQUEST_BLANK):
     url = 'http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?page=%s&num=1000&sort=symbol&asc=1&node=%s&symbol=&_s_r_a=page'
     dfc = pd.DataFrame()
     p = 0
@@ -138,7 +154,7 @@ def get_detail(tag, name, retry_count=3, pause=cons.REQUEST_BLANK):
         text = text.replace('{symbol', '{"symbol"')
         jstr = json.dumps(text)
         js = json.loads(jstr)
-        df = pd.DataFrame(pd.read_json(js, dtype={'code': object}), columns=cons.THE_FIELDS)
+        df = pd.DataFrame(pd.read_json(js, dtype={'code': object}), columns=THE_FIELDS)
         df.index.name = name
         dfc = pd.concat([dfc, df])
         console.write_exec()

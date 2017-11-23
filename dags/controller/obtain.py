@@ -79,27 +79,30 @@ def get_all_share(gem_flag):
     根据类别获取所有share数据
     """
     classify_list = [
-        # conf.HDF5_CLASSIFY_CONCEPT,
-        # conf.HDF5_CLASSIFY_INDUSTRY,
+        conf.HDF5_CLASSIFY_CONCEPT,
+        conf.HDF5_CLASSIFY_INDUSTRY,
         conf.HDF5_CLASSIFY_HOT,
     ]
+    # 初始化相关文件
     f = h5py.File(conf.HDF5_FILE_SHARE, 'a')
     f_classify = h5py.File(conf.HDF5_FILE_CLASSIFY, 'a')
     for ctype in classify_list:
-        # 初始化相关文件
         # 初始化error记录
         error.init_batch(conf.HDF5_ERROR_SHARE_GET)
 
-        # 获取对应类别
-        group_list = f_classify[ctype].keys()
-        for classify_name in group_list:
+        # 获取概念下具体类别名称
+        for classify_name in f_classify[ctype]:
+            # 如果不存在code list，则跳过
+            if f_classify[ctype][classify_name].get(conf.HDF5_CLASSIFY_DS_CODE) is None:
+                continue
+
             console.write_head(
                 conf.HDF5_OPERATE_GET,
                 conf.HDF5_RESOURCE_TUSHARE,
                 classify_name
             )
             # 获取单个分类(code的list)下的share数据
-            _get_one_classify_share(f, f_classify[ctype + '/' + classify_name], gem_flag)
+            _get_one_classify_share(f, f_classify[ctype][classify_name][conf.HDF5_CLASSIFY_DS_CODE], gem_flag)
             # 记录错误内容
             error.write_batch()
             # 输出获取情况
