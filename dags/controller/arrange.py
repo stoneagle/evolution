@@ -2,13 +2,57 @@ import h5py
 from library import conf, console, tool
 
 
-def arrange_detail(gem_flag, start_date):
-    # 将basic的detail内容，按个股整理至share文件下
+def arrange_detail(start_date):
+    """
+    将basic的detail内容，按个股整理至share文件下
+    """
+    # 获取basic所有日期的detail，并遍历读取详细信息
+    f = h5py.File(conf.HDF5_FILE_BASIC, 'a')
+    f_share = h5py.File(conf.HDF5_FILE_SHARE, 'a')
+    console.write_head(
+        conf.HDF5_OPERATE_ARRANGE,
+        conf.HDF5_RESOURCE_TUSHARE,
+        conf.HDF5_BASIC_DETAIL
+    )
+    path = '/' + conf.HDF5_BASIC_DETAIL
+    if f.get(path) is None:
+        return
+
+    code_basic_dict = dict()
+    for date in f[path]:
+        if start_date is not None and date < start_date:
+            continue
+        df = tool.df_from_dataset(f[path], date, None)
+        df["code"] = df["code"].str.decode("utf-8")
+        df = df.set_index("code")
+        for code in df.index:
+            if code == "600035":
+                if code not in code_basic_dict:
+                    code_basic_dict[code] = tool.init_empty_df(df.columns)
+                code_basic_dict[code].loc[date] = df.loc[code, :]
+    for code, code_df in code_basic_dict.items():
+        code_df.index.name = conf.HDF5_SHARE_DATE_INDEX
+        code_df = code_df.reset_index().sort_values(by=[conf.HDF5_SHARE_DATE_INDEX])
+
+        code_prefix = code[0:3]
+        code_group_path = '/' + code_prefix + '/' + code
+        if f_share.get(code_group_path) is None:
+            continue
+
+        if start_date is None:
+            tool.delete_dataset(f_share[code_group_path], conf.HDF5_BASIC_DETAIL)
+        tool.merge_df_dataset(f_share[code_group_path], conf.HDF5_BASIC_DETAIL, code_df)
+    console.write_tail()
+    f_share.close()
+    f.close()
+    # 从最初时间开始，按照code聚合detail
     return
 
 
 def operate_quit(action_type):
-    # 将退市quit内容，转换成标签添加在对应code下
+    """
+    将退市quit内容，转换成标签添加在对应code下
+    """
     f = h5py.File(conf.HDF5_FILE_BASIC, 'a')
     console.write_head(
         action_type,
@@ -36,6 +80,9 @@ def operate_quit(action_type):
 
 
 def operate_st(action_type):
+    """
+    将st内容，转换成标签添加在对应code下
+    """
     f = h5py.File(conf.HDF5_FILE_BASIC, 'a')
     console.write_head(
         action_type,
@@ -57,6 +104,9 @@ def operate_st(action_type):
 
 
 def arrange_all_classify_detail(gem_flag, start_date):
+    """
+    遍历所有分类，聚合所有code获取分类均值
+    """
     f = h5py.File(conf.HDF5_FILE_SHARE, 'a')
     f_classify = h5py.File(conf.HDF5_FILE_CLASSIFY, 'a')
     classify_list = [
@@ -91,8 +141,11 @@ def arrange_all_classify_detail(gem_flag, start_date):
 
 
 def arrange_one_classify_detail(f, code_list, gem_flag, ktype, start_date):
+    """
+    根据单个分类，聚合所有code获取分类均值
+    """
     # 初始化一个全日期的空DataFrame，并初始化一列作为统计个数
-    init_df = tool.init_empty_df_with_tradetime(conf.HDF5_SHARE_COLUMN)
+    init_df = tool.init_empty_df(conf.HDF5_SHARE_COLUMN)
 
     # 按照列表顺序，获取code并逐一添加至初始化DF，并递增该日期的个数
     for row in code_list:

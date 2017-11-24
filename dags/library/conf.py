@@ -37,6 +37,7 @@ HDF5_CLASSIFY_REFRESH_ATTR = 'datetime'
 
 HDF5_CLASSIFY_DS_CODE = 'codelist'
 HDF5_CLASSIFY_DS_DETAIL = 'detail'
+
 HDF5_BASIC_DETAIL = 'detail'
 HDF5_BASIC_ST = 'st'
 HDF5_BASIC_QUIT = 'quit'

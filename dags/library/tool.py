@@ -95,6 +95,6 @@ def op_attr_by_codelist(operator, code_list, attr_name, attr_value):
     return
 
 
-def init_empty_df_with_tradetime(columns):
+def init_empty_df(columns):
     ret = pd.DataFrame(columns=columns)
     return ret
