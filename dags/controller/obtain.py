@@ -39,38 +39,28 @@ def get_classify():
     return
 
 
-def _get_one_classify_share(f, classify_list, gem_flag):
-    # TODO, 筛选错误数据
-    # history = error.get_file()
-    # error_history = list()
-    # if history is not None:
-    #     history["ktype"] = history["ktype"].str.decode("utf-8")
-    #     history["code"] = history["code"].str.decode("utf-8")
-    #     error_history = history.values
+def get_code_share(f, code, gem_flag):
+    # 按编码前3位分组，如果group不存在，则创建新分组
+    code_prefix = code[0:3]
 
-    for row in classify_list:
-        code = row[0].astype(str)
-        # 按编码前3位分组，如果group不存在，则创建新分组
-        code_prefix = code[0:3]
+    # 判断是否跳过创业板
+    if gem_flag is True and code_prefix == "300":
+        return
 
-        # 判断是否跳过创业板
-        if gem_flag is True and code_prefix == "300":
-            continue
+    code_group_path = '/' + code_prefix + '/' + code
+    if f.get(code_group_path) is None:
+        f.create_group(code_group_path)
+    else:
+        # 忽略停牌、退市、无法获取的情况
+        if f[code_group_path].attrs.get(conf.HDF5_BASIC_QUIT) is not None:
+            return
 
-        code_group_path = '/' + code_prefix + '/' + code
-        if f.get(code_group_path) is None:
-            f.create_group(code_group_path)
-        else:
-            # 忽略停牌、退市、无法获取的情况
-            if f[code_group_path].attrs.get(conf.HDF5_BASIC_QUIT) is not None:
-                continue
+        if f[code_group_path].attrs.get(conf.HDF5_BASIC_ST) is not None:
+            return
 
-            if f[code_group_path].attrs.get(conf.HDF5_BASIC_ST) is not None:
-                continue
-
-        # 获取不同周期的数据
-        for ktype in ["M", "W", "D", "30", "5"]:
-            share.get_share_data(code, f[code_group_path], ktype)
+    # 获取不同周期的数据
+    for ktype in ["M", "W", "D", "30", "5"]:
+        share.get_share_data(code, f[code_group_path], ktype)
     return
 
 
@@ -102,7 +92,16 @@ def get_all_share(gem_flag):
                 classify_name
             )
             # 获取单个分类(code的list)下的share数据
-            _get_one_classify_share(f, f_classify[ctype][classify_name][conf.HDF5_CLASSIFY_DS_CODE], gem_flag)
+            for row in f_classify[ctype][classify_name][conf.HDF5_CLASSIFY_DS_CODE]:
+                code = row[0].astype(str)
+                # TODO, 筛选错误数据
+                # history = error.get_file()
+                # error_history = list()
+                # if history is not None:
+                #     history["ktype"] = history["ktype"].str.decode("utf-8")
+                #     history["code"] = history["code"].str.decode("utf-8")
+                #     error_history = history.values
+                get_code_share(f, code, gem_flag)
             # 记录错误内容
             error.write_batch()
             # 输出获取情况

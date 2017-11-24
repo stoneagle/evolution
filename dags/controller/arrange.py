@@ -56,10 +56,50 @@ def operate_st(action_type):
     return
 
 
-def arrange_classify_mean():
-    # 整理分类均线
+def arrange_all_classify_detail(gem_flag):
+    f = h5py.File(conf.HDF5_FILE_SHARE, 'a')
+    f_classify = h5py.File(conf.HDF5_FILE_CLASSIFY, 'a')
+    classify_list = [
+        conf.HDF5_CLASSIFY_CONCEPT,
+        conf.HDF5_CLASSIFY_INDUSTRY,
+        conf.HDF5_CLASSIFY_HOT,
+    ]
     # 获取classify列表
-    # 按照列表顺序，获取code的各周线数据
-    # 按日期顺序，逐一添加至df中，并统计该日期的个数
+    for ctype in classify_list:
+        console.write_head(
+            conf.HDF5_OPERATE_ARRANGE,
+            conf.HDF5_RESOURCE_TUSHARE,
+            ctype
+        )
+        for classify_name in f_classify[ctype]:
+            if f_classify[ctype][classify_name].get(conf.HDF5_CLASSIFY_DS_CODE) is None:
+                continue
+            for row in f_classify[ctype][classify_name].get(conf.HDF5_CLASSIFY_DS_CODE):
+                code = row[0].astype(str)
+                arrange_code_detail(f, code, gem_flag)
+        console.write_tail()
+    f_classify.close()
+    f.close()
+    return
+
+
+def arrange_code_detail(f, code, gem_flag):
+    code_prefix = code[0:3]
+    # 判断是否跳过创业板
+    if gem_flag is True and code_prefix == "300":
+        return
+    code_group_path = '/' + code_prefix + '/' + code
+    if f.get(code_group_path) is None:
+        # TODO 为空时立刻获取数据
+        print(code)
+    else:
+        # 忽略停牌、退市、无法获取的情况
+        if f[code_group_path].attrs.get(conf.HDF5_BASIC_QUIT) is not None:
+            return
+
+        if f[code_group_path].attrs.get(conf.HDF5_BASIC_ST) is not None:
+            return
+    # 初始化一个全日期的空DataFrame，并初始化一列作为统计个数
+    # 按照各周线顺序，列表顺序，日期顺序，获取code并逐一添加至初始化DF，并递增该日期的个数
     # 总数除以数量，得到平均值
     return

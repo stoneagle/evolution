@@ -7,10 +7,10 @@ TZ = timezone('Asia/Shanghai')
 REQUEST_BLANK = 1
 
 RUN_MODE = os.environ.get("runmode")
-if RUN_MODE == "prod":
-    HDF5_FILE_ROOT = '/tmp/hdf5'
-else:
+if RUN_MODE == "dev":
     HDF5_FILE_ROOT = '/home/wuzhongyang/database/hdf5'
+else:
+    HDF5_FILE_ROOT = '/tmp/hdf5'
 
 HDF5_FILE_CLASSIFY = HDF5_FILE_ROOT + '/classify.h5'
 HDF5_FILE_SHARE = HDF5_FILE_ROOT + '/share.h5'
@@ -49,5 +49,6 @@ HDF5_RESOURCE_DATASET = "dataset"
 HDF5_RESOURCE_GROUP = "group"
 HDF5_RESOURCE_ATTR = "attr"
 HDF5_OPERATE_GET = "get"
+HDF5_OPERATE_ARRANGE = "arrange"
 HDF5_OPERATE_ADD = "add"
 HDF5_OPERATE_DEL = "del"
