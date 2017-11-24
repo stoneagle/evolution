@@ -14,16 +14,16 @@ dag = DAG(
     dag_id='TS-AShare',
     default_args=args,
     description='从tushare源获取A股数据',
-    schedule_interval=timedelta(days=1, hours=1)
+    schedule_interval=timedelta(days=1)
 )
 
 
 def get_all():
     obtain.get_classify()
     obtain.get_basic()
-    obtain.get_all_share(True)
     obtain.get_quit()
     obtain.get_st()
+    obtain.get_all_share(True)
     return
 
 

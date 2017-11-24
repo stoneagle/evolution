@@ -13,7 +13,7 @@ services:
       - default
   webserver:
     environment:
-      runmode: "prod"
+        - runmode=prod
     image: puckel/docker-airflow:1.8.2-assets
     container_name: airflow-local-server-${DEV_USER}
     restart: always
