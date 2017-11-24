@@ -59,7 +59,7 @@ def get_code_share(f, code, gem_flag):
             return
 
     # 获取不同周期的数据
-    for ktype in ["M", "W", "D", "30", "5"]:
+    for ktype in conf.HDF5_SHARE_KTYPE:
         share.get_share_data(code, f[code_group_path], ktype)
     return
 

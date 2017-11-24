@@ -63,6 +63,12 @@ def merge_df_dataset(f, dset_name, df):
     return
 
 
+def delete_dataset(f, dset_name):
+    if f.get(dset_name) is not None:
+        del f[dset_name]
+    return
+
+
 def df_from_dataset(f, dset_name, columns):
     if f.get(dset_name) is not None:
         if columns is None:
@@ -87,3 +93,8 @@ def op_attr_by_codelist(operator, code_list, attr_name, attr_value):
                     del f_share[code_group_path].attrs[attr_name]
     f_share.close()
     return
+
+
+def init_empty_df_with_tradetime(columns):
+    ret = pd.DataFrame(columns=columns)
+    return ret

@@ -3,7 +3,6 @@ from library import tradetime as ttime
 from library import tool, count, error, console, conf
 import time
 SHARE_COLS = ['open', 'high', 'close', 'low', 'volume', 'turnover']
-SHARE_DATE_INDEX = 'date'
 
 
 def _add_data(code, ktype, f, end_date):
@@ -11,7 +10,7 @@ def _add_data(code, ktype, f, end_date):
     time.sleep(conf.REQUEST_BLANK)
     if df is not None and df.empty is not True:
         df = df[SHARE_COLS]
-        df = df.reset_index().sort_values(by=[SHARE_DATE_INDEX])
+        df = df.reset_index().sort_values(by=[conf.HDF5_SHARE_DATE_INDEX])
         tool.create_df_dataset(f, ktype, df)
         console.write_exec()
         count.inc_by_index(ktype)
@@ -26,7 +25,7 @@ def _append_data(code, ktype, f, start_date, end_date):
     time.sleep(conf.REQUEST_BLANK)
     if df is not None and df.empty is not True:
         df = df[SHARE_COLS]
-        df = df.reset_index().sort_values(by=[SHARE_DATE_INDEX])
+        df = df.reset_index().sort_values(by=[conf.HDF5_SHARE_DATE_INDEX])
         tool.append_df_dataset(f, ktype, df)
         console.write_exec()
         count.inc_by_index(ktype)

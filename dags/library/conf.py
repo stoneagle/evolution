@@ -42,7 +42,9 @@ HDF5_BASIC_ST = 'st'
 HDF5_BASIC_QUIT = 'quit'
 HDF5_BASIC_QUIT_SUSPEND = 'suspend'
 HDF5_BASIC_QUIT_TERMINATE = 'terminate'
-
+HDF5_SHARE_KTYPE = ["M", "W", "D", "30", "5"]
+HDF5_SHARE_DATE_INDEX = "date"
+HDF5_SHARE_COLUMN = ["open", "high", "close", "low", "volume", "turnover"]
 
 HDF5_RESOURCE_TUSHARE = "tushare"
 HDF5_RESOURCE_DATASET = "dataset"
