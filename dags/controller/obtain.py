@@ -60,7 +60,28 @@ def get_code_share(f, code, gem_flag):
 
     # 获取不同周期的数据
     for ktype in conf.HDF5_SHARE_KTYPE:
-        share.get_share_data(code, f[code_group_path], ktype)
+        share.get_share_data(code, f[code_group_path], ktype, share.SHARE_TYPE)
+    return
+
+
+def get_index_share():
+    index_list = ["sh", "sz", "hs300", "sz50", "zxb", "cyb"]
+    # 初始化相关文件
+    f = h5py.File(conf.HDF5_FILE_INDEX, 'a')
+    for code in index_list:
+        console.write_head(
+            conf.HDF5_OPERATE_GET,
+            conf.HDF5_RESOURCE_TUSHARE,
+            code
+        )
+        code_group_path = '/' + code
+        if f.get(code_group_path) is None:
+            f.create_group(code_group_path)
+        # 获取不同周期的数据
+        for ktype in conf.HDF5_SHARE_KTYPE:
+            share.get_share_data(code, f[code_group_path], ktype, share.INDEX_TYPE)
+        console.write_tail()
+    f.close()
     return
 
 
