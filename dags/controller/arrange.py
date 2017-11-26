@@ -26,10 +26,9 @@ def arrange_detail(start_date):
         df["code"] = df["code"].str.decode("utf-8")
         df = df.set_index("code")
         for code in df.index:
-            if code == "600035":
-                if code not in code_basic_dict:
-                    code_basic_dict[code] = tool.init_empty_df(df.columns)
-                code_basic_dict[code].loc[date] = df.loc[code, :]
+            if code not in code_basic_dict:
+                code_basic_dict[code] = tool.init_empty_df(df.columns)
+            code_basic_dict[code].loc[date] = df.loc[code, :]
     for code, code_df in code_basic_dict.items():
         code_df.index.name = conf.HDF5_SHARE_DATE_INDEX
         code_df = code_df.reset_index().sort_values(by=[conf.HDF5_SHARE_DATE_INDEX])
