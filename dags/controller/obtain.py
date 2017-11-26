@@ -1,5 +1,5 @@
 import h5py
-from tsSource import classify, share, basic
+from tsSource import classify, share, basic, fundamental
 from library import conf, count, error, console
 from controller import arrange
 
@@ -189,4 +189,63 @@ def get_st():
 
     # 添加标签
     arrange.operate_st(conf.HDF5_OPERATE_ADD)
+    return
+
+
+def get_fundamental():
+    # 初始化文件
+    f = h5py.File(conf.HDF5_FILE_FUNDAMENTAL, 'a')
+    # 获取限售股解禁数据
+    console.write_head(
+        conf.HDF5_OPERATE_GET,
+        conf.HDF5_RESOURCE_TUSHARE,
+        conf.HDF5_FUNDAMENTAL_XSG
+    )
+    path = '/' + conf.HDF5_FUNDAMENTAL_XSG
+    if f.get(path) is None:
+        f.create_group(path)
+    fundamental.get_xsg(f[path])
+    count.show_result()
+    console.write_tail()
+
+    # 获取ipo数据
+    console.write_head(
+        conf.HDF5_OPERATE_GET,
+        conf.HDF5_RESOURCE_TUSHARE,
+        conf.HDF5_FUNDAMENTAL_IPO
+    )
+    path = '/' + conf.HDF5_FUNDAMENTAL_IPO
+    if f.get(path) is None:
+        f.create_group(path)
+    fundamental.get_ipo(f[path])
+    count.show_result()
+    console.write_tail()
+
+    # 获取沪市融资融券
+    console.write_head(
+        conf.HDF5_OPERATE_GET,
+        conf.HDF5_RESOURCE_TUSHARE,
+        conf.HDF5_FUNDAMENTAL_SH_MARGINS
+    )
+    path = '/' + conf.HDF5_FUNDAMENTAL_SH_MARGINS
+    if f.get(path) is None:
+        f.create_group(path)
+    fundamental.get_sh_margins(f[path])
+    count.show_result()
+    console.write_tail()
+
+    # 获取深市融资融券
+    console.write_head(
+        conf.HDF5_OPERATE_GET,
+        conf.HDF5_RESOURCE_TUSHARE,
+        conf.HDF5_FUNDAMENTAL_SZ_MARGINS
+    )
+    path = '/' + conf.HDF5_FUNDAMENTAL_SZ_MARGINS
+    if f.get(path) is None:
+        f.create_group(path)
+    fundamental.get_sz_margins(f[path])
+    count.show_result()
+    console.write_tail()
+
+    f.close()
     return
