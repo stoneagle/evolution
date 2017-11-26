@@ -14,4 +14,4 @@ rm-local:
 	cd hack && docker-compose -f docker-compose-local.yml -p "airflow-$(USER)" rm 
 
 build-img:
-	cd hack/dockerfile && docker build -f ./Dockerfile-assets -t puckel/docker-airflow:1.8.2-assets .
+	cd hack/dockerfile && docker build -f ./Dockerfile -t puckel/docker-airflow:1.8.2-assets-2 .
