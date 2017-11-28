@@ -7,3 +7,4 @@ xlrd
 tables
 h5py
 TA-Lib
+influxdb
