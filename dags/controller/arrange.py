@@ -121,8 +121,6 @@ def arrange_all_classify_detail(gem_flag, start_date):
                 conf.HDF5_RESOURCE_TUSHARE,
                 classify_name
             )
-            if classify_name != "chgn_700997":
-                continue
 
             if f_classify[ctype][classify_name].get(conf.HDF5_CLASSIFY_DS_CODE) is None:
                 continue
@@ -132,7 +130,8 @@ def arrange_all_classify_detail(gem_flag, start_date):
                 # 如果start_date为空，则重置该数据
                 if start_date is None:
                     tool.delete_dataset(f_classify[ctype][classify_name], conf.HDF5_CLASSIFY_DS_DETAIL)
-                tool.merge_df_dataset(f_classify[ctype][classify_name], conf.HDF5_CLASSIFY_DS_DETAIL, mean_df)
+                if mean_df is not None:
+                    tool.merge_df_dataset(f_classify[ctype][classify_name], conf.HDF5_CLASSIFY_DS_DETAIL, mean_df)
             console.write_tail()
     f_classify.close()
     f.close()
