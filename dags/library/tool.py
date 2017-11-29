@@ -98,3 +98,8 @@ def op_attr_by_codelist(operator, code_list, attr_name, attr_value):
 def init_empty_df(columns):
     ret = pd.DataFrame(columns=columns)
     return ret
+
+
+def init_df(data, columns):
+    ret = pd.DataFrame(data, columns=columns)
+    return ret

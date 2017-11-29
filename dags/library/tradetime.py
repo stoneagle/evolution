@@ -81,6 +81,16 @@ def get_start_date(tail_date_str, code, ktype):
     return start_date
 
 
+def get_week_of_date(date_str, ktype):
+    time_switcher = {
+        "M": "%Y-%m",
+        "D": "%Y-%m-%d",
+        "S": "%Y-%m-%d %H:%M:%S",
+    }
+    transfer_date = datetime.strptime(date_str, time_switcher.get(ktype, 'error'))
+    return transfer_date.strftime("%Y-%W")
+
+
 LAST_MONTH_LAST_DAY = get_last_day_of_last_month()
 LAST_WEEK_LAST_DAY = get_last_day_of_last_week()
 LAST_TRADE_DAY = get_last_of_trade_day()

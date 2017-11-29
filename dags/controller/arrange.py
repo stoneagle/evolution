@@ -1,5 +1,5 @@
 import h5py
-from library import conf, console, tool
+from library import conf, console, tool, tradetime
 
 
 def arrange_detail(start_date):
@@ -180,3 +180,118 @@ def arrange_one_classify_detail(f, code_list, gem_flag, ktype, start_date):
         init_df = init_df.ix[start_date:]
     init_df = init_df.reset_index().sort_values(by=[conf.HDF5_SHARE_DATE_INDEX])
     return init_df
+
+
+def arrange_xsg():
+    # 初始化文件
+    f = h5py.File(conf.HDF5_FILE_FUNDAMENTAL, 'a')
+    f_share = h5py.File(conf.HDF5_FILE_SHARE, 'a')
+    console.write_head(
+        conf.HDF5_OPERATE_ARRANGE,
+        conf.HDF5_RESOURCE_TUSHARE,
+        conf.HDF5_FUNDAMENTAL_XSG
+    )
+    path = '/' + conf.HDF5_FUNDAMENTAL_XSG
+    xsg_sum_dict = dict()
+    if f.get(path) is not None:
+        for month in f[path]:
+            df = tool.df_from_dataset(f[path], month, None)
+            df["code"] = df["code"].str.decode("utf-8")
+            df["count"] = df["count"].str.decode("utf-8")
+            df[conf.HDF5_SHARE_DATE_INDEX] = df[conf.HDF5_SHARE_DATE_INDEX].str.decode("utf-8")
+            for index, row in df.iterrows():
+                code = row["code"]
+                xsg_date_str = row[conf.HDF5_SHARE_DATE_INDEX]
+                code_prefix = code[0:3]
+                code_group_path = '/' + code_prefix + '/' + code
+                if f_share.get(code_group_path) is None:
+                    continue
+                # 获取限售股解禁前一天的价格
+                share_df = tool.df_from_dataset(f_share[code_group_path], "D", None)
+                share_df[conf.HDF5_SHARE_DATE_INDEX] = share_df[conf.HDF5_SHARE_DATE_INDEX].str.decode("utf-8")
+                share_df = share_df.set_index(conf.HDF5_SHARE_DATE_INDEX)
+                share_df = share_df[: xsg_date_str]
+                if len(share_df) == 0:
+                    continue
+                close = share_df.tail(1)["close"]
+                close.values * float(row["count"])
+                code_sum = close.values * float(row["count"])
+                week_date = tradetime.get_week_of_date(xsg_date_str, "D")
+                if week_date in xsg_sum_dict:
+                    xsg_sum_dict[week_date] += code_sum[0]
+                else:
+                    xsg_sum_dict[week_date] = code_sum[0]
+        sum_df = tool.init_df(list(xsg_sum_dict.items()), [conf.HDF5_SHARE_DATE_INDEX, "sum"])
+        if len(sum_df) > 0:
+            sum_df = sum_df.sort_values(by=[conf.HDF5_SHARE_DATE_INDEX])
+            tool.create_df_dataset(f, conf.HDF5_FUNDAMENTAL_XSG_DETAIL, sum_df)
+    console.write_tail()
+    f_share.close()
+    f.close()
+    return
+
+
+def arrange_ipo():
+    f = h5py.File(conf.HDF5_FILE_FUNDAMENTAL, 'a')
+    path = '/' + conf.HDF5_FUNDAMENTAL_IPO
+    console.write_head(
+        conf.HDF5_OPERATE_ARRANGE,
+        conf.HDF5_RESOURCE_TUSHARE,
+        conf.HDF5_FUNDAMENTAL_IPO
+    )
+    path = '/' + conf.HDF5_FUNDAMENTAL_IPO
+    ipo_sum_dict = dict()
+    if f.get(path) is not None:
+        df = tool.df_from_dataset(f[path], conf.HDF5_FUNDAMENTAL_IPO, None)
+        df["issue_date"] = df["issue_date"].str.decode("utf-8")
+        df["ipo_date"] = df["ipo_date"].str.decode("utf-8")
+        for index, row in df.iterrows():
+            week_date = tradetime.get_week_of_date(row["ipo_date"], "D")
+            if week_date in ipo_sum_dict:
+                ipo_sum_dict[week_date] += row["funds"]
+            else:
+                ipo_sum_dict[week_date] = row["funds"]
+        sum_df = tool.init_df(list(ipo_sum_dict.items()), [conf.HDF5_SHARE_DATE_INDEX, "sum"])
+        if len(sum_df) > 0:
+            sum_df = sum_df.sort_values(by=[conf.HDF5_SHARE_DATE_INDEX])
+            tool.create_df_dataset(f[path], conf.HDF5_FUNDAMENTAL_IPO_DETAIL, sum_df)
+    console.write_tail()
+    f.close()
+    return
+
+
+def arrange_margins(mtype):
+    if mtype == "sh":
+        mtype_index = conf.HDF5_FUNDAMENTAL_SH_MARGINS
+        mtype_index_detail = conf.HDF5_FUNDAMENTAL_SH_MARGINS_DETAIL
+    elif mtype == "sz":
+        mtype_index = conf.HDF5_FUNDAMENTAL_SZ_MARGINS
+        mtype_index_detail = conf.HDF5_FUNDAMENTAL_SZ_MARGINS_DETAIL
+    else:
+        print("mtype " + mtype + " error\r\n")
+        return
+
+    f = h5py.File(conf.HDF5_FILE_FUNDAMENTAL, 'a')
+    path = '/' + mtype_index
+    console.write_head(
+        conf.HDF5_OPERATE_ARRANGE,
+        conf.HDF5_RESOURCE_TUSHARE,
+        mtype_index
+    )
+    console.write_tail()
+    margin_sum_dict = dict()
+    if f.get(path) is not None:
+        df = tool.df_from_dataset(f[path], mtype_index, None)
+        df["opDate"] = df["opDate"].str.decode("utf-8")
+        for index, row in df.iterrows():
+            week_date = tradetime.get_week_of_date(row["opDate"], "D")
+            if week_date in margin_sum_dict:
+                margin_sum_dict[week_date] += row["rzmre"] - row["rqmcl"]
+            else:
+                margin_sum_dict[week_date] = row["rzmre"] - row["rqmcl"]
+        sum_df = tool.init_df(list(margin_sum_dict.items()), [conf.HDF5_SHARE_DATE_INDEX, "sum"])
+        if len(sum_df) > 0:
+            sum_df = sum_df.sort_values(by=[conf.HDF5_SHARE_DATE_INDEX])
+            tool.create_df_dataset(f[mtype_index], mtype_index_detail, sum_df)
+    f.close()
+    return
