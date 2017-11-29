@@ -29,6 +29,7 @@ def get_xsg(f):
             try:
                 df = ts.xsg_data(year=year, month=month, pause=conf.REQUEST_BLANK)
                 df = df.drop("name", axis=1)
+                df = df.sort_values(by=[conf.HDF5_SHARE_DATE_INDEX])
                 tool.create_df_dataset(f, dset_name, df)
                 console.write_exec()
                 count.inc_by_index(conf.HDF5_COUNT_GET)
@@ -38,32 +39,41 @@ def get_xsg(f):
     return
 
 
-def get_ipo(f):
+def get_ipo(f, reset_flag=False):
     """
     获取ipo数据
     """
     df = ts.new_stocks(pause=conf.REQUEST_BLANK)
     df = df.drop("name", axis=1)
     df = df.sort_values(by=["ipo_date"])
-    tool.merge_df_dataset(f, conf.HDF5_FUNDAMENTAL_IPO, df)
+    if reset_flag is False:
+        tool.merge_df_dataset(f, conf.HDF5_FUNDAMENTAL_IPO, df)
+    else:
+        tool.create_df_dataset(f, conf.HDF5_FUNDAMENTAL_IPO, df)
     return
 
 
-def get_sh_margins(f):
+def get_sh_margins(f, reset_flag=False):
     """
     获取沪市的融资融券
     """
     df = ts.sh_margins(pause=conf.REQUEST_BLANK)
     df = df.sort_values(by=["opDate"])
-    tool.merge_df_dataset(f, conf.HDF5_FUNDAMENTAL_SH_MARGINS, df)
+    if reset_flag is False:
+        tool.merge_df_dataset(f, conf.HDF5_FUNDAMENTAL_SH_MARGINS, df)
+    else:
+        tool.create_df_dataset(f, conf.HDF5_FUNDAMENTAL_SH_MARGINS, df)
     return
 
 
-def get_sz_margins(f):
+def get_sz_margins(f, reset_flag=False):
     """
     获取深市的融资融券
     """
-    df = ts.sh_margins(pause=conf.REQUEST_BLANK)
+    df = ts.sz_margins(pause=conf.REQUEST_BLANK)
     df = df.sort_values(by=["opDate"])
-    tool.merge_df_dataset(f, conf.HDF5_FUNDAMENTAL_SZ_MARGINS, df)
+    if reset_flag is False:
+        tool.merge_df_dataset(f, conf.HDF5_FUNDAMENTAL_SZ_MARGINS, df)
+    else:
+        tool.create_df_dataset(f, conf.HDF5_FUNDAMENTAL_SZ_MARGINS, df)
     return

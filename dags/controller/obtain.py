@@ -213,7 +213,7 @@ def get_st():
     return
 
 
-def get_fundamental():
+def get_xsg():
     # 初始化文件
     f = h5py.File(conf.HDF5_FILE_FUNDAMENTAL, 'a')
     # 获取限售股解禁数据
@@ -228,7 +228,13 @@ def get_fundamental():
     fundamental.get_xsg(f[path])
     count.show_result()
     console.write_tail()
+    f.close()
+    return
 
+
+def get_ipo(reset_flag=False):
+    # 初始化文件
+    f = h5py.File(conf.HDF5_FILE_FUNDAMENTAL, 'a')
     # 获取ipo数据
     console.write_head(
         conf.HDF5_OPERATE_GET,
@@ -238,10 +244,16 @@ def get_fundamental():
     path = '/' + conf.HDF5_FUNDAMENTAL_IPO
     if f.get(path) is None:
         f.create_group(path)
-    fundamental.get_ipo(f[path])
+    fundamental.get_ipo(f[path], reset_flag)
     count.show_result()
     console.write_tail()
+    f.close()
+    return
 
+
+def get_margin(reset_flag=False):
+    # 初始化文件
+    f = h5py.File(conf.HDF5_FILE_FUNDAMENTAL, 'a')
     # 获取沪市融资融券
     console.write_head(
         conf.HDF5_OPERATE_GET,
@@ -251,7 +263,7 @@ def get_fundamental():
     path = '/' + conf.HDF5_FUNDAMENTAL_SH_MARGINS
     if f.get(path) is None:
         f.create_group(path)
-    fundamental.get_sh_margins(f[path])
+    fundamental.get_sh_margins(f[path], reset_flag)
     count.show_result()
     console.write_tail()
 
@@ -264,9 +276,8 @@ def get_fundamental():
     path = '/' + conf.HDF5_FUNDAMENTAL_SZ_MARGINS
     if f.get(path) is None:
         f.create_group(path)
-    fundamental.get_sz_margins(f[path])
+    fundamental.get_sz_margins(f[path], reset_flag)
     count.show_result()
     console.write_tail()
-
     f.close()
     return
