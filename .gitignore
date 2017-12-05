@@ -1,5 +1,4 @@
-dags/*/__pycache__/
-dags/__pycache__/
+**/__pycache__/
 hack/.env
 *.swp
 hack/dockerfile/hdf5/
