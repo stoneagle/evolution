@@ -26,7 +26,7 @@ def all_index(gem_flag, start_date):
                 ds_name = conf.HDF5_INDEX_DETAIL + "_" + ktype
                 if start_date is None:
                     tool.delete_dataset(f[code_prefix][code], ds_name)
-                tool.merge_df_dataset(f[code_prefix][code], ds_name, index_df)
+                tool.merge_df_dataset(f[code_prefix][code], ds_name, index_df.reset_index())
     console.write_tail()
     f.close()
     return
@@ -35,7 +35,7 @@ def all_index(gem_flag, start_date):
 def one_index(f, code, ktype, start_date):
     code_prefix = code[0:3]
     code_group_path = '/' + code_prefix + '/' + code
-    if f.get(code_group_path) is not None and f[code_prefix][code].get(ktype) is None:
+    if f.get(code_group_path) is None or f[code_prefix][code].get(ktype) is None:
         return
     df = tool.df_from_dataset(f[code_prefix][code], ktype, None)
     df[conf.HDF5_SHARE_DATE_INDEX] = df[conf.HDF5_SHARE_DATE_INDEX].str.decode("utf-8")
