@@ -52,6 +52,7 @@ HDF5_SHARE_COLUMN = ["open", "high", "close", "low", "volume", "turnover"]
 HDF5_INDEX_COLUMN = ["dif", "dea", "macd"]
 HDF5_INDEX_DETAIL = "index"
 HDF5_INDEX_MACD_TREND = "macd_trend"
+HDF5_INDEX_WRAP = "wrap"
 
 HDF5_RESOURCE_TUSHARE = "tushare"
 HDF5_RESOURCE_DATASET = "dataset"

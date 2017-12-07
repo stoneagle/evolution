@@ -1,5 +1,4 @@
 from library import tool
-
 # 行为类型
 TREND_STILL = "trend_still"
 TREND_TURN = "trend_turn"
