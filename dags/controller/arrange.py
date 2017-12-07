@@ -1,5 +1,6 @@
 import h5py
 from library import conf, console, tool, tradetime
+from strategy.util import action
 
 
 def arrange_detail(start_date):
@@ -44,7 +45,6 @@ def arrange_detail(start_date):
     console.write_tail()
     f_share.close()
     f.close()
-    # 从最初时间开始，按照code聚合detail
     return
 
 
@@ -295,3 +295,58 @@ def arrange_margins(mtype):
             tool.create_df_dataset(f[mtype_index], mtype_index_detail, sum_df)
     f.close()
     return
+
+
+def arrange_all_macd_trend(code_list, start_date):
+    """
+    整理所有股票的macd趋势数据
+    """
+    f = h5py.File(conf.HDF5_FILE_SHARE, 'a')
+    console.write_head(
+        conf.HDF5_OPERATE_ARRANGE,
+        conf.HDF5_RESOURCE_TUSHARE,
+        conf.HDF5_SHARE_DETAIL
+    )
+    for code in code_list:
+        code_prefix = code[0:3]
+        for ktype in conf.HDF5_SHARE_KTYPE:
+            trend_df = arrange_code_macd_trend(f, code, ktype, start_date)
+            if trend_df is not None:
+                ds_name = conf.HDF5_INDEX_MACD_TREND + "_" + ktype
+                if f[code_prefix][code].get(ds_name) is not None:
+                    tool.delete_dataset(f[code_prefix][code], ds_name)
+                tool.create_df_dataset(f[code_prefix][code], ds_name, trend_df)
+    console.write_tail()
+    f.close()
+    return
+
+
+def arrange_code_macd_trend(f, code, ktype, start_date):
+    """
+    整理某只股票的macd趋势数据
+    """
+    code_prefix = code[0:3]
+    code_group_path = '/' + code_prefix + '/' + code
+    # TODO, 立刻根据日期获取股票数据
+    if f.get(code_group_path) is None:
+        return None
+
+    # 忽略停牌、退市、无法获取的情况
+    if f[code_prefix][code].attrs.get(conf.HDF5_BASIC_QUIT) is not None or f[code_prefix][code].attrs.get(conf.HDF5_BASIC_ST) is not None:
+        return None
+
+    ds_name = conf.HDF5_INDEX_DETAIL + "_" + ktype
+    if f[code_prefix][code].get(ds_name) is None:
+        return None
+
+    index_df = tool.df_from_dataset(f[code_prefix][code], ds_name, None)
+    index_df[conf.HDF5_SHARE_DATE_INDEX] = index_df[conf.HDF5_SHARE_DATE_INDEX].str.decode("utf-8")
+    index_df = index_df[index_df["dif"].notnull()]
+    index_df = index_df.set_index(conf.HDF5_SHARE_DATE_INDEX)[["dif", "dea", "macd", "close"]]
+
+    # 如果数据集过少则直接返回
+    # TODO 异常报错
+    if len(index_df) <= 3:
+        return
+
+    return action.Action().run(index_df=index_df.reset_index(), date_column=conf.HDF5_SHARE_DATE_INDEX, value_column="macd")
