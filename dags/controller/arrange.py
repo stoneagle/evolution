@@ -364,8 +364,7 @@ def arrange_all_wrap(code_list, start_date):
     )
     for code in code_list:
         code_prefix = code[0:3]
-        # for ktype in conf.HDF5_SHARE_KTYPE:
-        for ktype in ["D"]:
+        for ktype in conf.HDF5_SHARE_KTYPE:
             wrap_df = arrange_code_wrap(f, code, ktype, start_date)
             if wrap_df is not None:
                 ds_name = conf.HDF5_INDEX_WRAP + "_" + ktype

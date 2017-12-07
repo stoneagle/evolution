@@ -1,19 +1,22 @@
 from library import tool
+from strategy.util import action
 INDEX_DATE = "date"
+INDEX_VALUE = "value"
 
 
 class Wrap(object):
     # 存储数据集合
     raw_df = None
     wrap_df = None
+    df = tool.init_empty_df([INDEX_DATE, INDEX_VALUE])
 
     def __init__(self, df):
-        self.df = df
-        self.wrap_df = tool.init_empty_df(self.df.columns)
+        self.raw_df = df
+        self.wrap_df = tool.init_empty_df(self.raw_df.columns)
         return
 
     def merge(self, high_column, low_column):
-        for index, row in self.df.iterrows():
+        for index, row in self.raw_df.iterrows():
             if index == 0:
                 self.wrap_df = self.wrap_df.append(row)
                 continue
@@ -28,4 +31,19 @@ class Wrap(object):
                 self.wrap_df.loc[length - 1:length, high_column] = row[high_column]
             else:
                 self.wrap_df = self.wrap_df.append(row)
-        return self.wrap_df
+
+        for index, row in self.wrap_df.iterrows():
+            one = dict()
+            one[INDEX_DATE] = row[INDEX_DATE]
+            if index == 0:
+                one[INDEX_VALUE] = row[high_column]
+                continue
+            pre_row = self.wrap_df.iloc[-1]
+            if pre_row[low_column] < row[low_column] and pre_row[high_column] < row[high_column]:
+                # 如果上涨，取high作为value
+                one[INDEX_VALUE] = row[high_column]
+            else:
+                # 如果下跌，取low作为value
+                one[INDEX_VALUE] = row[low_column]
+            self.df = self.df.append(one, ignore_index=True)
+        return action.Action().run(self.df, INDEX_DATE, INDEX_VALUE)
