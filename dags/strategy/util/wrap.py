@@ -26,9 +26,11 @@ class Wrap(object):
             if pre_row[high_column] <= row[high_column] and pre_row[low_column] >= row[low_column]:
                 # 上升过程中，N-1被N包含，两K线最高点当高点，低点中较高者当低点
                 self.wrap_df.loc[length - 1:length, high_column] = row[high_column]
+                # TODO 合并后，向前检查直到无法合并
             elif pre_row[high_column] >= row[high_column] and pre_row[low_column] <= row[low_column]:
                 # 下降过程中，N-1包含N，两K线最低点当低点，高点中较低者当高点
                 self.wrap_df.loc[length - 1:length, high_column] = row[high_column]
+                # TODO 合并后，向前检查直到无法合并
             else:
                 self.wrap_df = self.wrap_df.append(row)
 
