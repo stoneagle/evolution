@@ -1,13 +1,11 @@
-from strategy.phase import phase
+from strategy.util import phase
 
 
-def get_macd_phases(index_df, trend_df):
+def get_macd_phases(trend_df, share_df):
     """
     获取macd的阶段情况
-    记录各个红柱、绿柱面积
-    记录各个红柱、绿柱面积范围的价格变化
-    比较前后两段红柱/绿柱的价格高点/低点，判断趋势方向(上行、下行、震荡)
-    比较两段绿柱，价格的波动幅度
+    按照up、down与shake，记录各个阶段的红柱、绿柱面积
+    记录up、down趋势下，从最低点/最高点到0周阶段中，价格的变化与macd是否一致，价格波动幅度以及波动比例
     """
-    phase_obj = phase.Phase()
-    return phase_obj
+    result = phase.Phase(trend_df, share_df).merge(phase.PTYPE_MACD)
+    return result
