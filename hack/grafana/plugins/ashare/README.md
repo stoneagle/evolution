@@ -1,50 +1,45 @@
-## Clock Panel Plugin for Grafana
+# Progress List Panel
 
-The Clock Panel can show the current time or a countdown and updates every second.
+<img src="https://github.com/CorpGlory/grafana-progress-list/blob/master/src/assets/screenshot_main.png">
 
-Show the time in another office or show a countdown to an important event.
+## About
 
-### Options
+A panel showing list of progress-like list items in one board.
 
-- **Mode**:
+## How To Use
 
-  Default is time. If countdown is chosen then set the Countdown Deadline to start the countdown.
+1. Create a metric query where result looks like this: `[(time, key, value)]`
+2. Goto "Options" tab and choose aggregation function and other options
 
-- **12 or 24 hour**:
+More info in [**tutorials**](https://github.com/CorpGlory/grafana-progress-list/wiki)
 
-  Show time in the 12/24 hour format.
+Progress list will try to aggregate all values by key using chosen aggregate function.
 
-- **Offset from UTC**:
+Progress list can be thought of as many simple [Singlestat Panels](http://docs.grafana.org/features/panels/singlestat/). But items are generated from the query, rather than defined manually.
 
-  This is a simple way to get the time for different time zones. Default is empty and that means local time (whatever that is on your computer). -5 would be UTC -5 (New York or central US)
 
-- **Countdown Deadline**:
+## Installation
 
-  Used in conjuction with the mode being set to countdown. Choose a date and time to count down to.
+```
+cd $GRAFANA_HOME/data/plugins
+git clone https://github.com/CorpGlory/grafana-progress-list.git
+```
 
-- **Countdown End Text**:
+then restart your Grafana server
 
-  The text to show when the countdown ends. E.g. LIFTOFF
+## Build
 
-- **Date/Time formatting options**:
+```
+npm install
+npm run build
+```
 
-  The font size, weight and date/time formatting can be customized here. If the seconds ticking annoys you then change the time format to HH:mm for the 24 hour clock or h:mm A for the 12 hour clock.
+## Credits
 
-- **Bg Color**:
+Made by Alexey Velikiy
 
-  Choose a background color for the clock with the color picker.
+### See Also
 
-### Screenshots
+Dicussion on [Grafana Community Forum](https://community.grafana.com/t/progress-list-panel/3286)
 
-- [Screenshot of two clocks and a countdown](https://raw.githubusercontent.com/grafana/clock-panel/06ecf59c191db642127c6153bc3145e93a1df1f8/src/img/screenshot-clocks.png)
-- [Screenshot of the options screen](https://raw.githubusercontent.com/grafana/clock-panel/06ecf59c191db642127c6153bc3145e93a1df1f8/src/img/screenshot-clock-options.png)
-
-#### Changelog
-
-##### v0.0.8
-
-- Remove extraneous comma when 1 second left in the countdown. PR from @linkslice
-
-##### v0.0.9
-
-- Fixes bug with default properties not getting deep cloned [#20](https://github.com/grafana/clock-panel/issues/20)
+Based on [Webpack Typescript Template](https://github.com/CorpGlory/grafana-plugin-template-webpack-typescript)
