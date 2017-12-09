@@ -3,11 +3,13 @@ services:
   grafana:
     # environment:
     #   - GF_SECURITY_ADMIN_PASSWORD=a1b2c3d4e
-    image: grafana/grafana:4.6.2
+    image: grafana/grafana:4.6.2-1000
     container_name: ${COMPOSE_PROJECT_NAME}-${DEV_USER}-grafana
     volumes:
       - ./config/grafana.ini:/etc/grafana/grafana.ini
+      # - /etc/passwd:/etc/passwd
       - ./grafana:/var/lib/grafana
+    # user: "${DEV_UID}:${DEV_UID}"
     ports:
       - "3000:3000"
   influxdb:
