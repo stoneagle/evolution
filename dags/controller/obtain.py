@@ -40,6 +40,9 @@ def get_classify():
 
 
 def get_code_share(f, code, gem_flag):
+    """
+    获取对应code的股票数据
+    """
     # 按编码前3位分组，如果group不存在，则创建新分组
     code_prefix = code[0:3]
 
@@ -65,6 +68,9 @@ def get_code_share(f, code, gem_flag):
 
 
 def get_index_share():
+    """
+    获取对应指数数据
+    """
     index_list = ["sh", "sz", "hs300", "sz50", "zxb", "cyb"]
     # 初始化相关文件
     f = h5py.File(conf.HDF5_FILE_INDEX, 'a')
@@ -214,9 +220,11 @@ def get_st():
 
 
 def get_xsg():
+    """
+    获取限售股解禁数据
+    """
     # 初始化文件
     f = h5py.File(conf.HDF5_FILE_FUNDAMENTAL, 'a')
-    # 获取限售股解禁数据
     console.write_head(
         conf.HDF5_OPERATE_GET,
         conf.HDF5_RESOURCE_TUSHARE,
@@ -233,9 +241,11 @@ def get_xsg():
 
 
 def get_ipo(reset_flag=False):
+    """
+    获取ipo数据
+    """
     # 初始化文件
     f = h5py.File(conf.HDF5_FILE_FUNDAMENTAL, 'a')
-    # 获取ipo数据
     console.write_head(
         conf.HDF5_OPERATE_GET,
         conf.HDF5_RESOURCE_TUSHARE,
@@ -252,9 +262,11 @@ def get_ipo(reset_flag=False):
 
 
 def get_margin(reset_flag=False):
+    """
+    获取沪市融资融券
+    """
     # 初始化文件
     f = h5py.File(conf.HDF5_FILE_FUNDAMENTAL, 'a')
-    # 获取沪市融资融券
     console.write_head(
         conf.HDF5_OPERATE_GET,
         conf.HDF5_RESOURCE_TUSHARE,

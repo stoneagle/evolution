@@ -3,12 +3,13 @@
 PWD := $(shell pwd)
 USER := $(shell id -u)
 GROUP := $(shell id -g)
+DATE := $(shell date "+%F")
 
-run-local: 
+run-airflow: 
 	cd hack && docker-compose -f docker-compose-local.yml -p "airflow-$(USER)" up -d
-stop-local: 
+stop-airflow: 
 	cd hack && docker-compose -f docker-compose-local.yml -p "airflow-$(USER)" stop 
-rm-local: 
+rm-airflow: 
 	cd hack && docker-compose -f docker-compose-local.yml -p "airflow-$(USER)" rm 
 
 run-grafana: 
@@ -17,6 +18,13 @@ stop-grafana:
 	cd hack && docker-compose -f docker-compose-grafana.yml -p "grafana-$(USER)" stop 
 rm-grafana: 
 	cd hack && docker-compose -f docker-compose-grafana.yml -p "grafana-$(USER)" rm 
+
+local-bash:
+	nohup bash ./exec.sh > ./logs/$(DATE).log 2>&1 &
+
+local-python:
+	pip3 install --index https://pypi.mirrors.ustc.edu.cn/simple/ --user -r ./hack/dockerfile/requirements.utils.txt && \
+	pip3 install --index https://pypi.mirrors.ustc.edu.cn/simple/ --user -r ./hack/dockerfile/requirements.tushare.txt
 
 build-img:
 	cd hack/dockerfile && docker build -f ./Dockerfile -t puckel/docker-airflow:1.8.2-assets-2 .

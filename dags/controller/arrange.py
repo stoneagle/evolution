@@ -183,6 +183,9 @@ def arrange_one_classify_detail(f, code_list, gem_flag, ktype, start_date):
 
 
 def arrange_xsg():
+    """
+    聚合xsg数据
+    """
     # 初始化文件
     f = h5py.File(conf.HDF5_FILE_FUNDAMENTAL, 'a')
     f_share = h5py.File(conf.HDF5_FILE_SHARE, 'a')
@@ -232,6 +235,9 @@ def arrange_xsg():
 
 
 def arrange_ipo():
+    """
+    聚合ipo上市数据
+    """
     f = h5py.File(conf.HDF5_FILE_FUNDAMENTAL, 'a')
     path = '/' + conf.HDF5_FUNDAMENTAL_IPO
     console.write_head(
@@ -261,6 +267,9 @@ def arrange_ipo():
 
 
 def arrange_margins(mtype):
+    """
+    聚合融资融券数据
+    """
     if mtype == "sh":
         mtype_index = conf.HDF5_FUNDAMENTAL_SH_MARGINS
         mtype_index_detail = conf.HDF5_FUNDAMENTAL_SH_MARGINS_DETAIL

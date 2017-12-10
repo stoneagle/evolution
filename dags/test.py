@@ -6,14 +6,14 @@ code_list = ["002466"]
 
 # obtain
 # obtain.get_classify()
-# obtain.get_basic()
 # obtain.get_quit()
 # obtain.get_st()
+# obtain.get_index_share()
 # obtain.get_all_share(True)
+# obtain.get_basic()
 # obtain.get_xsg()
 # obtain.get_ipo()
 # obtain.get_margin()
-# obtain.get_index_share()
 # f = h5py.File(conf.HDF5_FILE_SHARE, 'a')
 # for code in code_list:
 #     obtain.get_code_share(f, code, True)

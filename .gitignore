@@ -1,4 +1,5 @@
 **/__pycache__/
+logs
 hack/.env
 hack/grafana/plugins/**/node_modules
 hack/grafana/sessions
