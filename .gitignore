@@ -1,7 +1,7 @@
 **/__pycache__/
 logs
 hack/.env
-hack/grafana/plugins/**/node_modules
-hack/grafana/sessions
+grafana/plugins/**/node_modules
+grafana/sessions
 *.swp
 hack/dockerfile/hdf5/

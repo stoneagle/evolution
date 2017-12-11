@@ -1,17 +1,13 @@
 version: '2'
 services:
   grafana:
-    # environment:
-    #   - GF_SECURITY_ADMIN_PASSWORD=a1b2c3d4e
     image: grafana/grafana:4.6.2-1000
     container_name: ${COMPOSE_PROJECT_NAME}-${DEV_USER}-grafana
     volumes:
       - ./config/grafana.ini:/etc/grafana/grafana.ini
-      # - /etc/passwd:/etc/passwd
-      - ./grafana:/var/lib/grafana
-    # user: "${DEV_UID}:${DEV_UID}"
+      - ../grafana:/var/lib/grafana
     ports:
-      - "3000:3000"
+      - "${DEV_GRAFANA}:3000"
   influxdb:
     environment:
       - INFLUXDB_ADMIN_ENABLED=true
@@ -21,8 +17,8 @@ services:
       - /home/wuzhongyang/database/influxdb:/var/lib/influxdb
       - ./config/influxdb.conf:/etc/influxdb/influxdb.conf
     ports:
-      - "8086:8086"
-      - "8083:8083"
+      - "${DEV_INFLUXDB}:8086"
+      - "${DEV_INFLUXDB_TWO}:8083"
 networks:
   default:
     external:

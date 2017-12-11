@@ -51361,11 +51361,11 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var panel_config_1 = __webpack_require__(165);
-var echarts = __webpack_require__(166);
-var mapper_1 = __webpack_require__(456);
 var sdk_1 = __webpack_require__(458);
-var progress_1 = __webpack_require__(459);
+var wrap_1 = __webpack_require__(459);
+var util_1 = __webpack_require__(461);
 var _ = __webpack_require__(163);
+var echarts = __webpack_require__(166);
 var defaults = {
     statNameOptionValue: 'current',
     statProgressType: 'shared',
@@ -51383,37 +51383,40 @@ var defaults = {
     nullMapping: undefined
 };
 
-var Ctrl = function (_sdk_1$MetricsPanelCt) {
-    _inherits(Ctrl, _sdk_1$MetricsPanelCt);
+var PanelCtrl = function (_sdk_1$MetricsPanelCt) {
+    _inherits(PanelCtrl, _sdk_1$MetricsPanelCt);
 
-    function Ctrl($scope, $injector) {
-        _classCallCheck(this, Ctrl);
+    function PanelCtrl($scope, $injector) {
+        _classCallCheck(this, PanelCtrl);
 
-        var _this = _possibleConstructorReturn(this, (Ctrl.__proto__ || Object.getPrototypeOf(Ctrl)).call(this, $scope, $injector));
+        var _this = _possibleConstructorReturn(this, (PanelCtrl.__proto__ || Object.getPrototypeOf(PanelCtrl)).call(this, $scope, $injector));
 
-        _this.statNameOptions = ['current', 'min', 'max', 'total'];
-        _this.statProgressTypeOptions = ['max value', 'shared'];
-        _this.coloringTypeOptions = ['none', 'thresholds', 'key mapping'];
-        _this.sortingOrderOptions = ['none', 'increasing', 'decreasing'];
-        _this.valueLabelTypeOptions = ['absolute', 'percentage'];
+        _this.echartsInitFlag = false;
         _.defaults(_this.panel, defaults);
         _this._panelConfig = new panel_config_1.PanelConfig(_this.panel);
         _this._initStyles();
-        progress_1.initProgress(_this._panelConfig, 'progressListPluginProgress');
-        _this.mapper = new mapper_1.Mapper(_this._panelConfig);
-        _this.items = [];
-        _this.events.on('init-edit-mode', _this._onInitEditMode.bind(_this));
-        _this.events.on('data-received', _this._onDataReceived.bind(_this));
+        wrap_1.initWrap(_this._panelConfig, 'asharePluginWrap');
+        _this.wraper = new util_1.WrapUtil();
+        _this.events.on('render', _this.onRender.bind(_this));
+        // this.events.on('refresh', this.postRefresh.bind(this));
+        // this.events.on('data-error', this.onDataError.bind(this));
+        // this.events.on('data-received', this.onDataReceived.bind(this));
+        // this.events.on('data-snapshot-load', this.onDataReceived.bind(this));
+        // this.events.on('init-edit-mode', this.onInitEditMode.bind(this));
+        // this.events.on('data-received', this._onDataReceived.bind(this));
         return _this;
     }
 
-    _createClass(Ctrl, [{
+    _createClass(PanelCtrl, [{
         key: "link",
-        value: function link(scope, element) {}
+        value: function link(scope, element, attrs, ctrl) {
+            this.$panelContainer = element.find('.panel-container');
+            this.$panelContoller = ctrl;
+        }
     }, {
         key: "_initStyles",
         value: function _initStyles() {
-            // small hack to load base styles
+            // 读取grafana基础样式
             sdk_1.loadPluginCss({
                 light: this._panelConfig.pluginDirName + 'css/panel.base.css',
                 dark: this._panelConfig.pluginDirName + 'css/panel.base.css'
@@ -51424,49 +51427,35 @@ var Ctrl = function (_sdk_1$MetricsPanelCt) {
             });
         }
     }, {
-        key: "render",
-        value: function render() {
-            var items = this.mapper.mapMetricData(this._seriesList);
-            if (this._panelConfig.getValue('sortingOrder') === 'increasing') {
-                items = _.sortBy(items, function (i) {
-                    return i.progress;
-                });
-            }
-            if (this._panelConfig.getValue('sortingOrder') === 'decreasing') {
-                items = _.sortBy(items, function (i) {
-                    return -i.progress;
-                });
-            }
-            this.$scope.items = items;
-            var container = document.getElementById("echarts");
-            console.log(container);
-            var myChart = echarts.init(container);
-            // 绘制图表
-            myChart.setOption({
-                title: {
-                    text: 'ECharts 入门示例'
-                },
-                tooltip: {},
-                xAxis: {
-                    data: ['衬衫', '羊毛衫', '雪纺衫', '裤子', '高跟鞋', '袜子']
-                },
-                yAxis: {},
-                series: [{
-                    name: '销量',
-                    type: 'bar',
-                    data: [5, 20, 36, 10, 10, 20]
-                }]
-            });
+        key: "onRender",
+        value: function onRender() {
+            this.setElementHeight();
+        }
+    }, {
+        key: "setElementHeight",
+        value: function setElementHeight() {
+            this.$panelContainer.find('.ashare-panel').css('min-height', this.$panelContoller.height + 'px');
+            this.minHeight = this.$panelContoller.height - 10;
+            this.$panelContainer.find('.wrap').css('min-height', this.minHeight + 'px');
         }
     }, {
         key: "_onDataReceived",
         value: function _onDataReceived(seriesList) {
-            this._seriesList = seriesList;
-            this.render();
+            // influxdb数据更新时,绘制图表
+            if (this.echartsInitFlag == false) {
+                var container = document.getElementById("wrap");
+                this.wrapChart = echarts.init(container);
+                this.echartsInitFlag = true;
+            }
+            var rawData = [['2013/5/8', 2242.39, 2246.3, 2235.42, 2255.21], ['2013/5/9', 2246.96, 2232.97, 2221.38, 2247.86], ['2013/5/10', 2228.82, 2246.83, 2225.81, 2247.67], ['2013/5/13', 2247.68, 2241.92, 2231.36, 2250.85], ['2013/5/14', 2238.9, 2217.01, 2205.87, 2239.93], ['2013/5/15', 2217.09, 2224.8, 2213.58, 2225.19], ['2013/5/16', 2221.34, 2251.81, 2210.77, 2252.87], ['2013/5/17', 2249.81, 2282.87, 2248.41, 2288.09], ['2013/5/20', 2286.33, 2299.99, 2281.9, 2309.39], ['2013/5/21', 2297.11, 2305.11, 2290.12, 2305.3], ['2013/5/22', 2303.75, 2302.4, 2292.43, 2314.18], ['2013/5/23', 2293.81, 2275.67, 2274.1, 2304.95], ['2013/5/24', 2281.45, 2288.53, 2270.25, 2292.59], ['2013/5/27', 2286.66, 2293.08, 2283.94, 2301.7], ['2013/5/28', 2293.4, 2321.32, 2281.47, 2322.1], ['2013/5/29', 2323.54, 2324.02, 2321.17, 2334.33], ['2013/5/30', 2316.25, 2317.75, 2310.49, 2325.72], ['2013/5/31', 2320.74, 2300.59, 2299.37, 2325.53], ['2013/6/3', 2300.21, 2299.25, 2294.11, 2313.43], ['2013/6/4', 2297.1, 2272.42, 2264.76, 2297.1], ['2013/6/5', 2270.71, 2270.93, 2260.87, 2276.86], ['2013/6/6', 2264.43, 2242.11, 2240.07, 2266.69], ['2013/6/7', 2242.26, 2210.9, 2205.07, 2250.63], ['2013/6/13', 2190.1, 2148.35, 2126.22, 2190.1]];
+            this.wraper.setData(rawData);
+            this.wrapChart.setOption(this.wraper.getOption());
+            this.onRender();
         }
     }, {
         key: "_onInitEditMode",
         value: function _onInitEditMode() {
+            // 编辑模式初始化
             var thisPartialPath = this._panelConfig.pluginDirName + 'partials/';
             this.addEditorTab('Options', thisPartialPath + 'options.html', 2);
         }
@@ -51476,7 +51465,7 @@ var Ctrl = function (_sdk_1$MetricsPanelCt) {
             var tmp = this.panel.colors[0];
             this.panel.colors[0] = this.panel.colors[2];
             this.panel.colors[2] = tmp;
-            this.render();
+            this.onRender();
         }
     }, {
         key: "addColorKeyMapping",
@@ -51490,7 +51479,7 @@ var Ctrl = function (_sdk_1$MetricsPanelCt) {
         key: "removeColorKeyMapping",
         value: function removeColorKeyMapping(index) {
             this.panel.colorKeyMappings.splice(index, 1);
-            this.render();
+            this.onRender();
         }
     }, {
         key: "_dataError",
@@ -51500,11 +51489,11 @@ var Ctrl = function (_sdk_1$MetricsPanelCt) {
         }
     }]);
 
-    return Ctrl;
+    return PanelCtrl;
 }(sdk_1.MetricsPanelCtrl);
 
-Ctrl.templateUrl = "partials/template.html";
-exports.PanelCtrl = Ctrl;
+PanelCtrl.templateUrl = "partials/template.html";
+exports.PanelCtrl = PanelCtrl;
 
 /***/ }),
 /* 165 */
@@ -51542,8 +51531,6 @@ var PanelConfig = function () {
             if (!this._pluginDirName) {
                 var panels = window['grafanaBootData'].settings.panels;
                 var thisPanel = panels[this._panel.type];
-                // the system loader preprends publib to the url,
-                // add a .. to go back one level
                 this._pluginDirName = '../' + thisPanel.baseUrl + '/';
             }
             return this._pluginDirName;
@@ -92132,285 +92119,7 @@ var _default = ClippathManager;
 module.exports = _default;
 
 /***/ }),
-/* 456 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var _ = __webpack_require__(163);
-
-var ProgressItem = function () {
-    function ProgressItem(panelConfig, key, value, maxValue) {
-        _classCallCheck(this, ProgressItem);
-
-        this._panelConfig = panelConfig;
-        this._key = key;
-        this._value = value;
-        this._maxValue = maxValue;
-    }
-
-    _createClass(ProgressItem, [{
-        key: "_getFormattedFloat",
-        value: function _getFormattedFloat() {
-            var value = this._panelConfig.getValue('valueLabelType') === 'percentage' ? this.progress : this.value;
-            var dm = this._getDecimalsForValue().decimals;
-            if (dm === 0) {
-                return Math.round(value).toString();
-            }
-            var fv = value;
-            for (var i = 0; i < dm; i++) {
-                fv *= 10;
-            }
-            ;
-            var fvs = Math.round(fv).toString();
-            return fvs.substr(0, fvs.length - dm) + '.' + fvs.substr(fvs.length - dm);
-        }
-    }, {
-        key: "_getDecimalsForValue",
-        value: function _getDecimalsForValue() {
-            var value = this._value;
-            // based on https://github.com/grafana/grafana/blob/v4.1.1/public/app/plugins/panel/singlestat/module.ts
-            if (_.isNumber(this._panelConfig.getValue('decimals'))) {
-                return {
-                    decimals: this._panelConfig.getValue('decimals'),
-                    scaledDecimals: null
-                };
-            }
-            var delta = value / 2;
-            var dec = -Math.floor(Math.log(delta) / Math.LN10);
-            var magn = Math.pow(10, -dec),
-                norm = delta / magn,
-                // norm is between 1.0 and 10.0
-            size;
-            if (norm < 1.5) {
-                size = 1;
-            } else if (norm < 3) {
-                size = 2;
-                // special case for 2.5, requires an extra decimal
-                if (norm > 2.25) {
-                    size = 2.5;
-                    ++dec;
-                }
-            } else if (norm < 7.5) {
-                size = 5;
-            } else {
-                size = 10;
-            }
-            size *= magn;
-            // reduce starting decimals if not needed
-            if (Math.floor(value) === value) {
-                dec = 0;
-            }
-            var result = {};
-            result.decimals = Math.max(0, dec);
-            result.scaledDecimals = result.decimals - Math.floor(Math.log(size) / Math.LN10) + 2;
-            return result;
-        }
-    }, {
-        key: "title",
-        get: function get() {
-            return this._key;
-        }
-    }, {
-        key: "progress",
-        get: function get() {
-            return 100 * this._value / this._maxValue;
-        }
-    }, {
-        key: "value",
-        get: function get() {
-            return this._value;
-        }
-    }, {
-        key: "formattedValue",
-        get: function get() {
-            var value = this._value;
-            var res = this._panelConfig.getValue('prefix');
-            res += this._getFormattedFloat();
-            res += this._panelConfig.getValue('postfix');
-            return res;
-        }
-    }, {
-        key: "color",
-        get: function get() {
-            var _this = this;
-
-            var colorType = this._panelConfig.getValue('coloringType');
-            if (colorType === 'auto') {
-                return 'auto';
-            }
-            if (colorType === 'thresholds') {
-                var thresholdsStr = this._panelConfig.getValue('thresholds');
-                var colors = this._panelConfig.getValue('colors');
-                var value = this.progress;
-                if (thresholdsStr === undefined) {
-                    return colors[0];
-                }
-                var thresholds = thresholdsStr.split(',').map(parseFloat);
-                for (var i = thresholds.length; i > 0; i--) {
-                    if (value >= thresholds[i - 1]) {
-                        return colors[i];
-                    }
-                }
-                return colors[0];
-            }
-            if (colorType === 'key mapping') {
-                var colorKeyMappings = this._panelConfig.getValue('colorKeyMappings');
-                var keyColorMapping = _.find(colorKeyMappings, function (k) {
-                    return k.key === _this._key;
-                });
-                if (keyColorMapping === undefined) {
-                    return this._panelConfig.getValue('colorsKeyMappingDefault');
-                }
-                return keyColorMapping.color;
-            }
-            throw new Error('Unknown color type ' + colorType);
-        }
-    }]);
-
-    return ProgressItem;
-}();
-
-exports.ProgressItem = ProgressItem;
-
-var Mapper = function () {
-    function Mapper(panelConfig) {
-        _classCallCheck(this, Mapper);
-
-        this._panelConfig = panelConfig;
-    }
-
-    _createClass(Mapper, [{
-        key: "mapMetricData",
-        value: function mapMetricData(seriesList) {
-            var _this2 = this;
-
-            if (seriesList === undefined || seriesList.length == 0) {
-                return [];
-            }
-            var kstat = [];
-            if (this._panelConfig.getValue('statNameOptionValue') === 'total' && seriesList.length == 1) {
-                kstat = this._mapKeysTotal(seriesList);
-            } else {
-                kstat = this._mapNumeric(seriesList);
-            }
-            var progressType = this._panelConfig.getValue('statProgressType');
-            var maxValue = -1;
-            if (this._panelConfig.getValue('statProgressType') === 'shared') {
-                var total = 0;
-                for (var i = 0; i < kstat.length; i++) {
-                    total += kstat[i][1];
-                }
-                maxValue = total;
-            }
-            if (this._panelConfig.getValue('statProgressType') === 'max value') {
-                var max = -Infinity;
-                if (this._panelConfig.getValue('statProgressMaxValue') !== null) {
-                    max = this._panelConfig.getValue('statProgressMaxValue');
-                } else {
-                    for (var _i = 0; _i < kstat.length; _i++) {
-                        max = Math.max(kstat[_i][1], max);
-                    }
-                }
-                maxValue = max;
-            }
-            return _.map(kstat, function (k) {
-                return new ProgressItem(_this2._panelConfig, k[0], k[1], maxValue);
-            });
-        }
-    }, {
-        key: "_mapKeysTotal",
-        value: function _mapKeysTotal(seriesList) {
-            if (seriesList.length !== 1) {
-                throw new Error('Expecting list of keys: got more than one timeseries');
-            }
-            var kv = {};
-            var datapointsLength = seriesList[0].datapoints.length;
-            for (var i = 0; i < datapointsLength; i++) {
-                var k = seriesList[0].datapoints[i][0].toString();
-                if (kv[k] === undefined) {
-                    kv[k] = 0;
-                }
-                kv[k]++;
-            }
-            var res = [];
-            for (var _k in kv) {
-                res.push([_k, kv[_k]]);
-            }
-            return res;
-        }
-    }, {
-        key: "_mapNumeric",
-        value: function _mapNumeric(seriesList) {
-            if (seriesList.length != 2) {
-                throw new Error('Expecting timeseries in format (key, value). You can use keys only in total mode');
-            }
-            if (seriesList[0].datapoints.length !== seriesList[1].datapoints.length) {
-                throw new Error('Timeseries has different length');
-            }
-            var kv = {};
-            var datapointsLength = seriesList[0].datapoints.length;
-            var nullMapping = this._panelConfig.getValue('nullMapping');
-            for (var i = 0; i < datapointsLength; i++) {
-                var k = seriesList[0].datapoints[i][0].toString();
-                var v = seriesList[1].datapoints[i][0];
-                var vn = parseFloat(v);
-                if (v === null) {
-                    if (nullMapping === undefined || nullMapping === null) {
-                        throw new Error('Got null value. You set null value mapping in Options -> Mapping -> Null');
-                    }
-                    console.log('nullMapping ->' + nullMapping);
-                    vn = nullMapping;
-                }
-                if (isNaN(vn)) {
-                    throw new Error('Got non-numberic value: ' + v);
-                }
-                if (kv[k] === undefined) {
-                    kv[k] = [];
-                }
-                kv[k].push(vn);
-            }
-            var res = [];
-            for (var _k2 in kv) {
-                res.push([_k2, this._flatSeries(kv[_k2])]);
-            }
-            return res;
-        }
-    }, {
-        key: "_flatSeries",
-        value: function _flatSeries(values) {
-            if (values.length === 0) {
-                return 0;
-            }
-            var t = this._panelConfig.getValue('statNameOptionValue');
-            if (t === 'total') {
-                return _.sum(values);
-            }
-            if (t === 'max') {
-                return _.max(values);
-            }
-            if (t === 'min') {
-                return _.min(values);
-            }
-            if (t === 'current') {
-                return values[values.length - 1];
-            }
-            return 0;
-        }
-    }]);
-
-    return Mapper;
-}();
-
-exports.Mapper = Mapper;
-
-/***/ }),
+/* 456 */,
 /* 457 */
 /***/ (function(module, exports) {
 
@@ -92454,8 +92163,8 @@ module.exports = __WEBPACK_EXTERNAL_MODULE_458__;
 Object.defineProperty(exports, "__esModule", { value: true });
 var core_1 = __webpack_require__(460);
 var directiveInited = false;
-function initProgress(panelConfig) {
-    var directiveName = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "progress";
+function initWrap(panelConfig) {
+    var directiveName = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "wrap";
 
     if (directiveInited) {
         return;
@@ -92463,7 +92172,7 @@ function initProgress(panelConfig) {
     directiveInited = true;
     core_1.coreModule.directive(directiveName, function () {
         return {
-            templateUrl: panelConfig.pluginDirName + 'directives/progress.html',
+            templateUrl: panelConfig.pluginDirName + 'wrap/wrap.html',
             restrict: 'E',
             scope: {
                 item: "="
@@ -92471,13 +92180,244 @@ function initProgress(panelConfig) {
         };
     });
 }
-exports.initProgress = initProgress;
+exports.initWrap = initWrap;
 
 /***/ }),
 /* 460 */
 /***/ (function(module, exports) {
 
 module.exports = __WEBPACK_EXTERNAL_MODULE_460__;
+
+/***/ }),
+/* 461 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var upColor = '#ec0000';
+var upBorderColor = '#8A0000';
+var downColor = '#00da3c';
+var downBorderColor = '#008F28';
+
+var WrapUtil = function () {
+    function WrapUtil() {
+        _classCallCheck(this, WrapUtil);
+
+        // 数据意义：开盘(open)，收盘(close)，最低(lowest)，最高(highest)
+        this.rawData = [];
+    }
+
+    _createClass(WrapUtil, [{
+        key: "setData",
+        value: function setData(rawData) {
+            this.rawData = rawData;
+        }
+    }, {
+        key: "splitData",
+        value: function splitData() {
+            var categoryData = [];
+            var values = [];
+            for (var i = 0; i < this.rawData.length; i++) {
+                categoryData.push(this.rawData[i].splice(0, 1)[0]);
+                values.push(this.rawData[i]);
+            }
+            return {
+                categoryData: categoryData,
+                values: values
+            };
+        }
+    }, {
+        key: "calculateMA",
+        value: function calculateMA(dayCount) {
+            var result = [];
+            var splitData = this.splitData();
+            for (var i = 0, len = splitData.values.length; i < len; i++) {
+                if (i < dayCount) {
+                    result.push('-');
+                    continue;
+                }
+                var sum = 0;
+                for (var j = 0; j < dayCount; j++) {
+                    sum += splitData.values[i - j][1];
+                }
+                result.push(sum / dayCount);
+            }
+            return result;
+        }
+    }, {
+        key: "getOption",
+        value: function getOption() {
+            return {
+                title: {
+                    text: '上证指数',
+                    left: 0
+                },
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'cross'
+                    }
+                },
+                legend: {
+                    data: ['日K', 'MA5', 'MA10', 'MA20', 'MA30']
+                },
+                grid: {
+                    left: '10%',
+                    right: '10%',
+                    bottom: '15%'
+                },
+                xAxis: {
+                    type: 'category',
+                    data: this.splitData().categoryData,
+                    scale: true,
+                    boundaryGap: false,
+                    axisLine: { onZero: false },
+                    splitLine: { show: false },
+                    splitNumber: 20,
+                    min: 'dataMin',
+                    max: 'dataMax'
+                },
+                yAxis: {
+                    scale: true,
+                    splitArea: {
+                        show: true
+                    }
+                },
+                dataZoom: [{
+                    type: 'inside',
+                    start: 50,
+                    end: 100
+                }, {
+                    show: true,
+                    type: 'slider',
+                    y: '90%',
+                    start: 50,
+                    end: 100
+                }],
+                series: [{
+                    name: '日K',
+                    type: 'candlestick',
+                    data: this.splitData().values,
+                    itemStyle: {
+                        normal: {
+                            color: upColor,
+                            color0: downColor,
+                            borderColor: upBorderColor,
+                            borderColor0: downBorderColor
+                        }
+                    },
+                    markPoint: {
+                        label: {
+                            normal: {
+                                formatter: function formatter(param) {
+                                    return param != null ? Math.round(param.value) : '';
+                                }
+                            }
+                        },
+                        data: [{
+                            name: 'XX标点',
+                            coord: ['2013/5/31', 2300],
+                            value: 2300,
+                            itemStyle: {
+                                normal: { color: 'rgb(41,60,85)' }
+                            }
+                        }, {
+                            name: 'highest value',
+                            type: 'max',
+                            valueDim: 'highest'
+                        }, {
+                            name: 'lowest value',
+                            type: 'min',
+                            valueDim: 'lowest'
+                        }, {
+                            name: 'average value on close',
+                            type: 'average',
+                            valueDim: 'close'
+                        }],
+                        tooltip: {
+                            formatter: function formatter(param) {
+                                return param.name + '<br>' + (param.data.coord || '');
+                            }
+                        }
+                    },
+                    markLine: {
+                        symbol: ['none', 'none'],
+                        data: [[{
+                            name: 'from lowest to highest',
+                            type: 'min',
+                            valueDim: 'lowest',
+                            symbol: 'circle',
+                            symbolSize: 10,
+                            label: {
+                                normal: { show: false },
+                                emphasis: { show: false }
+                            }
+                        }, {
+                            type: 'max',
+                            valueDim: 'highest',
+                            symbol: 'circle',
+                            symbolSize: 10,
+                            label: {
+                                normal: { show: false },
+                                emphasis: { show: false }
+                            }
+                        }], {
+                            name: 'min line on close',
+                            type: 'min',
+                            valueDim: 'close'
+                        }, {
+                            name: 'max line on close',
+                            type: 'max',
+                            valueDim: 'close'
+                        }]
+                    }
+                }, {
+                    name: 'MA5',
+                    type: 'line',
+                    data: this.calculateMA(5),
+                    smooth: true,
+                    lineStyle: {
+                        normal: { opacity: 0.5 }
+                    }
+                }, {
+                    name: 'MA10',
+                    type: 'line',
+                    data: this.calculateMA(10),
+                    smooth: true,
+                    lineStyle: {
+                        normal: { opacity: 0.5 }
+                    }
+                }, {
+                    name: 'MA20',
+                    type: 'line',
+                    data: this.calculateMA(20),
+                    smooth: true,
+                    lineStyle: {
+                        normal: { opacity: 0.5 }
+                    }
+                }, {
+                    name: 'MA30',
+                    type: 'line',
+                    data: this.calculateMA(30),
+                    smooth: true,
+                    lineStyle: {
+                        normal: { opacity: 0.5 }
+                    }
+                }]
+            };
+        }
+    }]);
+
+    return WrapUtil;
+}();
+
+exports.WrapUtil = WrapUtil;
 
 /***/ })
 /******/ ])});;
