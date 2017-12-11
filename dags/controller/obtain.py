@@ -95,47 +95,50 @@ def get_all_share(gem_flag):
     """
     根据类别获取所有share数据
     """
+    console.write_head(
+        conf.HDF5_OPERATE_GET,
+        conf.HDF5_RESOURCE_TUSHARE,
+        conf.HDF5_RESOURCE_TUSHARE
+    )
+    # 初始化相关文件
+    f_classify = h5py.File(conf.HDF5_FILE_CLASSIFY, 'a')
+    code_list = []
     classify_list = [
         conf.HDF5_CLASSIFY_CONCEPT,
         conf.HDF5_CLASSIFY_INDUSTRY,
         conf.HDF5_CLASSIFY_HOT,
     ]
-    # 初始化相关文件
-    f = h5py.File(conf.HDF5_FILE_SHARE, 'a')
-    f_classify = h5py.File(conf.HDF5_FILE_CLASSIFY, 'a')
     for ctype in classify_list:
-        # 初始化error记录
-        error.init_batch(conf.HDF5_ERROR_SHARE_GET)
-
         # 获取概念下具体类别名称
         for classify_name in f_classify[ctype]:
             # 如果不存在code list，则跳过
             if f_classify[ctype][classify_name].get(conf.HDF5_CLASSIFY_DS_CODE) is None:
                 continue
-
-            console.write_head(
-                conf.HDF5_OPERATE_GET,
-                conf.HDF5_RESOURCE_TUSHARE,
-                classify_name
-            )
             # 获取单个分类(code的list)下的share数据
             for row in f_classify[ctype][classify_name][conf.HDF5_CLASSIFY_DS_CODE]:
                 code = row[0].astype(str)
-                # TODO, 筛选错误数据
-                # history = error.get_file()
-                # error_history = list()
-                # if history is not None:
-                #     history["ktype"] = history["ktype"].str.decode("utf-8")
-                #     history["code"] = history["code"].str.decode("utf-8")
-                #     error_history = history.values
-                get_code_share(f, code, gem_flag)
-            # 记录错误内容
-            error.write_batch()
-            # 输出获取情况
-            count.show_result()
-            console.write_tail()
+                if code not in code_list:
+                    code_list.append(code)
     f_classify.close()
+
+    f = h5py.File(conf.HDF5_FILE_SHARE, 'a')
+    # 初始化error记录
+    error.init_batch(conf.HDF5_ERROR_SHARE_GET)
+    for code in code_list:
+        # TODO, 筛选错误数据
+        # history = error.get_file()
+        # error_history = list()
+        # if history is not None:
+        #     history["ktype"] = history["ktype"].str.decode("utf-8")
+        #     history["code"] = history["code"].str.decode("utf-8")
+        #     error_history = history.values
+        get_code_share(f, code, gem_flag)
+    # 记录错误内容
+    error.write_batch()
+    # 输出获取情况
+    count.show_result()
     f.close()
+    console.write_tail()
     return
 
 
