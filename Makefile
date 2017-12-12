@@ -22,6 +22,13 @@ rm-grafana:
 local-bash:
 	nohup bash ./exec.sh > ./logs/$(DATE).log 2>&1 &
 
+build-talib:
+	mkdir tmp && cd tmp && \
+		wget http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz && \
+		tar -xvf ./ta-lib-0.4.0-src.tar.gz && cd ./ta-lib && ./configure --prefix=/usr && \
+		make && sudo make install && cd ../.. && \
+		rm -rf ./tmp 
+
 local-python:
 	pip3 install --index https://pypi.mirrors.ustc.edu.cn/simple/ --user -r ./hack/dockerfile/requirements.utils.txt && \
 	pip3 install --index https://pypi.mirrors.ustc.edu.cn/simple/ --user -r ./hack/dockerfile/requirements.tushare.txt
