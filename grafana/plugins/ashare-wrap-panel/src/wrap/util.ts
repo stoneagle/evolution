@@ -15,8 +15,8 @@ export class WrapUtil {
   }
 
   splitData() {
-    var categoryData: any[] = [];
-    var values: any[] = []
+    var categoryData = new Array();
+    var values = new Array();
     for (var i = 0; i < this.rawData.length; i++) {
         categoryData.push(this.rawData[i].splice(0, 1)[0]);
         values.push(this.rawData[i])
@@ -27,9 +27,8 @@ export class WrapUtil {
     };
   }
 
-  calculateMA(dayCount: number): any[] {
-    var result:any[] = [];
-    var splitData = this.splitData();
+  calculateMA(dayCount: number, splitData): any[] {
+    var result = new Array();
     for (var i = 0, len = splitData.values.length; i < len; i++) {
         if (i < dayCount) {
             result.push('-');
@@ -37,14 +36,15 @@ export class WrapUtil {
         }
         var sum = 0;
         for (var j = 0; j < dayCount; j++) {
-            sum += splitData.values[i - j][1];
+          sum += parseInt(splitData.values[i - j][1]);
         }
-        result.push(sum / dayCount);
+        result.push((sum / dayCount).toFixed(2));
     }
     return result;
   }
 
   getOption() {
+    var splitData = this.splitData();
     return {
         title: {
             text: '上证指数',
@@ -66,7 +66,7 @@ export class WrapUtil {
         },
         xAxis: {
             type: 'category',
-            data: this.splitData().categoryData,
+            data: splitData.categoryData,
             scale: true,
             boundaryGap : false,
             axisLine: {onZero: false},
@@ -99,7 +99,7 @@ export class WrapUtil {
             {
                 name: '日K',
                 type: 'candlestick',
-                data: this.splitData().values,
+                data: splitData.values,
                 itemStyle: {
                     normal: {
                         color: upColor,
@@ -108,88 +108,88 @@ export class WrapUtil {
                         borderColor0: downBorderColor
                     }
                 },
-                markPoint: {
-                    label: {
-                        normal: {
-                            formatter: function (param) {
-                                return param != null ? Math.round(param.value) : '';
-                            }
-                        }
-                    },
-                    data: [
-                        {
-                            name: 'XX标点',
-                            coord: ['2013/5/31', 2300],
-                            value: 2300,
-                            itemStyle: {
-                                normal: {color: 'rgb(41,60,85)'}
-                            }
-                        },
-                        {
-                            name: 'highest value',
-                            type: 'max',
-                            valueDim: 'highest'
-                        },
-                        {
-                            name: 'lowest value',
-                            type: 'min',
-                            valueDim: 'lowest'
-                        },
-                        {
-                            name: 'average value on close',
-                            type: 'average',
-                            valueDim: 'close'
-                        }
-                    ],
-                    tooltip: {
-                        formatter: function (param) {
-                            return param.name + '<br>' + (param.data.coord || '');
-                        }
-                    }
-                },
-                markLine: {
-                    symbol: ['none', 'none'],
-                    data: [
-                        [
-                            {
-                                name: 'from lowest to highest',
-                                type: 'min',
-                                valueDim: 'lowest',
-                                symbol: 'circle',
-                                symbolSize: 10,
-                                label: {
-                                    normal: {show: false},
-                                    emphasis: {show: false}
-                                }
-                            },
-                            {
-                                type: 'max',
-                                valueDim: 'highest',
-                                symbol: 'circle',
-                                symbolSize: 10,
-                                label: {
-                                    normal: {show: false},
-                                    emphasis: {show: false}
-                                }
-                            }
-                        ],
-                        {
-                            name: 'min line on close',
-                            type: 'min',
-                            valueDim: 'close'
-                        },
-                        {
-                            name: 'max line on close',
-                            type: 'max',
-                            valueDim: 'close'
-                        }
-                    ]
-                }
+                // markPoint: {
+                //     label: {
+                //         normal: {
+                //             formatter: function (param) {
+                //                 return param != null ? Math.round(param.value) : '';
+                //             }
+                //         }
+                //     },
+                //     data: [
+                //         {
+                //             name: 'XX标点',
+                //             coord: ['2013/5/31', 2300],
+                //             value: 2300,
+                //             itemStyle: {
+                //                 normal: {color: 'rgb(41,60,85)'}
+                //             }
+                //         },
+                //         {
+                //             name: 'highest value',
+                //             type: 'max',
+                //             valueDim: 'highest'
+                //         },
+                //         {
+                //             name: 'lowest value',
+                //             type: 'min',
+                //             valueDim: 'lowest'
+                //         },
+                //         {
+                //             name: 'average value on close',
+                //             type: 'average',
+                //             valueDim: 'close'
+                //         }
+                //     ],
+                //     tooltip: {
+                //         formatter: function (param) {
+                //             return param.name + '<br>' + (param.data.coord || '');
+                //         }
+                //     }
+                // },
+                // markLine: {
+                //     symbol: ['none', 'none'],
+                //     data: [
+                //         [
+                //             {
+                //                 name: 'from lowest to highest',
+                //                 type: 'min',
+                //                 valueDim: 'lowest',
+                //                 symbol: 'circle',
+                //                 symbolSize: 10,
+                //                 label: {
+                //                     normal: {show: false},
+                //                     emphasis: {show: false}
+                //                 }
+                //             },
+                //             {
+                //                 type: 'max',
+                //                 valueDim: 'highest',
+                //                 symbol: 'circle',
+                //                 symbolSize: 10,
+                //                 label: {
+                //                     normal: {show: false},
+                //                     emphasis: {show: false}
+                //                 }
+                //             }
+                //         ],
+                //         {
+                //             name: 'min line on close',
+                //             type: 'min',
+                //             valueDim: 'close'
+                //         },
+                //         {
+                //             name: 'max line on close',
+                //             type: 'max',
+                //             valueDim: 'close'
+                //         }
+                //     ]
+                // }
             },
             {
                 name: 'MA5',
                 type: 'line',
-                data: this.calculateMA(5),
+                data: this.calculateMA(5, splitData),
                 smooth: true,
                 lineStyle: {
                     normal: {opacity: 0.5}
@@ -198,25 +198,7 @@ export class WrapUtil {
             {
                 name: 'MA10',
                 type: 'line',
-                data: this.calculateMA(10),
-                smooth: true,
-                lineStyle: {
-                    normal: {opacity: 0.5}
-                }
-            },
-            {
-                name: 'MA20',
-                type: 'line',
-                data: this.calculateMA(20),
-                smooth: true,
-                lineStyle: {
-                    normal: {opacity: 0.5}
-                }
-            },
-            {
-                name: 'MA30',
-                type: 'line',
-                data: this.calculateMA(30),
+                data: this.calculateMA(10, splitData),
                 smooth: true,
                 lineStyle: {
                     normal: {opacity: 0.5}
