@@ -34276,7 +34276,7 @@ var util_1 = __webpack_require__(169);
 var _ = __webpack_require__(170);
 var echarts = __webpack_require__(172);
 var defaults = {
-    echartsType: 'none',
+    echartsType: 'share',
     // https://github.com/grafana/grafana/blob/v4.1.1/public/app/plugins/panel/singlestat/module.ts#L57
     nullMapping: undefined
 };
@@ -34301,7 +34301,7 @@ var PanelCtrl = function (_sdk_1$MetricsPanelCt) {
         _this.events.on('data-error', _this.onDataError.bind(_this));
         _this.events.on('init-edit-mode', _this.onInitEditMode.bind(_this));
         _this.events.on('data-received', _this.onDataReceived.bind(_this));
-        // this.events.on('refresh', this.postRefresh.bind(this));
+        _this.events.on('refresh', _this.onRefresh.bind(_this));
         // this.events.on('data-snapshot-load', this.onDataReceived.bind(this));
         return _this;
     }
@@ -34331,6 +34331,9 @@ var PanelCtrl = function (_sdk_1$MetricsPanelCt) {
             // 渲染样式
             this._setElementHeight();
         }
+    }, {
+        key: "onRefresh",
+        value: function onRefresh() {}
     }, {
         key: "_setElementHeight",
         value: function _setElementHeight() {
@@ -34445,6 +34448,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var shareTable = "demo";
+var index_open = "open";
+var index_close = "close";
+var index_high = "high";
+var index_low = "low";
+var index_volume = "volume";
+var index_dif = "dif";
+var index_dea = "dea";
+var index_macd = "macd";
 
 var Mapper = function () {
     function Mapper(panelConfig) {
@@ -34465,30 +34476,30 @@ var Mapper = function () {
                 var targetArr = seriesList[i].target.split(".");
                 var columnName = targetArr[1];
                 switch (columnName) {
-                    case "close":
-                    case "high":
-                    case "low":
-                    case "open":
-                    case "volume":
+                    case index_open:
+                    case index_close:
+                    case index_low:
+                    case index_high:
+                    case index_volume:
+                    case index_dif:
+                    case index_dea:
+                    case index_macd:
                         seriesMap.set(columnName, seriesList[i].datapoints);
                 }
             }
-            var closeList = seriesMap.get("close");
-            var highList = seriesMap.get("high");
-            var lowList = seriesMap.get("low");
-            var openList = seriesMap.get("open");
-            var volumeList = seriesMap.get("volume");
-            console.log(volumeList);
             var ret = new Array();
             for (var _i = 0; _i < seriesLength; _i++) {
                 ret[_i] = new Array();
-                var date = this._getDateStr(closeList[_i][1]);
+                var date = this._getDateStr(seriesMap.get(index_close)[_i][1]);
                 ret[_i][0] = date;
-                ret[_i][1] = openList[_i][0].toFixed(2);
-                ret[_i][2] = closeList[_i][0].toFixed(2);
-                ret[_i][3] = lowList[_i][0].toFixed(2);
-                ret[_i][4] = highList[_i][0].toFixed(2);
-                ret[_i][5] = volumeList[_i][0].toFixed(2);
+                ret[_i][1] = seriesMap.get(index_open)[_i][0].toFixed(2);
+                ret[_i][2] = seriesMap.get(index_close)[_i][0].toFixed(2);
+                ret[_i][3] = seriesMap.get(index_low)[_i][0].toFixed(2);
+                ret[_i][4] = seriesMap.get(index_high)[_i][0].toFixed(2);
+                ret[_i][5] = seriesMap.get(index_volume)[_i][0].toFixed(2);
+                ret[_i][6] = seriesMap.get(index_dif)[_i][0].toFixed(2);
+                ret[_i][7] = seriesMap.get(index_dea)[_i][0].toFixed(2);
+                ret[_i][8] = seriesMap.get(index_macd)[_i][0].toFixed(2);
             }
             return ret;
         }
@@ -34568,7 +34579,7 @@ var EchartsUtil = function () {
     function EchartsUtil() {
         _classCallCheck(this, EchartsUtil);
 
-        // 数据意义：开盘(open),收盘(close),最低(low),最高(high),成交量(volume)
+        // 数据意义：开盘(open),收盘(close),最低(low),最高(high),成交量(volume),dea/dif/macd(macd)
         this.rawShareData = [];
     }
 
@@ -34583,16 +34594,25 @@ var EchartsUtil = function () {
             var categoryData = new Array();
             var values = new Array();
             var volumes = new Array();
+            var macdDIFs = new Array();
+            var macdDEAs = new Array();
+            var macdPillers = new Array();
             var data = this.rawShareData;
             for (var i = 0; i < data.length; i++) {
                 categoryData.push(data[i].splice(0, 1)[0]);
                 values.push(data[i]);
                 volumes.push([i, data[i][4], data[i][0] > data[i][1] ? 1 : -1]);
+                macdDIFs.push(data[i][5]);
+                macdDEAs.push(data[i][6]);
+                macdPillers.push([i, data[i][7], data[i][7] >= 0 ? 1 : -1]);
             }
             return {
                 categoryData: categoryData,
                 values: values,
-                volumes: volumes
+                volumes: volumes,
+                macdDIFs: macdDIFs,
+                macdDEAs: macdDEAs,
+                macdPillers: macdPillers
             };
         }
     }, {
@@ -34624,7 +34644,7 @@ var EchartsUtil = function () {
                 },
                 animation: false,
                 legend: {
-                    bottom: 10,
+                    // bottom: 10,
                     left: 'center',
                     data: ['日K', 'MA5', 'MA10', 'MA20', 'MA30']
                 },
@@ -34655,12 +34675,17 @@ var EchartsUtil = function () {
                 grid: [{
                     left: '10%',
                     right: '8%',
-                    height: '50%'
+                    height: '40%'
                 }, {
                     left: '10%',
                     right: '8%',
-                    top: '63%',
-                    height: '16%'
+                    top: '55%',
+                    height: '20%'
+                }, {
+                    left: '10%',
+                    right: '8%',
+                    top: '75%',
+                    height: '15%'
                 }],
                 xAxis: [{
                     type: 'category',
@@ -34674,7 +34699,17 @@ var EchartsUtil = function () {
                     max: 'dataMax'
                 }, {
                     type: 'category',
+                    data: splitData.categoryData,
                     gridIndex: 1,
+                    scale: true,
+                    boundaryGap: false,
+                    silent: false,
+                    axisTick: { show: false },
+                    splitLine: { show: false },
+                    axisLabel: { show: false }
+                }, {
+                    type: 'category',
+                    gridIndex: 2,
                     data: splitData.categoryData,
                     scale: true,
                     boundaryGap: false,
@@ -34692,8 +34727,16 @@ var EchartsUtil = function () {
                         show: true
                     }
                 }, {
-                    scale: true,
                     gridIndex: 1,
+                    scale: true,
+                    splitNumber: 2,
+                    axisLabel: { show: false },
+                    axisLine: { show: false },
+                    axisTick: { show: false },
+                    splitLine: { show: false }
+                }, {
+                    gridIndex: 2,
+                    scale: true,
                     splitNumber: 2,
                     axisLabel: { show: false },
                     axisLine: { show: false },
@@ -34702,15 +34745,14 @@ var EchartsUtil = function () {
                 }],
                 dataZoom: [{
                     type: 'inside',
-                    xAxisIndex: [0, 1],
+                    xAxisIndex: [0, 1, 2],
                     start: 90,
                     end: 100
                 }, {
                     show: true,
                     type: 'slider',
-                    xAxisIndex: [0, 1],
-                    // y: '90%',
-                    top: '85%',
+                    xAxisIndex: [0, 1, 2],
+                    top: '90%',
                     start: 90,
                     end: 100
                 }],
@@ -34743,15 +34785,56 @@ var EchartsUtil = function () {
                         normal: { opacity: 0.5 }
                     }
                 }, {
-                    name: 'Volume',
+                    name: 'MA10',
+                    type: 'line',
+                    data: this.calculateMA(10, splitData),
+                    smooth: true,
+                    lineStyle: {
+                        normal: { opacity: 0.5 }
+                    }
+                }, {
+                    name: 'MACD',
                     type: 'bar',
                     xAxisIndex: 1,
                     yAxisIndex: 1,
+                    data: splitData.macdPillers
+                }, {
+                    name: 'VOL',
+                    type: 'bar',
+                    xAxisIndex: 2,
+                    yAxisIndex: 2,
                     data: splitData.volumes
+                }, {
+                    name: 'DIF',
+                    type: 'line',
+                    xAxisIndex: 1,
+                    yAxisIndex: 1,
+                    data: splitData.macdDIFs,
+                    itemStyle: {
+                        normal: {
+                            color: 'rgb(0, 0, 0)'
+                        }
+                    },
+                    smooth: true,
+                    lineStyle: {
+                        normal: { opacity: 0.5 }
+                    }
+                }, {
+                    name: 'DEA',
+                    type: 'line',
+                    xAxisIndex: 1,
+                    yAxisIndex: 1,
+                    data: splitData.macdDEAs,
+                    itemStyle: {
+                        normal: {
+                            color: 'rgb(138,43,226)'
+                        }
+                    },
+                    smooth: true
                 }],
                 visualMap: {
                     show: false,
-                    seriesIndex: 3,
+                    seriesIndex: [3, 4],
                     dimension: 2,
                     pieces: [{
                         value: 1,

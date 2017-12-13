@@ -7,7 +7,7 @@ import * as _ from 'lodash';
 import * as echarts from 'echarts';
 
 const defaults = {
-  echartsType: 'none',
+  echartsType: 'share',
   // https://github.com/grafana/grafana/blob/v4.1.1/public/app/plugins/panel/singlestat/module.ts#L57
   nullMapping: undefined,
 };
@@ -42,7 +42,7 @@ export class PanelCtrl extends MetricsPanelCtrl {
 		this.events.on('data-error', this.onDataError.bind(this));
 		this.events.on('init-edit-mode', this.onInitEditMode.bind(this));
     this.events.on('data-received', this.onDataReceived.bind(this));
-		// this.events.on('refresh', this.postRefresh.bind(this));
+		this.events.on('refresh', this.onRefresh.bind(this));
 		// this.events.on('data-snapshot-load', this.onDataReceived.bind(this));
   }
 
@@ -68,6 +68,9 @@ export class PanelCtrl extends MetricsPanelCtrl {
     this._setElementHeight();
   }
 
+  onRefresh() {
+  }
+
 	_setElementHeight() {
     // 调整容器高度
     this.$panelContainer.find('.ashare-panel').css('min-height', this.$panelContoller.height + 'px');
@@ -75,7 +78,6 @@ export class PanelCtrl extends MetricsPanelCtrl {
     this.$panelContainer.find('.echarts-plugin').css('min-height', this.minHeight + 'px');
     this.$panelContainer.find('.echarts').css('min-height', this.minHeight + 'px');
 	}
-
 
   onDataReceived(seriesList: any) {
     // influxdb数据更新时,绘制图表
