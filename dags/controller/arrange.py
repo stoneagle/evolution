@@ -102,17 +102,12 @@ def operate_st(action_type):
     return
 
 
-def arrange_all_classify_detail(gem_flag, start_date):
+def arrange_all_classify_detail(classify_list, gem_flag, start_date):
     """
     遍历所有分类，聚合所有code获取分类均值
     """
     f = h5py.File(conf.HDF5_FILE_SHARE, 'a')
     f_classify = h5py.File(conf.HDF5_FILE_CLASSIFY, 'a')
-    classify_list = [
-        conf.HDF5_CLASSIFY_INDUSTRY,
-        conf.HDF5_CLASSIFY_CONCEPT,
-        conf.HDF5_CLASSIFY_HOT,
-    ]
     # 获取classify列表
     for ctype in classify_list:
         for classify_name in f_classify[ctype]:

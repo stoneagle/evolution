@@ -79,16 +79,11 @@ def share_detail(code_list):
     return
 
 
-def classify_detail():
+def classify_detail(classify_list):
     """
     将分类推送至influxdb
     """
     f = h5py.File(conf.HDF5_FILE_CLASSIFY, 'a')
-    classify_list = [
-        # conf.HDF5_CLASSIFY_INDUSTRY,
-        # conf.HDF5_CLASSIFY_CONCEPT,
-        conf.HDF5_CLASSIFY_HOT,
-    ]
     # 获取classify列表
     for ctype in classify_list:
         for classify_name in f[ctype]:

@@ -4,16 +4,11 @@ from library import conf, count, error, console
 from controller import arrange
 
 
-def get_classify():
+def get_classify(classify_list):
     """
     获取类别数据
     """
     f = h5py.File(conf.HDF5_FILE_CLASSIFY, 'a')
-    classify_list = [
-        conf.HDF5_CLASSIFY_CONCEPT,
-        conf.HDF5_CLASSIFY_INDUSTRY,
-        conf.HDF5_CLASSIFY_HOT,
-    ]
     for ctype in classify_list:
         console.write_head(
             conf.HDF5_OPERATE_GET,
