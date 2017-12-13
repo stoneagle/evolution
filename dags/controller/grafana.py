@@ -79,6 +79,37 @@ def share_detail(code_list):
     return
 
 
+def index_detail():
+    """
+    将指数推送至influxdb
+    """
+    f = h5py.File(conf.HDF5_FILE_INDEX, 'a')
+    for code in f:
+        console.write_head(
+            conf.HDF5_OPERATE_PUSH,
+            conf.HDF5_RESOURCE_TUSHARE,
+            code
+        )
+        for ktype in conf.HDF5_SHARE_KTYPE:
+            if f[code].get(ktype) is None:
+                continue
+            index_ds_name = conf.HDF5_INDEX_DETAIL + "_" + ktype
+            if f[code].get(index_ds_name) is None:
+                continue
+            detail_df = tool.df_from_dataset(f[code], ktype, None)
+            index_df = tool.df_from_dataset(f[code], index_ds_name, None)
+            detail_df = detail_df.merge(index_df, left_on=conf.HDF5_SHARE_DATE_INDEX, right_on=conf.HDF5_SHARE_DATE_INDEX, how='outer')
+            detail_df[conf.HDF5_SHARE_DATE_INDEX] = detail_df[conf.HDF5_SHARE_DATE_INDEX].str.decode("utf-8")
+            detail_df.index = pd.to_datetime(detail_df[conf.HDF5_SHARE_DATE_INDEX])
+            detail_df = detail_df.drop(conf.HDF5_SHARE_DATE_INDEX, axis=1)
+            detail_df = detail_df.replace(np.inf, 0)
+            detail_df = detail_df.replace(np.nan, 0)
+            influx.write_df(detail_df, conf.MEASUREMENT_INDEX, {"itype": code, "ktype": ktype})
+        console.write_tail()
+    f.close()
+    return
+
+
 def classify_detail(classify_list):
     """
     将分类推送至influxdb
@@ -105,7 +136,6 @@ def classify_detail(classify_list):
                 detail_df = tool.df_from_dataset(f[ctype][classify_name], detail_ds_name, None)
                 index_df = tool.df_from_dataset(f[ctype][classify_name], index_ds_name, None)
                 detail_df = detail_df.merge(index_df, left_on=conf.HDF5_SHARE_DATE_INDEX, right_on=conf.HDF5_SHARE_DATE_INDEX, how='outer')
-
                 detail_df[conf.HDF5_SHARE_DATE_INDEX] = detail_df[conf.HDF5_SHARE_DATE_INDEX].str.decode("utf-8")
                 detail_df.index = pd.to_datetime(detail_df[conf.HDF5_SHARE_DATE_INDEX])
                 detail_df = detail_df.drop(conf.HDF5_SHARE_DATE_INDEX, axis=1)
