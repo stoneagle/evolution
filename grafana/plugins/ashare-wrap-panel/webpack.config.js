@@ -28,7 +28,7 @@ module.exports = {
       { from: 'README.md' },
       { from: 'partials/*' },
       { from: 'css/*' },
-      { from: 'wrap/*.html' },
+      { from: 'echarts/*.html' },
       { from: 'assets/*' },
     ])
   ],

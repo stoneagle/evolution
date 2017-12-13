@@ -2,7 +2,7 @@ import { PanelConfig } from '../panel-config';
 import { coreModule } from 'grafana/app/core/core';
 
 var directiveInited = false;
-export function initWrap(panelConfig: PanelConfig, directiveName: string = "wrap") {
+export function EchartsInit(panelConfig: PanelConfig, directiveName: string = "echarts") {
   if(directiveInited) {
     return;
   }
@@ -10,7 +10,7 @@ export function initWrap(panelConfig: PanelConfig, directiveName: string = "wrap
 
   coreModule.directive(directiveName, function() {
     return {
-      templateUrl: panelConfig.pluginDirName + 'wrap/wrap.html',
+      templateUrl: panelConfig.pluginDirName + 'echarts/echarts.html',
       restrict: 'E',
       scope: {
         item: "="

@@ -25,6 +25,7 @@ export class Mapper {
         case "high":
         case "low":
         case "open":
+        case "volume":
           seriesMap.set(columnName, seriesList[i].datapoints)
       }
     }
@@ -33,6 +34,8 @@ export class Mapper {
     let highList = seriesMap.get("high")
     let lowList = seriesMap.get("low")
     let openList = seriesMap.get("open")
+    let volumeList = seriesMap.get("volume")
+    console.log(volumeList);
     let ret = new Array();
     for (let i = 0; i < seriesLength; i++) {
       ret[i] = new Array();
@@ -42,6 +45,7 @@ export class Mapper {
       ret[i][2] = closeList![i][0].toFixed(2);
       ret[i][3] = lowList![i][0].toFixed(2);
       ret[i][4] = highList![i][0].toFixed(2);
+      ret[i][5] = volumeList![i][0].toFixed(2);
     }
     return ret;
   }
