@@ -22,6 +22,9 @@ rm-grafana:
 local-bash:
 	nohup bash ./exec.sh > ./logs/$(DATE).log 2>&1 &
 
+local-test:
+	runmode=dev LD_LIBRARY_PATH=/usr/lib python3 ./dags/test.py
+
 build-talib:
 	mkdir tmp && cd tmp && \
 		wget http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz && \
