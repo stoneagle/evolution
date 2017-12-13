@@ -109,7 +109,7 @@ def arrange_all_classify_detail(gem_flag, start_date):
     f = h5py.File(conf.HDF5_FILE_SHARE, 'a')
     f_classify = h5py.File(conf.HDF5_FILE_CLASSIFY, 'a')
     classify_list = [
-        # conf.HDF5_CLASSIFY_INDUSTRY,
+        conf.HDF5_CLASSIFY_INDUSTRY,
         conf.HDF5_CLASSIFY_CONCEPT,
         conf.HDF5_CLASSIFY_HOT,
     ]
@@ -127,11 +127,13 @@ def arrange_all_classify_detail(gem_flag, start_date):
 
             for ktype in conf.HDF5_SHARE_KTYPE:
                 mean_df = arrange_one_classify_detail(f, f_classify[ctype][classify_name].get(conf.HDF5_CLASSIFY_DS_CODE), gem_flag, ktype, start_date)
+                ds_name = conf.HDF5_CLASSIFY_DS_DETAIL + "_" + ktype
                 # 如果start_date为空，则重置该数据
                 if start_date is None:
-                    tool.delete_dataset(f_classify[ctype][classify_name], conf.HDF5_CLASSIFY_DS_DETAIL)
+                    tool.delete_dataset(f_classify[ctype][classify_name], ds_name)
+
                 if mean_df is not None:
-                    tool.merge_df_dataset(f_classify[ctype][classify_name], conf.HDF5_CLASSIFY_DS_DETAIL, mean_df)
+                    tool.merge_df_dataset(f_classify[ctype][classify_name], ds_name, mean_df)
             console.write_tail()
     f_classify.close()
     f.close()

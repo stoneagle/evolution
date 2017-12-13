@@ -5,7 +5,10 @@ import numpy as np
 from library import conf, console, tool
 
 
-def all_index(gem_flag, start_date):
+def all_share_index(gem_flag, start_date):
+    """
+    获取所有股票的macd与所处均线等指标
+    """
     f = h5py.File(conf.HDF5_FILE_SHARE, 'a')
     console.write_head(
         conf.HDF5_OPERATE_INDEX,
@@ -21,8 +24,13 @@ def all_index(gem_flag, start_date):
                 continue
             if f[code_prefix][code].attrs.get(conf.HDF5_BASIC_ST) is not None:
                 continue
+
+            code_group_path = '/' + code_prefix + '/' + code
             for ktype in conf.HDF5_SHARE_KTYPE:
-                index_df = one_index(f, code, ktype, start_date)
+                if f.get(code_group_path) is None or f[code_prefix][code].get(ktype) is None:
+                    continue
+                df = tool.df_from_dataset(f[code_prefix][code], ktype, None)
+                index_df = one_df_index(df, start_date)
                 ds_name = conf.HDF5_INDEX_DETAIL + "_" + ktype
                 if start_date is None:
                     tool.delete_dataset(f[code_prefix][code], ds_name)
@@ -32,12 +40,47 @@ def all_index(gem_flag, start_date):
     return
 
 
-def one_index(f, code, ktype, start_date):
-    code_prefix = code[0:3]
-    code_group_path = '/' + code_prefix + '/' + code
-    if f.get(code_group_path) is None or f[code_prefix][code].get(ktype) is None:
-        return
-    df = tool.df_from_dataset(f[code_prefix][code], ktype, None)
+def all_classify_index(start_date):
+    """
+    获取所有分类的macd与所处均线等指标(依赖分类数据聚合)
+    """
+    f = h5py.File(conf.HDF5_FILE_CLASSIFY, 'a')
+    classify_list = [
+        conf.HDF5_CLASSIFY_INDUSTRY,
+        conf.HDF5_CLASSIFY_CONCEPT,
+        conf.HDF5_CLASSIFY_HOT,
+    ]
+    # 获取classify列表
+    for ctype in classify_list:
+        for classify_name in f[ctype]:
+            console.write_head(
+                conf.HDF5_OPERATE_ARRANGE,
+                conf.HDF5_RESOURCE_TUSHARE,
+                classify_name
+            )
+
+            for ktype in conf.HDF5_SHARE_KTYPE:
+                ds_name = conf.HDF5_CLASSIFY_DS_DETAIL + "_" + ktype
+                if f[ctype][classify_name].get(ds_name) is None:
+                    continue
+
+                df = tool.df_from_dataset(f[ctype][classify_name], ds_name, None)
+                df["close"] = df["close"].apply(lambda x: round(x, 2))
+                index_df = one_df_index(df, start_date)
+                index_ds_name = conf.HDF5_INDEX_DETAIL + "_" + ktype
+                if start_date is None:
+                    tool.delete_dataset(f[ctype][classify_name], index_ds_name)
+                tool.merge_df_dataset(f[ctype][classify_name], index_ds_name, index_df.reset_index())
+            console.write_tail()
+            break
+    f.close()
+    return
+
+
+def one_df_index(df, start_date):
+    """
+    处理单组df的均线与macd
+    """
     df[conf.HDF5_SHARE_DATE_INDEX] = df[conf.HDF5_SHARE_DATE_INDEX].str.decode("utf-8")
     df = df.set_index(conf.HDF5_SHARE_DATE_INDEX)
     # 计算macd
@@ -51,16 +94,15 @@ def one_index(f, code, ktype, start_date):
     df_index = pd.DataFrame(np.column_stack(macd), index=df.index, columns=conf.HDF5_INDEX_COLUMN)
     df_index["close"] = df["close"]
     df_index["macd"] = df_index["macd"] * 2
-    for i in [5, 10, 30, 60, 240, 480, 365]:
-        df_index["ma_" + str(i)] = tmp_mean_dict[i]
+
     if start_date is not None:
         df_index = df_index.ix[start_date:]
 
     # 计算close价格所处均线位置
     for index, row in df_index.iterrows():
         # 先确认均线是上行还是下行
-        ma5_price = row["ma_5"]
-        ma10_price = row["ma_10"]
+        ma5_price = tmp_mean_dict[5].loc[index]
+        ma10_price = tmp_mean_dict[10].loc[index]
         if np.isnan(ma5_price) or np.isnan(ma10_price):
             df_index.loc[index, "ma_border"] = np.NaN
             continue
@@ -73,7 +115,7 @@ def one_index(f, code, ktype, start_date):
         border = 0
         # 1. 如果下行，从小于找起直到出现大于;如果上行，从大于找起直到出现小于
         for i in [30, 60, 240, 480]:
-            compare_price = row["ma_" + str(i)]
+            compare_price = tmp_mean_dict[i].loc[index]
             if compare_price is np.NaN:
                 break
 
@@ -83,7 +125,7 @@ def one_index(f, code, ktype, start_date):
 
         # 2. 根据边界均线，按比例调整，找出离close最贴近的均线
         if border != 0:
-            border_price = row["ma_" + str(border)]
+            border_price = tmp_mean_dict[border].loc[index]
             df_index.loc[index, "ma_border"] = border
             min_diff = 0
             min_diff_ma_num = 0
@@ -99,4 +141,5 @@ def one_index(f, code, ktype, start_date):
                 df_index.loc[index, "ma_border"] = min_diff_ma_num
         else:
             df_index.loc[index, "ma_border"] = 5
+    df_index = df_index.drop("close", axis=1)
     return df_index
