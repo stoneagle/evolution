@@ -28,7 +28,23 @@ def init_db():
     return
 
 
-def write_df(df, measurement):
+def write_df(df, measurement, tags):
     global dfclient
-    dfclient.write_points(df, measurement, protocol=conf.INFLUXDB_PROTOCOL_JSON)
+    if tags is None:
+        dfclient.write_points(df, measurement, protocol=conf.INFLUXDB_PROTOCOL_JSON)
+    else:
+        dfclient.write_points(df, measurement, tags, protocol=conf.INFLUXDB_PROTOCOL_JSON)
+    return
+
+
+def reset_df(df, measurement, tags):
+    global dfclient
+    delete_measurement(measurement, tags)
+    write_df(df, measurement, tags)
+    return
+
+
+def delete_measurement(measurement, tags):
+    global dfclient
+    dfclient.delete_series(measurement=measurement, tags=tags)
     return

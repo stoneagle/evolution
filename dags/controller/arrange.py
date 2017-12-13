@@ -1,5 +1,5 @@
 import h5py
-from library import conf, console, tool, tradetime
+from library import conf, console, tool
 from strategy.util import action, wrap
 
 
@@ -109,8 +109,8 @@ def arrange_all_classify_detail(gem_flag, start_date):
     f = h5py.File(conf.HDF5_FILE_SHARE, 'a')
     f_classify = h5py.File(conf.HDF5_FILE_CLASSIFY, 'a')
     classify_list = [
+        # conf.HDF5_CLASSIFY_INDUSTRY,
         conf.HDF5_CLASSIFY_CONCEPT,
-        conf.HDF5_CLASSIFY_INDUSTRY,
         conf.HDF5_CLASSIFY_HOT,
     ]
     # 获取classify列表
@@ -217,13 +217,15 @@ def arrange_xsg():
                 if len(share_df) == 0:
                     continue
                 close = share_df.tail(1)["close"]
-                close.values * float(row["count"])
-                code_sum = close.values * float(row["count"])
-                week_date = tradetime.get_week_of_date(xsg_date_str, "D")
-                if week_date in xsg_sum_dict:
-                    xsg_sum_dict[week_date] += code_sum[0]
+                # 万股*元，统一单位为亿
+                code_sum = close.values * float(row["count"]) * 10000
+                sum_price = round(code_sum[0] / 10000 / 10000, 2)
+                # trade_date = tradetime.get_week_of_date(xsg_date_str, "D")
+                trade_date = xsg_date_str
+                if trade_date in xsg_sum_dict:
+                    xsg_sum_dict[trade_date] += sum_price
                 else:
-                    xsg_sum_dict[week_date] = code_sum[0]
+                    xsg_sum_dict[trade_date] = sum_price
         sum_df = tool.init_df(list(xsg_sum_dict.items()), [conf.HDF5_SHARE_DATE_INDEX, "sum"])
         if len(sum_df) > 0:
             sum_df = sum_df.sort_values(by=[conf.HDF5_SHARE_DATE_INDEX])
@@ -252,11 +254,13 @@ def arrange_ipo():
         df["issue_date"] = df["issue_date"].str.decode("utf-8")
         df["ipo_date"] = df["ipo_date"].str.decode("utf-8")
         for index, row in df.iterrows():
-            week_date = tradetime.get_week_of_date(row["ipo_date"], "D")
-            if week_date in ipo_sum_dict:
-                ipo_sum_dict[week_date] += row["funds"]
+            trade_date = row["ipo_date"]
+            # 统一单位为亿元
+            sum_price = round(row["funds"], 2)
+            if trade_date in ipo_sum_dict:
+                ipo_sum_dict[trade_date] += sum_price
             else:
-                ipo_sum_dict[week_date] = row["funds"]
+                ipo_sum_dict[trade_date] = sum_price
         sum_df = tool.init_df(list(ipo_sum_dict.items()), [conf.HDF5_SHARE_DATE_INDEX, "sum"])
         if len(sum_df) > 0:
             sum_df = sum_df.sort_values(by=[conf.HDF5_SHARE_DATE_INDEX])
@@ -293,11 +297,14 @@ def arrange_margins(mtype):
         df = tool.df_from_dataset(f[path], mtype_index, None)
         df["opDate"] = df["opDate"].str.decode("utf-8")
         for index, row in df.iterrows():
-            week_date = tradetime.get_week_of_date(row["opDate"], "D")
-            if week_date in margin_sum_dict:
-                margin_sum_dict[week_date] += row["rzmre"] - row["rqmcl"]
+            # trade_date = tradetime.get_week_of_date(row["opDate"], "D")
+            trade_date = row["opDate"]
+            # 统一单位为亿元
+            sum_price = round((row["rzmre"] - row["rqmcl"]) / 10000 / 10000, 2)
+            if trade_date in margin_sum_dict:
+                margin_sum_dict[trade_date] += sum_price
             else:
-                margin_sum_dict[week_date] = row["rzmre"] - row["rqmcl"]
+                margin_sum_dict[trade_date] = sum_price
         sum_df = tool.init_df(list(margin_sum_dict.items()), [conf.HDF5_SHARE_DATE_INDEX, "sum"])
         if len(sum_df) > 0:
             sum_df = sum_df.sort_values(by=[conf.HDF5_SHARE_DATE_INDEX])

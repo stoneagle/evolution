@@ -91,6 +91,18 @@ def get_week_of_date(date_str, ktype):
     return transfer_date.strftime("%Y-%W")
 
 
+def transfer_date(date_str, itype, otype):
+    time_switcher = {
+        "M": "%Y-%m",
+        # W模式无法转换
+        "W": "%Y-%W",
+        "D": "%Y-%m-%d",
+        "S": "%Y-%m-%d %H:%M:%S",
+    }
+    transfer_date = datetime.strptime(date_str, time_switcher.get(itype, 'error'))
+    return transfer_date.strftime(time_switcher.get(otype, 'error'))
+
+
 LAST_MONTH_LAST_DAY = get_last_day_of_last_month()
 LAST_WEEK_LAST_DAY = get_last_day_of_last_week()
 LAST_TRADE_DAY = get_last_of_trade_day()
