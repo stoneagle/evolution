@@ -40,16 +40,11 @@ def all_share_index(gem_flag, start_date):
     return
 
 
-def all_classify_index(start_date):
+def all_classify_index(classify_list, start_date):
     """
     获取所有分类的macd与所处均线等指标(依赖分类数据聚合)
     """
     f = h5py.File(conf.HDF5_FILE_CLASSIFY, 'a')
-    classify_list = [
-        conf.HDF5_CLASSIFY_INDUSTRY,
-        conf.HDF5_CLASSIFY_CONCEPT,
-        conf.HDF5_CLASSIFY_HOT,
-    ]
     # 获取classify列表
     for ctype in classify_list:
         for classify_name in f[ctype]:
@@ -73,6 +68,31 @@ def all_classify_index(start_date):
                 tool.merge_df_dataset(f[ctype][classify_name], index_ds_name, index_df.reset_index())
             console.write_tail()
             break
+    f.close()
+    return
+
+
+def all_index_index(start_date):
+    """
+    处理所有指数的均线与macd
+    """
+    f = h5py.File(conf.HDF5_FILE_INDEX, 'a')
+    for code in f:
+        console.write_head(
+            conf.HDF5_OPERATE_ARRANGE,
+            conf.HDF5_RESOURCE_TUSHARE,
+            code
+        )
+        for ktype in conf.HDF5_SHARE_KTYPE:
+            if f[code].get(ktype) is None:
+                continue
+            df = tool.df_from_dataset(f[code], ktype, None)
+            index_df = one_df_index(df, start_date)
+            index_ds_name = conf.HDF5_INDEX_DETAIL + "_" + ktype
+            if start_date is None:
+                tool.delete_dataset(f[code], index_ds_name)
+            tool.merge_df_dataset(f[code], index_ds_name, index_df.reset_index())
+        console.write_tail()
     f.close()
     return
 
