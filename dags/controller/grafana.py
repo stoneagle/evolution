@@ -85,27 +85,38 @@ def classify_detail():
     """
     f = h5py.File(conf.HDF5_FILE_CLASSIFY, 'a')
     classify_list = [
-        # conf.HDF5_CLASSIFY_CONCEPT,
         # conf.HDF5_CLASSIFY_INDUSTRY,
+        # conf.HDF5_CLASSIFY_CONCEPT,
         conf.HDF5_CLASSIFY_HOT,
     ]
     # 获取classify列表
     for ctype in classify_list:
-        # for classify_name in f[ctype]:
-        classify_name = "chgn_700997"
-        console.write_head(
-            conf.HDF5_OPERATE_PUSH,
-            conf.HDF5_RESOURCE_TUSHARE,
-            classify_name
-        )
+        for classify_name in f[ctype]:
+            console.write_head(
+                conf.HDF5_OPERATE_PUSH,
+                conf.HDF5_RESOURCE_TUSHARE,
+                classify_name
+            )
 
-        if f[ctype][classify_name].get(conf.HDF5_CLASSIFY_DS_DETAIL) is not None:
-            df = tool.df_from_dataset(f[ctype][classify_name], conf.HDF5_CLASSIFY_DS_DETAIL, None)
-            df[conf.HDF5_SHARE_DATE_INDEX] = df[conf.HDF5_SHARE_DATE_INDEX].str.decode("utf-8")
-            df.index = pd.to_datetime(df[conf.HDF5_SHARE_DATE_INDEX])
-            df = df.drop(conf.HDF5_SHARE_DATE_INDEX, axis=1)
-            df = df.replace(np.inf, 0)
-            influx.write_df(df, conf.MEASUREMENT_CLASSIFY, None)
-    console.write_tail()
+            for ktype in conf.HDF5_SHARE_KTYPE:
+                detail_ds_name = conf.HDF5_CLASSIFY_DS_DETAIL + "_" + ktype
+                if f[ctype][classify_name].get(detail_ds_name) is None:
+                    continue
+
+                index_ds_name = conf.HDF5_INDEX_DETAIL + "_" + ktype
+                if f[ctype][classify_name].get(index_ds_name) is None:
+                    continue
+
+                detail_df = tool.df_from_dataset(f[ctype][classify_name], detail_ds_name, None)
+                index_df = tool.df_from_dataset(f[ctype][classify_name], index_ds_name, None)
+                detail_df = detail_df.merge(index_df, left_on=conf.HDF5_SHARE_DATE_INDEX, right_on=conf.HDF5_SHARE_DATE_INDEX, how='outer')
+
+                detail_df[conf.HDF5_SHARE_DATE_INDEX] = detail_df[conf.HDF5_SHARE_DATE_INDEX].str.decode("utf-8")
+                detail_df.index = pd.to_datetime(detail_df[conf.HDF5_SHARE_DATE_INDEX])
+                detail_df = detail_df.drop(conf.HDF5_SHARE_DATE_INDEX, axis=1)
+                detail_df = detail_df.replace(np.inf, 0)
+                detail_df = detail_df.replace(np.nan, 0)
+                influx.write_df(detail_df, conf.MEASUREMENT_CLASSIFY + "-" + ctype, {"ktype": ktype, "classify": classify_name})
+            console.write_tail()
     f.close()
     return
