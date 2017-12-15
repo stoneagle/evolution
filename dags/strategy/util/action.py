@@ -32,6 +32,8 @@ SHAKE_MIN_NUM = 3
 
 
 class Action(object):
+    # 存储index_df数据
+    index_df = None
     # 存储所有时间节点的走向情况
     df = tool.init_empty_df([INDEX_DATE, INDEX_VALUE, INDEX_DIRECTION, INDEX_TURN_COUNT, INDEX_TREND_COUNT, INDEX_ACTION, INDEX_STATUS, INDEX_PHASE_STATUS])
     # 转折后的上边界
@@ -39,9 +41,16 @@ class Action(object):
     # 转折后的下边界
     down_border = 0
 
-    def run(self, index_df, date_column, value_column):
-        first = index_df.iloc[1]
-        second = index_df.iloc[2]
+    def __init__(self, index_df):
+        self.index_df = index_df
+        return
+
+    def all(self, date_column, value_column):
+        """
+        获取从头到尾的趋势
+        """
+        first = self.index_df.iloc[1]
+        second = self.index_df.iloc[2]
         diff = second[value_column] - first[value_column]
         if diff > 0 or (diff == 0 and second >= 0):
             direction = DIRECTION_UP
@@ -72,7 +81,7 @@ class Action(object):
         self.df = self.df.append(first_row, ignore_index=True)
         self.df = self.df.append(second_row, ignore_index=True)
 
-        for index, row in index_df[3:].iterrows():
+        for index, row in self.index_df[3:].iterrows():
             date = row[date_column]
             value = row[value_column]
             pre_turn_count = self.df.iloc[-1][INDEX_TURN_COUNT]
