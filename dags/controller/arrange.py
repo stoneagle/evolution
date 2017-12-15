@@ -1,9 +1,9 @@
 import h5py
 from library import conf, console, tool
-from strategy.util import action, wrap
+from strategy import macd, kline
 
 
-def arrange_detail(start_date):
+def share_detail(start_date):
     """
     将basic的detail内容，按个股整理至share文件下
     """
@@ -102,7 +102,7 @@ def operate_st(action_type):
     return
 
 
-def arrange_all_classify_detail(classify_list, gem_flag, start_date):
+def all_classify_detail(classify_list, gem_flag, start_date):
     """
     遍历所有分类，聚合所有code获取分类均值
     """
@@ -121,7 +121,7 @@ def arrange_all_classify_detail(classify_list, gem_flag, start_date):
                 continue
 
             for ktype in conf.HDF5_SHARE_KTYPE:
-                mean_df = arrange_one_classify_detail(f, f_classify[ctype][classify_name].get(conf.HDF5_CLASSIFY_DS_CODE), gem_flag, ktype, start_date)
+                mean_df = one_classify_detail(f, f_classify[ctype][classify_name].get(conf.HDF5_CLASSIFY_DS_CODE), gem_flag, ktype, start_date)
                 ds_name = conf.HDF5_CLASSIFY_DS_DETAIL + "_" + ktype
                 # 如果start_date为空，则重置该数据
                 if start_date is None:
@@ -135,7 +135,7 @@ def arrange_all_classify_detail(classify_list, gem_flag, start_date):
     return
 
 
-def arrange_one_classify_detail(f, code_list, gem_flag, ktype, start_date):
+def one_classify_detail(f, code_list, gem_flag, ktype, start_date):
     """
     根据单个分类，聚合所有code获取分类均值
     """
@@ -179,7 +179,7 @@ def arrange_one_classify_detail(f, code_list, gem_flag, ktype, start_date):
     return init_df
 
 
-def arrange_xsg():
+def xsg():
     """
     聚合xsg数据
     """
@@ -233,7 +233,7 @@ def arrange_xsg():
     return
 
 
-def arrange_ipo():
+def ipo():
     """
     聚合ipo上市数据
     """
@@ -267,7 +267,7 @@ def arrange_ipo():
     return
 
 
-def arrange_margins(mtype):
+def margins(mtype):
     """
     聚合融资融券数据
     """
@@ -310,7 +310,7 @@ def arrange_margins(mtype):
     return
 
 
-def arrange_all_macd_trend(code_list, start_date):
+def all_macd_trend(code_list, start_date):
     """
     整理所有股票的macd趋势数据
     """
@@ -322,8 +322,19 @@ def arrange_all_macd_trend(code_list, start_date):
     )
     for code in code_list:
         code_prefix = code[0:3]
+        code_group_path = '/' + code_prefix + '/' + code
+        if f.get(code_group_path) is None:
+            continue
+        # 忽略停牌、退市、无法获取的情况
+        if f[code_prefix][code].attrs.get(conf.HDF5_BASIC_QUIT) is not None or f[code_prefix][code].attrs.get(conf.HDF5_BASIC_ST) is not None:
+            continue
         for ktype in conf.HDF5_SHARE_KTYPE:
-            trend_df = arrange_code_macd_trend(f, code, ktype, start_date)
+            index_ds_name = conf.HDF5_INDEX_DETAIL + "_" + ktype
+            if f[code_prefix][code].get(index_ds_name) is None:
+                continue
+            index_df = tool.df_from_dataset(f[code_prefix][code], index_ds_name, None)
+            index_df[conf.HDF5_SHARE_DATE_INDEX] = index_df[conf.HDF5_SHARE_DATE_INDEX].str.decode("utf-8")
+            trend_df = macd.trend(index_df)
             if trend_df is not None:
                 ds_name = conf.HDF5_INDEX_MACD_TREND + "_" + ktype
                 if f[code_prefix][code].get(ds_name) is not None:
@@ -334,38 +345,7 @@ def arrange_all_macd_trend(code_list, start_date):
     return
 
 
-def arrange_code_macd_trend(f, code, ktype, start_date):
-    """
-    整理某只股票的macd趋势数据
-    """
-    code_prefix = code[0:3]
-    code_group_path = '/' + code_prefix + '/' + code
-    # TODO, 立刻根据日期获取股票数据
-    if f.get(code_group_path) is None:
-        return None
-
-    # 忽略停牌、退市、无法获取的情况
-    if f[code_prefix][code].attrs.get(conf.HDF5_BASIC_QUIT) is not None or f[code_prefix][code].attrs.get(conf.HDF5_BASIC_ST) is not None:
-        return None
-
-    ds_name = conf.HDF5_INDEX_DETAIL + "_" + ktype
-    if f[code_prefix][code].get(ds_name) is None:
-        return None
-
-    index_df = tool.df_from_dataset(f[code_prefix][code], ds_name, None)
-    index_df[conf.HDF5_SHARE_DATE_INDEX] = index_df[conf.HDF5_SHARE_DATE_INDEX].str.decode("utf-8")
-    index_df = index_df[index_df["dif"].notnull()]
-    index_df = index_df.set_index(conf.HDF5_SHARE_DATE_INDEX)[["dif", "dea", "macd", "close"]]
-
-    # 如果数据集过少则直接返回
-    # TODO 异常报错
-    if len(index_df) <= 3:
-        return None
-
-    return action.Action().run(index_df=index_df.reset_index(), date_column=conf.HDF5_SHARE_DATE_INDEX, value_column="macd")
-
-
-def arrange_all_wrap(code_list, start_date):
+def all_wrap(code_list, start_date):
     """
     整理所有股票的缠论k线
     """
@@ -377,8 +357,20 @@ def arrange_all_wrap(code_list, start_date):
     )
     for code in code_list:
         code_prefix = code[0:3]
+        code_group_path = '/' + code_prefix + '/' + code
+        if f.get(code_group_path) is None:
+            continue
+        # 忽略停牌、退市、无法获取的情况
+        if f[code_prefix][code].attrs.get(conf.HDF5_BASIC_QUIT) is not None or f[code_prefix][code].attrs.get(conf.HDF5_BASIC_ST) is not None:
+            continue
+
         for ktype in conf.HDF5_SHARE_KTYPE:
-            wrap_df = arrange_code_wrap(f, code, ktype, start_date)
+            ds_name = ktype
+            if f[code_prefix][code].get(ds_name) is None:
+                continue
+            share_df = tool.df_from_dataset(f[code_prefix][code], ds_name, None)
+
+            wrap_df = code_wrap(share_df, start_date)
             if wrap_df is not None:
                 ds_name = conf.HDF5_INDEX_WRAP + "_" + ktype
                 if f[code_prefix][code].get(ds_name) is not None:
@@ -389,29 +381,14 @@ def arrange_all_wrap(code_list, start_date):
     return
 
 
-def arrange_code_wrap(f, code, ktype, start_date):
+def code_wrap(share_df, start_date):
     """
     整理某只股票的缠论k线
     """
-    code_prefix = code[0:3]
-    code_group_path = '/' + code_prefix + '/' + code
-    # TODO, 立刻根据日期获取股票数据
-    if f.get(code_group_path) is None:
-        return None
-
-    # 忽略停牌、退市、无法获取的情况
-    if f[code_prefix][code].attrs.get(conf.HDF5_BASIC_QUIT) is not None or f[code_prefix][code].attrs.get(conf.HDF5_BASIC_ST) is not None:
-        return None
-
-    ds_name = ktype
-    if f[code_prefix][code].get(ds_name) is None:
-        return None
-
-    share_df = tool.df_from_dataset(f[code_prefix][code], ds_name, None)
     share_df[conf.HDF5_SHARE_DATE_INDEX] = share_df[conf.HDF5_SHARE_DATE_INDEX].str.decode("utf-8")
     share_df = share_df[["date", "high", "low"]]
 
     # 如果数据集过少则直接返回
     if len(share_df) <= 3:
         return None
-    return wrap.Wrap(share_df).merge("high", "low")
+    return kline.trans_wrap(share_df, False)

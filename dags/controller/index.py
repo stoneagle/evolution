@@ -5,20 +5,20 @@ import numpy as np
 from library import conf, console, tool
 
 
-def all_share_index(gem_flag, start_date):
+def all_share(gem_flag, start_date):
     """
     获取所有股票的macd与所处均线等指标
     """
     f = h5py.File(conf.HDF5_FILE_SHARE, 'a')
-    console.write_head(
-        conf.HDF5_OPERATE_INDEX,
-        conf.HDF5_RESOURCE_TUSHARE,
-        conf.HDF5_SHARE_DETAIL
-    )
     for code_prefix in f:
         if gem_flag is True and code_prefix == "300":
             continue
         for code in f[code_prefix]:
+            console.write_head(
+                conf.HDF5_OPERATE_INDEX,
+                conf.HDF5_RESOURCE_TUSHARE,
+                code
+            )
             # 忽略停牌、退市、无法获取的情况
             if f[code_prefix][code].attrs.get(conf.HDF5_BASIC_QUIT) is not None:
                 continue
@@ -30,17 +30,17 @@ def all_share_index(gem_flag, start_date):
                 if f.get(code_group_path) is None or f[code_prefix][code].get(ktype) is None:
                     continue
                 df = tool.df_from_dataset(f[code_prefix][code], ktype, None)
-                index_df = one_df_index(df, start_date)
+                index_df = one_df(df, start_date)
                 ds_name = conf.HDF5_INDEX_DETAIL + "_" + ktype
                 if start_date is None:
                     tool.delete_dataset(f[code_prefix][code], ds_name)
                 tool.merge_df_dataset(f[code_prefix][code], ds_name, index_df.reset_index())
-    console.write_tail()
+            console.write_tail()
     f.close()
     return
 
 
-def all_classify_index(classify_list, start_date):
+def all_classify(classify_list, start_date):
     """
     获取所有分类的macd与所处均线等指标(依赖分类数据聚合)
     """
@@ -61,7 +61,7 @@ def all_classify_index(classify_list, start_date):
 
                 df = tool.df_from_dataset(f[ctype][classify_name], ds_name, None)
                 df["close"] = df["close"].apply(lambda x: round(x, 2))
-                index_df = one_df_index(df, start_date)
+                index_df = one_df(df, start_date)
                 index_ds_name = conf.HDF5_INDEX_DETAIL + "_" + ktype
                 if start_date is None:
                     tool.delete_dataset(f[ctype][classify_name], index_ds_name)
@@ -72,7 +72,7 @@ def all_classify_index(classify_list, start_date):
     return
 
 
-def all_index_index(start_date):
+def all_index(start_date):
     """
     处理所有指数的均线与macd
     """
@@ -87,7 +87,7 @@ def all_index_index(start_date):
             if f[code].get(ktype) is None:
                 continue
             df = tool.df_from_dataset(f[code], ktype, None)
-            index_df = one_df_index(df, start_date)
+            index_df = one_df(df, start_date)
             index_ds_name = conf.HDF5_INDEX_DETAIL + "_" + ktype
             if start_date is None:
                 tool.delete_dataset(f[code], index_ds_name)
@@ -97,7 +97,7 @@ def all_index_index(start_date):
     return
 
 
-def one_df_index(df, start_date):
+def one_df(df, start_date):
     """
     处理单组df的均线与macd
     """

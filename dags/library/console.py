@@ -27,6 +27,11 @@ def write_head(action, resource, detail):
     sys.stdout.flush()
 
 
+def write_msg(msg):
+    sys.stdout.write(msg + "\r\n")
+    sys.stdout.flush()
+
+
 def write_create():
     sys.stdout.write('C')
     sys.stdout.flush()

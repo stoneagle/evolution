@@ -4,7 +4,7 @@ from library import conf, count, error, console
 from controller import arrange
 
 
-def get_classify(classify_list):
+def classify_detail(classify_list):
     """
     获取类别数据
     """
@@ -34,7 +34,7 @@ def get_classify(classify_list):
     return
 
 
-def get_code_share(f, code, gem_flag):
+def code_share(f, code, gem_flag):
     """
     获取对应code的股票数据
     """
@@ -62,7 +62,7 @@ def get_code_share(f, code, gem_flag):
     return
 
 
-def get_index_share():
+def index_share():
     """
     获取对应指数数据
     """
@@ -86,7 +86,7 @@ def get_index_share():
     return
 
 
-def get_all_share(gem_flag):
+def all_share(gem_flag):
     """
     根据类别获取所有share数据
     """
@@ -127,7 +127,7 @@ def get_all_share(gem_flag):
         #     history["ktype"] = history["ktype"].str.decode("utf-8")
         #     history["code"] = history["code"].str.decode("utf-8")
         #     error_history = history.values
-        get_code_share(f, code, gem_flag)
+        code_share(f, code, gem_flag)
     # 记录错误内容
     error.write_batch()
     # 输出获取情况
@@ -137,7 +137,7 @@ def get_all_share(gem_flag):
     return
 
 
-def get_basic():
+def basic_environment():
     """
     获取基本面数据
     """
@@ -165,7 +165,7 @@ def get_basic():
     return
 
 
-def get_quit():
+def quit():
     """
     获取退市、终止上市列表
     """
@@ -191,7 +191,7 @@ def get_quit():
     return
 
 
-def get_st():
+def st():
     """
     获取风险警示板列表
     """
@@ -217,7 +217,7 @@ def get_st():
     return
 
 
-def get_xsg():
+def xsg():
     """
     获取限售股解禁数据
     """
@@ -238,7 +238,7 @@ def get_xsg():
     return
 
 
-def get_ipo(reset_flag=False):
+def ipo(reset_flag=False):
     """
     获取ipo数据
     """
@@ -259,7 +259,7 @@ def get_ipo(reset_flag=False):
     return
 
 
-def get_margin(reset_flag=False):
+def margin(reset_flag=False):
     """
     获取沪市融资融券
     """
