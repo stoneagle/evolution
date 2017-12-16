@@ -64,6 +64,7 @@ def daily(omit_list):
     today_str = tradetime.get_today()
     tool.delete_dataset(f_screen, today_str)
     tool.merge_df_dataset(f_screen, today_str, filter_df)
+    f.close()
     return
 
 

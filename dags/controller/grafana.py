@@ -107,6 +107,19 @@ def daily_filter():
     """
     推送每日筛选列表至influxdb
     """
+    f = h5py.File(conf.HDF5_FILE_SCREEN, 'a')
+    today_str = tradetime.get_today()
+    console.write_head(
+        conf.HDF5_OPERATE_PUSH,
+        conf.HDF5_RESOURCE_TUSHARE,
+        today_str
+    )
+    if f.get(today_str) is None:
+        return
+    screen_df = tool.df_from_dataset(f, today_str, None)
+    screen_df = _datetime_index(screen_df)
+    influx.write_df(screen_df, conf.MEASUREMENT_SHARE_WRAP, None)
+    f.close()
     return
 
 
