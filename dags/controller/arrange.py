@@ -3,9 +3,9 @@ from library import conf, console, tool
 from strategy import macd, kline
 
 
-def share_detail(start_date, omit_list):
+def code_detail(code_list, start_date):
     """
-    将basic的detail内容，按个股整理至share文件下
+    将code的basic内容，整理至share文件下
     """
     # 获取basic所有日期的detail，并遍历读取详细信息
     f = h5py.File(conf.HDF5_FILE_BASIC, 'a')
@@ -27,6 +27,9 @@ def share_detail(start_date, omit_list):
         df["code"] = df["code"].str.decode("utf-8")
         df = df.set_index("code")
         for code in df.index:
+            if code not in code_list:
+                continue
+
             if code not in code_basic_dict:
                 code_basic_dict[code] = tool.init_empty_df(df.columns)
             code_basic_dict[code].loc[date] = df.loc[code, :]
@@ -36,9 +39,6 @@ def share_detail(start_date, omit_list):
         code_df = code_df.reset_index().sort_values(by=[conf.HDF5_SHARE_DATE_INDEX])
 
         code_prefix = code[0:3]
-        if code_prefix in omit_list:
-            continue
-
         code_group_path = '/' + code_prefix + '/' + code
         if f_share.get(code_group_path) is None:
             continue
@@ -46,6 +46,8 @@ def share_detail(start_date, omit_list):
         if start_date is None:
             tool.delete_dataset(f_share[code_group_path], conf.HDF5_BASIC_DETAIL)
         tool.merge_df_dataset(f_share[code_group_path], conf.HDF5_BASIC_DETAIL, code_df)
+        console.write_exec()
+    console.write_blank()
     console.write_tail()
     f_share.close()
     f.close()
