@@ -1,5 +1,5 @@
 import h5py
-from library import conf, console, tool
+from library import conf, console, tool, tradetime
 from strategy import macd, kline
 from strategy.util import action
 import warnings
@@ -14,7 +14,7 @@ INDEX_MACD_DIVERSE_PRICE_MIN = "_d_p_min"
 INDEX_MACD_DIVERSE_PRICE_START = "_m_p_start"
 
 
-def daily(code_list, gem_flag):
+def daily(omit_list):
     """
     每日选股，对个股进行排名与打分
     """
@@ -26,95 +26,123 @@ def daily(code_list, gem_flag):
     # 5. 5min的macd趋势，是否背离，数值差距，震荡中枢数量
     f = h5py.File(conf.HDF5_FILE_SHARE, 'a')
     filter_df = tool.init_empty_df(_ini_filter_columns())
-    for code in code_list:
+    for code_prefix in f:
+        if code_prefix in omit_list:
+            continue
         console.write_head(
             conf.HDF5_OPERATE_STRATEGY,
             conf.HDF5_RESOURCE_TUSHARE,
-            code
+            code_prefix
         )
-        code_prefix = code[0:3]
-        # 判断是否跳过创业板
-        if gem_flag is True and code_prefix == "300":
-            continue
-
-        code_group_path = '/' + code_prefix + '/' + code
-        if f.get(code_group_path) is None:
-            console.write_msg(code + "的tushare数据不存在")
-            continue
-
-        # 忽略停牌、退市、无法获取的情况
-        if f[code_prefix][code].attrs.get(conf.HDF5_BASIC_QUIT) is not None or f[code_prefix][code].attrs.get(conf.HDF5_BASIC_ST) is not None:
-            console.write_msg(code + "已退市或停牌")
-            continue
-
-        code_dict = dict()
-        code_dict["code"] = code
-        omit_flag = False
-        for ktype in ["D", "W", "M", "30", "5"]:
-            if f[code_prefix][code].get(ktype) is None:
-                console.write_msg(code + "阶段" + ktype + "的股票数据不存在")
+        for code in f[code_prefix]:
+            code_group_path = '/' + code_prefix + '/' + code
+            if f.get(code_group_path) is None:
+                console.write_blank()
+                console.write_msg(code + "的tushare数据不存在")
                 continue
-            share_df = tool.df_from_dataset(f[code_prefix][code], ktype, None)
 
-            index_ds_name = conf.HDF5_INDEX_DETAIL + "_" + ktype
-            if f[code_prefix][code].get(index_ds_name) is None:
-                console.write_msg(code + "阶段" + ktype + "的macd与均线数据不存在")
+            # 忽略停牌、退市、无法获取的情况
+            if f[code_prefix][code].attrs.get(conf.HDF5_BASIC_QUIT) is not None or f[code_prefix][code].attrs.get(conf.HDF5_BASIC_ST) is not None:
+                console.write_blank()
+                console.write_msg(code + "已退市或停牌")
                 continue
-            index_df = tool.df_from_dataset(f[code_prefix][code], index_ds_name, None)
-            share_df = share_df.merge(index_df, left_on=conf.HDF5_SHARE_DATE_INDEX, right_on=conf.HDF5_SHARE_DATE_INDEX, how='outer')
-            share_df[conf.HDF5_SHARE_DATE_INDEX] = share_df[conf.HDF5_SHARE_DATE_INDEX].str.decode("utf-8")
-            # 检查macd的趋势
-            if ktype in ["D", "M", "W"]:
-                try:
-                    code_dict = _filter_macd_trend(share_df.tail(50), code_dict, ktype)
-                except Exception as er:
-                    console.write_msg(str(er))
-                    omit_flag = True
-                    break
 
-            # 检查macd的背离
-            if ktype in ["D", "30"]:
-                code_dict = _filter_macd_diverse(share_df.tail(100), code_dict, ktype)
-
-            # 检查震荡中枢
-            # if ktype in ["30", "5"]:
-            #     code_dict = _filter_wrap_central(share_df, code_dict, ktype)
-        # 如果日线不存在macd的上涨趋势，则忽略该股票
-        if omit_flag is True:
-            continue
-
-        # 如果日线、30min一个阶段内都不存在背离，忽略
-        diverse_limit = 3
-        if code_dict["30" + INDEX_MACD_DIVERSE_COUNT] <= diverse_limit and code_dict["d" + INDEX_MACD_DIVERSE_COUNT] <= diverse_limit:
-            continue
-
-        filter_df = filter_df.append(code_dict, ignore_index=True)
+            try:
+                code_dict = _daily_code(f, code)
+                if code_dict is None:
+                    console.write_pass()
+                    continue
+                else:
+                    console.write_exec()
+            except Exception as er:
+                console.write_msg("[" + code + "]" + str(er))
+            filter_df = filter_df.append(code_dict, ignore_index=True)
+        console.write_blank()
         console.write_tail()
-    print(filter_df)
     f.close()
+    f_screen = h5py.File(conf.HDF5_FILE_SCREEN, 'a')
+    today_str = tradetime.get_today()
+    tool.delete_dataset(f_screen, today_str)
+    tool.merge_df_dataset(f_screen, today_str, filter_df)
     return
 
 
+def _daily_code(f, code):
+    MACD_DIVERSE_LIMIT = 5
+
+    code_prefix = code[0:3]
+    code_dict = dict()
+    code_dict["code"] = code
+    omit_flag = False
+    for ktype in ["D", "W", "M", "30", "5"]:
+        if f[code_prefix][code].get(ktype) is None:
+            console.write_blank()
+            console.write_msg(code + "阶段" + ktype + "的detail数据不存在")
+            return None
+        share_df = tool.df_from_dataset(f[code_prefix][code], ktype, None)
+
+        index_ds_name = conf.HDF5_INDEX_DETAIL + "_" + ktype
+        if f[code_prefix][code].get(index_ds_name) is None:
+            console.write_blank()
+            console.write_msg(code + "阶段" + ktype + "的macd与均线数据不存在")
+            return None
+        index_df = tool.df_from_dataset(f[code_prefix][code], index_ds_name, None)
+        share_df = share_df.merge(index_df, left_on=conf.HDF5_SHARE_DATE_INDEX, right_on=conf.HDF5_SHARE_DATE_INDEX, how='outer')
+        share_df[conf.HDF5_SHARE_DATE_INDEX] = share_df[conf.HDF5_SHARE_DATE_INDEX].str.decode("utf-8")
+        # 检查macd的趋势
+        if ktype in ["D", "M", "W"]:
+            code_dict = _filter_macd_trend(share_df.tail(50), code_dict, ktype)
+            if code_dict is None:
+                omit_flag = True
+                break
+
+        # 检查macd的背离
+        if ktype in ["D", "30"]:
+            code_dict = _filter_macd_diverse(share_df.tail(100), code_dict, ktype)
+
+        # 检查震荡中枢
+        # if ktype in ["30", "5"]:
+        #     code_dict = _filter_wrap_central(share_df, code_dict, ktype)
+
+    # 如果日线不存在macd的上涨趋势，则忽略该股票
+    if omit_flag is True:
+        return None
+
+    # 如果日线、30min一个阶段内都不存在背离，忽略
+    if code_dict["30" + INDEX_MACD_DIVERSE_COUNT] <= MACD_DIVERSE_LIMIT and code_dict["d" + INDEX_MACD_DIVERSE_COUNT] <= MACD_DIVERSE_LIMIT:
+        return None
+    return code_dict
+
+
 def _filter_macd_trend(share_df, code_dict, ktype):
-    result = macd.trend(share_df.tail(50))
-    tail_row = result.tail(1)
+    trend_df = macd.trend(share_df)
+    tail_row = trend_df.tail(1)
+    tail_macd = tail_row["macd"].values[0]
+    tail_dif = tail_row["dif"].values[0]
     tail_phase_status = tail_row[action.INDEX_PHASE_STATUS].values[0]
-    # 忽略日线macd下降，或者在下降中shake的股票
     if ktype == "D":
+        # 忽略日线macd下降
         if tail_phase_status == action.STATUS_DOWN:
-            raise Exception("macd处于下降通道")
+            return None
+        # 忽略dif已上穿零轴的情况
+        elif tail_dif > 0:
+            return None
+        # 忽略macd已启动的股票
+        elif tail_macd > 0.1:
+            return None
+        # 忽略下降中shake的股票
         elif tail_phase_status == action.STATUS_SHAKE:
             for i in range(2, 20):
-                pre_phase_status = result.tail(i)[action.INDEX_PHASE_STATUS].values[0]
+                pre_phase_status = trend_df.tail(i)[action.INDEX_PHASE_STATUS].values[0]
                 if pre_phase_status != action.STATUS_SHAKE:
                     break
             if tail_phase_status == action.STATUS_DOWN:
-                raise Exception("macd处于下降通道")
+                return None
     code_dict[str.lower(ktype) + INDEX_MACD_TREND_STATUS] = tail_phase_status
     code_dict[str.lower(ktype) + INDEX_MACD_TREND_COUNT] = tail_row[action.INDEX_TREND_COUNT].values[0]
     code_dict[str.lower(ktype) + INDEX_MACD_TREND_CROSS] = tail_row[macd.INDEX_CROSS_COUNT].values[0]
-    code_dict[str.lower(ktype) + INDEX_MACD_TREND_VALUE] = tail_row["macd"].values[0]
-    code_dict[str.lower(ktype) + INDEX_MACD_TREND_DIF] = tail_row["dif"].values[0]
+    code_dict[str.lower(ktype) + INDEX_MACD_TREND_VALUE] = tail_macd
+    code_dict[str.lower(ktype) + INDEX_MACD_TREND_DIF] = tail_dif
     return code_dict
 
 

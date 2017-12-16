@@ -103,6 +103,12 @@ def transfer_date(date_str, itype, otype):
     return transfer_date.strftime(time_switcher.get(otype, 'error'))
 
 
+def get_today():
+    today = datetime.now(conf.TZ)
+    date = str(today.year) + "-" + str(today.month) + "-" + str(today.day)
+    return date
+
+
 LAST_MONTH_LAST_DAY = get_last_day_of_last_month()
 LAST_WEEK_LAST_DAY = get_last_day_of_last_week()
 LAST_TRADE_DAY = get_last_of_trade_day()

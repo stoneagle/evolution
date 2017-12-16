@@ -111,4 +111,5 @@ def one_df(detail_df, init_flag, ma_pos_flag=False):
         index_df = index.mean_position(index_df, "close")
     else:
         index_df[index.INDEX_MA_BORDER] = 0
+    index_df = index_df.drop("close", axis=1)
     return index_df
