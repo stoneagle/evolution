@@ -11,12 +11,12 @@ def all_share(omit_list, init_flag=True):
     for code_prefix in f:
         if code_prefix in omit_list:
             continue
+        console.write_head(
+            conf.HDF5_OPERATE_INDEX,
+            conf.HDF5_RESOURCE_TUSHARE,
+            code_prefix
+        )
         for code in f[code_prefix]:
-            console.write_head(
-                conf.HDF5_OPERATE_INDEX,
-                conf.HDF5_RESOURCE_TUSHARE,
-                code
-            )
             # 忽略停牌、退市、无法获取的情况
             if f[code_prefix][code].attrs.get(conf.HDF5_BASIC_QUIT) is not None:
                 continue
@@ -33,7 +33,9 @@ def all_share(omit_list, init_flag=True):
                 if init_flag is True:
                     tool.delete_dataset(f[code_prefix][code], ds_name)
                 tool.merge_df_dataset(f[code_prefix][code], ds_name, index_df.reset_index())
-            console.write_tail()
+            console.write_exec()
+        console.write_blank()
+        console.write_tail()
     f.close()
     return
 
@@ -101,7 +103,7 @@ def one_df(detail_df, init_flag, ma_pos_flag=False):
     """
     detail_df[conf.HDF5_SHARE_DATE_INDEX] = detail_df[conf.HDF5_SHARE_DATE_INDEX].str.decode("utf-8")
     detail_df = detail_df.set_index(conf.HDF5_SHARE_DATE_INDEX)
-    if init_flag is True:
+    if init_flag is not True:
         detail_df = detail_df.tail(50)
     index_df = macd.value(detail_df)
     index_df["close"] = detail_df["close"]
