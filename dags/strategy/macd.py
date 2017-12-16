@@ -1,9 +1,20 @@
 from strategy.util import action, phase
 from library import conf
+import talib
+import pandas as pd
+import numpy as np
 INDEX_CROSS_COUNT = "cross"
 INDEX_PRICE_DIFF = "price_diff"
 INDEX_MACD_DIFF = "macd_diff"
 INDEX_DIVERSE = "diverse"
+
+
+def value(detail_df):
+    # 计算macd
+    macd = talib.MACD(detail_df["close"].values, fastperiod=12, slowperiod=26, signalperiod=9)
+    index_df = pd.DataFrame(np.column_stack(macd), index=detail_df.index, columns=conf.HDF5_INDEX_COLUMN)
+    index_df["macd"] = index_df["macd"] * 2
+    return index_df
 
 
 def trend(index_df):
