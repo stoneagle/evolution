@@ -27,6 +27,7 @@ def all_share(omit_list, init_flag=True):
             for ktype in conf.HDF5_SHARE_KTYPE:
                 try:
                     if f.get(code_group_path) is None or f[code_prefix][code].get(ktype) is None:
+                        console.write_msg(code + "-" + ktype + "的detail不存在")
                         continue
                     df = tool.df_from_dataset(f[code_prefix][code], ktype, None)
                     index_df = one_df(df, init_flag)
@@ -56,10 +57,10 @@ def all_classify(classify_list, init_flag=True):
                 conf.HDF5_RESOURCE_TUSHARE,
                 classify_name
             )
-
             for ktype in conf.HDF5_SHARE_KTYPE:
                 ds_name = conf.HDF5_CLASSIFY_DS_DETAIL + "_" + ktype
                 if f[ctype][classify_name].get(ds_name) is None:
+                    console.write_msg(classify_name + "分类聚合detail不存在")
                     continue
 
                 df = tool.df_from_dataset(f[ctype][classify_name], ds_name, None)
@@ -70,7 +71,6 @@ def all_classify(classify_list, init_flag=True):
                     tool.delete_dataset(f[ctype][classify_name], index_ds_name)
                 tool.merge_df_dataset(f[ctype][classify_name], index_ds_name, index_df.reset_index())
             console.write_tail()
-            break
     f.close()
     return
 
@@ -88,6 +88,7 @@ def all_index(init_flag=True):
         )
         for ktype in conf.HDF5_SHARE_KTYPE:
             if f[code].get(ktype) is None:
+                console.write_msg(code + "-" + ktype + "的detail不存在")
                 continue
             df = tool.df_from_dataset(f[code], ktype, None)
             index_df = one_df(df, init_flag)
@@ -109,10 +110,9 @@ def one_df(detail_df, init_flag, ma_pos_flag=False):
     if init_flag is not True:
         detail_df = detail_df.tail(50)
     index_df = macd.value(detail_df)
-    index_df["close"] = detail_df["close"]
     if ma_pos_flag is True:
+        index_df["close"] = detail_df["close"]
         index_df = index.mean_position(index_df, "close")
     else:
         index_df[index.INDEX_MA_BORDER] = 0
-    index_df = index_df.drop("close", axis=1)
     return index_df

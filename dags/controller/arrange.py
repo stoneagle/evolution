@@ -1,6 +1,6 @@
 import h5py
 from library import conf, console, tool
-from strategy import macd, kline
+from strategy import macd
 
 
 def code_detail(code_list, start_date):
@@ -22,6 +22,7 @@ def code_detail(code_list, start_date):
     code_basic_dict = dict()
     for date in f[path]:
         if start_date is not None and date < start_date:
+            console.write_msg(start_date + "起始日期大于基本数据的最大日期")
             continue
         df = tool.df_from_dataset(f[path], date, None)
         df["code"] = df["code"].str.decode("utf-8")
@@ -41,6 +42,7 @@ def code_detail(code_list, start_date):
         code_prefix = code[0:3]
         code_group_path = '/' + code_prefix + '/' + code
         if f_share.get(code_group_path) is None:
+            console.write_msg(code + "的detail文件不存在")
             continue
 
         if start_date is None:
@@ -66,6 +68,7 @@ def operate_quit(action_type):
     )
     path = '/' + conf.HDF5_BASIC_QUIT
     if f.get(path) is None:
+        console.write_msg("quit的detail不存在")
         return
 
     quit_list = [
@@ -79,6 +82,8 @@ def operate_quit(action_type):
             quit_df["code"] = quit_df["code"].str.decode("utf-8")
             # 将退市内容，转换成标签添加在对应code下
             tool.op_attr_by_codelist(action_type, quit_df["code"].values, conf.HDF5_BASIC_QUIT, True)
+        else:
+            console.write_msg("quit的detail数据获取失败")
     console.write_tail()
     f.close()
     return
@@ -97,12 +102,16 @@ def operate_st(action_type):
     path = '/' + conf.HDF5_BASIC_ST
     # 如果文件不存在，则退出
     if f.get(path) is None:
+        console.write_msg("st的detail文件不存在")
         return
+
     st_df = tool.df_from_dataset(f[path], conf.HDF5_BASIC_ST, None)
     if st_df is not None and st_df.empty is not True:
         st_df["code"] = st_df["code"].str.decode("utf-8")
         # 将st内容，转换成标签添加在对应code下
         tool.op_attr_by_codelist(action_type, st_df["code"].values, conf.HDF5_BASIC_ST, True)
+    else:
+        console.write_msg("st的detail数据获取失败")
     console.write_tail()
     f.close()
     return
@@ -124,6 +133,7 @@ def all_classify_detail(classify_list, omit_list, start_date):
             )
 
             if f_classify[ctype][classify_name].get(conf.HDF5_CLASSIFY_DS_CODE) is None:
+                console.write_msg(classify_name + "的detail文件不存在")
                 continue
 
             for ktype in conf.HDF5_SHARE_KTYPE:
@@ -154,21 +164,22 @@ def one_classify_detail(f, code_list, omit_list, ktype, start_date):
         code_prefix = code[0:3]
         # 判断是否跳过创业板
         if code_prefix in omit_list:
-            return
+            continue
 
         code_group_path = '/' + code_prefix + '/' + code
         if f.get(code_group_path) is None:
-            # TODO 为空时立刻获取数据
-            print(code)
+            console.write_msg(code + "的detail文件不存在")
+            continue
         else:
             # 忽略停牌、退市、无法获取的情况
             if f[code_group_path].attrs.get(conf.HDF5_BASIC_QUIT) is not None:
-                return
+                continue
 
             if f[code_group_path].attrs.get(conf.HDF5_BASIC_ST) is not None:
-                return
+                continue
 
         if f[code_group_path].get(ktype) is None:
+            console.write_msg(code + "的" + ktype + "文件不存在")
             continue
 
         add_df = tool.df_from_dataset(f[code_group_path], ktype, None)
@@ -349,112 +360,3 @@ def all_macd_trend(code_list, start_date):
     console.write_tail()
     f.close()
     return
-
-
-def filter_share_wrap(code_list, start_date):
-    """
-    整理筛选的股票缠论k线
-    """
-    f = h5py.File(conf.HDF5_FILE_SHARE, 'a')
-    console.write_head(
-        conf.HDF5_OPERATE_ARRANGE,
-        conf.HDF5_RESOURCE_TUSHARE,
-        conf.HDF5_INDEX_WRAP
-    )
-    for code in code_list:
-        code_prefix = code[0:3]
-        code_group_path = '/' + code_prefix + '/' + code
-        if f.get(code_group_path) is None:
-            continue
-        # 忽略停牌、退市、无法获取的情况
-        if f[code_prefix][code].attrs.get(conf.HDF5_BASIC_QUIT) is not None or f[code_prefix][code].attrs.get(conf.HDF5_BASIC_ST) is not None:
-            continue
-
-        for ktype in conf.HDF5_SHARE_KTYPE:
-            ds_name = ktype
-            if f[code_prefix][code].get(ds_name) is None:
-                continue
-            share_df = tool.df_from_dataset(f[code_prefix][code], ds_name, None)
-            wrap_df = code_wrap(share_df)
-            if wrap_df is not None:
-                ds_name = conf.HDF5_INDEX_WRAP + "_" + ktype
-                if f[code_prefix][code].get(ds_name) is not None:
-                    tool.delete_dataset(f[code_prefix][code], ds_name)
-                tool.create_df_dataset(f[code_prefix][code], ds_name, wrap_df)
-    console.write_tail()
-    f.close()
-    return
-
-
-def classify_wrap(classify_list, init_flag=True):
-    """
-    整理分类的缠论k线
-    """
-    f = h5py.File(conf.HDF5_FILE_SHARE, 'a')
-    f_classify = h5py.File(conf.HDF5_FILE_CLASSIFY, 'a')
-    # 获取classify列表
-    for ctype in classify_list:
-        for classify_name in f_classify[ctype]:
-            console.write_head(
-                conf.HDF5_OPERATE_ARRANGE,
-                conf.HDF5_RESOURCE_TUSHARE,
-                classify_name
-            )
-            for ktype in ["D", "30"]:
-                ds_name = conf.HDF5_CLASSIFY_DS_DETAIL + "_" + ktype
-                if f_classify[ctype][classify_name].get(ds_name) is None:
-                    continue
-                share_df = tool.df_from_dataset(f_classify[ctype][classify_name], ds_name, None)
-                wrap_df = code_wrap(share_df)
-                wrap_ds_name = conf.HDF5_INDEX_WRAP + "_" + ktype
-                if init_flag is True:
-                    tool.delete_dataset(f_classify[ctype][classify_name], wrap_ds_name)
-                if wrap_df is not None:
-                    tool.merge_df_dataset(f_classify[ctype][classify_name], wrap_ds_name, wrap_df)
-            console.write_tail()
-    f_classify.close()
-    f.close()
-    return
-
-
-def index_wrap(init_flag=True):
-    """
-    整理指数的缠论k线
-    """
-    f = h5py.File(conf.HDF5_FILE_INDEX, 'a')
-    for code in f:
-        console.write_head(
-            conf.HDF5_OPERATE_ARRANGE,
-            conf.HDF5_RESOURCE_TUSHARE,
-            code
-        )
-        for ktype in ["D", "30"]:
-            if f[code].get(ktype) is None:
-                continue
-            share_df = tool.df_from_dataset(f[code], ktype, None)
-            wrap_df = code_wrap(share_df)
-            wrap_ds_name = conf.HDF5_INDEX_WRAP + "_" + ktype
-            if init_flag is True:
-                tool.delete_dataset(f[code], wrap_ds_name)
-            if wrap_df is not None:
-                tool.merge_df_dataset(f[code], wrap_ds_name, wrap_df)
-        console.write_tail()
-    f.close()
-    return
-
-
-def code_wrap(share_df, index_flag=False):
-    """
-    整理某只股票的缠论k线
-    """
-    share_df[conf.HDF5_SHARE_DATE_INDEX] = share_df[conf.HDF5_SHARE_DATE_INDEX].str.decode("utf-8")
-    share_df = share_df[["date", "high", "low", "open", "close"]]
-
-    # 如果数据集过少则直接返回
-    if len(share_df) <= 3:
-        return None
-    wrap_df = kline.trans_wrap(share_df, False)
-    wrap_df = wrap_df.set_index(conf.HDF5_SHARE_DATE_INDEX)
-    index_df = macd.value(wrap_df)
-    wrap_df = wrap_df.merge(index_df, left_index=True, right_index=True, how='left')
-    return wrap_df.reset_index()
