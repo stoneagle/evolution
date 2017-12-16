@@ -3,7 +3,7 @@ from library import conf, console, tool
 from strategy import macd, kline
 
 
-def share_detail(start_date):
+def share_detail(start_date, omit_list):
     """
     将basic的detail内容，按个股整理至share文件下
     """
@@ -30,11 +30,15 @@ def share_detail(start_date):
             if code not in code_basic_dict:
                 code_basic_dict[code] = tool.init_empty_df(df.columns)
             code_basic_dict[code].loc[date] = df.loc[code, :]
+
     for code, code_df in code_basic_dict.items():
         code_df.index.name = conf.HDF5_SHARE_DATE_INDEX
         code_df = code_df.reset_index().sort_values(by=[conf.HDF5_SHARE_DATE_INDEX])
 
         code_prefix = code[0:3]
+        if code_prefix in omit_list:
+            continue
+
         code_group_path = '/' + code_prefix + '/' + code
         if f_share.get(code_group_path) is None:
             continue
@@ -102,7 +106,7 @@ def operate_st(action_type):
     return
 
 
-def all_classify_detail(classify_list, gem_flag, start_date):
+def all_classify_detail(classify_list, omit_list, start_date):
     """
     遍历所有分类，聚合所有code获取分类均值
     """
@@ -121,7 +125,7 @@ def all_classify_detail(classify_list, gem_flag, start_date):
                 continue
 
             for ktype in conf.HDF5_SHARE_KTYPE:
-                mean_df = one_classify_detail(f, f_classify[ctype][classify_name].get(conf.HDF5_CLASSIFY_DS_CODE), gem_flag, ktype, start_date)
+                mean_df = one_classify_detail(f, f_classify[ctype][classify_name].get(conf.HDF5_CLASSIFY_DS_CODE), omit_list, ktype, start_date)
                 ds_name = conf.HDF5_CLASSIFY_DS_DETAIL + "_" + ktype
                 # 如果start_date为空，则重置该数据
                 if start_date is None:
@@ -135,7 +139,7 @@ def all_classify_detail(classify_list, gem_flag, start_date):
     return
 
 
-def one_classify_detail(f, code_list, gem_flag, ktype, start_date):
+def one_classify_detail(f, code_list, omit_list, ktype, start_date):
     """
     根据单个分类，聚合所有code获取分类均值
     """
@@ -147,7 +151,7 @@ def one_classify_detail(f, code_list, gem_flag, ktype, start_date):
         code = row[0].astype(str)
         code_prefix = code[0:3]
         # 判断是否跳过创业板
-        if gem_flag is True and code_prefix == "300":
+        if code_prefix in omit_list:
             return
 
         code_group_path = '/' + code_prefix + '/' + code

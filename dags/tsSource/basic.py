@@ -10,9 +10,10 @@ GET_DETAIL_CLOSE = "close"
 GET_DETAIL_OTHER = "other"
 
 
-def get_detail(f):
+def get_detail(f, start_date):
     # 按日间隔获取
-    start_date = datetime.strptime("2016-08-09", "%Y-%m-%d")
+    if start_date is None:
+        start_date = datetime.strptime("2016-08-09", "%Y-%m-%d")
     # 获取历史错误数据
     history = error.get_file()
     close_history = list()

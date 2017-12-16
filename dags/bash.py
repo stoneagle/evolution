@@ -2,12 +2,12 @@ from controller import obtain, arrange, index, grafana
 from library import conf
 
 
-def get_basic(classify_list):
+def get_basic(classify_list, start_date):
     """
     获取基本信息
     """
     # 获取基本面
-    obtain.basic_environment()
+    obtain.basic_environment(start_date)
     # 获取ipo股票列表
     obtain.ipo()
     # 获取融资融券
@@ -23,25 +23,21 @@ def get_share():
     """
     获取股票数据
     """
-    # 根据类别获取所有股票
-    obtain.all_share(False)
-    # 根据类别获取所有指数
-    obtain.index_share()
     # 获取暂停上市股票列表
     obtain.quit()
     # 获取风险警示板股票列表
     obtain.st()
+    # 根据类别获取所有股票
+    obtain.all_share()
+    # 根据类别获取所有指数
+    obtain.index_share()
     return
 
 
-def arrange_all(classify_list, start_date):
+def arrange_all(classify_list, omit_list, start_date):
     """
     处理并聚合已获取数据
     """
-    # 标记股票是否退市
-    arrange.operate_quit(conf.HDF5_OPERATE_ADD)
-    # 标记股票是否st
-    arrange.operate_st(conf.HDF5_OPERATE_ADD)
     # 聚合xsg数据
     arrange.xsg()
     # 聚合ipo数据
@@ -51,22 +47,25 @@ def arrange_all(classify_list, start_date):
     # 聚合sz融资融券
     arrange.margins("sz")
     # 按照分类code，获取分类的均值
-    arrange.all_classify_detail(classify_list, True, start_date)
-    # # 将basic的detail，聚合至share对应code
-    # arrange.share_detail(start_date)
+    arrange.all_classify_detail(classify_list, omit_list, start_date)
+    # 将basic的detail，聚合至share对应code
+    arrange.share_detail(start_date, omit_list)
     return
 
 
-def index_exec(classify_list, start_date):
+def index_exec(classify_list, omit_list, start_date):
     """
     清洗并获取指数
     """
+    init_flag = True
+    if start_date is None:
+        init_flag = False
     # 整理classify分类的均值、macd等
-    index.all_classify(classify_list, start_date)
+    index.all_classify(classify_list, init_flag)
     # 整理index的均值、macd等
-    index.all_index(start_date)
+    index.all_index(init_flag)
     # 获取所有股票的均值、macd等
-    index.all_share(True, None)
+    index.all_share(omit_list, init_flag)
     return
 
 
@@ -96,6 +95,7 @@ def grafana_push(classify_list):
 
 
 start_date = None
+omit_list = ["300", "900"]
 classify_list = [
     # conf.HDF5_CLASSIFY_INDUSTRY,
     # conf.HDF5_CLASSIFY_CONCEPT,
@@ -103,9 +103,9 @@ classify_list = [
 ]
 
 
-get_basic(classify_list)
+get_basic(classify_list, start_date)
 get_share()
-arrange_all(classify_list, start_date)
-index_exec(classify_list, start_date)
+arrange_all(classify_list, omit_list, start_date)
+index_exec(classify_list, omit_list, start_date)
 # strategy_share()
 grafana_push(classify_list)

@@ -34,16 +34,12 @@ def classify_detail(classify_list):
     return
 
 
-def code_share(f, code, gem_flag):
+def code_share(f, code):
     """
     获取对应code的股票数据
     """
     # 按编码前3位分组，如果group不存在，则创建新分组
     code_prefix = code[0:3]
-
-    # 判断是否跳过创业板
-    if gem_flag is True and code_prefix == "300":
-        return
 
     code_group_path = '/' + code_prefix + '/' + code
     if f.get(code_group_path) is None:
@@ -86,7 +82,7 @@ def index_share():
     return
 
 
-def all_share(gem_flag):
+def all_share(omit_list):
     """
     根据类别获取所有share数据
     """
@@ -120,6 +116,9 @@ def all_share(gem_flag):
     # 初始化error记录
     error.init_batch(conf.HDF5_ERROR_SHARE_GET)
     for code in code_list:
+        code_prefix = code[0:3]
+        if code_prefix in omit_list:
+            continue
         # TODO, 筛选错误数据
         # history = error.get_file()
         # error_history = list()
@@ -127,7 +126,7 @@ def all_share(gem_flag):
         #     history["ktype"] = history["ktype"].str.decode("utf-8")
         #     history["code"] = history["code"].str.decode("utf-8")
         #     error_history = history.values
-        code_share(f, code, gem_flag)
+        code_share(f, code)
     # 记录错误内容
     error.write_batch()
     # 输出获取情况
@@ -137,7 +136,7 @@ def all_share(gem_flag):
     return
 
 
-def basic_environment():
+def basic_environment(start_date):
     """
     获取基本面数据
     """
@@ -154,7 +153,7 @@ def basic_environment():
     path = '/' + conf.HDF5_BASIC_DETAIL
     if f.get(path) is None:
         f.create_group(path)
-    basic.get_detail(f[path])
+    basic.get_detail(f[path], start_date)
 
     # 记录错误内容
     error.merge_batch()
