@@ -25,14 +25,17 @@ def all_share(omit_list, init_flag=True):
 
             code_group_path = '/' + code_prefix + '/' + code
             for ktype in conf.HDF5_SHARE_KTYPE:
-                if f.get(code_group_path) is None or f[code_prefix][code].get(ktype) is None:
-                    continue
-                df = tool.df_from_dataset(f[code_prefix][code], ktype, None)
-                index_df = one_df(df, init_flag)
-                ds_name = conf.HDF5_INDEX_DETAIL + "_" + ktype
-                if init_flag is True:
-                    tool.delete_dataset(f[code_prefix][code], ds_name)
-                tool.merge_df_dataset(f[code_prefix][code], ds_name, index_df.reset_index())
+                try:
+                    if f.get(code_group_path) is None or f[code_prefix][code].get(ktype) is None:
+                        continue
+                    df = tool.df_from_dataset(f[code_prefix][code], ktype, None)
+                    index_df = one_df(df, init_flag)
+                    ds_name = conf.HDF5_INDEX_DETAIL + "_" + ktype
+                    if init_flag is True:
+                        tool.delete_dataset(f[code_prefix][code], ds_name)
+                    tool.merge_df_dataset(f[code_prefix][code], ds_name, index_df.reset_index())
+                except Exception as er:
+                    print(str(er))
             console.write_exec()
         console.write_blank()
         console.write_tail()
