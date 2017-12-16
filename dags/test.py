@@ -1,9 +1,9 @@
-from controller import index 
+from controller import screen
 # import h5py
 from library import conf
 
 code_list = ["002273"]
-omit_list = ["300", "900"]
+omit_list = ["000", "001", "600", "601", "602", "603", "300", "900"]
 start_date = None
 init_flag = True
 classify_list = [
@@ -37,7 +37,7 @@ classify_list = [
 # arrange.margins("sh")
 # arrange.margins("sz")
 # arrange.all_classify_detail(classify_list, omit_list, start_date)
-# arrange.share_detail(start_date, omit_list)
+# arrange.code_detail(code_list, start_date)
 # arrange.all_macd_trend(code_list, start_date)
 # arrange.all_wrap(code_list, start_date)
 
@@ -52,13 +52,17 @@ classify_list = [
 #         tool.delete_dataset(f[code_prefix][code], conf.HDF5_INDEX_DETAIL + "_" + ktype)
 #         tool.merge_df_dataset(f[code_prefix][code], conf.HDF5_INDEX_DETAIL + "_" + ktype, index_df.reset_index())
 # f.close()
-index.all_share(omit_list, init_flag)
+# index.all_share(omit_list, init_flag)
 # index.all_index(init_flag)
 # index.all_classify(classify_list, init_flag)
 
 
 # strategy
-# screen.daily(code_list, True)
+screen.daily(omit_list)
+# f = h5py.File(conf.HDF5_FILE_SHARE, 'a')
+# for code in code_list:
+#     screen._daily_code(f, code)
+# f.close()
 
 
 # grafana
@@ -85,16 +89,19 @@ def idea():
         [x] 个股K线图，向缠论转换
         [x] 个股MACD趋势
         [] 成交量?
+        [] 多线程处理
     策略思路:
         基本面
             [x]市场抽水:限售股解禁、ipo上市、融券
             [x]市场填水:融资，沪港通
         比价
-            []横向:各概念均价所处均线位置
+            [x]横向:各概念均价所处均线位置
             []纵向:个股季度财报，行业内龙头比对
         出入信号
-            []出入时机:macd的背离(三类买卖点),成交量
-            []波动空间:缠论K线的箱体，背离级别与均线位置
+            [x]出入时机:macd的背离
+            []出入时机:三类买卖点
+            [x]波动空间:缠论K线的箱体
+            []波动空间:均线位置
             []持续时间:股东人数
         管理
             []入场风格:左侧/右侧交易

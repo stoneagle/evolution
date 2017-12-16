@@ -1,4 +1,4 @@
-from controller import obtain, arrange, index, grafana
+from controller import obtain, arrange, index, grafana, screen
 from library import conf
 
 
@@ -48,8 +48,6 @@ def arrange_all(classify_list, omit_list, start_date):
     arrange.margins("sz")
     # 按照分类code，获取分类的均值
     arrange.all_classify_detail(classify_list, omit_list, start_date)
-    # 将basic的detail，聚合至share对应code
-    arrange.share_detail(start_date, omit_list)
     return
 
 
@@ -69,15 +67,14 @@ def index_exec(classify_list, omit_list, start_date):
     return
 
 
-def strategy_share():
+def strategy_share(omit_list):
     """
     策略选股
     """
-    # 整理对应股票的macd趋势
-    # code_list = []
-    # arrange.all_macd_trend(code_list, None)
-    # 整理对应股票的缠论k线
-    # arrange.all_wrap(code_list, None)
+    # 每日股票筛选
+    screen.daily(omit_list)
+    # 将筛选出的股票basic的detail，聚合至share对应code下
+    # arrange.share_detail(start_date, omit_list)
     return
 
 
@@ -91,6 +88,8 @@ def grafana_push(classify_list):
     grafana.classify_detail(classify_list)
     # 推送index数据
     grafana.index_detail()
+    # 推送筛选结果
+    # 推送筛选出的股票数据
     return
 
 
@@ -107,5 +106,5 @@ get_basic(classify_list, start_date)
 get_share()
 arrange_all(classify_list, omit_list, start_date)
 index_exec(classify_list, omit_list, start_date)
-# strategy_share()
-grafana_push(classify_list)
+strategy_share(omit_list)
+# grafana_push(classify_list)
