@@ -351,9 +351,9 @@ def all_macd_trend(code_list, start_date):
     return
 
 
-def all_wrap(code_list, start_date):
+def filter_share_wrap(code_list, start_date):
     """
-    整理所有股票的缠论k线
+    整理筛选的股票缠论k线
     """
     f = h5py.File(conf.HDF5_FILE_SHARE, 'a')
     console.write_head(
@@ -375,8 +375,7 @@ def all_wrap(code_list, start_date):
             if f[code_prefix][code].get(ds_name) is None:
                 continue
             share_df = tool.df_from_dataset(f[code_prefix][code], ds_name, None)
-
-            wrap_df = code_wrap(share_df, start_date)
+            wrap_df = code_wrap(share_df)
             if wrap_df is not None:
                 ds_name = conf.HDF5_INDEX_WRAP + "_" + ktype
                 if f[code_prefix][code].get(ds_name) is not None:
@@ -387,14 +386,75 @@ def all_wrap(code_list, start_date):
     return
 
 
-def code_wrap(share_df, start_date):
+def classify_wrap(classify_list, init_flag=True):
+    """
+    整理分类的缠论k线
+    """
+    f = h5py.File(conf.HDF5_FILE_SHARE, 'a')
+    f_classify = h5py.File(conf.HDF5_FILE_CLASSIFY, 'a')
+    # 获取classify列表
+    for ctype in classify_list:
+        for classify_name in f_classify[ctype]:
+            console.write_head(
+                conf.HDF5_OPERATE_ARRANGE,
+                conf.HDF5_RESOURCE_TUSHARE,
+                classify_name
+            )
+            for ktype in ["D", "30"]:
+                ds_name = conf.HDF5_CLASSIFY_DS_DETAIL + "_" + ktype
+                if f_classify[ctype][classify_name].get(ds_name) is None:
+                    continue
+                share_df = tool.df_from_dataset(f_classify[ctype][classify_name], ds_name, None)
+                wrap_df = code_wrap(share_df)
+                wrap_ds_name = conf.HDF5_INDEX_WRAP + "_" + ktype
+                if init_flag is True:
+                    tool.delete_dataset(f_classify[ctype][classify_name], wrap_ds_name)
+                if wrap_df is not None:
+                    tool.merge_df_dataset(f_classify[ctype][classify_name], wrap_ds_name, wrap_df)
+            console.write_tail()
+    f_classify.close()
+    f.close()
+    return
+
+
+def index_wrap(init_flag=True):
+    """
+    整理指数的缠论k线
+    """
+    f = h5py.File(conf.HDF5_FILE_INDEX, 'a')
+    for code in f:
+        console.write_head(
+            conf.HDF5_OPERATE_ARRANGE,
+            conf.HDF5_RESOURCE_TUSHARE,
+            code
+        )
+        for ktype in ["D", "30"]:
+            if f[code].get(ktype) is None:
+                continue
+            share_df = tool.df_from_dataset(f[code], ktype, None)
+            wrap_df = code_wrap(share_df)
+            wrap_ds_name = conf.HDF5_INDEX_WRAP + "_" + ktype
+            if init_flag is True:
+                tool.delete_dataset(f[code], wrap_ds_name)
+            if wrap_df is not None:
+                tool.merge_df_dataset(f[code], wrap_ds_name, wrap_df)
+        console.write_tail()
+    f.close()
+    return
+
+
+def code_wrap(share_df, index_flag=False):
     """
     整理某只股票的缠论k线
     """
     share_df[conf.HDF5_SHARE_DATE_INDEX] = share_df[conf.HDF5_SHARE_DATE_INDEX].str.decode("utf-8")
-    share_df = share_df[["date", "high", "low"]]
+    share_df = share_df[["date", "high", "low", "open", "close"]]
 
     # 如果数据集过少则直接返回
     if len(share_df) <= 3:
         return None
-    return kline.trans_wrap(share_df, False)
+    wrap_df = kline.trans_wrap(share_df, False)
+    wrap_df = wrap_df.set_index(conf.HDF5_SHARE_DATE_INDEX)
+    index_df = macd.value(wrap_df)
+    wrap_df = wrap_df.merge(index_df, left_index=True, right_index=True, how='left')
+    return wrap_df.reset_index()
