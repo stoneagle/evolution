@@ -188,12 +188,15 @@ def one_classify_detail(f, code_list, omit_list, ktype, start_date):
         add_df = add_df.set_index(conf.HDF5_SHARE_DATE_INDEX)
         init_df = init_df.add(add_df, fill_value=0)
     # 总数除以数量，得到平均值
-    init_df = init_df.div(init_df.num, axis=0)
-    init_df = init_df.drop("num", axis=1)
-    if start_date is not None:
-        init_df = init_df.ix[start_date:]
-    init_df = init_df.reset_index().sort_values(by=[conf.HDF5_SHARE_DATE_INDEX])
-    return init_df
+    if len(init_df) > 0:
+        init_df = init_df.div(init_df.num, axis=0)
+        init_df = init_df.drop("num", axis=1)
+        if start_date is not None:
+            init_df = init_df.ix[start_date:]
+        init_df = init_df.reset_index().sort_values(by=[conf.HDF5_SHARE_DATE_INDEX])
+        return init_df
+    else:
+        return None
 
 
 def xsg():

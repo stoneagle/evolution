@@ -53,7 +53,7 @@ def all_classify(classify_list, init_flag=True):
     for ctype in classify_list:
         for classify_name in f[ctype]:
             console.write_head(
-                conf.HDF5_OPERATE_ARRANGE,
+                conf.HDF5_OPERATE_INDEX,
                 conf.HDF5_RESOURCE_TUSHARE,
                 classify_name
             )
@@ -65,7 +65,11 @@ def all_classify(classify_list, init_flag=True):
 
                 df = tool.df_from_dataset(f[ctype][classify_name], ds_name, None)
                 df["close"] = df["close"].apply(lambda x: round(x, 2))
-                index_df = one_df(df, init_flag, True)
+                try:
+                    index_df = one_df(df, init_flag, True)
+                except Exception as er:
+                    console.write_msg("[" + classify_name + "]" + str(er))
+                    continue
                 index_ds_name = conf.HDF5_INDEX_DETAIL + "_" + ktype
                 if init_flag is True:
                     tool.delete_dataset(f[ctype][classify_name], index_ds_name)
@@ -82,7 +86,7 @@ def all_index(init_flag=True):
     f = h5py.File(conf.HDF5_FILE_INDEX, 'a')
     for code in f:
         console.write_head(
-            conf.HDF5_OPERATE_ARRANGE,
+            conf.HDF5_OPERATE_INDEX,
             conf.HDF5_RESOURCE_TUSHARE,
             code
         )
