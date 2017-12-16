@@ -1,9 +1,11 @@
-from controller import screen
+from controller import index 
 # import h5py
 from library import conf
 
 code_list = ["002273"]
+omit_list = ["300", "900"]
 start_date = None
+init_flag = True
 classify_list = [
     # conf.HDF5_CLASSIFY_INDUSTRY,
     # conf.HDF5_CLASSIFY_CONCEPT,
@@ -17,7 +19,7 @@ classify_list = [
 # obtain.st()
 # obtain.index_share()
 # obtain.all_share(True)
-# obtain.basic_environment()
+# obtain.basic_environment(start_date)
 # obtain.xsg()
 # obtain.ipo()
 # obtain.margin()
@@ -34,10 +36,10 @@ classify_list = [
 # arrange.ipo()
 # arrange.margins("sh")
 # arrange.margins("sz")
-# arrange.all_classify_detail(classify_list, True, None)
-# arrange.share_detail(None)
-# arrange.all_macd_trend(code_list, None)
-# arrange.all_wrap(code_list, None)
+# arrange.all_classify_detail(classify_list, omit_list, start_date)
+# arrange.share_detail(start_date, omit_list)
+# arrange.all_macd_trend(code_list, start_date)
+# arrange.all_wrap(code_list, start_date)
 
 
 # index
@@ -46,23 +48,28 @@ classify_list = [
 #     for ktype in conf.HDF5_SHARE_KTYPE:
 #         code_prefix = code[0:3]
 #         df = tool.df_from_dataset(f[code_prefix][code], ktype, None)
-#         index_df = index.one_df(df, None)
+#         index_df = index.one_df(df, True)
 #         tool.delete_dataset(f[code_prefix][code], conf.HDF5_INDEX_DETAIL + "_" + ktype)
 #         tool.merge_df_dataset(f[code_prefix][code], conf.HDF5_INDEX_DETAIL + "_" + ktype, index_df.reset_index())
 # f.close()
-# index.all_index(None)
-# index.all_share(True, None)
-# index.all_classify(classify_list, None)
+index.all_share(omit_list, init_flag)
+# index.all_index(init_flag)
+# index.all_classify(classify_list, init_flag)
 
 
 # strategy
-screen.daily_filter(code_list, True)
+# screen.daily(code_list, True)
 
 
 # grafana
 # grafana.classify_detail(classify_list)
 # grafana.basic_detail()
 # grafana.index_detail()
+
+"""
+TODO
+[]index的macd与均线，share不计算均线所处位置
+"""
 
 
 def idea():
