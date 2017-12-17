@@ -22,6 +22,9 @@ rm-grafana:
 local-bash:
 	nohup bash ./exec.sh > ./logs/$(DATE).log 2>&1 &
 
+local-bash-front:
+	runmode=dev LD_LIBRARY_PATH=/usr/lib python3 ./dags/bash.py
+
 local-test:
 	runmode=dev LD_LIBRARY_PATH=/usr/lib python3 ./dags/test.py
 
