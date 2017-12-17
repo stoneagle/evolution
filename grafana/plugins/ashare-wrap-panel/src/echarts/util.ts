@@ -1,3 +1,5 @@
+import { PanelConfig } from '../panel-config';
+
 const upColor: string = '#ec0000';
 const upBorderColor: string = '#8A0000';
 const downColor: string = '#00da3c';
@@ -6,8 +8,10 @@ const downBorderColor: string = '#008F28';
 export class EchartsUtil {
   // 数据意义：开盘(open),收盘(close),最低(low),最高(high),成交量(volume),dea/dif/macd(macd)
   private rawShareData: any[] = [];
+  private _panelConfig: PanelConfig;
 
-  constructor() {
+  constructor(panelConfig: PanelConfig) {
+    this._panelConfig = panelConfig;
   }
 
   setData(rawShareData: any[]) {
@@ -17,18 +21,18 @@ export class EchartsUtil {
   splitShareData() {
     var categoryData = new Array();
     var values = new Array();
-    var volumes = new Array();
     var macdDIFs = new Array();
     var macdDEAs = new Array();
     var macdPillers = new Array();
+    var volumes = new Array();
     var data = this.rawShareData;
     for (var i = 0; i < data.length; i++) {
       categoryData.push(data[i].splice(0, 1)[0]);
       values.push(data[i])
-      volumes.push([i, data[i][4], data[i][0] > data[i][1] ? 1 : -1]);
-      macdDIFs.push(data[i][5]);
-      macdDEAs.push(data[i][6]);
-      macdPillers.push([i, data[i][7], data[i][7] >= 0 ? 1 : -1]);
+      macdDIFs.push(data[i][4]);
+      macdDEAs.push(data[i][5]);
+      macdPillers.push([i, data[i][6], data[i][6] >= 0 ? 1 : -1]);
+      volumes.push([i, data[i][7], data[i][0] > data[i][1] ? 1 : -1]);
     }
     return {
         categoryData: categoryData,
@@ -61,14 +65,13 @@ export class EchartsUtil {
     return {
       backgroundColor: '#fff',
       title: {
-          text: '上证指数',
+          text: this._panelConfig.getValue('echartsName'),
           left: 0
       },
       animation: false,
       legend: {
-          // bottom: 10,
           left: 'center',
-          data: ['日K', 'MA5', 'MA10', 'MA20', 'MA30']
+          data: ['日K', 'MA5', 'MA10']
       },
       tooltip: {
           trigger: 'axis',
@@ -206,83 +209,6 @@ export class EchartsUtil {
               borderColor0: downBorderColor
             }
           },
-          // markPoint: {
-          //     label: {
-          //         normal: {
-          //             formatter: function (param) {
-          //                 return param != null ? Math.round(param.value) : '';
-          //             }
-          //         }
-          //     },
-          //     data: [
-          //         {
-          //             name: 'XX标点',
-          //             coord: ['2013/5/31', 2300],
-          //             value: 2300,
-          //             itemStyle: {
-          //                 normal: {color: 'rgb(41,60,85)'}
-          //             }
-          //         },
-          //         {
-          //             name: 'highest value',
-          //             type: 'max',
-          //             valueDim: 'highest'
-          //         },
-          //         {
-          //             name: 'lowest value',
-          //             type: 'min',
-          //             valueDim: 'lowest'
-          //         },
-          //         {
-          //             name: 'average value on close',
-          //             type: 'average',
-          //             valueDim: 'close'
-          //         }
-          //     ],
-          //     tooltip: {
-          //         formatter: function (param) {
-          //             return param.name + '<br>' + (param.data.coord || '');
-          //         }
-          //     }
-          // },
-          // markLine: {
-          //     symbol: ['none', 'none'],
-          //     data: [
-          //         [
-          //             {
-          //                 name: 'from lowest to highest',
-          //                 type: 'min',
-          //                 valueDim: 'lowest',
-          //                 symbol: 'circle',
-          //                 symbolSize: 10,
-          //                 label: {
-          //                     normal: {show: false},
-          //                     emphasis: {show: false}
-          //                 }
-          //             },
-          //             {
-          //                 type: 'max',
-          //                 valueDim: 'highest',
-          //                 symbol: 'circle',
-          //                 symbolSize: 10,
-          //                 label: {
-          //                     normal: {show: false},
-          //                     emphasis: {show: false}
-          //                 }
-          //             }
-          //         ],
-          //         {
-          //             name: 'min line on close',
-          //             type: 'min',
-          //             valueDim: 'close'
-          //         },
-          //         {
-          //             name: 'max line on close',
-          //             type: 'max',
-          //             valueDim: 'close'
-          //         }
-          //     ]
-          // }
         },
         {
           name: 'MA5',
@@ -357,7 +283,7 @@ export class EchartsUtil {
       ],
       visualMap: {
         show: false,
-        seriesIndex: [3, 4],
+        seriesIndex: [4, 5],
         dimension: 2,
         pieces: [
           {

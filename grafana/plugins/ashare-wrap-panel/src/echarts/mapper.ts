@@ -1,4 +1,4 @@
-import { PanelConfig } from './panel-config';
+import { PanelConfig } from '../panel-config';
 import * as _ from 'lodash';
 
 type rawData = any[];
@@ -12,14 +12,18 @@ const index_dif: string = "dif";
 const index_dea: string = "dea";
 const index_macd: string = "macd";
 
-export class Mapper {
+export class EchartsMapper {
   private _panelConfig: PanelConfig;
 
   constructor(panelConfig: PanelConfig) {
     this._panelConfig = panelConfig;
   }
 
-  mapShare(seriesList): any[] {
+  get echartsID(): string {
+    return this._panelConfig.getValue('echartsID')
+  }
+
+  mapShare(seriesList: any): any[] {
     if(seriesList.length == 0) {
       throw new Error('Expecting list of keys: got less than one timeseries');
     }
@@ -50,10 +54,12 @@ export class Mapper {
       ret[i][2] = seriesMap.get(index_close)![i][0].toFixed(2);
       ret[i][3] = seriesMap.get(index_low)![i][0].toFixed(2);
       ret[i][4] = seriesMap.get(index_high)![i][0].toFixed(2);
-      ret[i][5] = seriesMap.get(index_volume)![i][0].toFixed(2);
-      ret[i][6] = seriesMap.get(index_dif)![i][0].toFixed(2);
-      ret[i][7] = seriesMap.get(index_dea)![i][0].toFixed(2);
-      ret[i][8] = seriesMap.get(index_macd)![i][0].toFixed(2);
+      ret[i][5] = seriesMap.get(index_dif)![i][0].toFixed(2);
+      ret[i][6] = seriesMap.get(index_dea)![i][0].toFixed(2);
+      ret[i][7] = seriesMap.get(index_macd)![i][0].toFixed(2);
+      if (this._panelConfig.getValue('echartsType') == 'share') {
+        ret[i][8] = seriesMap.get(index_volume)![i][0].toFixed(2);
+      }
     }
     return ret;
   }

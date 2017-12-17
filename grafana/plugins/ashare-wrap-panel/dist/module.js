@@ -34270,13 +34270,15 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 Object.defineProperty(exports, "__esModule", { value: true });
 var panel_config_1 = __webpack_require__(164);
 var sdk_1 = __webpack_require__(165);
-var mapper_1 = __webpack_require__(166);
 var echarts_1 = __webpack_require__(167);
+var mapper_1 = __webpack_require__(166);
 var util_1 = __webpack_require__(169);
 var _ = __webpack_require__(170);
 var echarts = __webpack_require__(172);
 var defaults = {
     echartsType: 'share',
+    echartsName: 'default',
+    echartsID: 'default',
     // https://github.com/grafana/grafana/blob/v4.1.1/public/app/plugins/panel/singlestat/module.ts#L57
     nullMapping: undefined
 };
@@ -34289,14 +34291,15 @@ var PanelCtrl = function (_sdk_1$MetricsPanelCt) {
 
         var _this = _possibleConstructorReturn(this, (PanelCtrl.__proto__ || Object.getPrototypeOf(PanelCtrl)).call(this, $scope, $injector));
 
-        _this.echartsTypeOptions = ["share", "basic"];
+        _this.echartsTypeOptions = ["share", "wrap"];
         _this.echartsInitFlag = false;
         _.defaults(_this.panel, defaults);
         _this._panelConfig = new panel_config_1.PanelConfig(_this.panel);
         _this.initStyles();
-        echarts_1.EchartsInit(_this._panelConfig, 'asharePluginEcharts');
-        _this.util = new util_1.EchartsUtil();
-        _this.mapper = new mapper_1.Mapper(_this._panelConfig);
+        _this.util = new util_1.EchartsUtil(_this._panelConfig);
+        _this.mapper = new mapper_1.EchartsMapper(_this._panelConfig);
+        echarts_1.EchartsContainer(_this._panelConfig, 'asharePluginEcharts');
+        _this.$scope.item = _this.mapper;
         _this.events.on('render', _this.onRender.bind(_this));
         _this.events.on('data-error', _this.onDataError.bind(_this));
         _this.events.on('init-edit-mode', _this.onInitEditMode.bind(_this));
@@ -34329,32 +34332,32 @@ var PanelCtrl = function (_sdk_1$MetricsPanelCt) {
         key: "onRender",
         value: function onRender() {
             // 渲染样式
-            this._setElementHeight();
+            this.$panelContainer.find('.ashare-panel').css('min-height', this.$panelContoller.height + 'px');
+            this.minHeight = this.$panelContoller.height - 10;
+            this.$panelContainer.find('.echarts-plugin').css('min-height', this.minHeight + 'px');
+            this.$panelContainer.find('.echarts').css('min-height', this.minHeight + 'px');
+            if (this.echartsInitFlag == true) {
+                this.wrapChart.resize();
+            }
         }
     }, {
         key: "onRefresh",
         value: function onRefresh() {}
     }, {
-        key: "_setElementHeight",
-        value: function _setElementHeight() {
-            // 调整容器高度
-            this.$panelContainer.find('.ashare-panel').css('min-height', this.$panelContoller.height + 'px');
-            this.minHeight = this.$panelContoller.height - 10;
-            this.$panelContainer.find('.echarts-plugin').css('min-height', this.minHeight + 'px');
-            this.$panelContainer.find('.echarts').css('min-height', this.minHeight + 'px');
-        }
-    }, {
         key: "onDataReceived",
         value: function onDataReceived(seriesList) {
             // influxdb数据更新时,绘制图表
             this.onRender();
-            if (this._panelConfig.getValue('echartsType') === 'share') {
+            if (this.echartsInitFlag == false) {
+                var container = document.getElementById(this._panelConfig.getValue('echartsID'));
+                this.wrapChart = echarts.init(container);
+                this.echartsInitFlag = true;
+            }
+            if (seriesList.length == 0) {
+                // this.wrapChart.setOption({});
+                this.wrapChart.clear();
+            } else {
                 // 展示k线类别数据 
-                if (this.echartsInitFlag == false) {
-                    var container = document.getElementById("echarts");
-                    this.wrapChart = echarts.init(container);
-                    this.echartsInitFlag = true;
-                }
                 var rawData = this.mapper.mapShare(seriesList);
                 this.util.setData(rawData);
                 this.wrapChart.setOption(this.util.getKLineOption());
@@ -34457,14 +34460,14 @@ var index_dif = "dif";
 var index_dea = "dea";
 var index_macd = "macd";
 
-var Mapper = function () {
-    function Mapper(panelConfig) {
-        _classCallCheck(this, Mapper);
+var EchartsMapper = function () {
+    function EchartsMapper(panelConfig) {
+        _classCallCheck(this, EchartsMapper);
 
         this._panelConfig = panelConfig;
     }
 
-    _createClass(Mapper, [{
+    _createClass(EchartsMapper, [{
         key: "mapShare",
         value: function mapShare(seriesList) {
             if (seriesList.length == 0) {
@@ -34496,10 +34499,12 @@ var Mapper = function () {
                 ret[_i][2] = seriesMap.get(index_close)[_i][0].toFixed(2);
                 ret[_i][3] = seriesMap.get(index_low)[_i][0].toFixed(2);
                 ret[_i][4] = seriesMap.get(index_high)[_i][0].toFixed(2);
-                ret[_i][5] = seriesMap.get(index_volume)[_i][0].toFixed(2);
-                ret[_i][6] = seriesMap.get(index_dif)[_i][0].toFixed(2);
-                ret[_i][7] = seriesMap.get(index_dea)[_i][0].toFixed(2);
-                ret[_i][8] = seriesMap.get(index_macd)[_i][0].toFixed(2);
+                ret[_i][5] = seriesMap.get(index_dif)[_i][0].toFixed(2);
+                ret[_i][6] = seriesMap.get(index_dea)[_i][0].toFixed(2);
+                ret[_i][7] = seriesMap.get(index_macd)[_i][0].toFixed(2);
+                if (this._panelConfig.getValue('echartsType') == 'share') {
+                    ret[_i][8] = seriesMap.get(index_volume)[_i][0].toFixed(2);
+                }
             }
             return ret;
         }
@@ -34516,12 +34521,17 @@ var Mapper = function () {
             var dateStr = year + '-' + month + '-' + day + ' ' + hour + ':' + minute;
             return dateStr;
         }
+    }, {
+        key: "echartsID",
+        get: function get() {
+            return this._panelConfig.getValue('echartsID');
+        }
     }]);
 
-    return Mapper;
+    return EchartsMapper;
 }();
 
-exports.Mapper = Mapper;
+exports.EchartsMapper = EchartsMapper;
 
 /***/ }),
 /* 167 */
@@ -34533,7 +34543,7 @@ exports.Mapper = Mapper;
 Object.defineProperty(exports, "__esModule", { value: true });
 var core_1 = __webpack_require__(168);
 var directiveInited = false;
-function EchartsInit(panelConfig) {
+function EchartsContainer(panelConfig) {
     var directiveName = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "echarts";
 
     if (directiveInited) {
@@ -34550,7 +34560,7 @@ function EchartsInit(panelConfig) {
         };
     });
 }
-exports.EchartsInit = EchartsInit;
+exports.EchartsContainer = EchartsContainer;
 
 /***/ }),
 /* 168 */
@@ -34576,11 +34586,12 @@ var downColor = '#00da3c';
 var downBorderColor = '#008F28';
 
 var EchartsUtil = function () {
-    function EchartsUtil() {
+    function EchartsUtil(panelConfig) {
         _classCallCheck(this, EchartsUtil);
 
         // 数据意义：开盘(open),收盘(close),最低(low),最高(high),成交量(volume),dea/dif/macd(macd)
         this.rawShareData = [];
+        this._panelConfig = panelConfig;
     }
 
     _createClass(EchartsUtil, [{
@@ -34593,18 +34604,18 @@ var EchartsUtil = function () {
         value: function splitShareData() {
             var categoryData = new Array();
             var values = new Array();
-            var volumes = new Array();
             var macdDIFs = new Array();
             var macdDEAs = new Array();
             var macdPillers = new Array();
+            var volumes = new Array();
             var data = this.rawShareData;
             for (var i = 0; i < data.length; i++) {
                 categoryData.push(data[i].splice(0, 1)[0]);
                 values.push(data[i]);
-                volumes.push([i, data[i][4], data[i][0] > data[i][1] ? 1 : -1]);
-                macdDIFs.push(data[i][5]);
-                macdDEAs.push(data[i][6]);
-                macdPillers.push([i, data[i][7], data[i][7] >= 0 ? 1 : -1]);
+                macdDIFs.push(data[i][4]);
+                macdDEAs.push(data[i][5]);
+                macdPillers.push([i, data[i][6], data[i][6] >= 0 ? 1 : -1]);
+                volumes.push([i, data[i][7], data[i][0] > data[i][1] ? 1 : -1]);
             }
             return {
                 categoryData: categoryData,
@@ -34639,14 +34650,13 @@ var EchartsUtil = function () {
             return {
                 backgroundColor: '#fff',
                 title: {
-                    text: '上证指数',
+                    text: this._panelConfig.getValue('echartsName'),
                     left: 0
                 },
                 animation: false,
                 legend: {
-                    // bottom: 10,
                     left: 'center',
-                    data: ['日K', 'MA5', 'MA10', 'MA20', 'MA30']
+                    data: ['日K', 'MA5', 'MA10']
                 },
                 tooltip: {
                     trigger: 'axis',
@@ -34834,7 +34844,7 @@ var EchartsUtil = function () {
                 }],
                 visualMap: {
                     show: false,
-                    seriesIndex: [3, 4],
+                    seriesIndex: [4, 5],
                     dimension: 2,
                     pieces: [{
                         value: 1,
