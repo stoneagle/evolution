@@ -184,7 +184,7 @@ export class EchartsUtil {
         {
           type: 'inside',
           xAxisIndex: [0, 1, 2],
-          start: 90,
+          start: this._panelConfig.getValue('optionsXAxisStart'),
           end: 100
         },
         {
@@ -192,7 +192,7 @@ export class EchartsUtil {
           type: 'slider',
           xAxisIndex: [0, 1, 2],
           top: '90%',
-          start: 90,
+          start: this._panelConfig.getValue('optionsXAxisStart'),
           end: 100
         }
       ],

@@ -1,9 +1,9 @@
 {
   "type": "panel",
-  "name": "ashare",
-  "id": "ashare-panel",
+  "name": "ashare-kline",
+  "id": "ashare-kline",
   "info": {
-    "description": "ashare index",
+    "description": "ashare kline",
     "author": {
       "name": "wuzhongyang",
       "url": ""

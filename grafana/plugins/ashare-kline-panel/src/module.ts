@@ -11,6 +11,7 @@ const defaults = {
   echartsType: 'share',
   echartsName: 'default',
   echartsID: 'default',
+  optionsXAxisStart: 75,
   // https://github.com/grafana/grafana/blob/v4.1.1/public/app/plugins/panel/singlestat/module.ts#L57
   nullMapping: undefined,
 };
@@ -71,7 +72,7 @@ export class PanelCtrl extends MetricsPanelCtrl {
 
   onRender() {
     // 渲染样式
-    this.$panelContainer.find('.ashare-panel').css('min-height', this.$panelContoller.height + 'px');
+    this.$panelContainer.find('.ashare-kline').css('min-height', this.$panelContoller.height + 'px');
     this.minHeight = this.$panelContoller.height-10;
     this.$panelContainer.find('.echarts-plugin').css('min-height', this.minHeight + 'px');
     this.$panelContainer.find('.echarts').css('min-height', this.minHeight + 'px');

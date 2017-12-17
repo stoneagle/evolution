@@ -1,4 +1,4 @@
-define(["app/plugins/sdk","app/core/core"], function(__WEBPACK_EXTERNAL_MODULE_165__, __WEBPACK_EXTERNAL_MODULE_168__) { return /******/ (function(modules) { // webpackBootstrap
+define(["app/plugins/sdk","app/core/core"], function(__WEBPACK_EXTERNAL_MODULE_165__, __WEBPACK_EXTERNAL_MODULE_167__) { return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
 /******/
@@ -34270,8 +34270,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 Object.defineProperty(exports, "__esModule", { value: true });
 var panel_config_1 = __webpack_require__(164);
 var sdk_1 = __webpack_require__(165);
-var echarts_1 = __webpack_require__(167);
-var mapper_1 = __webpack_require__(166);
+var echarts_1 = __webpack_require__(166);
+var mapper_1 = __webpack_require__(168);
 var util_1 = __webpack_require__(169);
 var _ = __webpack_require__(170);
 var echarts = __webpack_require__(172);
@@ -34279,6 +34279,7 @@ var defaults = {
     echartsType: 'share',
     echartsName: 'default',
     echartsID: 'default',
+    optionsXAxisStart: 75,
     // https://github.com/grafana/grafana/blob/v4.1.1/public/app/plugins/panel/singlestat/module.ts#L57
     nullMapping: undefined
 };
@@ -34332,7 +34333,7 @@ var PanelCtrl = function (_sdk_1$MetricsPanelCt) {
         key: "onRender",
         value: function onRender() {
             // 渲染样式
-            this.$panelContainer.find('.ashare-panel').css('min-height', this.$panelContoller.height + 'px');
+            this.$panelContainer.find('.ashare-kline').css('min-height', this.$panelContoller.height + 'px');
             this.minHeight = this.$panelContoller.height - 10;
             this.$panelContainer.find('.echarts-plugin').css('min-height', this.minHeight + 'px');
             this.$panelContainer.find('.echarts').css('min-height', this.minHeight + 'px');
@@ -34445,6 +34446,41 @@ module.exports = __WEBPACK_EXTERNAL_MODULE_165__;
 "use strict";
 
 
+Object.defineProperty(exports, "__esModule", { value: true });
+var core_1 = __webpack_require__(167);
+var directiveInited = false;
+function EchartsContainer(panelConfig) {
+    var directiveName = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "echarts";
+
+    if (directiveInited) {
+        return;
+    }
+    directiveInited = true;
+    core_1.coreModule.directive(directiveName, function () {
+        return {
+            templateUrl: panelConfig.pluginDirName + 'echarts/echarts.html',
+            restrict: 'E',
+            scope: {
+                item: "="
+            }
+        };
+    });
+}
+exports.EchartsContainer = EchartsContainer;
+
+/***/ }),
+/* 167 */
+/***/ (function(module, exports) {
+
+module.exports = __WEBPACK_EXTERNAL_MODULE_167__;
+
+/***/ }),
+/* 168 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -34532,41 +34568,6 @@ var EchartsMapper = function () {
 }();
 
 exports.EchartsMapper = EchartsMapper;
-
-/***/ }),
-/* 167 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var core_1 = __webpack_require__(168);
-var directiveInited = false;
-function EchartsContainer(panelConfig) {
-    var directiveName = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "echarts";
-
-    if (directiveInited) {
-        return;
-    }
-    directiveInited = true;
-    core_1.coreModule.directive(directiveName, function () {
-        return {
-            templateUrl: panelConfig.pluginDirName + 'echarts/echarts.html',
-            restrict: 'E',
-            scope: {
-                item: "="
-            }
-        };
-    });
-}
-exports.EchartsContainer = EchartsContainer;
-
-/***/ }),
-/* 168 */
-/***/ (function(module, exports) {
-
-module.exports = __WEBPACK_EXTERNAL_MODULE_168__;
 
 /***/ }),
 /* 169 */
@@ -34756,14 +34757,14 @@ var EchartsUtil = function () {
                 dataZoom: [{
                     type: 'inside',
                     xAxisIndex: [0, 1, 2],
-                    start: 90,
+                    start: this._panelConfig.getValue('optionsXAxisStart'),
                     end: 100
                 }, {
                     show: true,
                     type: 'slider',
                     xAxisIndex: [0, 1, 2],
                     top: '90%',
-                    start: 90,
+                    start: this._panelConfig.getValue('optionsXAxisStart'),
                     end: 100
                 }],
                 series: [{
