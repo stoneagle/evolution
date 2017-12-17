@@ -58,11 +58,12 @@ classify_list = [
 
 
 # strategy
-# screen.daily(omit_list)
+# screen.daily_share_filter(omit_list)
 # f = h5py.File(conf.HDF5_FILE_SHARE, 'a')
 # for code in code_list:
 #     screen._daily_code(f, code)
 # f.close()
+# screen.mark_grade()
 
 
 # wrap
@@ -75,5 +76,6 @@ classify_list = [
 # grafana.classify_detail(classify_list)
 # grafana.index_detail()
 # grafana.share_detail(code_list)
-# grafana.daily_filter("2017-12-16")
+# grafana.share_filter("2017-12-16")
+grafana.share_grade()
 # grafana.code_classify()

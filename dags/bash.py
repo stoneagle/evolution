@@ -72,8 +72,9 @@ def strategy_share(omit_list):
     策略选股
     """
     # 每日股票筛选
-    screen.daily(omit_list)
+    screen.share_filter(omit_list)
     # 为筛选的股票进行打分
+    screen.mark_grade()
     # 获取股票最新的分类，并标记热门与冷门概念
     # 选出的股票basic的detail，聚合至share对应code下
     # arrange.code_detail(start_date, omit_list)
@@ -100,8 +101,9 @@ def grafana_push(classify_list, code_list):
     """
     # 推送ipo、xsg、shm、szm等数据
     grafana.basic_detail()
-    # 推送筛选结果
-    grafana.daily_filter()
+    # 推送筛选结果和打分结果
+    grafana.share_filter()
+    grafana.share_grade()
     # 推送筛选股票的分类
     grafana.code_classify()
     # 推送index数据
