@@ -98,9 +98,9 @@ def share_detail(code_list, reset_flag=False):
     return
 
 
-def daily_filter(today_str=None):
+def share_filter(today_str=None):
     """
-    推送每日筛选列表至influxdb
+    推送筛选列表至influxdb
     """
     f = h5py.File(conf.HDF5_FILE_SCREEN, 'a')
     if today_str is None:
@@ -111,10 +111,10 @@ def daily_filter(today_str=None):
         conf.MEASUREMENT_FILTER_SHARE
     )
 
-    if f.get(today_str) is None:
+    if f[conf.SCREEN_SHARE_FILTER].get(today_str) is None:
         console.write_msg(today_str + "的筛选数据不存在")
         return
-    screen_df = tool.df_from_dataset(f, today_str, None)
+    screen_df = tool.df_from_dataset(f[conf.SCREEN_SHARE_FILTER], today_str, None)
     screen_df[conf.HDF5_SHARE_DATE_INDEX] = bytes(today_str, encoding="utf8")
     screen_df = _datetime_index(screen_df)
     screen_df = screen_df.reset_index()
@@ -125,6 +125,40 @@ def daily_filter(today_str=None):
     screen_df = screen_df.set_index(conf.HDF5_SHARE_DATE_INDEX)
     try:
         influx.write_df(screen_df, conf.MEASUREMENT_FILTER_SHARE, {"filter_date": today_str})
+    except Exception as er:
+        print(str(er))
+    console.write_tail()
+    f.close()
+    return
+
+
+def share_grade(today_str=None):
+    """
+    推送打分结果至influxdb
+    """
+    f = h5py.File(conf.HDF5_FILE_SCREEN, 'a')
+    if today_str is None:
+        today_str = tradetime.get_today()
+    console.write_head(
+        conf.HDF5_OPERATE_PUSH,
+        conf.HDF5_RESOURCE_TUSHARE,
+        conf.MEASUREMENT_FILTER_SHARE_GRADE
+    )
+
+    if f[conf.SCREEN_SHARE_GRADE].get(today_str) is None:
+        console.write_msg(today_str + "的打分数据不存在")
+        return
+    grade_df = tool.df_from_dataset(f[conf.SCREEN_SHARE_GRADE], today_str, None)
+    grade_df[conf.HDF5_SHARE_DATE_INDEX] = bytes(today_str, encoding="utf8")
+    grade_df = _datetime_index(grade_df)
+    grade_df = grade_df.reset_index()
+    num = 1
+    for index, row in grade_df.iterrows():
+        grade_df.loc[index, conf.HDF5_SHARE_DATE_INDEX] = grade_df.loc[index][conf.HDF5_SHARE_DATE_INDEX] + datetime.timedelta(0, num)
+        num += 1
+    grade_df = grade_df.set_index(conf.HDF5_SHARE_DATE_INDEX)
+    try:
+        influx.write_df(grade_df, conf.MEASUREMENT_FILTER_SHARE_GRADE, {"filter_date": today_str})
     except Exception as er:
         print(str(er))
     console.write_tail()
