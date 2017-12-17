@@ -19,6 +19,7 @@ HDF5_FILE_BASIC = HDF5_FILE_ROOT + '/basic.h5'
 HDF5_FILE_ERROR = HDF5_FILE_ROOT + '/error.h5'
 HDF5_FILE_FUNDAMENTAL = HDF5_FILE_ROOT + '/fundamental.h5'
 HDF5_FILE_SCREEN = HDF5_FILE_ROOT + '/screen.h5'
+HDF5_FILE_OTHER = HDF5_FILE_ROOT + '/other.h5'
 
 HDF5_ERROR_SHARE_GET = 'share_get'
 HDF5_ERROR_DETAIL_GET = 'detail_get'
@@ -46,10 +47,12 @@ HDF5_BASIC_ST = 'st'
 HDF5_BASIC_QUIT = 'quit'
 HDF5_BASIC_QUIT_SUSPEND = 'suspend'
 HDF5_BASIC_QUIT_TERMINATE = 'terminate'
+
 HDF5_SHARE_DETAIL = "share"
 HDF5_SHARE_KTYPE = ["M", "W", "D", "30", "5"]
 HDF5_SHARE_DATE_INDEX = "date"
 HDF5_SHARE_COLUMN = ["open", "high", "close", "low", "volume", "turnover"]
+
 HDF5_INDEX_COLUMN = ["dif", "dea", "macd"]
 HDF5_INDEX_DETAIL = "index"
 HDF5_INDEX_MACD_TREND = "macd_trend"
@@ -60,11 +63,15 @@ HDF5_RESOURCE_TUSHARE = "tushare"
 HDF5_RESOURCE_DATASET = "dataset"
 HDF5_RESOURCE_GROUP = "group"
 HDF5_RESOURCE_ATTR = "attr"
+
+HDF5_OTHER_CODE_CLASSIFY = "code_classify"
+
 HDF5_OPERATE_GET = "get"
 HDF5_OPERATE_ARRANGE = "arrange"
 HDF5_OPERATE_INDEX = "index"
 HDF5_OPERATE_TACTICS = "tactics"
 HDF5_OPERATE_STRATEGY = "strategy"
+HDF5_OPERATE_WRAP = "wrap"
 HDF5_OPERATE_PUSH = "push"
 HDF5_OPERATE_ADD = "add"
 HDF5_OPERATE_DEL = "del"

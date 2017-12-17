@@ -56,6 +56,39 @@ def code_detail(code_list, start_date):
     return
 
 
+def code_classify(code_list, classify_list):
+    """
+    按照code整理其所属的classify
+    """
+    f = h5py.File(conf.HDF5_FILE_CLASSIFY, 'a')
+    console.write_head(
+        conf.HDF5_OPERATE_ARRANGE,
+        conf.HDF5_RESOURCE_TUSHARE,
+        "code所属classify"
+    )
+    # 获取classify列表
+    code_classify_df = tool.init_empty_df(["code", "classify"])
+    for ctype in classify_list:
+        for classify_name in f[ctype]:
+            if f[ctype][classify_name].get(conf.HDF5_CLASSIFY_DS_CODE) is None:
+                console.write_msg(classify_name + "的code列表不存在")
+            classify_df = tool.df_from_dataset(f[ctype][classify_name], conf.HDF5_CLASSIFY_DS_CODE, None)
+            for index, row in classify_df.iterrows():
+                code = row[0].astype(str)
+                if code in code_list:
+                    code_dict = dict()
+                    code_dict["code"] = code
+                    code_dict["classify"] = classify_name
+                    code_classify_df = code_classify_df.append(code_dict, ignore_index=True)
+    console.write_tail()
+    f.close()
+
+    f_other = h5py.File(conf.HDF5_FILE_OTHER, 'a')
+    tool.merge_df_dataset(f_other, conf.HDF5_OTHER_CODE_CLASSIFY, code_classify_df)
+    f_other.close()
+    return
+
+
 def operate_quit(action_type):
     """
     将退市quit内容，转换成标签添加在对应code下
