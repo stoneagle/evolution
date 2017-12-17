@@ -1,5 +1,5 @@
 import h5py
-from library import conf, console, tool
+from library import conf, console, tool, tradetime
 from strategy import macd
 
 
@@ -64,10 +64,11 @@ def code_classify(code_list, classify_list):
     console.write_head(
         conf.HDF5_OPERATE_ARRANGE,
         conf.HDF5_RESOURCE_TUSHARE,
-        "code所属classify"
+        conf.HDF5_OTHER_CODE_CLASSIFY
     )
     # 获取classify列表
-    code_classify_df = tool.init_empty_df(["code", "classify"])
+    code_classify_df = tool.init_empty_df(["date", "code", "classify"])
+    today_str = tradetime.get_today()
     for ctype in classify_list:
         for classify_name in f[ctype]:
             if f[ctype][classify_name].get(conf.HDF5_CLASSIFY_DS_CODE) is None:
@@ -77,6 +78,7 @@ def code_classify(code_list, classify_list):
                 code = row[0].astype(str)
                 if code in code_list:
                     code_dict = dict()
+                    code_dict["date"] = today_str
                     code_dict["code"] = code
                     code_dict["classify"] = classify_name
                     code_classify_df = code_classify_df.append(code_dict, ignore_index=True)
@@ -84,6 +86,7 @@ def code_classify(code_list, classify_list):
     f.close()
 
     f_other = h5py.File(conf.HDF5_FILE_OTHER, 'a')
+    tool.delete_dataset(f_other, conf.HDF5_OTHER_CODE_CLASSIFY)
     tool.merge_df_dataset(f_other, conf.HDF5_OTHER_CODE_CLASSIFY, code_classify_df)
     f_other.close()
     return

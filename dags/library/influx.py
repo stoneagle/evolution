@@ -48,3 +48,21 @@ def delete_measurement(measurement, tags):
     global dfclient
     dfclient.delete_series(measurement=measurement, tags=tags)
     return
+
+
+def get_last_datetime(measurement, tags):
+    global dfclient
+    sql = "select * from " + measurement
+    num = 0
+    for index, value in tags.items():
+        if num == 0:
+            sql = sql + " where " + index + " = " + "'" + value + "'"
+        else:
+            sql = sql + " and " + index + " = " + "'" + value + "'"
+        num += 1
+    sql = sql + " order by time desc limit 1"
+    datetime_df = dfclient.query(sql)
+    if not bool(datetime_df):
+        return None
+    else:
+        return datetime_df[measurement].index.values[0]

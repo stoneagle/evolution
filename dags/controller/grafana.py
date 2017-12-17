@@ -1,7 +1,9 @@
-from library import console, conf, tool, influx
+from library import console, conf, tool, influx, tradetime
 import pandas as pd
 import numpy as np
 import h5py
+
+DF_INIT_LIMIT = 500
 
 
 def basic_detail():
@@ -88,7 +90,7 @@ def share_detail(code_list):
             index_df = tool.df_from_dataset(f[code_prefix][code], index_ds_name, None)
             detail_df = detail_df.merge(index_df, left_on=conf.HDF5_SHARE_DATE_INDEX, right_on=conf.HDF5_SHARE_DATE_INDEX, how='outer')
             detail_df = _datetime_index(detail_df)
-            influx.write_df(detail_df, conf.MEASUREMENT_SHARE, {"code": code, "ktype": ktype})
+            influx.reset_df(detail_df, conf.MEASUREMENT_SHARE, {"code": code, "ktype": ktype})
 
         # 推送缠论kline
         for ktype in ["D", "30"]:
@@ -97,7 +99,7 @@ def share_detail(code_list):
                 continue
             wrap_df = tool.df_from_dataset(f[code], wrap_ds_name, None)
             wrap_df = _datetime_index(wrap_df)
-            influx.write_df(wrap_df, conf.MEASUREMENT_SHARE_WRAP, {"code": code, "ktype": ktype})
+            influx.reset_df(wrap_df, conf.MEASUREMENT_SHARE_WRAP, {"code": code, "ktype": ktype})
         console.write_tail()
     f.close()
     return
@@ -118,7 +120,26 @@ def daily_filter():
         return
     screen_df = tool.df_from_dataset(f, today_str, None)
     screen_df = _datetime_index(screen_df)
-    influx.write_df(screen_df, conf.MEASUREMENT_SHARE_WRAP, None)
+    influx.reset_df(screen_df, conf.MEASUREMENT_FILTER_SHARE, None)
+    f.close()
+    return
+
+
+def code_classify():
+    """
+    推送筛选出的股票相关分类
+    """
+    f = h5py.File(conf.HDF5_FILE_OTHER, 'a')
+    console.write_head(
+        conf.HDF5_OPERATE_PUSH,
+        conf.HDF5_RESOURCE_TUSHARE,
+        conf.HDF5_OTHER_CODE_CLASSIFY
+    )
+    if f.get(conf.HDF5_FILE_OTHER) is None:
+        return
+    code_classify_df = tool.df_from_dataset(f, conf.HDF5_FILE_OTHER, None)
+    code_classify_df = _datetime_index(code_classify_df)
+    influx.reset_df(code_classify_df, conf.MEASUREMENT_CODE_CLASSIFY, None)
     f.close()
     return
 
@@ -145,7 +166,7 @@ def index_detail():
             index_df = tool.df_from_dataset(f[code], index_ds_name, None)
             detail_df = detail_df.merge(index_df, left_on=conf.HDF5_SHARE_DATE_INDEX, right_on=conf.HDF5_SHARE_DATE_INDEX, how='outer')
             detail_df = _datetime_index(detail_df)
-            influx.write_df(detail_df, conf.MEASUREMENT_INDEX, {"itype": code, "ktype": ktype})
+            influx.reset_df(detail_df, conf.MEASUREMENT_INDEX, {"itype": code, "ktype": ktype})
 
         # 推送缠论kline
         for ktype in ["D", "30"]:
@@ -154,28 +175,30 @@ def index_detail():
                 continue
             wrap_df = tool.df_from_dataset(f[code], wrap_ds_name, None)
             wrap_df = _datetime_index(wrap_df)
-            influx.write_df(wrap_df, conf.MEASUREMENT_INDEX_WRAP, {"itype": code, "ktype": ktype})
+            influx.reset_df(wrap_df, conf.MEASUREMENT_INDEX_WRAP, {"itype": code, "ktype": ktype})
         console.write_tail()
     f.close()
     return
 
 
-def classify_detail(classify_list):
+def classify_detail(classify_list, reset_flag=False):
     """
     将分类推送至influxdb
     """
     f = h5py.File(conf.HDF5_FILE_CLASSIFY, 'a')
     # 获取classify列表
     for ctype in classify_list:
+        console.write_head(
+            conf.HDF5_OPERATE_PUSH,
+            conf.HDF5_RESOURCE_TUSHARE,
+            ctype
+        )
         for classify_name in f[ctype]:
-            console.write_head(
-                conf.HDF5_OPERATE_PUSH,
-                conf.HDF5_RESOURCE_TUSHARE,
-                classify_name
-            )
 
             # 推送原始kline
             for ktype in conf.HDF5_SHARE_KTYPE:
+                ctags = {"ktype": ktype, "classify": classify_name}
+                measurement = conf.MEASUREMENT_CLASSIFY + "_" + ctype
                 detail_ds_name = conf.HDF5_CLASSIFY_DS_DETAIL + "_" + ktype
                 if f[ctype][classify_name].get(detail_ds_name) is None:
                     continue
@@ -188,17 +211,44 @@ def classify_detail(classify_list):
                 index_df = tool.df_from_dataset(f[ctype][classify_name], index_ds_name, None)
                 detail_df = detail_df.merge(index_df, left_on=conf.HDF5_SHARE_DATE_INDEX, right_on=conf.HDF5_SHARE_DATE_INDEX, how='outer')
                 detail_df = _datetime_index(detail_df)
-                influx.write_df(detail_df, conf.MEASUREMENT_CLASSIFY + "_" + ctype, {"ktype": ktype, "classify": classify_name})
+                datetime = influx.get_last_datetime(measurement, ctags)
+                if datetime is not None and reset_flag is False:
+                    detail_df = detail_df.loc[detail_df.index > datetime]
+                else:
+                    detail_df = detail_df.tail(DF_INIT_LIMIT)
+                if len(detail_df) > 0:
+                    try:
+                        influx.reset_df(detail_df, measurement, ctags)
+                        console.write_exec()
+                    except Exception as er:
+                        print(str(er))
+                else:
+                    console.write_pass()
 
             # 推送缠论kline
             for ktype in ["D", "30"]:
+                ctags = {"ktype": ktype, "classify": classify_name}
+                measurement = conf.MEASUREMENT_CLASSIFY_WRAP + "_" + ctype
                 wrap_ds_name = conf.HDF5_INDEX_WRAP + "_" + ktype
                 if f[ctype][classify_name].get(wrap_ds_name) is None:
                     continue
                 wrap_df = tool.df_from_dataset(f[ctype][classify_name], wrap_ds_name, None)
                 wrap_df = _datetime_index(wrap_df)
-                influx.write_df(wrap_df, conf.MEASUREMENT_CLASSIFY_WRAP + "_" + ctype, {"ktype": ktype, "classify": classify_name})
-            console.write_tail()
+                datetime = influx.get_last_datetime(measurement, ctags)
+                if datetime is not None and reset_flag is False:
+                    wrap_df = wrap_df.loc[wrap_df.index > datetime]
+                else:
+                    detail_df = detail_df.tail(DF_INIT_LIMIT)
+                if len(wrap_df) > 0:
+                    try:
+                        influx.reset_df(wrap_df, measurement, ctags)
+                        console.write_exec()
+                    except Exception as er:
+                        print(str(er))
+                else:
+                    console.write_pass()
+        console.write_blank()
+        console.write_tail()
     f.close()
     return
 
@@ -208,5 +258,6 @@ def _datetime_index(df):
     df.index = pd.to_datetime(df[conf.HDF5_SHARE_DATE_INDEX])
     df = df.drop(conf.HDF5_SHARE_DATE_INDEX, axis=1)
     df = df.replace(np.inf, 0)
+    df = df.replace(-np.inf, 0)
     df = df.replace(np.nan, 0)
     return df
