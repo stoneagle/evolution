@@ -55,9 +55,9 @@ def share_filter(omit_list):
                     continue
                 else:
                     console.write_exec()
+                    filter_df = filter_df.append(code_dict, ignore_index=True)
             except Exception as er:
                 console.write_msg("[" + code + "]" + str(er))
-            filter_df = filter_df.append(code_dict, ignore_index=True)
         console.write_blank()
         console.write_tail()
     f.close()
