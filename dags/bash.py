@@ -76,11 +76,12 @@ def strategy_share(omit_list):
     # 为筛选的股票进行打分
     # 获取股票最新的分类，并标记热门与冷门概念
     # 选出的股票basic的detail，聚合至share对应code下
-    # arrange.share_detail(start_date, omit_list)
-    return
+    # arrange.code_detail(start_date, omit_list)
+    code_list = ["002273"]
+    return code_list
 
 
-def wrap_exec(classify_list):
+def wrap_exec(classify_list, code_list, start_date):
     """
     将指数、概念分类、筛选个股聚合成缠论模式，并进行中枢分析
     """
@@ -88,10 +89,12 @@ def wrap_exec(classify_list):
     wrap.all_classify(classify_list)
     # 获取指数的缠论数据
     wrap.all_index()
+    # 获取筛选股票的缠论数据
+    wrap.filter_share(code_list, start_date)
     return
 
 
-def grafana_push(classify_list):
+def grafana_push(classify_list, code_list):
     """
     推送相关数据至influxdb
     """
@@ -103,7 +106,6 @@ def grafana_push(classify_list):
     grafana.code_classify()
     # 推送index数据
     grafana.index_detail()
-    code_list = ["002273"]
     # 推送筛选出的股票数据
     grafana.share_detail(code_list)
     # 推送classify数据
@@ -124,6 +126,6 @@ get_basic(classify_list, start_date)
 get_share()
 arrange_all(classify_list, omit_list, start_date)
 index_exec(classify_list, omit_list, start_date)
-strategy_share(omit_list)
-wrap_exec(classify_list)
-grafana_push(classify_list)
+code_list = strategy_share(omit_list)
+wrap_exec(classify_list, code_list, start_date)
+grafana_push(classify_list, code_list)

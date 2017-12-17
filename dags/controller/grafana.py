@@ -82,11 +82,15 @@ def share_detail(code_list, reset_flag=False):
         )
         # 推送原始kline
         measurement = conf.MEASUREMENT_SHARE
-        _raw_kline(f[code_prefix][code], measurement, code)
+        _raw_kline(f[code_prefix][code], measurement, code, reset_flag)
 
         # 推送缠论kline
         measurement = conf.MEASUREMENT_SHARE_WRAP
-        _wrap_kline(f[code_prefix][code], measurement, code)
+        _wrap_kline(f[code_prefix][code], measurement, code, reset_flag)
+
+        # 推送基本面数据
+        measurement = conf.MEASUREMENT_SHARE_BASIC
+        _basic_info(f[code_prefix][code], measurement, code, reset_flag)
 
         console.write_blank()
         console.write_tail()
@@ -175,11 +179,11 @@ def index_detail(reset_flag=False):
         )
         # 推送原始kline
         measurement = conf.MEASUREMENT_INDEX
-        _raw_kline(f[code], measurement, code)
+        _raw_kline(f[code], measurement, code, reset_flag)
 
         # 推送缠论kline
         measurement = conf.MEASUREMENT_INDEX_WRAP
-        _wrap_kline(f[code], measurement, code)
+        _wrap_kline(f[code], measurement, code, reset_flag)
 
         console.write_blank()
         console.write_tail()
@@ -202,11 +206,11 @@ def classify_detail(classify_list, reset_flag=False):
         for classify_name in f[ctype]:
             # 推送原始kline
             measurement = conf.MEASUREMENT_CLASSIFY + "_" + ctype
-            _raw_kline(f[ctype][classify_name], measurement, classify_name)
+            _raw_kline(f[ctype][classify_name], measurement, classify_name, reset_flag)
 
             # 推送缠论kline
             measurement = conf.MEASUREMENT_CLASSIFY_WRAP + "_" + ctype
-            _wrap_kline(f[ctype][classify_name], measurement, classify_name)
+            _wrap_kline(f[ctype][classify_name], measurement, classify_name, reset_flag)
         console.write_blank()
         console.write_tail()
     f.close()
@@ -233,8 +237,10 @@ def _raw_kline(f, measurement, code, reset_flag=False):
         index_ds_name = conf.HDF5_INDEX_DETAIL + "_" + ktype
 
         if f.get(detail_ds_name) is None:
+            console.write_msg(code + "的detail数据不存在")
             continue
         if f.get(index_ds_name) is None:
+            console.write_msg(code + "的index数据不存在")
             continue
         detail_df = tool.df_from_dataset(f, detail_ds_name, None)
         index_df = tool.df_from_dataset(f, index_ds_name, None)
@@ -265,6 +271,7 @@ def _wrap_kline(f, measurement, code, reset_flag=False):
         ctags = {"kcode": code, "ktype": ktype}
         wrap_ds_name = conf.HDF5_INDEX_WRAP + "_" + ktype
         if f.get(wrap_ds_name) is None:
+            console.write_msg(code + "缠论数据不存在")
             continue
 
         wrap_df = tool.df_from_dataset(f, wrap_ds_name, None)
@@ -282,4 +289,29 @@ def _wrap_kline(f, measurement, code, reset_flag=False):
                 print(str(er))
         else:
             console.write_pass()
+    return
+
+
+def _basic_info(f, measurement, code, reset_flag):
+    ctags = {"kcode": code}
+    basic_ds_name = conf.HDF5_BASIC_DETAIL
+    if f.get(basic_ds_name) is None:
+        console.write_msg(code + "基本面数据不存在")
+        return
+
+    basic_df = tool.df_from_dataset(f, basic_ds_name, None)
+    basic_df = _datetime_index(basic_df)
+    last_datetime = influx.get_last_datetime(measurement, ctags)
+    if last_datetime is not None and reset_flag is False:
+        basic_df = basic_df.loc[basic_df.index > last_datetime]
+    else:
+        basic_df = basic_df.tail(DF_INIT_LIMIT)
+    if len(basic_df) > 0:
+        try:
+            influx.reset_df(basic_df, measurement, ctags)
+            console.write_exec()
+        except Exception as er:
+            print(str(er))
+    else:
+        console.write_pass()
     return
