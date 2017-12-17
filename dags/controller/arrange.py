@@ -174,7 +174,7 @@ def all_classify_detail(classify_list, omit_list, start_date):
 
             for ktype in conf.HDF5_SHARE_KTYPE:
                 mean_df = one_classify_detail(f, f_classify[ctype][classify_name].get(conf.HDF5_CLASSIFY_DS_CODE), omit_list, ktype, start_date)
-                ds_name = conf.HDF5_CLASSIFY_DS_DETAIL + "_" + ktype
+                ds_name = ktype
                 # 如果start_date为空，则重置该数据
                 if start_date is None:
                     tool.delete_dataset(f_classify[ctype][classify_name], ds_name)
@@ -217,7 +217,6 @@ def one_classify_detail(f, code_list, omit_list, ktype, start_date):
         if f[code_group_path].get(ktype) is None:
             console.write_msg(code + "的" + ktype + "文件不存在")
             continue
-
         add_df = tool.df_from_dataset(f[code_group_path], ktype, None)
         add_df[conf.HDF5_SHARE_DATE_INDEX] = add_df[conf.HDF5_SHARE_DATE_INDEX].str.decode("utf-8")
         add_df["num"] = 1
@@ -230,6 +229,7 @@ def one_classify_detail(f, code_list, omit_list, ktype, start_date):
         if start_date is not None:
             init_df = init_df.ix[start_date:]
         init_df = init_df.reset_index().sort_values(by=[conf.HDF5_SHARE_DATE_INDEX])
+        init_df["volume"] = init_df["volume"].astype('float64')
         return init_df
     else:
         return None

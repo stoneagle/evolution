@@ -50,6 +50,7 @@ HDF5_BASIC_QUIT_TERMINATE = 'terminate'
 
 HDF5_SHARE_DETAIL = "share"
 HDF5_SHARE_KTYPE = ["M", "W", "D", "30", "5"]
+HDF5_SHARE_WRAP_KTYPE = ["D", "30"]
 HDF5_SHARE_DATE_INDEX = "date"
 HDF5_SHARE_COLUMN = ["open", "high", "close", "low", "volume", "turnover"]
 
@@ -97,7 +98,7 @@ INFLUXDB_PORT = 18086
 INFLUXDB_PROTOCOL_JSON = "json"
 
 MEASUREMENT_SHARE = "share"
-MEASUREMENT_SHARE_WRAP = "share"
+MEASUREMENT_SHARE_WRAP = "share_wrap"
 MEASUREMENT_BASIC = "basic"
 MEASUREMENT_SCREEN = "screen"
 MEASUREMENT_INDEX = "index"

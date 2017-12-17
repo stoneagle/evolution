@@ -22,7 +22,7 @@ def filter_share(code_list, start_date):
         if f[code_prefix][code].attrs.get(conf.HDF5_BASIC_QUIT) is not None or f[code_prefix][code].attrs.get(conf.HDF5_BASIC_ST) is not None:
             continue
 
-        for ktype in conf.HDF5_SHARE_KTYPE:
+        for ktype in conf.HDF5_SHARE_WRAP_KTYPE:
             ds_name = ktype
             if f[code_prefix][code].get(ds_name) is None:
                 continue
@@ -33,6 +33,10 @@ def filter_share(code_list, start_date):
                 if f[code_prefix][code].get(ds_name) is not None:
                     tool.delete_dataset(f[code_prefix][code], ds_name)
                 tool.create_df_dataset(f[code_prefix][code], ds_name, wrap_df)
+                console.write_exec()
+            else:
+                console.write_pass()
+    console.write_blank()
     console.write_tail()
     f.close()
     return
@@ -52,7 +56,7 @@ def all_classify(classify_list, init_flag=True):
                 conf.HDF5_RESOURCE_TUSHARE,
                 classify_name
             )
-            for ktype in ["D", "30"]:
+            for ktype in conf.HDF5_SHARE_WRAP_KTYPE:
                 ds_name = conf.HDF5_CLASSIFY_DS_DETAIL + "_" + ktype
                 if f_classify[ctype][classify_name].get(ds_name) is None:
                     continue
@@ -80,7 +84,7 @@ def all_index(init_flag=True):
             conf.HDF5_RESOURCE_TUSHARE,
             code
         )
-        for ktype in ["D", "30"]:
+        for ktype in conf.HDF5_SHARE_WRAP_KTYPE:
             if f[code].get(ktype) is None:
                 continue
             share_df = tool.df_from_dataset(f[code], ktype, None)

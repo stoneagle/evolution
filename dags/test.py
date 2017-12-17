@@ -1,4 +1,4 @@
-from controller import screen
+from controller import grafana
 # import h5py
 from library import conf
 
@@ -39,7 +39,7 @@ classify_list = [
 # arrange.all_classify_detail(classify_list, omit_list, start_date)
 # arrange.code_detail(code_list, start_date)
 # arrange.all_macd_trend(code_list, start_date)
-# arrange.all_wrap(code_list, start_date)
+# arrange.code_classify(code_list, classify_list)
 
 
 # index
@@ -58,56 +58,22 @@ classify_list = [
 
 
 # strategy
-screen.daily(omit_list)
+# screen.daily(omit_list)
 # f = h5py.File(conf.HDF5_FILE_SHARE, 'a')
 # for code in code_list:
 #     screen._daily_code(f, code)
 # f.close()
 
 
+# wrap
+# wrap.filter_share(code_list, start_date)
+# wrap.all_index()
+# wrap.all_classify()
+
 # grafana
-# grafana.classify_detail(classify_list)
 # grafana.basic_detail()
+# grafana.classify_detail(classify_list)
 # grafana.index_detail()
-
-"""
-TODO
-[]index的macd与均线，share不计算均线所处位置
-"""
-
-
-def idea():
-    """
-    数据还原:
-        [] 删除所有清洗生成的数据
-    数据获取:
-    数据清洗:
-        [x] 投资基本面，平均每周的ipo、限售股、融资融券数据
-        [x] 价格所处均线位置
-        [x] 概念均价
-        [x] 股票股东人数变化
-        [x] 个股K线图，向缠论转换
-        [x] 个股MACD趋势
-        [] 成交量?
-        [] 多线程处理
-    策略思路:
-        基本面
-            [x]市场抽水:限售股解禁、ipo上市、融券
-            [x]市场填水:融资，沪港通
-        比价
-            [x]横向:各概念均价所处均线位置
-            []纵向:个股季度财报，行业内龙头比对
-        出入信号
-            [x]出入时机:macd的背离
-            []出入时机:三类买卖点
-            [x]波动空间:缠论K线的箱体
-            []波动空间:均线位置
-            []持续时间:股东人数
-        管理
-            []入场风格:左侧/右侧交易
-            []资金管理
-    数据展示:
-        [x] 将量化数据传导至influxdb
-        [] 梳理需要展示的内容，以及脚本执行顺序
-        [] 在grafana上进行配置
-    """
+# grafana.share_detail(code_list)
+# grafana.daily_filter("2017-12-16")
+# grafana.code_classify()

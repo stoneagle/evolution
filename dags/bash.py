@@ -1,4 +1,4 @@
-from controller import obtain, arrange, index, grafana, screen
+from controller import obtain, arrange, index, grafana, screen, wrap
 from library import conf
 
 
@@ -56,7 +56,7 @@ def index_exec(classify_list, omit_list, start_date):
     清洗并获取指数
     """
     init_flag = True
-    if start_date is None:
+    if start_date is not None:
         init_flag = False
     # 整理classify分类的均值、macd等
     index.all_classify(classify_list, init_flag)
@@ -73,8 +73,21 @@ def strategy_share(omit_list):
     """
     # 每日股票筛选
     screen.daily(omit_list)
-    # 将筛选出的股票basic的detail，聚合至share对应code下
+    # 为筛选的股票进行打分
+    # 获取股票最新的分类，并标记热门与冷门概念
+    # 选出的股票basic的detail，聚合至share对应code下
     # arrange.share_detail(start_date, omit_list)
+    return
+
+
+def wrap_exec(classify_list):
+    """
+    将指数、概念分类、筛选个股聚合成缠论模式，并进行中枢分析
+    """
+    # 获取分类的缠论数据
+    wrap.all_classify(classify_list)
+    # 获取指数的缠论数据
+    wrap.all_index()
     return
 
 
@@ -84,12 +97,17 @@ def grafana_push(classify_list):
     """
     # 推送ipo、xsg、shm、szm等数据
     grafana.basic_detail()
-    # 推送classify数据
-    grafana.classify_detail(classify_list)
+    # 推送筛选结果
+    grafana.daily_filter()
+    # 推送筛选股票的分类
+    grafana.code_classify()
     # 推送index数据
     grafana.index_detail()
-    # 推送筛选结果
+    code_list = ["002273"]
     # 推送筛选出的股票数据
+    grafana.share_detail(code_list)
+    # 推送classify数据
+    grafana.classify_detail(classify_list)
     return
 
 
@@ -107,4 +125,5 @@ get_share()
 arrange_all(classify_list, omit_list, start_date)
 index_exec(classify_list, omit_list, start_date)
 strategy_share(omit_list)
-# grafana_push(classify_list)
+wrap_exec(classify_list)
+grafana_push(classify_list)
