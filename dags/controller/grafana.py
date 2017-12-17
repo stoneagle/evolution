@@ -35,7 +35,7 @@ def basic_detail():
         influx.reset_df(ipo_df, conf.MEASUREMENT_BASIC, {"btype": "ipo"})
     console.write_tail()
 
-    # 获取shm融资融券
+    # 获取sh融资融券
     console.write_head(
         conf.HDF5_OPERATE_PUSH,
         conf.HDF5_RESOURCE_TUSHARE,
@@ -47,7 +47,7 @@ def basic_detail():
         shm_df = _datetime_index(shm_df)
         influx.reset_df(shm_df, conf.MEASUREMENT_BASIC, {"btype": "shm"})
 
-    # 获取shz融资融券
+    # 获取sz融资融券
     console.write_head(
         conf.HDF5_OPERATE_PUSH,
         conf.HDF5_RESOURCE_TUSHARE,
@@ -144,7 +144,7 @@ def code_classify():
     return
 
 
-def index_detail():
+def index_detail(reset_flag=False):
     """
     将指数数据推送至influxdb
     """
@@ -157,25 +157,60 @@ def index_detail():
         )
         # 推送原始kline
         for ktype in conf.HDF5_SHARE_KTYPE:
+            ctags = {"itype": code, "ktype": ktype}
+            measurement = conf.MEASUREMENT_INDEX
+
             if f[code].get(ktype) is None:
                 continue
             index_ds_name = conf.HDF5_INDEX_DETAIL + "_" + ktype
             if f[code].get(index_ds_name) is None:
                 continue
+
             detail_df = tool.df_from_dataset(f[code], ktype, None)
             index_df = tool.df_from_dataset(f[code], index_ds_name, None)
             detail_df = detail_df.merge(index_df, left_on=conf.HDF5_SHARE_DATE_INDEX, right_on=conf.HDF5_SHARE_DATE_INDEX, how='outer')
             detail_df = _datetime_index(detail_df)
-            influx.reset_df(detail_df, conf.MEASUREMENT_INDEX, {"itype": code, "ktype": ktype})
+
+            datetime = influx.get_last_datetime(measurement, ctags)
+            if datetime is not None and reset_flag is False:
+                detail_df = detail_df.loc[detail_df.index > datetime]
+            else:
+                detail_df = detail_df.tail(DF_INIT_LIMIT)
+            detail_df = detail_df.drop("ma_border", axis=1)
+            if len(detail_df) > 0:
+                try:
+                    # influx.reset_df(detail_df, measurement, ctags)
+                    console.write_exec()
+                except Exception as er:
+                    print(str(er))
+            else:
+                console.write_pass()
 
         # 推送缠论kline
         for ktype in ["D", "30"]:
+            ctags = {"itype": code, "ktype": ktype}
+            measurement = conf.MEASUREMENT_INDEX_WRAP
+
             wrap_ds_name = conf.HDF5_INDEX_WRAP + "_" + ktype
             if f[code].get(wrap_ds_name) is None:
+                console.write_msg(wrap_ds_name + "的wrap数据不存在")
                 continue
             wrap_df = tool.df_from_dataset(f[code], wrap_ds_name, None)
             wrap_df = _datetime_index(wrap_df)
-            influx.reset_df(wrap_df, conf.MEASUREMENT_INDEX_WRAP, {"itype": code, "ktype": ktype})
+            datetime = influx.get_last_datetime(measurement, ctags)
+            if datetime is not None and reset_flag is False:
+                wrap_df = wrap_df.loc[wrap_df.index > datetime]
+            else:
+                wrap_df = wrap_df.tail(DF_INIT_LIMIT)
+            if len(wrap_df) > 0:
+                try:
+                    influx.reset_df(wrap_df, measurement, ctags)
+                    console.write_exec()
+                except Exception as er:
+                    print(str(er))
+            else:
+                console.write_pass()
+        console.write_blank()
         console.write_tail()
     f.close()
     return
