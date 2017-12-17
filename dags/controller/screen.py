@@ -11,12 +11,13 @@ INDEX_MACD_TREND_VALUE = "_m_macd"
 INDEX_MACD_TREND_DIF = "_m_dif"
 INDEX_MACD_DIVERSE_COUNT = "_d_count"
 INDEX_MACD_DIVERSE_PRICE_MIN = "_d_p_min"
+INDEX_MACD_DIVERSE_PRICE_MAX = "_d_p_max"
 INDEX_MACD_DIVERSE_PRICE_START = "_m_p_start"
 
 
-def daily(omit_list):
+def share_filter(omit_list):
     """
-    每日选股，对个股进行排名与打分
+    每日选股，筛选出存在背离的股票
     """
     # 筛选记录内容如下:
     # 1. 月线macd趋势
@@ -61,10 +62,76 @@ def daily(omit_list):
         console.write_tail()
     f.close()
     f_screen = h5py.File(conf.HDF5_FILE_SCREEN, 'a')
+    if f_screen.get(conf.SCREEN_SHARE_FILTER) is None:
+        f_screen.create_group(conf.SCREEN_SHARE_FILTER)
     today_str = tradetime.get_today()
-    tool.delete_dataset(f_screen, today_str)
-    tool.merge_df_dataset(f_screen, today_str, filter_df)
+    tool.delete_dataset(f_screen[conf.SCREEN_SHARE_FILTER], today_str)
+    tool.merge_df_dataset(f_screen[conf.SCREEN_SHARE_FILTER], today_str, filter_df)
+    f_screen.close()
+    return
+
+
+def mark_grade(today_str=None):
+    """
+    对筛选结果进行打分
+    """
+    console.write_head(
+        conf.HDF5_OPERATE_STRATEGY,
+        conf.HDF5_RESOURCE_TUSHARE,
+        conf.SCREEN_SHARE_GRADE
+    )
+    f = h5py.File(conf.HDF5_FILE_SCREEN, 'a')
+    f_share = h5py.File(conf.HDF5_FILE_SHARE, 'a')
+    if today_str is None:
+        today_str = tradetime.get_today()
+    if f[conf.SCREEN_SHARE_FILTER].get(today_str) is None:
+        console.write_msg(today_str + "个股筛选结果不存在")
+        return
+    grade_df = tool.init_empty_df(["code", "status", "d_price_space", "d_price_per", "30_price_space", "30_price_per", "d_macd", "30_macd"])
+    screen_df = tool.df_from_dataset(f[conf.SCREEN_SHARE_FILTER], today_str, None)
+    screen_df["d_m_status"] = screen_df["d_m_status"].str.decode("utf-8")
+    screen_df["w_m_status"] = screen_df["w_m_status"].str.decode("utf-8")
+    screen_df["m_m_status"] = screen_df["m_m_status"].str.decode("utf-8")
+    screen_df["code"] = screen_df["code"].str.decode("utf-8")
+    for index, row in screen_df.iterrows():
+        code = row["code"]
+        grade_dict = dict()
+        grade_dict["code"] = code
+        grade_dict["status"] = 0
+        grade_dict["status"] += _macd_status_grade(row["d_m_status"])
+        grade_dict["status"] += _macd_status_grade(row["w_m_status"])
+        grade_dict["status"] += _macd_status_grade(row["m_m_status"])
+        code_prefix = code[0:3]
+        code_group_path = '/' + code_prefix + '/' + code
+        for ktype in ["D", "30"]:
+            detail_ds_name = ktype
+            index_ds_name = conf.HDF5_INDEX_DETAIL + "_" + ktype
+            if f_share[code_group_path].get(detail_ds_name) is None:
+                console.write_msg(code + "的detail数据不存在")
+                continue
+            if f_share[code_group_path].get(index_ds_name) is None:
+                console.write_msg(code + "的index数据不存在")
+                continue
+            detail_df = tool.df_from_dataset(f_share[code_group_path], detail_ds_name, None)
+            index_df = tool.df_from_dataset(f_share[code_group_path], index_ds_name, None)
+            latest_price = detail_df.tail(1)["close"].values[0]
+            latest_macd = index_df.tail(1)["macd"].values[0]
+            diverse_price_start = row[str.lower(ktype) + INDEX_MACD_DIVERSE_PRICE_START]
+            if diverse_price_start == 0:
+                grade_dict[str.lower(ktype) + "_price_space"] = 0
+                grade_dict[str.lower(ktype) + "_price_per"] = 0
+            else:
+                grade_dict[str.lower(ktype) + "_price_space"] = round(diverse_price_start - latest_price, 2)
+                grade_dict[str.lower(ktype) + "_price_per"] = round(grade_dict[str.lower(ktype) + "_price_space"] * 100 / diverse_price_start, 2)
+            grade_dict[str.lower(ktype) + "_macd"] = latest_macd
+        grade_df = grade_df.append(grade_dict, ignore_index=True)
+    if f.get(conf.SCREEN_SHARE_GRADE) is None:
+        f.create_group(conf.SCREEN_SHARE_GRADE)
+    tool.delete_dataset(f[conf.SCREEN_SHARE_GRADE], today_str)
+    tool.merge_df_dataset(f[conf.SCREEN_SHARE_GRADE], today_str, grade_df)
+    f_share.close()
     f.close()
+    console.write_tail()
     return
 
 
@@ -163,6 +230,8 @@ def _filter_macd_diverse(share_df, code_dict, ktype):
     if diverse_count > 0:
         code_dict[str.lower(ktype) + INDEX_MACD_DIVERSE_COUNT] = diverse_count
         code_dict[str.lower(ktype) + INDEX_MACD_DIVERSE_PRICE_MIN] = lp_diverse_df["close"].min()
+        # TODO 获取背离开始期间，价格的最大值
+        # code_dict[str.lower(ktype) + INDEX_MACD_DIVERSE_PRICE_MAX] = lp_diverse_df["close"].max()
         code_dict[str.lower(ktype) + INDEX_MACD_DIVERSE_PRICE_START] = lp_diverse_df.head(1)["close"].values[0]
     else:
         code_dict[str.lower(ktype) + INDEX_MACD_DIVERSE_COUNT] = 0
@@ -200,3 +269,13 @@ def _ini_filter_columns():
         columns.append(ktype + INDEX_MACD_DIVERSE_PRICE_MIN)
         columns.append(ktype + INDEX_MACD_DIVERSE_PRICE_START)
     return columns
+
+
+def _macd_status_grade(status):
+    if status == action.STATUS_UP:
+        ret = 2
+    elif status == action.STATUS_SHAKE:
+        ret = 1
+    else:
+        ret = 0
+    return ret
