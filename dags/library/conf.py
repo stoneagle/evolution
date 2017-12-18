@@ -112,3 +112,5 @@ MEASUREMENT_CLASSIFY_WRAP = "classify_wrap"
 MEASUREMENT_CODE_CLASSIFY = "code_classify"
 MEASUREMENT_FILTER_SHARE = "filter_share"
 MEASUREMENT_FILTER_SHARE_GRADE = "filter_share_grade"
+
+WEIXIN_BOT_CACHE_PATH = "/home/wuzhongyang/www/airflow/tmp"

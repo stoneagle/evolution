@@ -115,19 +115,19 @@ def grafana_push(classify_list, code_list):
     return
 
 
-start_date = None
-omit_list = ["300", "900"]
-classify_list = [
-    # conf.HDF5_CLASSIFY_INDUSTRY,
-    # conf.HDF5_CLASSIFY_CONCEPT,
-    conf.HDF5_CLASSIFY_HOT,
-]
+def start():
+    start_date = None
+    omit_list = ["300", "900"]
+    classify_list = [
+        # conf.HDF5_CLASSIFY_INDUSTRY,
+        # conf.HDF5_CLASSIFY_CONCEPT,
+        conf.HDF5_CLASSIFY_HOT,
+    ]
 
-
-get_basic(classify_list, start_date)
-get_share(omit_list)
-arrange_all(classify_list, omit_list, start_date)
-index_exec(classify_list, omit_list, start_date)
-code_list = strategy_share(omit_list)
-wrap_exec(classify_list, code_list, start_date)
-grafana_push(classify_list, code_list)
+    get_basic(classify_list, start_date)
+    get_share(omit_list)
+    arrange_all(classify_list, omit_list, start_date)
+    index_exec(classify_list, omit_list, start_date)
+    code_list = strategy_share(omit_list)
+    wrap_exec(classify_list, code_list, start_date)
+    grafana_push(classify_list, code_list)
