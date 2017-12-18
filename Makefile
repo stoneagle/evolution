@@ -13,7 +13,7 @@ rm-airflow:
 	cd hack && docker-compose -f docker-compose-local.yml -p "airflow-$(USER)" rm 
 
 run-grafana: 
-	cd hack && docker-compose -f docker-compose-grafana.yml -p "grafana-$(USER)" up
+	cd hack && docker-compose -f docker-compose-grafana.yml -p "grafana-$(USER)" up -d
 stop-grafana: 
 	cd hack && docker-compose -f docker-compose-grafana.yml -p "grafana-$(USER)" stop 
 rm-grafana: 

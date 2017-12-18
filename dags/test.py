@@ -1,4 +1,4 @@
-from controller import grafana
+from controller import index
 # import h5py
 from library import conf
 
@@ -18,7 +18,7 @@ classify_list = [
 # obtain.quit()
 # obtain.st()
 # obtain.index_share()
-# obtain.all_share(True)
+# obtain.all_share(omit_list)
 # obtain.basic_environment(start_date)
 # obtain.xsg()
 # obtain.ipo()
@@ -54,7 +54,7 @@ classify_list = [
 # f.close()
 # index.all_share(omit_list, init_flag)
 # index.all_index(init_flag)
-# index.all_classify(classify_list, init_flag)
+index.all_classify(classify_list, init_flag)
 
 
 # strategy
@@ -63,19 +63,19 @@ classify_list = [
 # for code in code_list:
 #     screen._daily_code(f, code)
 # f.close()
-# screen.mark_grade()
+# screen.mark_grade("2017-12-17")
 
 
 # wrap
 # wrap.filter_share(code_list, start_date)
 # wrap.all_index()
-# wrap.all_classify()
+# wrap.all_classify(classify_list)
 
 # grafana
 # grafana.basic_detail()
 # grafana.classify_detail(classify_list)
 # grafana.index_detail()
 # grafana.share_detail(code_list)
-# grafana.share_filter("2017-12-16")
-grafana.share_grade()
+# grafana.share_filter("2017-12-17")
+# grafana.share_grade()
 # grafana.code_classify()

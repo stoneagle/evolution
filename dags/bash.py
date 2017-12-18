@@ -19,7 +19,7 @@ def get_basic(classify_list, start_date):
     return
 
 
-def get_share():
+def get_share(omit_list):
     """
     获取股票数据
     """
@@ -28,7 +28,7 @@ def get_share():
     # 获取风险警示板股票列表
     obtain.st()
     # 根据类别获取所有股票
-    obtain.all_share()
+    obtain.all_share(omit_list)
     # 根据类别获取所有指数
     obtain.index_share()
     return
@@ -125,7 +125,7 @@ classify_list = [
 
 
 get_basic(classify_list, start_date)
-get_share()
+get_share(omit_list)
 arrange_all(classify_list, omit_list, start_date)
 index_exec(classify_list, omit_list, start_date)
 code_list = strategy_share(omit_list)

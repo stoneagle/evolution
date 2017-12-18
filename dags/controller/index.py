@@ -58,7 +58,7 @@ def all_classify(classify_list, init_flag=True):
                 classify_name
             )
             for ktype in conf.HDF5_SHARE_KTYPE:
-                ds_name = conf.HDF5_CLASSIFY_DS_DETAIL + "_" + ktype
+                ds_name = ktype
                 if f[ctype][classify_name].get(ds_name) is None:
                     console.write_msg(classify_name + "分类聚合detail不存在")
                     continue
