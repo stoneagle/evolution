@@ -8,3 +8,5 @@ tables
 h5py
 TA-Lib
 influxdb
+wxpy
+pillow

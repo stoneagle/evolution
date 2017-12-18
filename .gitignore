@@ -5,3 +5,4 @@ grafana/plugins/**/node_modules
 grafana/sessions
 *.swp
 hack/dockerfile/hdf5/
+tmp/
