@@ -71,5 +71,5 @@ def start():
     # grafana.share_grade()
     # grafana.code_classify()
     # watch
-    watch.daily_ashare(code_list)
+    watch.tushare(code_list)
     return

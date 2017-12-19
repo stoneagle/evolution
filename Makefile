@@ -23,10 +23,10 @@ local-bash:
 	nohup bash ./exec.sh > ./logs/$(DATE).log 2>&1 &
 
 local-bash-front:
-	runmode=dev LD_LIBRARY_PATH=/usr/lib python3 ./dags/scripts/bash.py
+	script=bash runmode=dev LD_LIBRARY_PATH=/usr/lib python3 ./dags/route.py
 
 local-test:
-	runmode=dev LD_LIBRARY_PATH=/usr/lib python3 ./dags/scripts/test.py
+	script=test runmode=dev LD_LIBRARY_PATH=/usr/lib python3 ./dags/route.py
 
 build-talib:
 	mkdir tmp && cd tmp && \
