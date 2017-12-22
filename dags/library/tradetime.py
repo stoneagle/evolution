@@ -109,6 +109,20 @@ def get_today():
     return date
 
 
+def get_preday(pre_num):
+    today = datetime.now(conf.TZ)
+    preday = today + timedelta(days=-pre_num)
+    return preday.strftime("%Y-%m-%d")
+
+
+def get_remain_second(ttype):
+    today = datetime.now(conf.TZ)
+    if ttype == "5":
+        remain_minute = 5 - today.minute % 5
+        remain_second = remain_minute * 60 - today.second
+    return remain_second
+
+
 LAST_MONTH_LAST_DAY = get_last_day_of_last_month()
 LAST_WEEK_LAST_DAY = get_last_day_of_last_week()
 LAST_TRADE_DAY = get_last_of_trade_day()
