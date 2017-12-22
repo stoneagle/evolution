@@ -385,12 +385,7 @@ def all_macd_trend(code_list, start_date):
         if f[code_prefix][code].attrs.get(conf.HDF5_BASIC_QUIT) is not None or f[code_prefix][code].attrs.get(conf.HDF5_BASIC_ST) is not None:
             continue
         for ktype in conf.HDF5_SHARE_KTYPE:
-            index_ds_name = conf.HDF5_INDEX_DETAIL + "_" + ktype
-            if f[code_prefix][code].get(index_ds_name) is None:
-                continue
-            index_df = tool.df_from_dataset(f[code_prefix][code], index_ds_name, None)
-            index_df[conf.HDF5_SHARE_DATE_INDEX] = index_df[conf.HDF5_SHARE_DATE_INDEX].str.decode("utf-8")
-            trend_df = macd.trend(index_df)
+            trend_df = code_macd_trend(f[code_prefix][code], ktype)
             if trend_df is not None:
                 ds_name = conf.HDF5_INDEX_MACD_TREND + "_" + ktype
                 if f[code_prefix][code].get(ds_name) is not None:
@@ -399,3 +394,19 @@ def all_macd_trend(code_list, start_date):
     console.write_tail()
     f.close()
     return
+
+
+def code_macd_trend(f, ktype):
+    index_ds_name = conf.HDF5_INDEX_DETAIL + "_" + ktype
+    if f.get(ktype) is None:
+        return None
+
+    if f.get(index_ds_name) is None:
+        return None
+
+    share_df = tool.df_from_dataset(f, ktype, None)
+    index_df = tool.df_from_dataset(f, index_ds_name, None)
+    share_df = share_df.merge(index_df, left_on=conf.HDF5_SHARE_DATE_INDEX, right_on=conf.HDF5_SHARE_DATE_INDEX, how='left')
+    share_df[conf.HDF5_SHARE_DATE_INDEX] = share_df[conf.HDF5_SHARE_DATE_INDEX].str.decode("utf-8")
+    trend_df = macd.trend(share_df.tail(60))
+    return trend_df
