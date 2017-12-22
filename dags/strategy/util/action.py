@@ -1,4 +1,6 @@
 from library import tool
+FACTOR_MACD_RANGE = 0.002
+
 # 行为类型
 TREND_STILL = "trend_still"
 TREND_TURN = "trend_turn"
@@ -24,11 +26,10 @@ INDEX_TREND_COUNT = "trend_count"
 INDEX_ACTION = "action"
 INDEX_STATUS = "status"
 INDEX_PHASE_STATUS = "phase_status"
-
-# 第一次转折后，恢复TREND所需最小次数
-TREND_MIN_NUM = 3
 # 进入震荡状态所需最小turn次数
 SHAKE_MIN_NUM = 3
+# 单次有效突破最低次数
+TURN_MIN_NUM = 3
 
 
 class Action(object):
@@ -113,7 +114,11 @@ class Action(object):
             one[INDEX_DIRECTION] = pre_row[INDEX_DIRECTION]
         # 出现转折
         elif self.compare_border(TREND_TURN, value):
-            self.set_border(pre_row[INDEX_VALUE], value)
+            pre_value = pre_row[INDEX_VALUE]
+            if pre_row[INDEX_DIRECTION] == DIRECTION_UP:
+                self.set_border(pre_value - FACTOR_MACD_RANGE, pre_value)
+            else:
+                self.set_border(pre_value + FACTOR_MACD_RANGE, pre_value)
             one[INDEX_ACTION] = TREND_TURN
             one[INDEX_TREND_COUNT] = 1
             one[INDEX_TURN_COUNT] = 1
@@ -130,6 +135,11 @@ class Action(object):
         one[INDEX_DATE] = date
         one[INDEX_VALUE] = value
         pre_row = self.df.iloc[-1]
+        border_row = None
+        for i in range(1, len(self.df)):
+            border_row = self.df.iloc[-i]
+            if border_row[INDEX_STATUS] != STATUS_SHAKE:
+                break
         # 如果未出现转折，并且超出转折边界
         if self.compare_border(STILL_OUT, value):
             one[INDEX_ACTION] = STILL_OUT
@@ -139,27 +149,33 @@ class Action(object):
             one[INDEX_TREND_COUNT] = 1 + pre_row[INDEX_TREND_COUNT]
             one[INDEX_TURN_COUNT] = 0
             pre_turn_count = pre_row[INDEX_TURN_COUNT]
+            # 如果只转折一次
             if pre_turn_count == 1:
-                if one[INDEX_TREND_COUNT] < TREND_MIN_NUM:
-                    one[INDEX_STATUS] = STATUS_SHAKE
-                    one[INDEX_PHASE_STATUS] = STATUS_SHAKE
-                    one[INDEX_TURN_COUNT] = pre_row[INDEX_TURN_COUNT]
-                    self.update_border(one[INDEX_VALUE])
-                else:
+                if one[INDEX_TREND_COUNT] >= TURN_MIN_NUM:
                     self.df.loc[len(self.df) - pre_row[INDEX_TREND_COUNT]:len(self.df), INDEX_PHASE_STATUS] = self.get_d_s(one[INDEX_DIRECTION])
                     self.reset_border()
-            elif pre_turn_count < SHAKE_MIN_NUM and pre_turn_count % 2 == 0:
-                # 视作上一阶段延续
-                for i in range(1, 100):
-                    if self.df.iloc[len(self.df) - i][INDEX_PHASE_STATUS] != STATUS_SHAKE:
-                        self.df.loc[len(self.df) - i:len(self.df), INDEX_PHASE_STATUS] = self.get_d_s(one[INDEX_DIRECTION])
-                        break
-                self.reset_border()
-            else:
-                # 两种情况，超出shake次数，不论方向正反都视作震荡结束
-                # 小于shake次数，并且方向与上一阶段反向，趋势逆转
-                self.df.loc[len(self.df) - 1:len(self.df), INDEX_PHASE_STATUS] = self.get_d_s(one[INDEX_DIRECTION])
-                self.reset_border()
+                else:
+                    one[INDEX_STATUS] = STATUS_SHAKE
+                    one[INDEX_PHASE_STATUS] = one[INDEX_STATUS]
+                    one[INDEX_TURN_COUNT] = 1
+            elif pre_turn_count % 2 == 0:
+                if pre_turn_count < SHAKE_MIN_NUM:
+                    # 视作上一阶段延续
+                    for i in range(1, len(self.df)):
+                        if self.df.iloc[len(self.df) - i][INDEX_PHASE_STATUS] != STATUS_SHAKE:
+                            self.df.loc[len(self.df) - i:len(self.df), INDEX_PHASE_STATUS] = self.get_d_s(one[INDEX_DIRECTION])
+                            break
+                    one[INDEX_TREND_COUNT] = border_row[INDEX_TREND_COUNT] + i
+                    self.reset_border()
+                else:
+                    # 视作新的相反阶段开始
+                    self.reset_border()
+            elif pre_turn_count % 2 == 1:
+                # 小于shake次数，趋势逆转，大于shake次数，震荡结束
+                if pre_turn_count < SHAKE_MIN_NUM:
+                    self.reset_border()
+                else:
+                    self.reset_border()
         # 如果未出现转折，延伸长度未超出转折边界
         elif self.compare_border(STILL_IN, value):
             one[INDEX_ACTION] = STILL_IN
@@ -189,6 +205,7 @@ class Action(object):
                 if pre_turn_count % 2 == 1:
                     # 上一阶段延续
                     self.df.loc[len(self.df) - pre_row[INDEX_TREND_COUNT]:len(self.df), INDEX_PHASE_STATUS] = self.get_d_s(one[INDEX_DIRECTION])
+                    one[INDEX_TREND_COUNT] = border_row[INDEX_TREND_COUNT] + i
                 else:
                     # 趋势逆转
                     for i in range(1, 100):
@@ -209,7 +226,7 @@ class Action(object):
         down_border = self.down_border
 
         up_switch = {
-            TREND_STILL: value > pre,
+            TREND_STILL: value >= pre,
             TREND_TURN: value < pre,
             STILL_OUT: value > up_border,
             STILL_IN: pre <= value <= up_border,
@@ -217,7 +234,7 @@ class Action(object):
             TURN_OUT: value < down_border,
         }
         down_switch = {
-            TREND_STILL: value < pre,
+            TREND_STILL: value <= pre,
             TREND_TURN: value > pre,
             STILL_OUT: value < down_border,
             STILL_IN: pre >= value >= down_border,
@@ -237,16 +254,6 @@ class Action(object):
         """
         self.up_border = max(a, b)
         self.down_border = min(a, b)
-        return
-
-    def update_border(self, v):
-        """
-        更新边界
-        """
-        if v >= self.up_border:
-            self.up_border = v
-        elif v <= self.down_border:
-            self.down_border = v
         return
 
     def reset_border(self):
