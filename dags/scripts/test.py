@@ -1,10 +1,11 @@
 # import h5py
+from controller import screen
 from library import conf
-from controller import watch
 
 
 def start():
-    code_list = ["002273"]
+    # code_list = ["002273", "002601", "600291", "000725"]
+    code_list = ["000725"]
     omit_list = ["000", "001", "600", "601", "602", "603", "300", "900"]
     start_date = None
     init_flag = True
@@ -13,6 +14,7 @@ def start():
         # conf.HDF5_CLASSIFY_CONCEPT,
         conf.HDF5_CLASSIFY_HOT,
     ]
+
     # obtain
     # obtain.classify_detail(classify_list)
     # obtain.quit()
@@ -27,6 +29,7 @@ def start():
     # for code in code_list:
     #     obtain.code_share(f, code, True)
     # f.close()
+
     # arrange
     # arrange.operate_quit(conf.HDF5_OPERATE_ADD)
     # arrange.operate_st(conf.HDF5_OPERATE_ADD)
@@ -37,7 +40,14 @@ def start():
     # arrange.all_classify_detail(classify_list, omit_list, start_date)
     # arrange.code_detail(code_list, start_date)
     # arrange.all_macd_trend(code_list, start_date)
+    # f = h5py.File(conf.HDF5_FILE_SHARE, 'a')
+    # for code in code_list:
+    #     code_prefix = code[0:3]
+    #     trend_df = arrange.code_macd_trend(f[code_prefix][code], "5")
+    #     print(trend_df[["turn_count", "trend_count", "action", "status", "phase_status", "macd"]])
+    # f.close()
     # arrange.code_classify(code_list, classify_list)
+
     # index
     # f = h5py.File(conf.HDF5_FILE_SHARE, 'a')
     # for code in code_list:
@@ -51,17 +61,19 @@ def start():
     # index.all_share(omit_list, init_flag)
     # index.all_index(init_flag)
     # index.all_classify(classify_list, init_flag)
-    # strategy
-    # screen.daily_share_filter(omit_list)
+
+    # screen
+    screen.daily(conf.STRATEGY_TREND_AND_REVERSE, omit_list)
     # f = h5py.File(conf.HDF5_FILE_SHARE, 'a')
     # for code in code_list:
     #     screen._daily_code(f, code)
     # f.close()
-    # screen.mark_grade("2017-12-17")
+
     # wrap
     # wrap.filter_share(code_list, start_date)
     # wrap.all_index()
     # wrap.all_classify(classify_list)
+
     # grafana
     # grafana.basic_detail()
     # grafana.classify_detail(classify_list)
@@ -70,6 +82,7 @@ def start():
     # grafana.share_filter("2017-12-17")
     # grafana.share_grade()
     # grafana.code_classify()
+
     # watch
-    watch.tushare(code_list)
+    # watch.tushare(code_list)
     return

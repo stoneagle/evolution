@@ -114,3 +114,5 @@ MEASUREMENT_FILTER_SHARE = "filter_share"
 MEASUREMENT_FILTER_SHARE_GRADE = "filter_share_grade"
 
 WEIXIN_BOT_CACHE_PATH = "/home/wuzhongyang/www/airflow/tmp"
+
+STRATEGY_TREND_AND_REVERSE = "trend_and_reverse"

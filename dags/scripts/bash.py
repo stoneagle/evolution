@@ -67,14 +67,12 @@ def index_exec(classify_list, omit_list, start_date):
     return
 
 
-def strategy_share(omit_list):
+def screen_share(omit_list):
     """
     策略选股
     """
     # 每日股票筛选
-    screen.share_filter(omit_list)
-    # 为筛选的股票进行打分
-    screen.mark_grade()
+    screen.daily(conf.STRATEGY_TREND_AND_REVERSE, omit_list)
     # 获取股票最新的分类，并标记热门与冷门概念
     # 选出的股票basic的detail，聚合至share对应code下
     # arrange.code_detail(start_date, omit_list)
@@ -128,6 +126,6 @@ def start():
     get_share(omit_list)
     arrange_all(classify_list, omit_list, start_date)
     index_exec(classify_list, omit_list, start_date)
-    code_list = strategy_share(omit_list)
+    code_list = screen_share(omit_list)
     wrap_exec(classify_list, code_list, start_date)
-    grafana_push(classify_list, code_list)
+    # grafana_push(classify_list, code_list)
