@@ -10,6 +10,9 @@ code_dict = dict()
 INIT_FLAG = "init"
 CHECK_FLAG = "check"
 
+DF_START_NUM = 26
+DF_SPLIT_NUM = 48 + 48
+
 
 def tushare(code_list):
     global timer
@@ -34,7 +37,6 @@ def tushare(code_list):
         code_dict[code] = dict()
         code_dict[code][INIT_FLAG] = True
         code_dict[code][CHECK_FLAG] = False
-        # TODO 监听筛选池的股票，发出5min和30min的出入信号
     five_minutes()
     # bot = weixin.WXBot()
     # bot.sendHelper("lalala")
@@ -51,7 +53,7 @@ def five_minutes():
 
         # 当天第一次开启监控时，读取数据并初始化
         if flag_dict[INIT_FLAG] is True:
-            for i in range(2, len(trend_df) + 1):
+            for i in range(DF_START_NUM, len(trend_df) + 1):
                 tmp_df = trend_df.head(i)
                 check(code, tmp_df)
             code_dict[code][INIT_FLAG] = False
@@ -65,51 +67,58 @@ def five_minutes():
 
 
 def check(code, trend_df):
-    # TODO 添加中枢(空间)的判断
-    # TODO 修复phase_status的回溯数量
-    # TODO 震荡空间只跟trend_count相关，一般7-8根有2个点左右，时间滞后性有1个点成本
-    # TODO 成交量对股票波动幅度的影响
-    # TODO 结合背离的分析
+    # TODO (应该放在筛选中处理)添加中枢(空间)的判断，估算涨跌空间
+    # TODO (应该放在筛选中处理)成交量对股票波动幅度的影响
     global code_dict
+
+    now = trend_df.iloc[-1]
+    pre = trend_df.iloc[-2]
+    start = trend_df.iloc[-2 - pre[action.INDEX_TREND_COUNT]]
+    phase_range = pre["macd"] - start["macd"]
+    price_range = pre["close"] - start["close"]
+
+    # 背离分析，如果macd是下降趋势，但是价格上涨，则属于背离；反之同理
+    reverse_flag = False
+    if (phase_range > 0 and price_range < 0) or (phase_range < 0 and price_range > 0):
+        reverse_flag = True
+
     if code_dict[code][CHECK_FLAG] is False:
         # 判断第一次出现的波动
-        now = trend_df.iloc[-1]
-        pre = trend_df.iloc[-2]
-        if pre[action.INDEX_TREND_COUNT] >= 5 and now[action.INDEX_STATUS] == action.STATUS_SHAKE:
+        # 如果该段趋势大于1(太少没有做T必要)，则判断波动情况
+        if abs(phase_range) >= 0.01 and now[action.INDEX_STATUS] == action.STATUS_SHAKE:
             # 检查macd波动幅度
-            if abs(now["macd"] - pre["macd"]) > action.FACTOR_MACD_RANGE:
+            macd_diff = (now["macd"] - pre["macd"])
+            macd_range = action.FACTOR_MACD_RANGE * 1.5
+            if abs(macd_diff) > macd_range:
                 # 如果macd波动值超出范围，视为转折
-                macd_diff = now["macd"] - pre["macd"]
-                output(code, now["date"], pre["status"], pre["trend_count"], macd_diff)
+                output(code, now["date"], pre["status"], pre["trend_count"], macd_diff, reverse_flag)
             else:
                 # 如果macd波动值在范围以内，则视为波动，观察后续走势
                 code_dict[code][CHECK_FLAG] = pre["date"]
     else:
         # 判断波动过程
         border = trend_df[trend_df["date"] == code_dict[code][CHECK_FLAG]]
-        now = trend_df.iloc[-1]
-        pre = trend_df.iloc[-2]
         if now["status"] != action.STATUS_SHAKE:
             # 波动结束趋势逆转
             if now["status"] != border["status"].values[0]:
                 raw_status = border["status"].values[0]
-                trend_count = border["trend_count"]
+                trend_count = border["trend_count"].values[0]
                 macd_diff = now["macd"] - border["macd"].values[0]
-                output(code, now["date"], raw_status, trend_count, macd_diff)
+                output(code, now["date"], raw_status, trend_count, macd_diff, reverse_flag)
             code_dict[code][CHECK_FLAG] = False
         else:
             macd_diff = now["macd"] - border["macd"].values[0]
-            if abs(macd_diff) > 0.015:
+            if abs(macd_diff) > action.FACTOR_MACD_RANGE * 2:
                 raw_status = border[action.INDEX_STATUS].values[0]
-                trend_count = border[action.INDEX_TREND_COUNT]
-                output(code, now["date"], raw_status, trend_count, macd_diff)
+                trend_count = border[action.INDEX_TREND_COUNT].values[0]
+                output(code, now["date"], raw_status, trend_count, macd_diff, reverse_flag)
                 code_dict[code][CHECK_FLAG] = False
     return
 
 
-def output(code, date, raw_status, trend_count, macd_diff):
-    # 考虑30min对5min的影响，30min上升对5min卖点，30min下降对5min买点，相反方向会产生压制
+def output(code, date, raw_status, trend_count, macd_diff, reverse_flag):
     # TODO，能否估算当前5min对应的30min情况，将未来因子考虑进去
+    # 考虑30min对5min的影响，30min上升对5min卖点，30min下降对5min买点，相反方向会产生压制
     thirty_status, thirty_macd_diff, thirty_trend_count = get_relate(code, "30", date)
 
     # 根据股票类型，获取对应大盘状况
@@ -118,25 +127,42 @@ def output(code, date, raw_status, trend_count, macd_diff):
         index = "sz"
     elif code_prefix == "6":
         index = "sh"
-    index_status, index_macd_diff, index_trend_count = get_relate(index, "5", date)
+    index_status, index_macd_diff, index_trend_count = get_relate(index, "30", date)
 
-    positions = 3
+    # 仓位计算
+    positions = 1
     if raw_status == action.STATUS_UP:
-        trade_type = "卖点"
-        if thirty_status == action.STATUS_UP:
-            positions -= 1
-        if index_status == action.STATUS_UP:
-            positions -= 1
-    else:
-        trade_type = "买点"
+        if reverse_flag is True:
+            trade_type = "背离买点"
+        else:
+            trade_type = "正常卖点"
         if thirty_status == action.STATUS_DOWN:
-            positions -= 1
+            positions += 1
         if index_status == action.STATUS_DOWN:
-            positions -= 1
+            positions += 1
+    else:
+        if reverse_flag is True:
+            trade_type = "背离卖点"
+        else:
+            trade_type = "正常买点"
+        if thirty_status == action.STATUS_UP:
+            positions += 1
+        if index_status == action.STATUS_UP:
+            positions += 1
     console.write_msg("【%s, %s, %s】" % (code, date, trade_type))
     console.write_msg("个股5min，趋势%s，连续%d次，macd差值%f" % (raw_status, trend_count, macd_diff))
     console.write_msg("个股30min，趋势%s，连续%d次，macd差值%f" % (thirty_status, thirty_trend_count, thirty_macd_diff))
-    console.write_msg("大盘5min，趋势%s，连续%d次，macd差值%f" % (index_status, index_trend_count, index_macd_diff))
+    console.write_msg("大盘30min，趋势%s，连续%d次，macd差值%f" % (index_status, index_trend_count, index_macd_diff))
+    # 根据trend_count和当前时间，判断买卖时机(背离情况要计算两次买卖点trend_count的差值)
+    if reverse_flag is False:
+        remain_seconds = tradetime.get_trade_day_remain_second(date, "S")
+        upper_estimate = (trend_count + 1) * 5
+        lower_estimate = (trend_count - 1) * 5
+        if (upper_estimate * 60) <= remain_seconds:
+            trade_opportunity = "T+0"
+        else:
+            trade_opportunity = "T+1"
+        console.write_msg("剩余时间%d分钟，下个交易点预估需要%d-%d分钟，模式%s" % (round(remain_seconds / 60, 0), lower_estimate, upper_estimate, trade_opportunity))
     console.write_msg("建议仓位：%d/3" % (positions))
     return
 
@@ -203,5 +229,5 @@ def get_trend(code, ktype, start_date, end_date=None):
             action.INDEX_PHASE_STATUS,
             "close", "macd", "dif", "dea"
         ]
-    ].tail(48)
+    ].tail(DF_SPLIT_NUM)
     return trend_df

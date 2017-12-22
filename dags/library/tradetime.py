@@ -123,6 +123,26 @@ def get_remain_second(ttype):
     return remain_second
 
 
+def get_trade_day_remain_second(date_str, itype):
+    time_switcher = {
+        "M": "%Y-%m",
+        "W": "%Y-%W",
+        "D": "%Y-%m-%d",
+        "S": "%Y-%m-%d %H:%M:%S",
+    }
+    transfer_date = datetime.strptime(date_str, time_switcher.get(itype, 'error'))
+    minute = 60 - transfer_date.minute
+    if (transfer_date.hour == 9 and transfer_date.minute >= 30):
+        remain_second = minute * 60 + 60 * 60 * 3.5
+    elif transfer_date.hour == 10:
+        remain_second = minute * 60 + 60 * 60 * 2.5
+    elif (transfer_date.hour == 11 and transfer_date.minute <= 30):
+        remain_second = minute * 60 + 60 * 60
+    elif 13 <= transfer_date.hour or transfer_date.hour <= 15:
+        remain_second = minute * 60
+    return remain_second
+
+
 LAST_MONTH_LAST_DAY = get_last_day_of_last_month()
 LAST_WEEK_LAST_DAY = get_last_day_of_last_week()
 LAST_TRADE_DAY = get_last_of_trade_day()
