@@ -1,4 +1,4 @@
-from strategy.util import action, phase
+from quota.util import action, phase
 from library import conf
 import talib
 import pandas as pd

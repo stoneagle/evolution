@@ -1,6 +1,6 @@
 import h5py
 from library import conf, console, tool, tradetime
-from strategy import macd
+from quota import macd
 
 
 def code_detail(code_list, start_date):

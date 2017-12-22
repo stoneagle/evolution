@@ -1,6 +1,6 @@
 import h5py
 from library import conf, console, tool
-from strategy import macd, index
+from quota import macd, index
 
 
 def all_share(omit_list, init_flag=True):

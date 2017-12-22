@@ -1,8 +1,8 @@
 import time
 import tushare as ts
 from library import conf, console, tradetime
-from strategy import macd
-from strategy.util import action
+from quota import macd
+from quota.util import action
 import threading
 # 定时器
 timer = None
@@ -17,7 +17,6 @@ DF_SPLIT_NUM = 48 + 48
 def tushare(code_list):
     global timer
     global code_dict
-    # 读取相关股票的数据，并存入字典
     for code in code_list:
         # 检查股票日线状态，只有趋势上升才监听
         ktype = "D"

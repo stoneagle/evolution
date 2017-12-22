@@ -1,7 +1,7 @@
 import h5py
 from library import conf, console, tool, tradetime
-from strategy import macd, kline
-from strategy.util import action
+from quota import macd, kline
+from quota.util import action
 import warnings
 warnings.filterwarnings("ignore")
 INDEX_MACD_TREND_STATUS = "_m_status"
@@ -31,7 +31,7 @@ def share_filter(omit_list):
         if code_prefix in omit_list:
             continue
         console.write_head(
-            conf.HDF5_OPERATE_STRATEGY,
+            conf.HDF5_OPERATE_SCREEN,
             conf.HDF5_RESOURCE_TUSHARE,
             code_prefix
         )
@@ -76,7 +76,7 @@ def mark_grade(today_str=None):
     对筛选结果进行打分
     """
     console.write_head(
-        conf.HDF5_OPERATE_STRATEGY,
+        conf.HDF5_OPERATE_SCREEN,
         conf.HDF5_RESOURCE_TUSHARE,
         conf.SCREEN_SHARE_GRADE
     )

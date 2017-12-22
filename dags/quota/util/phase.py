@@ -1,4 +1,4 @@
-from strategy.util import action
+from quota.util import action
 from library import tool
 
 PTYPE_MACD = "macd"

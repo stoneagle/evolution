@@ -1,4 +1,4 @@
-from strategy.util import wrap
+from quota.util import wrap
 from library import tool
 import numpy as np
 POINT_UP = "up"

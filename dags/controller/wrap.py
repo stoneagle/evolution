@@ -1,6 +1,6 @@
 import h5py
 from library import conf, console, tool
-from strategy import macd, kline
+from quota import macd, kline
 
 
 def filter_share(code_list, start_date):
