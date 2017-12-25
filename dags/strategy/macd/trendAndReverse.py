@@ -60,11 +60,13 @@ def all_exec(omit_list):
                 console.write_msg("[" + code + "]" + str(er))
     f.close()
     f_screen = h5py.File(conf.HDF5_FILE_SCREEN, 'a')
-    if f_screen.get(conf.SCREEN_SHARE_FILTER) is None:
-        f_screen.create_group(conf.SCREEN_SHARE_FILTER)
+    if f_screen.get(conf.STRATEGY_TREND_AND_REVERSE) is None:
+        f_screen.create_group(conf.STRATEGY_TREND_AND_REVERSE)
+    if f_screen[conf.STRATEGY_TREND_AND_REVERSE].get(conf.SCREEN_SHARE_FILTER) is None:
+        f_screen[conf.STRATEGY_TREND_AND_REVERSE].create_group(conf.SCREEN_SHARE_FILTER)
     today_str = tradetime.get_today()
-    tool.delete_dataset(f_screen[conf.SCREEN_SHARE_FILTER], today_str)
-    tool.merge_df_dataset(f_screen[conf.SCREEN_SHARE_FILTER], today_str, filter_df)
+    tool.delete_dataset(f_screen[conf.STRATEGY_TREND_AND_REVERSE][conf.SCREEN_SHARE_FILTER], today_str)
+    tool.merge_df_dataset(f_screen[conf.STRATEGY_TREND_AND_REVERSE][conf.SCREEN_SHARE_FILTER], today_str, filter_df)
     f_screen.close()
     console.write_blank()
     console.write_tail()
@@ -126,11 +128,11 @@ def mark_grade(today_str=None):
     f_share = h5py.File(conf.HDF5_FILE_SHARE, 'a')
     if today_str is None:
         today_str = tradetime.get_today()
-    if f[conf.SCREEN_SHARE_FILTER].get(today_str) is None:
+    if f[conf.STRATEGY_TREND_AND_REVERSE][conf.SCREEN_SHARE_FILTER].get(today_str) is None:
         console.write_msg(today_str + "个股筛选结果不存在")
         return
     grade_df = tool.init_empty_df(["code", "status", "d_price_space", "d_price_per", "30_price_space", "30_price_per", "d_macd", "30_macd"])
-    screen_df = tool.df_from_dataset(f[conf.SCREEN_SHARE_FILTER], today_str, None)
+    screen_df = tool.df_from_dataset(f[conf.STRATEGY_TREND_AND_REVERSE][conf.SCREEN_SHARE_FILTER], today_str, None)
     screen_df["d_m_status"] = screen_df["d_m_status"].str.decode("utf-8")
     screen_df["w_m_status"] = screen_df["w_m_status"].str.decode("utf-8")
     screen_df["m_m_status"] = screen_df["m_m_status"].str.decode("utf-8")
@@ -167,10 +169,10 @@ def mark_grade(today_str=None):
                 grade_dict[str.lower(ktype) + "_price_per"] = round(grade_dict[str.lower(ktype) + "_price_space"] * 100 / diverse_price_start, 2)
             grade_dict[str.lower(ktype) + "_macd"] = latest_macd
         grade_df = grade_df.append(grade_dict, ignore_index=True)
-    if f.get(conf.SCREEN_SHARE_GRADE) is None:
-        f.create_group(conf.SCREEN_SHARE_GRADE)
-    tool.delete_dataset(f[conf.SCREEN_SHARE_GRADE], today_str)
-    tool.merge_df_dataset(f[conf.SCREEN_SHARE_GRADE], today_str, grade_df)
+    if f[conf.STRATEGY_TREND_AND_REVERSE].get(conf.SCREEN_SHARE_GRADE) is None:
+        f[conf.STRATEGY_TREND_AND_REVERSE].create_group(conf.SCREEN_SHARE_GRADE)
+    tool.delete_dataset(f[conf.STRATEGY_TREND_AND_REVERSE][conf.SCREEN_SHARE_GRADE], today_str)
+    tool.merge_df_dataset(f[conf.STRATEGY_TREND_AND_REVERSE][conf.SCREEN_SHARE_GRADE], today_str, grade_df)
     f_share.close()
     f.close()
     console.write_tail()
