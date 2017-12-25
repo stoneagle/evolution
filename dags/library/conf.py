@@ -20,6 +20,7 @@ HDF5_FILE_ERROR = HDF5_FILE_ROOT + '/error.h5'
 HDF5_FILE_FUNDAMENTAL = HDF5_FILE_ROOT + '/fundamental.h5'
 HDF5_FILE_SCREEN = HDF5_FILE_ROOT + '/screen.h5'
 HDF5_FILE_OTHER = HDF5_FILE_ROOT + '/other.h5'
+HDF5_FILE_FUTURE = HDF5_FILE_ROOT + '/future.h5'
 
 HDF5_ERROR_SHARE_GET = 'share_get'
 HDF5_ERROR_DETAIL_GET = 'detail_get'
@@ -61,6 +62,7 @@ HDF5_INDEX_WRAP = "wrap"
 HDF5_INDEX_PHASE = "phase"
 
 HDF5_RESOURCE_TUSHARE = "tushare"
+HDF5_RESOURCE_BITMEX = "bitmex"
 HDF5_RESOURCE_DATASET = "dataset"
 HDF5_RESOURCE_GROUP = "group"
 HDF5_RESOURCE_ATTR = "attr"
@@ -116,3 +118,6 @@ MEASUREMENT_FILTER_SHARE_GRADE = "filter_share_grade"
 WEIXIN_BOT_CACHE_PATH = "/home/wuzhongyang/www/airflow/tmp"
 
 STRATEGY_TREND_AND_REVERSE = "trend_and_reverse"
+
+BITMEX_HISTORY_URL = "https://www.bitmex.com/api/udf/history?symbol=%s&resolution=%s&from=%s&to=%s"
+BITMEX_XBTUSD = "XBTUSD"

@@ -1,7 +1,9 @@
 import h5py
-from tsSource import classify, share, basic, fundamental
-from library import conf, count, error, console
+from source.ts import classify, share, basic, fundamental
+from source.bitmex import future
+from library import conf, count, error, console, tradetime, tool
 from controller import arrange
+import time
 
 
 def classify_detail(classify_list):
@@ -289,4 +291,30 @@ def margin(reset_flag=False):
     count.show_result()
     console.write_tail()
     f.close()
+    return
+
+
+def bitmex(symbol):
+    """
+    bitmex期货数据
+    """
+    console.write_head(
+        conf.HDF5_OPERATE_GET,
+        conf.HDF5_RESOURCE_BITMEX,
+        symbol
+    )
+    f = h5py.File(conf.HDF5_FILE_FUTURE, 'a')
+    if f.get(conf.HDF5_RESOURCE_BITMEX) is None:
+        f.create_group(conf.HDF5_RESOURCE_BITMEX)
+    if f[conf.HDF5_RESOURCE_BITMEX].get(symbol) is None:
+        f[conf.HDF5_RESOURCE_BITMEX].create_group(symbol)
+
+    for ktype in ["D", "5"]:
+        start = tradetime.get_date_by_barnum(300, ktype)
+        df = future.latest(symbol, ktype, start)
+        if df is not None and df.empty is not True:
+            tool.merge_df_dataset(f[conf.HDF5_RESOURCE_BITMEX][symbol], ktype, df)
+        time.sleep(conf.REQUEST_BLANK)
+    f.close()
+    console.write_tail()
     return

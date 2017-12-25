@@ -1,6 +1,7 @@
 import calendar
 from library import conf
 from datetime import datetime, timedelta, date
+import time
 
 
 def get_last_day_of_last_month():
@@ -137,10 +138,61 @@ def get_trade_day_remain_second(date_str, itype):
     elif transfer_date.hour == 10:
         remain_second = minute * 60 + 60 * 60 * 2.5
     elif (transfer_date.hour == 11 and transfer_date.minute <= 30):
+        remain_second = minute * 60 + 60 * 60 * 2
+    elif transfer_date.hour == 13:
         remain_second = minute * 60 + 60 * 60
-    elif 13 <= transfer_date.hour or transfer_date.hour <= 15:
+    elif transfer_date.hour == 14:
         remain_second = minute * 60
     return remain_second
+
+
+def get_unixtime(date_str=None, itype=None):
+    if date_str is None:
+        dtime = datetime.now(conf.TZ)
+    else:
+        time_switcher = {
+            "M": "%Y-%m",
+            "W": "%Y-%W",
+            "D": "%Y-%m-%d",
+            "30": "%Y-%m-%d %H:%M:%S",
+            "5": "%Y-%m-%d %H:%M:%S",
+            "1": "%Y-%m-%d %H:%M:%S",
+        }
+        dtime = datetime.strptime(date_str, time_switcher.get(itype, 'error'))
+    return time.mktime(dtime.timetuple())
+
+
+def transfer_unixtime(unixtime, ktype):
+    time_switcher = {
+        "M": "%Y-%m",
+        "W": "%Y-%W",
+        "D": "%Y-%m-%d",
+        "30": "%Y-%m-%d %H:%M:%S",
+        "5": "%Y-%m-%d %H:%M:%S",
+        "1": "%Y-%m-%d %H:%M:%S",
+    }
+    return datetime.fromtimestamp(unixtime).strftime(time_switcher.get(ktype, 'error'))
+
+
+def get_date_by_barnum(barnum, ktype):
+    d = datetime.now(conf.TZ)
+    switcher = {
+        "M": 30 * 24 * 60 * 60,
+        "W": 7 * 24 * 60 * 60,
+        "D": 24 * 60 * 60,
+        "30": 30 * 60,
+        "5": 5 * 60,
+    }
+    time_switcher = {
+        "M": "%Y-%m",
+        "W": "%Y-%W",
+        "D": "%Y-%m-%d",
+        "30": "%Y-%m-%d %H:%M:%S",
+        "5": "%Y-%m-%d %H:%M:%S",
+    }
+    diff = barnum * switcher.get(ktype, 'error')
+    diff_datetime = datetime(d.year, d.month, d.day, d.hour, d.minute, d.second) - timedelta(seconds=diff)
+    return diff_datetime.strftime(time_switcher.get(ktype, 'error'))
 
 
 LAST_MONTH_LAST_DAY = get_last_day_of_last_month()

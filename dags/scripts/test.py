@@ -1,5 +1,5 @@
 # import h5py
-from controller import screen
+from controller import obtain
 from library import conf
 
 
@@ -29,6 +29,7 @@ def start():
     # for code in code_list:
     #     obtain.code_share(f, code, True)
     # f.close()
+    obtain.bitmex(conf.BITMEX_XBTUSD)
 
     # arrange
     # arrange.operate_quit(conf.HDF5_OPERATE_ADD)
@@ -63,7 +64,7 @@ def start():
     # index.all_classify(classify_list, init_flag)
 
     # screen
-    screen.daily(conf.STRATEGY_TREND_AND_REVERSE, omit_list)
+    # screen.daily(conf.STRATEGY_TREND_AND_REVERSE, omit_list)
     # f = h5py.File(conf.HDF5_FILE_SHARE, 'a')
     # for code in code_list:
     #     screen._daily_code(f, code)
