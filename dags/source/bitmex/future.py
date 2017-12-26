@@ -16,6 +16,13 @@ def latest(symbol, ktype, start_date):
     return df.head(len(df) - 1)
 
 
+def trade_history():
+    """
+    获取交易历史
+    """
+    return
+
+
 def _get_raw_data(symbol, ktype, start, end):
     url = conf.BITMEX_HOST + conf.BITMEX_HISTORY_URL
     headers = auth.bitmex_header("GET", conf.BITMEX_HISTORY_URL % (symbol, ktype, start, end), '')
