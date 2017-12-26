@@ -22,7 +22,8 @@ def exec(code_list):
         trend_df = get_trend(code, ktype, last_datetime)
         tail_row = trend_df.iloc[-1]
         if tail_row[action.INDEX_STATUS] == action.STATUS_DOWN:
-            console.write_msg("%s日线当前状态%s，趋势状态%s，忽略监听" % (code, tail_row[action.INDEX_STATUS]))
+            console.write_msg("%s日线当前状态%s，忽略监听" % (code, tail_row[action.INDEX_STATUS]))
+            continue
         else:
             for i in range(1, len(trend_df)):
                 row = trend_df.iloc[-i]
