@@ -1,5 +1,5 @@
 # import h5py
-from controller import obtain
+from controller import arrange
 from library import conf
 
 
@@ -29,7 +29,7 @@ def start():
     # for code in code_list:
     #     obtain.code_share(f, code, True)
     # f.close()
-    obtain.bitmex(conf.BITMEX_XBTUSD)
+    # obtain.bitmex(conf.BITMEX_XBTUSD)
 
     # arrange
     # arrange.operate_quit(conf.HDF5_OPERATE_ADD)
@@ -48,6 +48,7 @@ def start():
     #     print(trend_df[["turn_count", "trend_count", "action", "status", "phase_status", "macd"]])
     # f.close()
     # arrange.code_classify(code_list, classify_list)
+    arrange.bitmex_thirty(conf.BITMEX_XBTUSD)
 
     # index
     # f = h5py.File(conf.HDF5_FILE_SHARE, 'a')
