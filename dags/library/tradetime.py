@@ -1,6 +1,7 @@
 import calendar
 from library import conf
 from datetime import datetime, timedelta, date
+from dateutil import parser
 import time
 
 
@@ -193,6 +194,17 @@ def get_date_by_barnum(barnum, ktype):
     diff = barnum * switcher.get(ktype, 'error')
     diff_datetime = datetime(d.year, d.month, d.day, d.hour, d.minute, d.second) - timedelta(seconds=diff)
     return diff_datetime.strftime(time_switcher.get(ktype, 'error'))
+
+
+def get_iso_datetime(date_str, itype):
+    time_switcher = {
+        "M": "%Y-%m",
+        "W": "%Y-%W",
+        "D": "%Y-%m-%d",
+        "M": "%Y-%m-%d %H:%M:%S",
+    }
+    date = parser.parse(date_str)
+    return date.strftime(time_switcher.get(itype, 'error'))
 
 
 LAST_MONTH_LAST_DAY = get_last_day_of_last_month()

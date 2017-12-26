@@ -1,11 +1,12 @@
 # import h5py
-from controller import arrange
+# from controller import obtain
 from library import conf
+from source.bitmex import order 
 
 
 def start():
     # code_list = ["002273", "002601", "600291", "000725"]
-    code_list = ["000725"]
+    code_list = ["000725", "002601"]
     omit_list = ["000", "001", "600", "601", "602", "603", "300", "900"]
     start_date = None
     init_flag = True
@@ -48,7 +49,7 @@ def start():
     #     print(trend_df[["turn_count", "trend_count", "action", "status", "phase_status", "macd"]])
     # f.close()
     # arrange.code_classify(code_list, classify_list)
-    arrange.bitmex_thirty(conf.BITMEX_XBTUSD)
+    # arrange.bitmex_thirty(conf.BITMEX_XBTUSD)
 
     # index
     # f = h5py.File(conf.HDF5_FILE_SHARE, 'a')
@@ -87,4 +88,9 @@ def start():
 
     # watch
     # watch.tushare(code_list)
+
+    # source.bitmex
+    # future.latest(conf.BITMEX_XBTUSD, 'D', '2017-12-17')
+    # order.book(conf.BITMEX_XBTUSD, 10)
+    # account.wallet_history(100, 0)
     return

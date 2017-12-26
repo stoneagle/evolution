@@ -1,4 +1,4 @@
-from library import conf, tool, tradetime
+from library import conf, tool, tradetime, auth
 import json
 try:
     from urllib.request import urlopen, Request
@@ -17,8 +17,9 @@ def latest(symbol, ktype, start_date):
 
 
 def _get_raw_data(symbol, ktype, start, end):
-    url = conf.BITMEX_HISTORY_URL
-    request = Request(url % (symbol, ktype, start, end))
+    url = conf.BITMEX_HOST + conf.BITMEX_HISTORY_URL
+    headers = auth.bitmex_header("GET", conf.BITMEX_HISTORY_URL % (symbol, ktype, start, end), '')
+    request = Request(url % (symbol, ktype, start, end), headers=headers)
     data_str = urlopen(request, timeout=10).read()
     data_str = data_str.decode('GBK')
     data_json = json.loads(data_str)
