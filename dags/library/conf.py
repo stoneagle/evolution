@@ -1,13 +1,14 @@
 from pytz import timezone
 import os
-
+from library import basic
+basic.import_env()
 TZ = timezone('Asia/Shanghai')
 
 # 请求间隔
 REQUEST_BLANK = 1
 
-RUN_MODE = os.environ.get("runmode")
-if RUN_MODE == "dev":
+RUNMODE = os.environ.get("RUNMODE")
+if RUNMODE == "dev":
     HDF5_FILE_ROOT = '/home/wuzhongyang/database/hdf5'
 else:
     HDF5_FILE_ROOT = '/tmp/hdf5'
@@ -121,10 +122,10 @@ STRATEGY_TREND_AND_REVERSE = "trend_and_reverse"
 
 BITMEX_HOST = "https://www.bitmex.com"
 BITMEX_HISTORY_URL = "/api/udf/history?symbol=%s&resolution=%s&from=%s&to=%s"
-BITMEX_ORDERBOOK_URL = "/api/v1/orderBook/L2?symbol=%s&depth=%d"
-BITMEX_WALLET_HISTORY_URL = "/api/v1/user/walletHistory?count=%d&start=%d&reverse=true"
-BITMEX_ORDER_LIST_URL = "/api/v1/order?symbol=%s&count=%d&start=%d&reverse=true"
+BITMEX_ORDERBOOK_URL = "/api/v1/orderBook/L2"
+BITMEX_WALLET_HISTORY_URL = "/api/v1/user/walletHistory"
+BITMEX_ORDER_LIST_URL = "/api/v1/order"
 BITMEX_XBTUSD = "XBTUSD"
 
-BITMEX_APIKEY = "4kWQl3EB0rQvBUpJ3jYjwKg-"
-BITMEX_APISECRET = "j4dDtbXQG6gQvrytJ7w3Edoh7PEdQgXMBpOHA13JO7IAle7a"
+BITMEX_APIKEY = os.environ.get("APIKEY")
+BITMEX_APISECRET = os.environ.get("APISECRET")

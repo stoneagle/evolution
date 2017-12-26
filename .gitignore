@@ -6,3 +6,4 @@ grafana/sessions
 *.swp
 hack/dockerfile/hdf5/
 tmp/
+.env

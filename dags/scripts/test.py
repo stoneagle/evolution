@@ -1,7 +1,7 @@
 # import h5py
 # from controller import obtain
 from library import conf
-from source.bitmex import order 
+from source.bitmex import order
 
 
 def start():
@@ -93,4 +93,5 @@ def start():
     # future.latest(conf.BITMEX_XBTUSD, 'D', '2017-12-17')
     # order.book(conf.BITMEX_XBTUSD, 10)
     # account.wallet_history(100, 0)
+    # account.order_history(conf.BITMEX_XBTUSD, 100, 0)
     return
