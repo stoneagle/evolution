@@ -1,4 +1,4 @@
-from library import conf, tool, tradetime, auth
+from library import conf, tool, tradetime
 import json
 try:
     from urllib.request import urlopen, Request
