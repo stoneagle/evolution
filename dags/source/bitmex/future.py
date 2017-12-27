@@ -55,15 +55,14 @@ def history(symbol, bin_size, count, start_time=None, end_time=None):
                     continue
                 else:
                     row_dict = dict()
-                    row_dict['date'] = row['date']
+                    row_dict['date'] = df.iloc[index - 6]['date']
+                    row_dict['open'] = df.iloc[index - 5]['open']
                     row_dict['close'] = row['close']
                     row_dict['high'] = row['high']
                     row_dict['low'] = row['low']
                     row_dict['volume'] = row['volume']
                     for i in range(0, 6):
                         one = df.iloc[index - 5 + i]
-                        if i == 0:
-                            row_dict['open'] = one['open']
                         row_dict['volume'] += one['volume']
                         row_dict['high'] = max(one['high'], row_dict['high'])
                         row_dict['low'] = min(one['low'], row_dict['low'])
