@@ -21,12 +21,14 @@ rm-grafana:
 
 local-bash:
 	nohup bash ./exec.sh > ./logs/$(DATE).log 2>&1 &
-
-local-bash-front:
-	SCRIPT=bash LD_LIBRARY_PATH=/usr/lib python3 ./dags/route.py
-
-local-test:
-	SCRIPT=test LD_LIBRARY_PATH=/usr/lib python3 ./dags/route.py
+bitmex-test:
+	LD_LIBRARY_PATH=/usr/lib python3 ./dags/route.py -s bitmex -f test 
+bitmex-watch:
+	LD_LIBRARY_PATH=/usr/lib python3 ./dags/route.py -s bitmex -f watch 
+ashare-test:
+	LD_LIBRARY_PATH=/usr/lib python3 ./dags/route.py -s ashare -f test 
+ashare-watch:
+	LD_LIBRARY_PATH=/usr/lib python3 ./dags/route.py -s ashare -f watch
 
 build-talib:
 	mkdir tmp && cd tmp && \
