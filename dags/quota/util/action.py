@@ -1,5 +1,4 @@
 from library import tool
-FACTOR_MACD_RANGE = 0.002
 
 # 行为类型
 TREND_STILL = "trend_still"
@@ -30,6 +29,8 @@ INDEX_PHASE_STATUS = "phase_status"
 SHAKE_MIN_NUM = 3
 # 单次有效突破最低次数
 TURN_MIN_NUM = 3
+# 默认macd的range因子，取10%数值
+DEFAULT_FACTOR_MACD_RANGE = 0.1
 
 
 class Action(object):
@@ -41,9 +42,16 @@ class Action(object):
     up_border = 0
     # 转折后的下边界
     down_border = 0
+    # 方案A，绝对值(废弃):不同价格量级的数据(例如比特币)，波动幅度不同，不能用固定值
+    # 方案B，该段趋势波动差，差值越大越快说明趋势越急，对转折要求更高
+    factor_macd_range = None
 
-    def __init__(self, index_df):
+    def __init__(self, index_df, factor_macd_range=None):
         self.index_df = index_df
+        if factor_macd_range is not None:
+            self.factor_macd_range = factor_macd_range
+        else:
+            self.factor_macd_range = DEFAULT_FACTOR_MACD_RANGE
         return
 
     def all(self, date_column, value_column):
@@ -115,10 +123,15 @@ class Action(object):
         # 出现转折
         elif self.compare_border(TREND_TURN, value):
             pre_value = pre_row[INDEX_VALUE]
-            if pre_row[INDEX_DIRECTION] == DIRECTION_UP:
-                self.set_border(pre_value - FACTOR_MACD_RANGE, pre_value)
+            if len(self.df) > pre_row[INDEX_TREND_COUNT]:
+                start_row = self.df.iloc[-1 - pre_row[INDEX_TREND_COUNT]]
             else:
-                self.set_border(pre_value + FACTOR_MACD_RANGE, pre_value)
+                start_row = self.df.iloc[-pre_row[INDEX_TREND_COUNT] + 1]
+            macd_range = abs(pre_value - start_row[INDEX_VALUE])
+            if pre_row[INDEX_DIRECTION] == DIRECTION_UP:
+                self.set_border(pre_value - self.factor_macd_range * macd_range, pre_value)
+            else:
+                self.set_border(pre_value + self.factor_macd_range * macd_range, pre_value)
             one[INDEX_ACTION] = TREND_TURN
             one[INDEX_TREND_COUNT] = 1
             one[INDEX_TURN_COUNT] = 1

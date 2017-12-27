@@ -1,4 +1,4 @@
-from scripts import bash, ashare, bitmex
+from scripts import bash, ashare, bitmex, part
 import sys
 import getopt
 
@@ -24,12 +24,17 @@ def main(argv):
     if script == "bitmex":
         if func == "test":
             bitmex.test()
+        elif func == "watch":
+            bitmex.monitor()
     elif script == "ashare":
         if func == "test":
             ashare.test()
-        else:
-            ashare.watch()
-    if script == "bash":
+        elif func == "watch":
+            ashare.monitor()
+    elif script == "part":
+        if func == "test":
+            part.test()
+    elif script == "bash":
         bash.start()
 
 

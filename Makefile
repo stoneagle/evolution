@@ -29,6 +29,8 @@ ashare-test:
 	LD_LIBRARY_PATH=/usr/lib python3 ./dags/route.py -s ashare -f test 
 ashare-watch:
 	LD_LIBRARY_PATH=/usr/lib python3 ./dags/route.py -s ashare -f watch
+part-test:
+	LD_LIBRARY_PATH=/usr/lib python3 ./dags/route.py -s part -f test 
 
 build-talib:
 	mkdir tmp && cd tmp && \

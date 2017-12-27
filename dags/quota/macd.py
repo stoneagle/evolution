@@ -17,7 +17,7 @@ def value(detail_df):
     return index_df
 
 
-def trend(index_df):
+def trend(index_df, factor_macd_range):
     """
     获取macd的趋势状况
     """
@@ -26,7 +26,7 @@ def trend(index_df):
     # 如果数据集过少则直接返回
     if len(index_df) <= 3:
         return None
-    trend_df = action.Action(index_df.reset_index()).all(date_column=conf.HDF5_SHARE_DATE_INDEX, value_column="macd")
+    trend_df = action.Action(index_df.reset_index(), factor_macd_range).all(date_column=conf.HDF5_SHARE_DATE_INDEX, value_column="macd")
     trend_df = trend_df.drop(action.INDEX_VALUE, axis=1)
     index_df = index_df.reset_index()
     trend_df = trend_df.merge(index_df, left_on=conf.HDF5_SHARE_DATE_INDEX, right_on=conf.HDF5_SHARE_DATE_INDEX, how='left')
@@ -57,12 +57,12 @@ def trend(index_df):
     return trend_df
 
 
-def price_diverse(share_df):
+def price_diverse(share_df, factor_macd_range):
     """
     获取价格背离情况
     当前点与起点相比，价格与macd的背离情况，包括波动幅度与比例
     """
-    trend_df = trend(share_df)
+    trend_df = trend(share_df, factor_macd_range)
     if trend is None:
         return None
     trend_df = trend_df.merge(share_df[["date", "high", "low", "open"]], left_on=conf.HDF5_SHARE_DATE_INDEX, right_on=conf.HDF5_SHARE_DATE_INDEX, how='left')
@@ -89,12 +89,12 @@ def price_diverse(share_df):
     return trend_df
 
 
-def phase_static(share_df):
+def phase_static(share_df, factor_macd_range):
     """
     获取各阶段的背离情况
     按照up、down与shake，记录各个阶段的红柱、绿柱面积
     """
-    trend_df = trend(share_df)
+    trend_df = trend(share_df, factor_macd_range)
     if trend is None:
         return None
     trend_df = trend_df.merge(share_df[["date", "high", "low", "open"]], left_on=conf.HDF5_SHARE_DATE_INDEX, right_on=conf.HDF5_SHARE_DATE_INDEX, how='left')
