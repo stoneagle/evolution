@@ -1,7 +1,7 @@
 import h5py
 from source.ts import classify, share, basic, fundamental
 from source.bitmex import future
-from library import conf, count, error, console, tradetime, tool
+from library import conf, count, error, console, tool
 from controller import arrange
 import time
 
@@ -294,7 +294,7 @@ def margin(reset_flag=False):
     return
 
 
-def bitmex(symbol):
+def bitmex(symbol, count=301):
     """
     bitmex期货数据
     """
@@ -309,11 +309,24 @@ def bitmex(symbol):
     if f[conf.HDF5_RESOURCE_BITMEX].get(symbol) is None:
         f[conf.HDF5_RESOURCE_BITMEX].create_group(symbol)
 
-    for ktype in ["D", "5"]:
-        start = tradetime.get_date_by_barnum(300, ktype)
-        df = future.latest(symbol, ktype, start)
+    ktype_dict = dict()
+    ktype_dict['D'] = dict()
+    ktype_dict['D']['bin_size'] = future.BINSIZE_ONE_DAY
+    ktype_dict['D']['count'] = 80
+    ktype_dict['30'] = dict()
+    ktype_dict['30']['bin_size'] = future.BINSIZE_THIRTY_MINUTE
+    ktype_dict['30']['count'] = 80
+    ktype_dict['5'] = dict()
+    ktype_dict['5']['bin_size'] = future.BINSIZE_FIVE_MINUTE
+    ktype_dict['5']['count'] = 300
+    ktype_dict['1'] = dict()
+    ktype_dict['1']['bin_size'] = future.BINSIZE_ONE_MINUTE
+    ktype_dict['1']['count'] = 300
+    for ktype in ktype_dict:
+        detail = ktype_dict[ktype]
+        df = future.history(symbol, detail['bin_size'], detail['count'])
         if df is not None and df.empty is not True:
-            tool.merge_df_dataset(f[conf.HDF5_RESOURCE_BITMEX][symbol], ktype, df)
+            tool.merge_df_dataset(f[conf.HDF5_RESOURCE_BITMEX][symbol], ktype, df.head(len(df) - 1))
         time.sleep(conf.REQUEST_BLANK)
     f.close()
     console.write_tail()

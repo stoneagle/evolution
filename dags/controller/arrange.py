@@ -1,8 +1,6 @@
 import h5py
 from library import conf, console, tool, tradetime
 from quota import macd
-from datetime import datetime
-from source.bitmex import future
 
 
 def code_detail(code_list, start_date):
@@ -412,51 +410,3 @@ def code_macd_trend(f, ktype):
     share_df[conf.HDF5_SHARE_DATE_INDEX] = share_df[conf.HDF5_SHARE_DATE_INDEX].str.decode("utf-8")
     trend_df = macd.trend(share_df.tail(60))
     return trend_df
-
-
-def bitmex_thirty(symbol):
-    """
-    基于5min数据，聚合30min数据
-    """
-    console.write_head(
-        conf.HDF5_OPERATE_ARRANGE,
-        conf.HDF5_RESOURCE_BITMEX,
-        symbol + "-30min"
-    )
-    f = h5py.File(conf.HDF5_FILE_FUTURE, 'a')
-    if f.get(conf.HDF5_RESOURCE_BITMEX) is None:
-        console.write_msg("future文件不存在")
-        return
-    if f[conf.HDF5_RESOURCE_BITMEX].get(symbol) is None:
-        console.write_msg("future文件中的" + symbol + "目录不存在")
-        return
-    future_df = tool.df_from_dataset(f[conf.HDF5_RESOURCE_BITMEX][symbol], "5", None)
-    future_df[conf.HDF5_SHARE_DATE_INDEX] = future_df[conf.HDF5_SHARE_DATE_INDEX].str.decode("utf-8")
-    merge_df = tool.init_empty_df(future.SYMBOL_COLS)
-    for index, row in future_df.iterrows():
-        datetime_obj = datetime.strptime(row[conf.HDF5_SHARE_DATE_INDEX], "%Y-%m-%d %H:%M:%S")
-        if datetime_obj.minute % 30 == 0:
-            if index < 5:
-                continue
-            else:
-                row_dict = dict()
-                row_dict['date'] = row['date']
-                row_dict['close'] = row['close']
-                row_dict['high'] = row['high']
-                row_dict['low'] = row['low']
-                row_dict['volume'] = row['volume']
-                for i in range(0, 6):
-                    one = future_df.iloc[index - 5 + i]
-                    if i == 0:
-                        row_dict['open'] = one['open']
-                    row_dict['volume'] += one['volume']
-                    row_dict['high'] = max(one['high'], row_dict['high'])
-                    row_dict['low'] = min(one['low'], row_dict['low'])
-                merge_df = merge_df.append(row_dict, ignore_index=True)
-        else:
-            continue
-    if merge_df.empty is not True:
-        tool.merge_df_dataset(f[conf.HDF5_RESOURCE_BITMEX][symbol], "30", merge_df)
-    f.close()
-    console.write_tail()
-    return

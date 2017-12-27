@@ -1,13 +1,12 @@
 from library import conf, tool, tradetime, bitmexClient
 WALLET_COLS = ['status', 'address', 'amount', 'fee', 'date', 'balance']
-ORDER_COLS = ['symbol', 'date', 'price', 'side', 'type', 'value', 'order_amount', 'fill_amount']
 
 
 def wallet_history(count, start):
     """
     钱包历史列表
     """
-    client = bitmexClient.Client(conf.BITMEX_WALLET_HISTORY_URL)
+    client = bitmexClient.Client(conf.BITMEX_URL_WALLET_HISTORY)
     params = {
         "count": count,
         "start": start,
@@ -24,32 +23,19 @@ def wallet_history(count, start):
         row_dict['balance'] = one['walletBalance']
         row_dict['date'] = tradetime.get_iso_datetime(one['timestamp'], "M")
         df = df.append(row_dict, ignore_index=True)
-    print(df)
     return df
 
 
-def order_history(symbol, count, start):
+def wallet(currency=conf.BITMEX_CURRENCY_XBT):
     """
-    交易历史列表
+    钱包状态
     """
-    client = bitmexClient.Client(conf.BITMEX_ORDER_LIST_URL)
+    client = bitmexClient.Client(conf.BITMEX_URL_WALLET)
     params = {
-        "symbol": symbol,
-        "count": count,
-        "start": start,
-        "reverse": True
+        "currency": currency,
     }
     data_json = client.get(params)
-    df = tool.init_empty_df(ORDER_COLS)
-    for one in data_json:
-        row_dict = dict()
-        row_dict['symbol'] = one['symbol']
-        row_dict['date'] = tradetime.get_iso_datetime(one['timestamp'], "M")
-        row_dict['price'] = one['price']
-        row_dict['side'] = one['side']
-        row_dict['type'] = one['ordType']
-        row_dict['value'] = one['simpleCumQty']
-        row_dict['order_amount'] = one['orderQty']
-        row_dict['fill_amount'] = one['cumQty']
-        df = df.append(row_dict, ignore_index=True)
-    return df
+    row_dict = dict()
+    row_dict['date'] = tradetime.get_iso_datetime(data_json['timestamp'], "M")
+    row_dict['amount'] = data_json['amount']
+    return row_dict

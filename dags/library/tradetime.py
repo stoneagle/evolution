@@ -130,7 +130,7 @@ def get_trade_day_remain_second(date_str, itype):
         "M": "%Y-%m",
         "W": "%Y-%W",
         "D": "%Y-%m-%d",
-        "S": "%Y-%m-%d %H:%M:%S",
+        "5": "%Y-%m-%d %H:%M",
     }
     transfer_date = datetime.strptime(date_str, time_switcher.get(itype, 'error'))
     minute = 60 - transfer_date.minute
@@ -203,7 +203,7 @@ def get_iso_datetime(date_str, itype):
         "D": "%Y-%m-%d",
         "M": "%Y-%m-%d %H:%M:%S",
     }
-    date = parser.parse(date_str)
+    date = parser.parse(date_str).astimezone(conf.TZ)
     return date.strftime(time_switcher.get(itype, 'error'))
 
 
