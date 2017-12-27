@@ -10,7 +10,7 @@ code_dict = dict()
 INIT_FLAG = "init"
 CHECK_FLAG = "check"
 DF_START_NUM = 26
-DF_SPLIT_NUM = 48 + 48
+DF_SPLIT_NUM = 48 + 24
 
 
 def exec(code_list):
@@ -65,7 +65,7 @@ def five_minutes():
 
     global timer
     remain_second = tradetime.get_remain_second("5")
-    timer = threading.Timer(remain_second + 30, five_minutes)
+    timer = threading.Timer(remain_second + 15, five_minutes)
     timer.start()
 
 
@@ -75,6 +75,7 @@ def check(code, trend_df):
     """
     # TODO (应该放在筛选中处理)添加中枢(空间)的判断，估算涨跌空间
     # TODO (应该放在筛选中处理)成交量对股票波动幅度的影响
+    # TODO 对于红柱子，如果在macd下跌趋势中出现反弹买点，有可能是背离形态，该买点可以忽略（卖点同理）
     global code_dict
 
     now = trend_df.iloc[-1]
@@ -114,7 +115,7 @@ def check(code, trend_df):
             code_dict[code][CHECK_FLAG] = False
         else:
             macd_diff = now["macd"] - border["macd"].values[0]
-            if abs(macd_diff) > action.FACTOR_MACD_RANGE * 2:
+            if abs(macd_diff) > action.FACTOR_MACD_RANGE * 1.5:
                 raw_status = border[action.INDEX_STATUS].values[0]
                 trend_count = border[action.INDEX_TREND_COUNT].values[0]
                 output(code, now["date"], raw_status, trend_count, macd_diff, reverse_flag)
@@ -164,7 +165,7 @@ def output(code, date, raw_status, trend_count, macd_diff, reverse_flag):
     console.write_msg("大盘30min，趋势%s，连续%d次，macd差值%f" % (index_status, index_trend_count, index_macd_diff))
     # 根据trend_count和当前时间，判断买卖时机(背离情况要计算两次买卖点trend_count的差值)
     if reverse_flag is False:
-        remain_seconds = tradetime.get_trade_day_remain_second(date, "S")
+        remain_seconds = tradetime.get_trade_day_remain_second(date, "5")
         upper_estimate = (trend_count + 1) * 5
         lower_estimate = (trend_count - 1) * 5
         if (upper_estimate * 60) <= remain_seconds:
@@ -216,12 +217,12 @@ def get_trend(code, ktype, start_date, end_date=None):
     # TODO (重要)，支持ip池并发获取，要不然无法支持多code的高频获取
     while True:
         if end_date is None:
-            df = ts.get_hist_data(code, ktype=ktype, pause=conf.REQUEST_BLANK, start=start_date)
+            df = ts.get_k_data(code, ktype=ktype, pause=conf.REQUEST_BLANK, start=start_date)
         else:
-            df = ts.get_hist_data(code, ktype=ktype, pause=conf.REQUEST_BLANK, start=start_date, end=end_date)
+            df = ts.get_k_data(code, ktype=ktype, pause=conf.REQUEST_BLANK, start=start_date, end=end_date)
         time.sleep(conf.REQUEST_BLANK)
         if df is not None and df.empty is not True:
-            df = df[['open', 'high', 'close', 'low', 'volume']]
+            df = df[['open', 'high', 'close', 'low', 'volume', 'date']]
             df = df.reset_index().sort_values(by=[conf.HDF5_SHARE_DATE_INDEX])
             df = df.set_index(conf.HDF5_SHARE_DATE_INDEX)
             index_df = macd.value(df)
