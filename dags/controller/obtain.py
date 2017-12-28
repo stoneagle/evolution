@@ -3,7 +3,7 @@ from source.ts import classify, share, basic, fundamental
 from source.bitmex import future
 from library import conf, count, error, console, tool
 from controller import arrange
-import time
+from quota import macd
 
 
 def classify_detail(classify_list):
@@ -294,14 +294,14 @@ def margin(reset_flag=False):
     return
 
 
-def bitmex(symbol, count=301):
+def bitmex(symbol, bin_size, count):
     """
     bitmex期货数据
     """
     console.write_head(
         conf.HDF5_OPERATE_GET,
         conf.HDF5_RESOURCE_BITMEX,
-        symbol
+        symbol + '-' + bin_size
     )
     f = h5py.File(conf.HDF5_FILE_FUTURE, 'a')
     if f.get(conf.HDF5_RESOURCE_BITMEX) is None:
@@ -309,25 +309,28 @@ def bitmex(symbol, count=301):
     if f[conf.HDF5_RESOURCE_BITMEX].get(symbol) is None:
         f[conf.HDF5_RESOURCE_BITMEX].create_group(symbol)
 
-    ktype_dict = dict()
-    ktype_dict['D'] = dict()
-    ktype_dict['D']['bin_size'] = future.BINSIZE_ONE_DAY
-    ktype_dict['D']['count'] = 80
-    ktype_dict['30'] = dict()
-    ktype_dict['30']['bin_size'] = future.BINSIZE_THIRTY_MINUTE
-    ktype_dict['30']['count'] = 80
-    ktype_dict['5'] = dict()
-    ktype_dict['5']['bin_size'] = future.BINSIZE_FIVE_MINUTE
-    ktype_dict['5']['count'] = 300
-    ktype_dict['1'] = dict()
-    ktype_dict['1']['bin_size'] = future.BINSIZE_ONE_MINUTE
-    ktype_dict['1']['count'] = 300
-    for ktype in ktype_dict:
-        detail = ktype_dict[ktype]
-        df = future.history(symbol, detail['bin_size'], detail['count'])
-        if df is not None and df.empty is not True:
-            tool.merge_df_dataset(f[conf.HDF5_RESOURCE_BITMEX][symbol], ktype, df.head(len(df) - 1))
-        time.sleep(conf.REQUEST_BLANK)
+    # 处理D,5,1数据
+    if bin_size in [
+        future.BINSIZE_ONE_DAY,
+        future.BINSIZE_ONE_HOUR,
+        future.BINSIZE_FIVE_MINUTE,
+        future.BINSIZE_ONE_MINUTE,
+    ]:
+        df = future.history(symbol, bin_size, count)
+    # 处理30m数据
+    elif bin_size in [
+        future.BINSIZE_THIRTY_MINUTE,
+        future.BINSIZE_FOUR_HOUR
+    ]:
+        df = future.history_merge(symbol, bin_size, count)
+
+    if df is not None and df.empty is not True:
+        df = df.set_index(conf.HDF5_SHARE_DATE_INDEX)
+        index_df = macd.value(df)
+        df = df.merge(index_df, left_index=True, right_index=True, how='left')
+        df = df.dropna().reset_index()
+        tool.merge_df_dataset(f[conf.HDF5_RESOURCE_BITMEX][symbol], bin_size, df)
+
     f.close()
     console.write_tail()
     return

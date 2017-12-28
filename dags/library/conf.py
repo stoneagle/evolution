@@ -3,6 +3,7 @@ import os
 from library import basic
 basic.import_env()
 TZ = timezone('Asia/Shanghai')
+TZ_UTC = timezone('Utc')
 
 # 请求间隔
 REQUEST_BLANK = 1
@@ -131,6 +132,7 @@ BITMEX_URL_ORDER = "/api/v1/order"
 BITMEX_URL_ORDER_CANCEL_ALL = "/api/v1/order/all"
 BITMEX_URL_ORDER_CANCEL_ALL_AFTER = "/api/v1/order/cancelAllAfter"
 BITMEX_XBTUSD = "XBTUSD"
+BITMEX_BXBT = ".BXBT"
 
 BITMEX_APIKEY = os.environ.get("APIKEY")
 BITMEX_APISECRET = os.environ.get("APISECRET")

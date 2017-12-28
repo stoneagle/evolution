@@ -1,14 +1,21 @@
-from library import conf
 from controller import obtain
+from library import conf
 from source.bitmex import future
 
 
 def test():
     # obtain
-    obtain.bitmex(conf.BITMEX_XBTUSD)
+    # symbol_list = [conf.BITMEX_XBTUSD, conf.BITMEX_BXBT]
+    # for symbol in symbol_list:
+    #     obtain.bitmex(symbol, future.BINSIZE_ONE_DAY, 300)
+    #     obtain.bitmex(symbol, future.BINSIZE_FIVE_MINUTE, 300)
+    #     obtain.bitmex(symbol, future.BINSIZE_FOUR_HOUR, 300)
+    #     obtain.bitmex(symbol, future.BINSIZE_THIRTY_MINUTE, 300)
 
     # future
-    # result = future.history(conf.BITMEX_XBTUSD, future.BINSIZE_THIRTY_MINUTE, 100)
+    # result = future.history(conf.BITMEX_BXBT, future.BINSIZE_THIRTY_MINUTE, 3)
+    # result = future.history_thirty_minute(conf.BITMEX_XBTUSD, 100)
+    # result = future.history_four_hour(conf.BITMEX_XBTUSD, 100)
     # print(result)
 
     # order

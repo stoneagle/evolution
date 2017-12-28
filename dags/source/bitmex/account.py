@@ -21,7 +21,7 @@ def wallet_history(count, start):
         row_dict['amount'] = one['amount']
         row_dict['fee'] = one['fee']
         row_dict['balance'] = one['walletBalance']
-        row_dict['date'] = tradetime.get_iso_datetime(one['timestamp'], "M")
+        row_dict['date'] = tradetime.transfer_iso_datetime(one['timestamp'], "M")
         df = df.append(row_dict, ignore_index=True)
     return df
 
@@ -36,6 +36,6 @@ def wallet(currency=conf.BITMEX_CURRENCY_XBT):
     }
     data_json = client.get(params)
     row_dict = dict()
-    row_dict['date'] = tradetime.get_iso_datetime(data_json['timestamp'], "M")
+    row_dict['date'] = tradetime.transfer_iso_datetime(data_json['timestamp'], "M")
     row_dict['amount'] = data_json['amount']
     return row_dict

@@ -45,7 +45,7 @@ def list(symbol, count, start, filter_dict=None):
     df = tool.init_empty_df(None)
     for one in data_json:
         row_dict = dict()
-        row_dict['date'] = tradetime.get_iso_datetime(one['timestamp'], "M")
+        row_dict['date'] = tradetime.transfer_iso_datetime(one['timestamp'], "M")
         row_dict['symbol'] = one['symbol']
         row_dict['side'] = one['side']
         row_dict['type'] = one['ordType']

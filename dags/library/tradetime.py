@@ -2,6 +2,7 @@ import calendar
 from library import conf
 from datetime import datetime, timedelta, date
 from dateutil import parser
+import math
 import time
 
 
@@ -147,19 +148,11 @@ def get_trade_day_remain_second(date_str, itype):
     return remain_second
 
 
-def get_unixtime(date_str=None, itype=None):
+def get_unixtime(date_str=None):
     if date_str is None:
         dtime = datetime.now(conf.TZ)
     else:
-        time_switcher = {
-            "M": "%Y-%m",
-            "W": "%Y-%W",
-            "D": "%Y-%m-%d",
-            "30": "%Y-%m-%d %H:%M:%S",
-            "5": "%Y-%m-%d %H:%M:%S",
-            "1": "%Y-%m-%d %H:%M:%S",
-        }
-        dtime = datetime.strptime(date_str, time_switcher.get(itype, 'error'))
+        dtime = datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
     return time.mktime(dtime.timetuple())
 
 
@@ -172,31 +165,55 @@ def transfer_unixtime(unixtime, ktype):
         "5": "%Y-%m-%d %H:%M:%S",
         "1": "%Y-%m-%d %H:%M:%S",
     }
-    return datetime.fromtimestamp(unixtime).strftime(time_switcher.get(ktype, 'error'))
+    return datetime.fromtimestamp(unixtime).strftime(time_switcher.get(ktype, '%Y-%m-%d %H:%M:%S'))
 
 
-def get_date_by_barnum(barnum, ktype):
-    d = datetime.now(conf.TZ)
+def get_date_by_barnum(barnum, ktype, local=False):
+    """
+    根据barnum的数量，获取对应时间点
+    """
+    if local is False:
+        d = datetime.now(conf.TZ)
+    else:
+        d = datetime.now(conf.TZ_UTC)
     switcher = {
-        "M": 30 * 24 * 60 * 60,
-        "W": 7 * 24 * 60 * 60,
-        "D": 24 * 60 * 60,
-        "30": 30 * 60,
-        "5": 5 * 60,
-    }
-    time_switcher = {
-        "M": "%Y-%m",
-        "W": "%Y-%W",
-        "D": "%Y-%m-%d",
-        "30": "%Y-%m-%d %H:%M:%S",
-        "5": "%Y-%m-%d %H:%M:%S",
+        "M": 30 * 24 * 60,
+        "W": 7 * 24 * 60,
+        "D": 24 * 60,
+        "H": 60,
+        "60": 60,
+        "30": 30,
+        "5": 5,
     }
     diff = barnum * switcher.get(ktype, 'error')
-    diff_datetime = datetime(d.year, d.month, d.day, d.hour, d.minute, d.second) - timedelta(seconds=diff)
-    return diff_datetime.strftime(time_switcher.get(ktype, 'error'))
+    diff_datetime = datetime(d.year, d.month, d.day, d.hour, d.minute, d.second) - timedelta(minutes=diff)
+    return diff_datetime.strftime("%Y-%m-%d %H:%M:%S")
 
 
-def get_iso_datetime(date_str, itype):
+def fix_merge_barnum(bin_size, date_str=None, local=False):
+    """
+    获取聚合的修正barnum
+    """
+    if date_str is None:
+        dtime = datetime.now()
+    else:
+        dtime = datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
+
+    if local is True:
+        dtime = dtime.replace(tzinfo=conf.TZ)
+    else:
+        dtime = dtime.replace(tzinfo=conf.TZ_UTC)
+
+    if bin_size == "30m":
+        diff = dtime.minute % 30
+        barnum = math.ceil(diff / 5)
+    elif bin_size == "4h":
+        diff = dtime.hour % 4
+        barnum = diff
+    return barnum
+
+
+def transfer_iso_datetime(date_str, itype):
     time_switcher = {
         "M": "%Y-%m",
         "W": "%Y-%W",
@@ -205,6 +222,17 @@ def get_iso_datetime(date_str, itype):
     }
     date = parser.parse(date_str).astimezone(conf.TZ)
     return date.strftime(time_switcher.get(itype, 'error'))
+
+
+def get_iso_datetime(date_str, itype):
+    time_switcher = {
+        "M": "%Y-%m",
+        "W": "%Y-%W",
+        "D": "%Y-%m-%d",
+        "S": "%Y-%m-%d %H:%M:%S",
+    }
+    dtime = datetime.strptime(date_str, time_switcher.get(itype, 'error'))
+    return dtime.isoformat()
 
 
 LAST_MONTH_LAST_DAY = get_last_day_of_last_month()

@@ -1,4 +1,4 @@
-from library import conf
+from library import conf, console
 import json
 import time
 import hashlib
@@ -47,7 +47,9 @@ class Client(object):
         elif method == "DELETE":
             r = requests.delete(path, data=data, headers=headers)
         data_str = r.text
-        # print(r.headers)
+        remain = r.headers["X-RateLimit-Remaining"]
+        if int(remain) < 50:
+            console.write_msg("bitmex remain num " + remain + " < 50")
         data_json = json.loads(data_str)
         return data_json
 
