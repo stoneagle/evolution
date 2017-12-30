@@ -57,6 +57,16 @@ def trend(index_df, factor_macd_range):
     return trend_df
 
 
+def value_and_trend(df, factor_macd_range):
+    df = df.sort_values(by=[conf.HDF5_SHARE_DATE_INDEX])
+    df = df.set_index(conf.HDF5_SHARE_DATE_INDEX)
+    index_df = value(df)
+    df = df.merge(index_df, left_index=True, right_index=True, how='left')
+    df = df.dropna()
+    trend_df = trend(df.reset_index(), factor_macd_range)
+    return trend_df
+
+
 def price_diverse(share_df, factor_macd_range):
     """
     获取价格背离情况

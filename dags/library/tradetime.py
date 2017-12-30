@@ -126,14 +126,8 @@ def get_remain_second(ttype):
     return remain_second
 
 
-def get_trade_day_remain_second(date_str, itype):
-    time_switcher = {
-        "M": "%Y-%m",
-        "W": "%Y-%W",
-        "D": "%Y-%m-%d",
-        "5": "%Y-%m-%d %H:%M",
-    }
-    transfer_date = datetime.strptime(date_str, time_switcher.get(itype, 'error'))
+def get_ashare_remain_second(date_str):
+    transfer_date = datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
     minute = 60 - transfer_date.minute
     if (transfer_date.hour == 9 and transfer_date.minute >= 30):
         remain_second = minute * 60 + 60 * 60 * 3.5
@@ -145,6 +139,8 @@ def get_trade_day_remain_second(date_str, itype):
         remain_second = minute * 60 + 60 * 60
     elif transfer_date.hour == 14:
         remain_second = minute * 60
+    elif transfer_date.hour == 15:
+        remain_second = 0
     return remain_second
 
 
@@ -233,6 +229,39 @@ def get_iso_datetime(date_str, itype):
     }
     dtime = datetime.strptime(date_str, time_switcher.get(itype, 'error'))
     return dtime.isoformat()
+
+
+def check_pull_time(date_str, ktype, local=True):
+    ntime = datetime.now()
+    dtime = datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
+
+    if local is True:
+        ntime = dtime.replace(tzinfo=conf.TZ)
+        dtime = dtime.replace(tzinfo=conf.TZ)
+    else:
+        ntime = dtime.replace(tzinfo=conf.TZ_UTC)
+        dtime = dtime.replace(tzinfo=conf.TZ_UTC)
+
+    switcher = {
+        conf.KTYPE_ONE: 1,
+        conf.KTYPE_FIVE: 5,
+        conf.KTYPE_THIRTY: 30,
+        conf.KTYPE_DAY: 60 * 24,
+        conf.BINSIZE_ONE_MINUTE: 1,
+        conf.BINSIZE_FIVE_MINUTE: 5,
+        conf.BINSIZE_THIRTY_MINUTE: 30,
+        conf.BINSIZE_FOUR_HOUR: 60 * 4,
+        conf.BINSIZE_ONE_DAY: 60 * 24,
+    }
+    diff = ntime.second - dtime.second
+    span = switcher.get(ktype, 'error')
+    if span == 'error':
+        raise Exception(ktype + "不合法")
+    if diff >= span * 60:
+        ret = True
+    else:
+        ret = False
+    return ret
 
 
 LAST_MONTH_LAST_DAY = get_last_day_of_last_month()

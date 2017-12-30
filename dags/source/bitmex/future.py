@@ -1,22 +1,16 @@
 from library import conf, tool, tradetime, bitmexClient
 from datetime import datetime
 SYMBOL_COLS = ['date', 'open', 'high', 'close', 'low', 'volume']
-BINSIZE_ONE_MINUTE = "1m"
-BINSIZE_FIVE_MINUTE = "5m"
-BINSIZE_ONE_HOUR = "1h"
-BINSIZE_ONE_DAY = "1d"
-BINSIZE_THIRTY_MINUTE = "30m"
-BINSIZE_FOUR_HOUR = "4h"
 BUCKET_LIMIT = 10000
 TYPE_API = "api"
 TYPE_SPIDER = "spider"
 SPIDER_BINSIZE_DICT = {
-    BINSIZE_ONE_MINUTE: "1",
-    BINSIZE_FIVE_MINUTE: "5",
-    BINSIZE_THIRTY_MINUTE: "5",
-    BINSIZE_ONE_HOUR: "60",
-    BINSIZE_FOUR_HOUR: "60",
-    BINSIZE_ONE_DAY: "D",
+    conf.BINSIZE_ONE_MINUTE: "1",
+    conf.BINSIZE_FIVE_MINUTE: "5",
+    conf.BINSIZE_THIRTY_MINUTE: "5",
+    conf.BINSIZE_ONE_HOUR: "60",
+    conf.BINSIZE_FOUR_HOUR: "60",
+    conf.BINSIZE_ONE_DAY: "D",
 }
 
 
@@ -44,11 +38,11 @@ def history_merge(symbol, bin_size, count, gtype=TYPE_SPIDER):
     """
     获取聚合类交易历史
     """
-    if bin_size == BINSIZE_FOUR_HOUR:
+    if bin_size == conf.BINSIZE_FOUR_HOUR:
         df = _get_merge_data(symbol, bin_size, count, 4, 'H', gtype)
         df = df.head(len(df) - 1)
         merge_df = _get_merge_df(df, 4, 'H')
-    elif bin_size == BINSIZE_THIRTY_MINUTE:
+    elif bin_size == conf.BINSIZE_THIRTY_MINUTE:
         df = _get_merge_data(symbol, bin_size, count, 6, '5', gtype)
         df = df.head(len(df) - 1)
         merge_df = _get_merge_df(df, 6, '30')

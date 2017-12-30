@@ -7,13 +7,13 @@ def test():
     # obtain
     # symbol_list = [conf.BITMEX_XBTUSD, conf.BITMEX_BXBT]
     # for symbol in symbol_list:
-    #     obtain.bitmex(symbol, future.BINSIZE_ONE_DAY, 300)
-    #     obtain.bitmex(symbol, future.BINSIZE_FIVE_MINUTE, 300)
-    #     obtain.bitmex(symbol, future.BINSIZE_FOUR_HOUR, 300)
-    #     obtain.bitmex(symbol, future.BINSIZE_THIRTY_MINUTE, 300)
+    #     obtain.bitmex(symbol, conf.BINSIZE_ONE_DAY, 300)
+    #     obtain.bitmex(symbol, conf.BINSIZE_FIVE_MINUTE, 300)
+    #     obtain.bitmex(symbol, conf.BINSIZE_FOUR_HOUR, 300)
+    #     obtain.bitmex(symbol, conf.BINSIZE_THIRTY_MINUTE, 300)
 
     # future
-    # result = future.history(conf.BITMEX_BXBT, future.BINSIZE_THIRTY_MINUTE, 3)
+    # result = future.history(conf.BITMEX_BXBT, conf.BINSIZE_THIRTY_MINUTE, 3)
     # result = future.history_thirty_minute(conf.BITMEX_XBTUSD, 100)
     # result = future.history_four_hour(conf.BITMEX_XBTUSD, 100)
     # print(result)

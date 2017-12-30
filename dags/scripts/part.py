@@ -1,7 +1,6 @@
 from quota.util import action
 import h5py
 from library import conf, tool
-from watch.common import common
 
 
 def test():
@@ -15,7 +14,7 @@ def test():
             code_prefix = code[0:3]
             df = tool.df_from_dataset(f[code_prefix][code], ktype, None)
             df[conf.HDF5_SHARE_DATE_INDEX] = df[conf.HDF5_SHARE_DATE_INDEX].str.decode("utf-8")
-            trend_df = common.arrange_trend(df.tail(100), 0.1)
+            trend_df = action.arrange_trend(df.tail(100), 0.1)
             length = len(trend_df)
             for index, row in trend_df.iterrows():
                 if index != length - 1:

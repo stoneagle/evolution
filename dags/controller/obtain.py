@@ -311,16 +311,16 @@ def bitmex(symbol, bin_size, count):
 
     # 处理D,5,1数据
     if bin_size in [
-        future.BINSIZE_ONE_DAY,
-        future.BINSIZE_ONE_HOUR,
-        future.BINSIZE_FIVE_MINUTE,
-        future.BINSIZE_ONE_MINUTE,
+        conf.BINSIZE_ONE_DAY,
+        conf.BINSIZE_ONE_HOUR,
+        conf.BINSIZE_FIVE_MINUTE,
+        conf.BINSIZE_ONE_MINUTE,
     ]:
         df = future.history(symbol, bin_size, count)
     # 处理30m数据
     elif bin_size in [
-        future.BINSIZE_THIRTY_MINUTE,
-        future.BINSIZE_FOUR_HOUR
+        conf.BINSIZE_THIRTY_MINUTE,
+        conf.BINSIZE_FOUR_HOUR
     ]:
         df = future.history_merge(symbol, bin_size, count)
 
