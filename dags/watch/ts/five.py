@@ -5,19 +5,19 @@ timer = None
 strategy_dict = dict()
 
 
-def exec(code_list, backtest=False):
+def exec(code_list, backtest, rewrite):
     factor_macd_range = 0.1
     global strategy_dict
 
     # TODO 获取个股股东人数、解禁、股东出货等情况
     for code in code_list:
-        obj = fmwr.strategy(code, fmwr.STYPE_TUSHARE, factor_macd_range, not backtest)
+        obj = fmwr.strategy(code, fmwr.STYPE_TUSHARE, backtest, rewrite, factor_macd_range)
         strategy_dict[code] = obj
         # 初始化数据
         obj.prepare()
         # 初始检查
         obj.check_all()
-    # monitor()
+    monitor()
     # bot = weixin.WXBot()
     # bot.sendHelper("lalala")
     return

@@ -1,6 +1,7 @@
 from quota.util import action
 from quota import macd
 from library import tool, conf, console, tradetime
+from source.ts import share as tss
 import tushare as ts
 import h5py
 import time
@@ -17,7 +18,8 @@ TRADE_MACD_DIFF = "_macd_diff"
 TRADE_TREND_COUNT = "_trend_count"
 STYPE_TUSHARE = "tushare"
 STYPE_BITMEX = "bitmex"
-DF_FILE_NUM = 128
+DF_MACD_MIN_NUM = 34
+DF_FILE_NUM = 48 + DF_MACD_MIN_NUM
 DF_START_NUM = 26
 
 
@@ -33,8 +35,10 @@ class strategy(object):
     code = None
     # 数据来源类别
     stype = None
-    # check时是否更新数据源
-    update = None
+    # 回测标签，回测时不更新数据源
+    backtest = None
+    # 是否将最新数据回写至文件
+    rewrite = None
     # 5min是否处于shake状态
     five_shake = False
     # 5min的macd趋势是否处于背离
@@ -57,10 +61,11 @@ class strategy(object):
     # 震荡因子，shake幅度百分比，默认10%
     factor_macd_range = 0.1
 
-    def __init__(self, code, stype, factor_macd_range=None, update=True):
+    def __init__(self, code, stype, backtest, rewrite, factor_macd_range=None):
         self.code = code
         self.stype = stype
-        self.update = update
+        self.backtest = backtest
+        self.rewrite = rewrite
         if factor_macd_range is not None:
             self.factor_macd_range = factor_macd_range
         return
@@ -98,8 +103,7 @@ class strategy(object):
                 setattr(self, key, self.get_trend_from_file(ktype, index))
             else:
                 setattr(self, key, self.get_trend_from_file(ktype))
-
-        if self.update is True:
+        if self.backtest is False:
             self.update()
         return
 
@@ -135,12 +139,23 @@ class strategy(object):
             pull_flag = tradetime.check_pull_time(last_date, ktype)
             if pull_flag is False:
                 continue
+
             if key == DF_INDEX:
                 new_df = self.get_trend_from_remote(ktype, last_date, index)
             else:
                 new_df = self.get_trend_from_remote(ktype, last_date)
-            setattr(self, key, new_df)
-            # TODO 将读取的数据，写回文件
+
+            # 定期更新trend_df
+            if ktype != conf.KTYPE_DAY:
+                new_df[conf.HDF5_SHARE_DATE_INDEX] = new_df[conf.HDF5_SHARE_DATE_INDEX].apply(lambda x: tradetime.transfer_date(x, ktype, "S"))
+            new_df = new_df[new_df[conf.HDF5_SHARE_DATE_INDEX] > last_date][["date", "close"]]
+            trend_df = getattr(self, key)
+            share_df = trend_df[["date", "close"]]
+            share_df = share_df.append(new_df).drop_duplicates(conf.HDF5_SHARE_DATE_INDEX)
+            new_trend_df = macd.value_and_trend(share_df, self.factor_macd_range).tail(len(new_df) + DF_MACD_MIN_NUM)
+
+            trend_df = trend_df.append(new_trend_df).drop_duplicates(conf.HDF5_SHARE_DATE_INDEX).tail(DF_FILE_NUM)
+            setattr(self, key, trend_df.reset_index(drop=True))
         return
 
     def check_all(self):
@@ -162,16 +177,16 @@ class strategy(object):
         """
         检查5min-macd最新趋势，是否存在买卖信号
         """
-        if self.update is True:
+        if self.backtest is False:
             self.update()
         start, shake_before, pre, now = self._get_phase_row()
         if start is None:
             return False
 
         # 当前macd趋势的macd波动幅度
-        phase_range = abs(shake_before["macd"] - start["macd"])
+        phase_range = shake_before["macd"] - start["macd"]
         # 当前macd趋势的price波动幅度
-        price_range = pre["close"] - start["close"]
+        price_range = shake_before["close"] - start["close"]
 
         # 背离分析，如果macd是下降趋势，但是价格上涨，则属于背离；反之同理
         self.five_trend_reverse = False
@@ -182,10 +197,10 @@ class strategy(object):
         if self.five_shake is False:
             # 判断第一次出现的波动，如果该段趋势太小则没有做T必要
             # TODO phase_range的大小判断，避免判断太小的range趋势(目前用的是旧方案，trend数量)
-            if shake_before[action.INDEX_TREND_COUNT] >= 4 and now[action.INDEX_STATUS] == action.STATUS_SHAKE:
+            if shake_before[action.INDEX_TREND_COUNT] >= 6 and now[action.INDEX_STATUS] == action.STATUS_SHAKE and pre[action.INDEX_STATUS] != action.STATUS_SHAKE:
                 # 检查macd波动幅度
                 macd_diff = abs(now["macd"] - pre["macd"])
-                if macd_diff > self.factor_macd_range * phase_range:
+                if macd_diff > self.factor_macd_range * abs(phase_range):
                     # 如果macd波动值超出范围，视为转折
                     ret = True
                 else:
@@ -201,7 +216,7 @@ class strategy(object):
             else:
                 macd_diff = abs(now["macd"] - shake_before["macd"])
                 # 波动超出边界，震荡结束
-                if macd_diff > self.factor_macd_range * phase_range:
+                if macd_diff > self.factor_macd_range * abs(phase_range):
                     self.five_shake = False
                     ret = True
         return ret
@@ -308,7 +323,7 @@ class strategy(object):
             msg = "下个交易点预估需要%d-%d分钟"
             console.write_msg(msg % (lower_estimate, upper_estimate))
 
-        console.write_msg("建议仓位：%d/6" % (now[TRADE_POSITIONS]))
+        console.write_msg("建议仓位：%d/3" % (now[TRADE_POSITIONS]))
         console.write_blank()
         return
 
@@ -317,18 +332,15 @@ class strategy(object):
         仓位估算
         考虑相关趋势的影响，相反方向会产生压制，例如relate上升对5min卖点，relate下降对5min买点
         """
+        # TODO 将shake的细节考虑进去
         # 检查big 30min index的趋势,计算仓位
         if pre_status == action.STATUS_UP:
-            if status == action.STATUS_DOWN:
-                positions += 2
-            elif status == action.STATUS_UP:
+            if status == action.STATUS_UP:
                 positions += 0
             else:
                 positions += 1
         else:
-            if status == action.STATUS_UP:
-                positions += 2
-            elif status == action.STATUS_DOWN:
+            if status == action.STATUS_DOWN:
                 positions += 0
             else:
                 positions += 1
@@ -363,22 +375,35 @@ class strategy(object):
 
     def get_trend_from_remote(self, ktype, start_date, code=None):
         """
-        从远端获取最新数据，并计算趋势
+        从远端获取最新数据
         """
         if code is None:
             code = self.code
 
         # TODO (重要)，支持ip池并发获取，要不然多code的高频获取过于缓慢
-        while True:
-            time.sleep(conf.REQUEST_BLANK)
-            if self.stype == STYPE_TUSHARE:
-                df = ts.get_k_data(code, ktype=ktype, pause=conf.REQUEST_BLANK, start=start_date)
-            if df is not None and df.empty is not True:
-                break
+        if self.stype == STYPE_TUSHARE:
+            if self.rewrite:
+                # backtest时，将读取的hist数据写回文件
+                df = ts.get_hist_data(code, ktype=ktype, pause=conf.REQUEST_BLANK, start=start_date)
+                if code.isdigit():
+                    f = h5py.File(conf.HDF5_FILE_SHARE, 'a')
+                    code_prefix = code[0:3]
+                    path = '/' + code_prefix + '/' + code
+                    df = df[tss.SHARE_COLS]
+                else:
+                    f = h5py.File(conf.HDF5_FILE_INDEX, 'a')
+                    path = '/' + code
+                    df = df[tss.INDEX_COLS]
+                df = df.reset_index().sort_values(by=[conf.HDF5_SHARE_DATE_INDEX])
+                tool.merge_df_dataset(f[path], ktype, df)
+                f.close
             else:
-                console.write_msg("无法获取" + code + "-" + ktype + ":" + start_date + "以后的数据，休息30秒重新获取")
-                time.sleep(30)
-        return macd.value_and_trend(df, self.factor_macd_range)
+                # get_k_data无法获取换手率，但是在线监听时，get_k_data存在时间延迟
+                df = ts.get_k_data(code, ktype=ktype, pause=conf.REQUEST_BLANK, start=start_date)
+            time.sleep(conf.REQUEST_BLANK)
+        if df is None and df.empty is True:
+            raise Exception("无法获取" + code + "-" + ktype + ":" + start_date + "以后的数据，休息30秒重新获取")
+        return df
 
     def get_trend_from_file(self, ktype, code=None):
         """
@@ -390,7 +415,7 @@ class strategy(object):
         if self.stype == STYPE_TUSHARE:
             if code.isdigit():
                 f = h5py.File(conf.HDF5_FILE_SHARE, 'a')
-                code_prefix = self.code[0:3]
+                code_prefix = code[0:3]
                 path = '/' + code_prefix + '/' + code
             else:
                 f = h5py.File(conf.HDF5_FILE_INDEX, 'a')
@@ -420,11 +445,14 @@ class strategy(object):
         # 次新bar
         pre = trend_df.iloc[-2]
         # 当前macd趋势开始震荡前的bar
+        if now[action.INDEX_STATUS] != action.STATUS_SHAKE and pre[action.INDEX_STATUS] == action.STATUS_SHAKE:
+            trend_df = trend_df.head(len(trend_df) - 1)
         trend_no_shake_df = trend_df[trend_df[action.INDEX_STATUS] != action.STATUS_SHAKE]
         shake_before = trend_no_shake_df.iloc[-1]
+
         # 当前macd趋势的开始bar的数据
-        if abs(1 + shake_before[action.INDEX_TREND_COUNT]) < len(trend_no_shake_df):
-            start = trend_no_shake_df.iloc[-1 - shake_before[action.INDEX_TREND_COUNT]]
+        if shake_before.name - shake_before[action.INDEX_TREND_COUNT] > 0:
+            start = trend_df.loc[shake_before.name - shake_before[action.INDEX_TREND_COUNT]]
         else:
             start = None
         return start, shake_before, pre, now

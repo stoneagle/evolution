@@ -6,5 +6,10 @@ basic.import_env()
 
 def tushare(code_list):
     backtest = os.environ.get("BACKTEST")
-    tsfive.exec(code_list, backtest)
+    if not backtest:
+        backtest = False
+    rewrite = os.environ.get("REWRITE")
+    if not rewrite:
+        rewrite = False
+    tsfive.exec(code_list, backtest, rewrite)
     return

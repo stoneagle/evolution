@@ -99,8 +99,10 @@ def transfer_date(date_str, itype, otype):
         "M": "%Y-%m",
         # W模式无法转换
         "W": "%Y-%W",
-        "D": "%Y-%m-%d",
         "S": "%Y-%m-%d %H:%M:%S",
+        conf.KTYPE_DAY: "%Y-%m-%d",
+        conf.KTYPE_THIRTY: "%Y-%m-%d %H:%M",
+        conf.KTYPE_FIVE: "%Y-%m-%d %H:%M",
     }
     transfer_date = datetime.strptime(date_str, time_switcher.get(itype, 'error'))
     return transfer_date.strftime(time_switcher.get(otype, 'error'))
@@ -232,14 +234,19 @@ def get_iso_datetime(date_str, itype):
 
 
 def check_pull_time(date_str, ktype, local=True):
+    time_switcher = {
+        conf.KTYPE_DAY: "%Y-%m-%d",
+        conf.KTYPE_THIRTY: "%Y-%m-%d %H:%M:%S",
+        conf.KTYPE_FIVE: "%Y-%m-%d %H:%M:%S",
+    }
     ntime = datetime.now()
-    dtime = datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
+    dtime = datetime.strptime(date_str, time_switcher.get(ktype, 'error'))
 
     if local is True:
-        ntime = dtime.replace(tzinfo=conf.TZ)
+        ntime = ntime.replace(tzinfo=conf.TZ)
         dtime = dtime.replace(tzinfo=conf.TZ)
     else:
-        ntime = dtime.replace(tzinfo=conf.TZ_UTC)
+        ntime = ntime.replace(tzinfo=conf.TZ_UTC)
         dtime = dtime.replace(tzinfo=conf.TZ_UTC)
 
     switcher = {
@@ -253,7 +260,7 @@ def check_pull_time(date_str, ktype, local=True):
         conf.BINSIZE_FOUR_HOUR: 60 * 4,
         conf.BINSIZE_ONE_DAY: 60 * 24,
     }
-    diff = ntime.second - dtime.second
+    diff = (ntime - dtime).total_seconds()
     span = switcher.get(ktype, 'error')
     if span == 'error':
         raise Exception(ktype + "不合法")
