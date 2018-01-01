@@ -45,9 +45,12 @@ class Action(object):
     # 方案A，绝对值(废弃):不同价格量级的数据(例如比特币)，波动幅度不同，不能用固定值
     # 方案B，该段趋势波动差，差值越大越快说明趋势越急，对转折要求更高
     factor_macd_range = None
+    # 直接转折标签，常用于1min等时间敏感节点
+    direct_turn = None
 
-    def __init__(self, index_df, factor_macd_range=None):
+    def __init__(self, index_df, factor_macd_range, direct_turn=False):
         self.index_df = index_df
+        self.direct_turn = direct_turn
         if factor_macd_range is not None:
             self.factor_macd_range = factor_macd_range
         else:
@@ -123,21 +126,33 @@ class Action(object):
         # 出现转折
         elif self.compare_border(TREND_TURN, value):
             pre_value = pre_row[INDEX_VALUE]
+            # 对于第一个趋势的bar，如果无法追溯最初的则标记
             if len(self.df) > pre_row[INDEX_TREND_COUNT]:
                 start_row = self.df.iloc[-1 - pre_row[INDEX_TREND_COUNT]]
+                real_start = True
             else:
                 start_row = self.df.iloc[-pre_row[INDEX_TREND_COUNT] + 1]
-            macd_range = abs(pre_value - start_row[INDEX_VALUE])
-            if pre_row[INDEX_DIRECTION] == DIRECTION_UP:
-                self.set_border(pre_value - self.factor_macd_range * macd_range, pre_value)
+                real_start = False
+            macd_range = abs((pre_value - start_row[INDEX_VALUE]) * self.factor_macd_range)
+
+            if self.direct_turn is True and abs(pre_value - value) > macd_range and real_start is True and pre_row[INDEX_TREND_COUNT] > 4:
+                one[INDEX_ACTION] = TREND_STILL
+                one[INDEX_TREND_COUNT] = 1
+                one[INDEX_TURN_COUNT] = 0
+                one[INDEX_DIRECTION] = self.get_op_d(pre_row[INDEX_DIRECTION])
+                one[INDEX_STATUS] = self.get_d_s(one[INDEX_DIRECTION])
+                one[INDEX_PHASE_STATUS] = one[INDEX_STATUS]
             else:
-                self.set_border(pre_value + self.factor_macd_range * macd_range, pre_value)
-            one[INDEX_ACTION] = TREND_TURN
-            one[INDEX_TREND_COUNT] = 1
-            one[INDEX_TURN_COUNT] = 1
-            one[INDEX_STATUS] = STATUS_SHAKE
-            one[INDEX_PHASE_STATUS] = one[INDEX_STATUS]
-            one[INDEX_DIRECTION] = self.get_op_d(pre_row[INDEX_DIRECTION])
+                if pre_row[INDEX_DIRECTION] == DIRECTION_UP:
+                    self.set_border(pre_value - macd_range, pre_value)
+                else:
+                    self.set_border(pre_value + macd_range, pre_value)
+                one[INDEX_ACTION] = TREND_TURN
+                one[INDEX_TREND_COUNT] = 1
+                one[INDEX_TURN_COUNT] = 1
+                one[INDEX_STATUS] = STATUS_SHAKE
+                one[INDEX_PHASE_STATUS] = one[INDEX_STATUS]
+                one[INDEX_DIRECTION] = self.get_op_d(pre_row[INDEX_DIRECTION])
         return one
 
     def turn(self, value, date):
@@ -164,7 +179,7 @@ class Action(object):
             pre_turn_count = pre_row[INDEX_TURN_COUNT]
             # 如果只转折一次
             if pre_turn_count == 1:
-                if one[INDEX_TREND_COUNT] >= TURN_MIN_NUM:
+                if one[INDEX_TREND_COUNT] >= TURN_MIN_NUM or self.direct_turn is True:
                     self.df.loc[len(self.df) - pre_row[INDEX_TREND_COUNT]:len(self.df), INDEX_PHASE_STATUS] = self.get_d_s(one[INDEX_DIRECTION])
                     self.reset_border()
                 else:
