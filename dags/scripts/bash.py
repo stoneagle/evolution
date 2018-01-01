@@ -126,6 +126,6 @@ def start():
     get_share(omit_list)
     arrange_all(classify_list, omit_list, start_date)
     index_exec(classify_list, omit_list, start_date)
-    code_list = screen_share(omit_list)
-    wrap_exec(classify_list, code_list, start_date)
+    # code_list = screen_share(omit_list)
+    # wrap_exec(classify_list, code_list, start_date)
     # grafana_push(classify_list, code_list)

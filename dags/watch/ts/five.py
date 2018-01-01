@@ -12,11 +12,11 @@ def exec(code_list, backtest, rewrite):
     # TODO 获取个股股东人数、解禁、股东出货等情况
     for code in code_list:
         obj = fmwr.strategy(code, fmwr.STYPE_TUSHARE, backtest, rewrite, factor_macd_range)
-        strategy_dict[code] = obj
         # 初始化数据
         obj.prepare()
         # 初始检查
         obj.check_all()
+        strategy_dict[code] = obj
     monitor()
     # bot = weixin.WXBot()
     # bot.sendHelper("lalala")
@@ -28,7 +28,7 @@ def monitor():
     global strategy_dict
     for code in strategy_dict:
         obj = strategy_dict[code]
-        ret = obj.check()
+        ret = obj.check_new()
         if ret is True:
             obj.save_trade()
             obj.output()

@@ -84,7 +84,7 @@ def test():
     return
 
 
-def exec():
+def monitor():
     code_list = ["000725"]
     # watch
     watch.tushare(code_list)
