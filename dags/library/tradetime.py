@@ -182,10 +182,38 @@ def get_date_by_barnum(barnum, ktype, local=False):
         "60": 60,
         "30": 30,
         "5": 5,
+        "1": 1,
     }
     diff = barnum * switcher.get(ktype, 'error')
     diff_datetime = datetime(d.year, d.month, d.day, d.hour, d.minute, d.second) - timedelta(minutes=diff)
     return diff_datetime.strftime("%Y-%m-%d %H:%M:%S")
+
+
+def get_barnum_by_date(date_str, ktype, local=False):
+    """
+    根据barnum的数量，获取对应时间点
+    """
+    ntime = datetime.now()
+    dtime = datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
+
+    if local is True:
+        ntime = ntime.replace(tzinfo=conf.TZ)
+        dtime = dtime.replace(tzinfo=conf.TZ)
+    else:
+        ntime = ntime.replace(tzinfo=conf.TZ_UTC)
+        dtime = dtime.replace(tzinfo=conf.TZ_UTC)
+
+    switcher = {
+        conf.BINSIZE_ONE_DAY: 60 * 24,
+        conf.BINSIZE_FOUR_HOUR: 60 * 4,
+        conf.BINSIZE_ONE_HOUR: 60,
+        conf.BINSIZE_THIRTY_MINUTE: 30,
+        conf.BINSIZE_FIVE_MINUTE: 5,
+        conf.BINSIZE_ONE_MINUTE: 1,
+    }
+    diff_seconds = (ntime - dtime).total_seconds()
+    barnum = round(diff_seconds / 60 / switcher.get(ktype, 'error'), 0) + 1
+    return barnum
 
 
 def fix_merge_barnum(bin_size, date_str=None, local=False):
@@ -238,6 +266,12 @@ def check_pull_time(date_str, ktype, local=True):
         conf.KTYPE_DAY: "%Y-%m-%d",
         conf.KTYPE_THIRTY: "%Y-%m-%d %H:%M:%S",
         conf.KTYPE_FIVE: "%Y-%m-%d %H:%M:%S",
+        conf.BINSIZE_ONE_MINUTE: "%Y-%m-%d %H:%M:%S",
+        conf.BINSIZE_FIVE_MINUTE: "%Y-%m-%d %H:%M:%S",
+        conf.BINSIZE_THIRTY_MINUTE: "%Y-%m-%d %H:%M:%S",
+        conf.BINSIZE_ONE_HOUR: "%Y-%m-%d %H:%M:%S",
+        conf.BINSIZE_FOUR_HOUR: "%Y-%m-%d %H:%M:%S",
+        conf.BINSIZE_ONE_DAY: "%Y-%m-%d %H:%M:%S",
     }
     ntime = datetime.now()
     dtime = datetime.strptime(date_str, time_switcher.get(ktype, 'error'))
@@ -269,6 +303,16 @@ def check_pull_time(date_str, ktype, local=True):
     else:
         ret = False
     return ret
+
+
+def move_delta(date_str, mtype, num):
+    dtime = datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
+    move_switcher = {
+        "D": dtime + timedelta(days=num),
+        "M": dtime + timedelta(minutes=num),
+        "S": dtime + timedelta(seconds=num),
+    }
+    return date.strftime(move_switcher.get(mtype, 'error'), "%Y-%m-%d %H:%M:%S")
 
 
 LAST_MONTH_LAST_DAY = get_last_day_of_last_month()
