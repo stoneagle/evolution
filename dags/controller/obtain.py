@@ -3,7 +3,6 @@ from source.ts import classify, share, basic, fundamental
 from source.bitmex import future
 from library import conf, count, error, console, tool
 from controller import arrange
-from quota import macd
 
 
 def classify_detail(classify_list):
@@ -325,10 +324,11 @@ def bitmex(symbol, bin_size, count):
         df = future.history_merge(symbol, bin_size, count)
 
     if df is not None and df.empty is not True:
-        df = df.set_index(conf.HDF5_SHARE_DATE_INDEX)
-        index_df = macd.value(df)
-        df = df.merge(index_df, left_index=True, right_index=True, how='left')
-        df = df.dropna().reset_index()
+        # 存储数据暂时不包括macd的内容
+        # df = df.set_index(conf.HDF5_SHARE_DATE_INDEX)
+        # index_df = macd.value(df)
+        # df = df.merge(index_df, left_index=True, right_index=True, how='left')
+        # df = df.dropna().reset_index()
         tool.merge_df_dataset(f[conf.HDF5_RESOURCE_BITMEX][symbol], bin_size, df)
 
     f.close()

@@ -1,16 +1,16 @@
-from controller import obtain
+from controller import watch, obtain
 from library import conf
-from source.bitmex import future
+# from source.bitmex import future
 
 
 def test():
     # obtain
-    # symbol_list = [conf.BITMEX_XBTUSD, conf.BITMEX_BXBT]
-    # for symbol in symbol_list:
-    #     obtain.bitmex(symbol, conf.BINSIZE_ONE_DAY, 300)
-    #     obtain.bitmex(symbol, conf.BINSIZE_FIVE_MINUTE, 300)
-    #     obtain.bitmex(symbol, conf.BINSIZE_FOUR_HOUR, 300)
-    #     obtain.bitmex(symbol, conf.BINSIZE_THIRTY_MINUTE, 300)
+    symbol_list = [conf.BITMEX_XBTUSD, conf.BITMEX_BXBT]
+    for symbol in symbol_list:
+        obtain.bitmex(symbol, conf.BINSIZE_FIVE_MINUTE, 300)
+        obtain.bitmex(symbol, conf.BINSIZE_THIRTY_MINUTE, 300)
+        obtain.bitmex(symbol, conf.BINSIZE_FOUR_HOUR, 300)
+        obtain.bitmex(symbol, conf.BINSIZE_ONE_DAY, 300)
 
     # future
     # result = future.history(conf.BITMEX_BXBT, conf.BINSIZE_THIRTY_MINUTE, 3)
@@ -31,4 +31,11 @@ def test():
     # account.wallet_history(100, 0)
     # result = account.wallet()
     # print(result)
+    return
+
+
+def monitor():
+    code_list = [conf.BITMEX_XBTUSD]
+    # watch
+    watch.bitmex(code_list)
     return

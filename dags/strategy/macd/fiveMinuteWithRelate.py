@@ -430,6 +430,13 @@ class strategy(object):
             f.close
         elif self.stype == STYPE_BITMEX:
             f = h5py.File(conf.HDF5_FILE_FUTURE, 'a')
+            path = '/' + conf.HDF5_RESOURCE_BITMEX + '/' + code
+            if f.get(path) is not None:
+                df = tool.df_from_dataset(f[path], ktype, None)
+                df[conf.HDF5_SHARE_DATE_INDEX] = df[conf.HDF5_SHARE_DATE_INDEX].str.decode("utf-8")
+                df = df.tail(DF_FILE_NUM)
+            else:
+                raise Exception(code + "的" + ktype + "文件数据不存在")
         else:
             raise Exception("数据源不存在或未配置")
         return macd.value_and_trend(df, self.factor_macd_range)
