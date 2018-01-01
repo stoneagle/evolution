@@ -7,8 +7,9 @@ def test():
     # obtain
     symbol_list = [conf.BITMEX_XBTUSD, conf.BITMEX_BXBT]
     for symbol in symbol_list:
-        obtain.bitmex(symbol, conf.BINSIZE_FIVE_MINUTE, 300)
-        obtain.bitmex(symbol, conf.BINSIZE_THIRTY_MINUTE, 300)
+        obtain.bitmex(symbol, conf.BINSIZE_ONE_MINUTE, 7200)
+        obtain.bitmex(symbol, conf.BINSIZE_FIVE_MINUTE, 1440)
+        obtain.bitmex(symbol, conf.BINSIZE_THIRTY_MINUTE, 240)
         obtain.bitmex(symbol, conf.BINSIZE_FOUR_HOUR, 300)
         obtain.bitmex(symbol, conf.BINSIZE_ONE_DAY, 300)
 

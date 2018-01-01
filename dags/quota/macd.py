@@ -17,7 +17,7 @@ def value(detail_df):
     return index_df
 
 
-def trend(index_df, factor_macd_range):
+def trend(index_df, factor_macd_range, direct_turn=False):
     """
     获取macd的趋势状况
     """
@@ -26,7 +26,7 @@ def trend(index_df, factor_macd_range):
     # 如果数据集过少则直接返回
     if len(index_df) <= 3:
         return None
-    trend_df = action.Action(index_df.reset_index(), factor_macd_range).all(date_column=conf.HDF5_SHARE_DATE_INDEX, value_column="macd")
+    trend_df = action.Action(index_df.reset_index(), factor_macd_range, direct_turn).all(date_column=conf.HDF5_SHARE_DATE_INDEX, value_column="macd")
     trend_df = trend_df.drop(action.INDEX_VALUE, axis=1)
     index_df = index_df.reset_index()
     trend_df = trend_df.merge(index_df, left_on=conf.HDF5_SHARE_DATE_INDEX, right_on=conf.HDF5_SHARE_DATE_INDEX, how='left')
@@ -57,13 +57,13 @@ def trend(index_df, factor_macd_range):
     return trend_df
 
 
-def value_and_trend(df, factor_macd_range):
+def value_and_trend(df, factor_macd_range, direct_turn=False):
     df = df.sort_values(by=[conf.HDF5_SHARE_DATE_INDEX])
     df = df.set_index(conf.HDF5_SHARE_DATE_INDEX)
     index_df = value(df)
     df = df.merge(index_df, left_index=True, right_index=True, how='left')
     df = df.dropna()
-    trend_df = trend(df.reset_index(), factor_macd_range)
+    trend_df = trend(df.reset_index(), factor_macd_range, direct_turn)
     return trend_df
 
 

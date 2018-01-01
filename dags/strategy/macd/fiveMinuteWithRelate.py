@@ -1,10 +1,6 @@
 from quota.util import action
-from quota import macd
+from strategy.common import trend, phase
 from library import tool, conf, console, tradetime
-from source.ts import share as tss
-import tushare as ts
-import h5py
-import time
 DF_ONE = "one"
 DF_FIVE = "five"
 DF_THIRTY = "thirty"
@@ -16,11 +12,6 @@ TRADE_STATUS = "_status"
 TRADE_MACD_PHASE = "_macd_phase"
 TRADE_MACD_DIFF = "_macd_diff"
 TRADE_TREND_COUNT = "_trend_count"
-STYPE_TUSHARE = "tushare"
-STYPE_BITMEX = "bitmex"
-DF_MACD_MIN_NUM = 34
-DF_FILE_NUM = 48 + DF_MACD_MIN_NUM
-DF_START_NUM = 26
 
 
 class strategy(object):
@@ -74,7 +65,7 @@ class strategy(object):
         """
         初始化数据
         """
-        if self.stype == STYPE_TUSHARE:
+        if self.stype == conf.STYPE_ASHARE:
             ktype_dict = {
                 DF_FIVE: conf.KTYPE_FIVE,
                 DF_THIRTY: conf.KTYPE_THIRTY,
@@ -86,7 +77,7 @@ class strategy(object):
                 index = "sz"
             elif code_prefix == "6":
                 index = "sh"
-        elif self.stype == STYPE_BITMEX:
+        elif self.stype == conf.STYPE_BITMEX:
             ktype_dict = {
                 DF_FIVE: conf.BINSIZE_FIVE_MINUTE,
                 DF_THIRTY: conf.BINSIZE_THIRTY_MINUTE,
@@ -100,15 +91,15 @@ class strategy(object):
         for key in ktype_dict:
             ktype = ktype_dict[key]
             if key == DF_INDEX:
-                setattr(self, key, self.get_trend_from_file(ktype, index))
+                setattr(self, key, trend.get_from_file(ktype, self.stype, index, self.factor_macd_range))
             else:
-                setattr(self, key, self.get_trend_from_file(ktype))
+                setattr(self, key, trend.get_from_file(ktype, self.stype, self.code, self.factor_macd_range))
         if self.backtest is False:
             self.update()
         return
 
     def update(self):
-        if self.stype == STYPE_TUSHARE:
+        if self.stype == conf.STYPE_ASHARE:
             ktype_dict = {
                 DF_FIVE: conf.KTYPE_FIVE,
                 DF_THIRTY: conf.KTYPE_THIRTY,
@@ -120,7 +111,7 @@ class strategy(object):
                 index = "sz"
             elif code_prefix == "6":
                 index = "sh"
-        elif self.stype == STYPE_BITMEX:
+        elif self.stype == conf.STYPE_BITMEX:
             ktype_dict = {
                 DF_FIVE: conf.BINSIZE_FIVE_MINUTE,
                 DF_THIRTY: conf.BINSIZE_THIRTY_MINUTE,
@@ -141,20 +132,15 @@ class strategy(object):
                 continue
 
             if key == DF_INDEX:
-                new_df = self.get_trend_from_remote(ktype, last_date, index)
+                new_df = trend.get_from_remote(ktype, self.stype, last_date, index, self.rewrite)
             else:
-                new_df = self.get_trend_from_remote(ktype, last_date)
+                new_df = trend.get_from_remote(ktype, self.stype, last_date, self.code, self.rewrite)
 
             # 定期更新trend_df
             if ktype != conf.KTYPE_DAY:
                 new_df[conf.HDF5_SHARE_DATE_INDEX] = new_df[conf.HDF5_SHARE_DATE_INDEX].apply(lambda x: tradetime.transfer_date(x, ktype, "S"))
-            new_df = new_df[new_df[conf.HDF5_SHARE_DATE_INDEX] > last_date][["date", "close"]]
             trend_df = getattr(self, key)
-            share_df = trend_df[["date", "close"]]
-            share_df = share_df.append(new_df).drop_duplicates(conf.HDF5_SHARE_DATE_INDEX)
-            new_trend_df = macd.value_and_trend(share_df, self.factor_macd_range).tail(len(new_df) + DF_MACD_MIN_NUM)
-
-            trend_df = trend_df.append(new_trend_df).drop_duplicates(conf.HDF5_SHARE_DATE_INDEX).tail(DF_FILE_NUM)
+            trend_df.append_and_macd(trend_df, new_df, last_date, self.factor_macd_range)
             setattr(self, key, trend_df.reset_index(drop=True))
         return
 
@@ -179,7 +165,7 @@ class strategy(object):
         """
         if self.backtest is False:
             self.update()
-        start, shake_before, pre, now = self._get_phase_row()
+        start, shake_before, pre, now = phase.now_and_shake_before(self.five)
         if start is None:
             return False
 
@@ -229,11 +215,11 @@ class strategy(object):
 
     def save_trade(self):
         """
-        存储买卖点，并输出结果
+        存储买卖点
         """
         # 获取当前5min非shake的状态
         trade_dict = dict()
-        start, shake_before, pre, now = self._get_phase_row()
+        start, shake_before, pre, now = phase.now_and_shake_before(self.five)
         phase_range = abs(shake_before["macd"] - start["macd"])
 
         if pre[action.INDEX_STATUS] == action.STATUS_SHAKE:
@@ -310,7 +296,7 @@ class strategy(object):
         trend_count = now[DF_FIVE + TRADE_TREND_COUNT]
         upper_estimate = (trend_count + 1) * 5
         lower_estimate = (trend_count - 1) * 5
-        if self.stype == STYPE_TUSHARE:
+        if self.stype == conf.STYPE_ASHARE:
             remain_seconds = tradetime.get_ashare_remain_second(now[conf.HDF5_SHARE_DATE_INDEX])
             remain_minutes = round(remain_seconds / 60, 0)
             msg = "剩余时间%d分钟，下个交易点预估需要%d-%d分钟，模式%s"
@@ -319,7 +305,7 @@ class strategy(object):
             else:
                 trade_opportunity = "T+1"
             console.write_msg(msg % (remain_minutes, lower_estimate, upper_estimate, trade_opportunity))
-        elif self.stype == STYPE_BITMEX:
+        elif self.stype == conf.STYPE_BITMEX:
             msg = "下个交易点预估需要%d-%d分钟"
             console.write_msg(msg % (lower_estimate, upper_estimate))
 
@@ -359,7 +345,7 @@ class strategy(object):
             trend_df = self.index
         trend_df = trend_df[trend_df[conf.HDF5_SHARE_DATE_INDEX] <= now_date]
 
-        start, shake_before, pre, now = self._get_phase_row(trend_df)
+        start, shake_before, pre, now = phase.now_and_shake_before(trend_df)
         # 如果最新状态是震荡，则追溯至非震荡状态的时间点，非震荡则直接获取状态
         if now[action.INDEX_STATUS] == action.STATUS_SHAKE:
             status = shake_before[action.INDEX_STATUS] + "-" + now[action.INDEX_STATUS]
@@ -372,105 +358,3 @@ class strategy(object):
             status = now[action.INDEX_STATUS]
             trend_count = now[action.INDEX_TREND_COUNT]
         return status, trend_count, macd_diff, phase_range
-
-    def get_trend_from_remote(self, ktype, start_date, code=None):
-        """
-        从远端获取最新数据
-        """
-        if code is None:
-            code = self.code
-
-        # TODO (重要)，支持ip池并发获取，要不然多code的高频获取过于缓慢
-        if self.stype == STYPE_TUSHARE:
-            if self.rewrite:
-                # backtest时，将读取的hist数据写回文件
-                df = ts.get_hist_data(code, ktype=ktype, pause=conf.REQUEST_BLANK, start=start_date)
-                if code.isdigit():
-                    f = h5py.File(conf.HDF5_FILE_SHARE, 'a')
-                    code_prefix = code[0:3]
-                    path = '/' + code_prefix + '/' + code
-                    df = df[tss.SHARE_COLS]
-                else:
-                    f = h5py.File(conf.HDF5_FILE_INDEX, 'a')
-                    path = '/' + code
-                    df = df[tss.INDEX_COLS]
-                df = df.reset_index().sort_values(by=[conf.HDF5_SHARE_DATE_INDEX])
-                tool.merge_df_dataset(f[path], ktype, df)
-                f.close
-            else:
-                # get_k_data无法获取换手率，但是在线监听时，get_k_data存在时间延迟
-                df = ts.get_k_data(code, ktype=ktype, pause=conf.REQUEST_BLANK, start=start_date)
-            time.sleep(conf.REQUEST_BLANK)
-        if df is None and df.empty is True:
-            raise Exception("无法获取" + code + "-" + ktype + ":" + start_date + "以后的数据，休息30秒重新获取")
-        return df
-
-    def get_trend_from_file(self, ktype, code=None):
-        """
-        从文件获取历史数据，并计算趋势
-        """
-        if code is None:
-            code = self.code
-        df = None
-        if self.stype == STYPE_TUSHARE:
-            if code.isdigit():
-                f = h5py.File(conf.HDF5_FILE_SHARE, 'a')
-                code_prefix = code[0:3]
-                path = '/' + code_prefix + '/' + code
-            else:
-                f = h5py.File(conf.HDF5_FILE_INDEX, 'a')
-                path = '/' + code
-
-            if f.get(path) is not None:
-                df = tool.df_from_dataset(f[path], ktype, None)
-                df[conf.HDF5_SHARE_DATE_INDEX] = df[conf.HDF5_SHARE_DATE_INDEX].str.decode("utf-8")
-                df = df.tail(DF_FILE_NUM)
-            else:
-                raise Exception(code + "的" + ktype + "文件数据不存在")
-            f.close
-        elif self.stype == STYPE_BITMEX:
-            f = h5py.File(conf.HDF5_FILE_FUTURE, 'a')
-            path = '/' + conf.HDF5_RESOURCE_BITMEX + '/' + code
-            if f.get(path) is not None:
-                df = tool.df_from_dataset(f[path], ktype, None)
-                df[conf.HDF5_SHARE_DATE_INDEX] = df[conf.HDF5_SHARE_DATE_INDEX].str.decode("utf-8")
-                df = df.tail(DF_FILE_NUM)
-            else:
-                raise Exception(code + "的" + ktype + "文件数据不存在")
-        else:
-            raise Exception("数据源不存在或未配置")
-        return macd.value_and_trend(df, self.factor_macd_range)
-
-    def _get_phase_row(self, trend_df=None):
-        """
-        获取5min的不同时机的row
-        """
-        if trend_df is None:
-            trend_df = self.five
-        # 最新bar
-        now = trend_df.iloc[-1]
-        # 次新bar
-        pre = trend_df.iloc[-2]
-        # 当前macd趋势开始震荡前的bar
-        if now[action.INDEX_STATUS] != action.STATUS_SHAKE and pre[action.INDEX_STATUS] == action.STATUS_SHAKE:
-            trend_df = trend_df.head(len(trend_df) - 1)
-        trend_no_shake_df = trend_df[trend_df[action.INDEX_STATUS] != action.STATUS_SHAKE]
-        shake_before = trend_no_shake_df.iloc[-1]
-
-        # 当前macd趋势的开始bar的数据
-        if shake_before.name - shake_before[action.INDEX_TREND_COUNT] > 0:
-            start = trend_df.loc[shake_before.name - shake_before[action.INDEX_TREND_COUNT]]
-        else:
-            start = None
-        return start, shake_before, pre, now
-
-    def _valid_exist(self):
-        if self.five is None:
-            raise Exception("5min的数据不存在")
-        if self.thirty is None:
-            raise Exception("30min的数据不存在")
-        if self.big is None:
-            raise Exception("big的数据不存在")
-        if self.index is None:
-            raise Exception("index的数据不存在")
-        return
