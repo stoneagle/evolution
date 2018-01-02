@@ -1,5 +1,5 @@
 from strategy.macd import fiveMinuteWithRelate as fmwr
-from library import tradetime
+from library import tradetime, conf
 import threading
 timer = None
 strategy_dict = dict()
@@ -11,13 +11,14 @@ def exec(code_list, backtest, rewrite):
 
     # TODO 获取个股股东人数、解禁、股东出货等情况
     for code in code_list:
-        obj = fmwr.strategy(code, fmwr.STYPE_TUSHARE, backtest, rewrite, factor_macd_range)
+        obj = fmwr.strategy(code, conf.STYPE_ASHARE, backtest, rewrite, factor_macd_range)
         # 初始化数据
         obj.prepare()
         # 初始检查
         obj.check_all()
         strategy_dict[code] = obj
-    monitor()
+    if backtest is False:
+        monitor()
     # bot = weixin.WXBot()
     # bot.sendHelper("lalala")
     return
@@ -28,11 +29,15 @@ def monitor():
     global strategy_dict
     for code in strategy_dict:
         obj = strategy_dict[code]
+        # 更新数据
+        if obj.backtest is False:
+            obj.update()
+
+        # 检查最新数据
         ret = obj.check_new()
         if ret is True:
             obj.save_trade()
             obj.output()
-
     remain_second = tradetime.get_remain_second("5")
     timer = threading.Timer(remain_second + 15, monitor)
     timer.start()

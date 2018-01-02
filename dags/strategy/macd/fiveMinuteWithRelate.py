@@ -137,10 +137,10 @@ class strategy(object):
                 new_df = trend.get_from_remote(ktype, self.stype, last_date, self.code, self.rewrite)
 
             # 定期更新trend_df
-            if ktype != conf.KTYPE_DAY:
+            if ktype != conf.KTYPE_DAY and self.rewrite is False:
                 new_df[conf.HDF5_SHARE_DATE_INDEX] = new_df[conf.HDF5_SHARE_DATE_INDEX].apply(lambda x: tradetime.transfer_date(x, ktype, "S"))
             trend_df = getattr(self, key)
-            trend_df.append_and_macd(trend_df, new_df, last_date, self.factor_macd_range)
+            trend_df = trend.append_and_macd(trend_df, new_df, last_date, self.factor_macd_range)
             setattr(self, key, trend_df.reset_index(drop=True))
         return
 
@@ -163,30 +163,31 @@ class strategy(object):
         """
         检查5min-macd最新趋势，是否存在买卖信号
         """
-        if self.backtest is False:
-            self.update()
-        start, shake_before, pre, now = phase.now_and_shake_before(self.five)
-        if start is None:
+        phase_start, phase_end, pre, now = phase.now_and_shake_before(self.five)
+        if phase_start is None:
             return False
 
         # 当前macd趋势的macd波动幅度
-        phase_range = shake_before["macd"] - start["macd"]
+        phase_range = phase_end["macd"] - phase_start["macd"]
         # 当前macd趋势的price波动幅度
-        price_range = shake_before["close"] - start["close"]
+        price_range = phase_end["close"] - phase_start["close"]
 
         # 背离分析，如果macd是下降趋势，但是价格上涨，则属于背离；反之同理
         self.five_trend_reverse = False
         if (phase_range > 0 and price_range < 0) or (phase_range < 0 and price_range > 0):
             self.five_trend_reverse = True
 
+        # check检查的波动，在计算基础上扩张一部分
+        macd_range = self.factor_macd_range * abs(phase_range) * 1
+
         ret = False
         if self.five_shake is False:
             # 判断第一次出现的波动，如果该段趋势太小则没有做T必要
             # TODO phase_range的大小判断，避免判断太小的range趋势(目前用的是旧方案，trend数量)
-            if shake_before[action.INDEX_TREND_COUNT] >= 6 and now[action.INDEX_STATUS] == action.STATUS_SHAKE and pre[action.INDEX_STATUS] != action.STATUS_SHAKE:
+            if phase_end[action.INDEX_TREND_COUNT] >= 5 and now[action.INDEX_STATUS] == action.STATUS_SHAKE and pre[action.INDEX_STATUS] != action.STATUS_SHAKE:
                 # 检查macd波动幅度
                 macd_diff = abs(now["macd"] - pre["macd"])
-                if macd_diff > self.factor_macd_range * abs(phase_range):
+                if macd_diff > macd_range:
                     # 如果macd波动值超出范围，视为转折
                     ret = True
                 else:
@@ -197,12 +198,12 @@ class strategy(object):
             if now["status"] != action.STATUS_SHAKE:
                 # 波动结束趋势逆转
                 self.five_shake = False
-                if now["status"] != shake_before[action.INDEX_STATUS]:
+                if now["status"] != phase_end[action.INDEX_STATUS]:
                     ret = True
             else:
-                macd_diff = abs(now["macd"] - shake_before["macd"])
+                macd_diff = abs(now["macd"] - phase_end["macd"])
                 # 波动超出边界，震荡结束
-                if macd_diff > self.factor_macd_range * abs(phase_range):
+                if macd_diff > macd_range:
                     self.five_shake = False
                     ret = True
         return ret
@@ -219,18 +220,13 @@ class strategy(object):
         """
         # 获取当前5min非shake的状态
         trade_dict = dict()
-        start, shake_before, pre, now = phase.now_and_shake_before(self.five)
-        phase_range = abs(shake_before["macd"] - start["macd"])
-
-        if pre[action.INDEX_STATUS] == action.STATUS_SHAKE:
-            shake_pre_status = shake_before[action.INDEX_STATUS]
-            macd_diff = abs(now["macd"] - shake_before["macd"])
-        else:
-            shake_pre_status = pre[action.INDEX_STATUS]
-            macd_diff = abs(now["macd"] - pre["macd"])
+        phase_start, phase_end, pre, now = phase.now_and_shake_before(self.five)
+        phase_range = abs(phase_end["macd"] - phase_start["macd"])
+        phase_end_status = phase_end[action.INDEX_STATUS]
+        macd_diff = abs(now["macd"] - phase_end["macd"])
 
         # 判断交易点性质
-        if shake_pre_status == action.STATUS_UP:
+        if phase_end_status == action.STATUS_UP:
             if self.five_trend_reverse is True:
                 trade_type = "背离买点"
             else:
@@ -243,10 +239,10 @@ class strategy(object):
         trade_dict = dict()
         trade_dict[conf.HDF5_SHARE_DATE_INDEX] = now[conf.HDF5_SHARE_DATE_INDEX]
         trade_dict[TRADE_TYPE] = trade_type
-        trade_dict[DF_FIVE + TRADE_STATUS] = shake_pre_status
+        trade_dict[DF_FIVE + TRADE_STATUS] = phase_end_status
         trade_dict[DF_FIVE + TRADE_MACD_PHASE] = phase_range
         trade_dict[DF_FIVE + TRADE_MACD_DIFF] = round(macd_diff * 100 / phase_range, 0)
-        trade_dict[DF_FIVE + TRADE_TREND_COUNT] = shake_before[action.INDEX_TREND_COUNT]
+        trade_dict[DF_FIVE + TRADE_TREND_COUNT] = phase_end[action.INDEX_TREND_COUNT]
 
         # 获取仓位与状态
         positions = 0
@@ -257,7 +253,7 @@ class strategy(object):
         }
         for dtype in dtype_dict:
             status, trend_count, macd_diff, phase_range = self.get_relate_status(dtype)
-            positions = self.count_positions(shake_pre_status, status, positions)
+            positions = self.count_positions(phase_end_status, status, positions)
             trade_dict[dtype + TRADE_STATUS] = status
             trade_dict[dtype + TRADE_MACD_PHASE] = phase_range
             trade_dict[dtype + TRADE_MACD_DIFF] = round(macd_diff * 100 / phase_range, 0)
@@ -279,8 +275,8 @@ class strategy(object):
         ))
         dtype_dict = {
             DF_THIRTY: "个股30min",
-            DF_INDEX: "指数30min",
             DF_BIG: "个股大趋势",
+            DF_INDEX: "指数30min",
         }
         for dtype in dtype_dict:
             msg = "%s，趋势%s，连续%d次，macd趋势%f, macd差值%d%%"
@@ -318,18 +314,25 @@ class strategy(object):
         仓位估算
         考虑相关趋势的影响，相反方向会产生压制，例如relate上升对5min卖点，relate下降对5min买点
         """
-        # TODO 将shake的细节考虑进去
         # 检查big 30min index的趋势,计算仓位
         if pre_status == action.STATUS_UP:
             if status == action.STATUS_UP:
                 positions += 0
-            else:
+            elif status == action.STATUS_DOWN:
                 positions += 1
+            else:
+                status_arr = status.split("-")
+                if status_arr[0] == action.STATUS_UP:
+                    positions += 1
         else:
             if status == action.STATUS_DOWN:
                 positions += 0
-            else:
+            elif status == action.STATUS_UP:
                 positions += 1
+            else:
+                status_arr = status.split("-")
+                if status_arr[0] == action.STATUS_DOWN:
+                    positions += 1
         return positions
 
     def get_relate_status(self, dtype):

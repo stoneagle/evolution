@@ -102,16 +102,16 @@ def get_from_remote(ktype, stype, start_date, code, rewrite):
     return df
 
 
-def append_and_macd(old_df, new_df, last_date, factor_macd_range, direct_turn=False):
+def append_and_macd(old_trend_df, new_df, last_date, factor_macd_range, direct_turn=False):
     """
     拼接原始与已计算macd的数据
     """
     new_df = new_df[new_df[conf.HDF5_SHARE_DATE_INDEX] > last_date][["date", "close"]]
-    old_df = old_df[["date", "close"]]
+    old_df = old_trend_df[["date", "close"]]
     old_df = old_df.append(new_df).drop_duplicates(conf.HDF5_SHARE_DATE_INDEX)
     new_trend_df = macd.value_and_trend(old_df, factor_macd_range, direct_turn).tail(len(new_df) + DF_MACD_MIN_NUM)
-    old_df = old_df.append(new_trend_df).drop_duplicates(conf.HDF5_SHARE_DATE_INDEX)
-    return old_df
+    old_trend_df = old_trend_df.append(new_trend_df).drop_duplicates(conf.HDF5_SHARE_DATE_INDEX)
+    return old_trend_df
 
 
 def check_reverse(now_date, check_df):

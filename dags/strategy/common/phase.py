@@ -4,29 +4,28 @@ from library import conf
 
 def now_and_shake_before(trend_df):
     """
-    获取trend不同时机的row
+    获取now,pre以及当前phase的start与end
     """
     # 最新bar
     now = trend_df.iloc[-1]
     # 次新bar
     pre = trend_df.iloc[-2]
     # 当前macd趋势开始震荡前的bar
-    if now[action.INDEX_STATUS] != action.STATUS_SHAKE and pre[action.INDEX_STATUS] == action.STATUS_SHAKE:
-        trend_df = trend_df.head(len(trend_df) - 1)
     trend_no_shake_df = trend_df[trend_df[action.INDEX_STATUS] != action.STATUS_SHAKE]
-    shake_before = trend_no_shake_df.iloc[-1]
+    trend_no_shake_df = trend_no_shake_df.reset_index(drop=True)
+    phase_end = trend_no_shake_df.iloc[-1]
 
     # 当前macd趋势的开始bar的数据
-    if shake_before.name - shake_before[action.INDEX_TREND_COUNT] > 0:
-        start = trend_df.loc[shake_before.name - shake_before[action.INDEX_TREND_COUNT]]
+    if phase_end.name - phase_end[action.INDEX_TREND_COUNT] > 0:
+        phase_start = trend_no_shake_df.loc[phase_end.name - phase_end[action.INDEX_TREND_COUNT]]
     else:
-        start = None
-    return start, shake_before, pre, now
+        phase_start = None
+    return phase_start, phase_end, pre, now
 
 
 def now(trend_df):
     """
-    获取trend最近两个phase的起点与终点
+    获取trend最近phase的起点与终点
     """
     trend_no_shake_df = trend_df[trend_df[action.INDEX_STATUS] != action.STATUS_SHAKE]
     now = trend_no_shake_df.iloc[-1]
