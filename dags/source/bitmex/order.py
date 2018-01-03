@@ -58,15 +58,31 @@ def list(symbol, count, start, filter_dict=None):
     return df
 
 
-def create(symbol, side, simple_qty, otype=TYPE_LIMIT, price=None):
+def create_simple(symbol, side, simple_qty, otype=TYPE_LIMIT, price=None):
     """
-    创建订单
+    创建订单(基于simple)
     """
     client = bitmexClient.Client(conf.BITMEX_URL_ORDER)
     content = {
         "symbol": symbol,
         "side": side,
         "simpleOrderQty": simple_qty,
+        "ordType": otype,
+    }
+    if otype == TYPE_LIMIT or otype == TYPE_STOP_LIMIT or otype == TYPE_LIMIT_IF_TOUCH:
+        content["price"] = price
+    return client.post(content)
+
+
+def create_contract(symbol, side, qty, otype=TYPE_LIMIT, price=None):
+    """
+    创建订单(基于contract)
+    """
+    client = bitmexClient.Client(conf.BITMEX_URL_ORDER)
+    content = {
+        "symbol": symbol,
+        "side": side,
+        "orderQty": qty,
         "ordType": otype,
     }
     if otype == TYPE_LIMIT or otype == TYPE_STOP_LIMIT or otype == TYPE_LIMIT_IF_TOUCH:
@@ -96,14 +112,28 @@ def cancel_all(symbol):
     return client.delete(content)
 
 
-def amend(oid, simple_qty, price=None):
+def amend_simple(oid, simple_qty, price=None):
     """
-    修改订单
+    修改订单(基于simple)
     """
     client = bitmexClient.Client(conf.BITMEX_URL_ORDER)
     content = {
         "orderID": oid,
         "simpleOrderQty": simple_qty,
+    }
+    if price is not None:
+        content["price"] = price
+    return client.put(content)
+
+
+def amend_contract(oid, qty, price=None):
+    """
+    修改订单(基于contract)
+    """
+    client = bitmexClient.Client(conf.BITMEX_URL_ORDER)
+    content = {
+        "orderID": oid,
+        "orderQty": qty,
     }
     if price is not None:
         content["price"] = price
