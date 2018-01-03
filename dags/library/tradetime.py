@@ -125,6 +125,9 @@ def get_remain_second(ttype):
     if ttype == "5":
         remain_minute = 5 - today.minute % 5
         remain_second = remain_minute * 60 - today.second
+    elif ttype == "1":
+        remain_second = 60 - today.second
+
     return remain_second
 
 

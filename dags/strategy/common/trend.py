@@ -16,8 +16,8 @@ def get_from_file(ktype, stype, code, factor_macd_range, df_file_num=48, direct_
     df = None
     df_file_num = df_file_num + DF_MACD_MIN_NUM
     if stype == conf.STYPE_BITMEX:
-        f = h5py.File(conf.HDF5_FILE_FUTURE, 'a')
-        path = '/' + conf.HDF5_RESOURCE_BITMEX + '/' + code
+        f = h5py.File(conf.HDF5_FILE_BITMEX, 'a')
+        path = '/' + code
         if f.get(path) is not None:
             df = tool.df_from_dataset(f[path], ktype, None)
             df[conf.HDF5_SHARE_DATE_INDEX] = df[conf.HDF5_SHARE_DATE_INDEX].str.decode("utf-8")
@@ -67,8 +67,8 @@ def get_from_remote(ktype, stype, start_date, code, rewrite):
 
         if rewrite:
             # 将读取的remote数据写回文件
-            f = h5py.File(conf.HDF5_FILE_FUTURE, 'a')
-            path = '/' + conf.HDF5_RESOURCE_BITMEX + '/' + code
+            f = h5py.File(conf.HDF5_FILE_BITMEX, 'a')
+            path = '/' + code
             if f.get(path) is None:
                 f.create(path)
             tool.merge_df_dataset(f[path], ktype, df)

@@ -10,19 +10,21 @@ REQUEST_BLANK = 1
 
 RUNMODE = os.environ.get("RUNMODE")
 if RUNMODE == "dev":
-    HDF5_FILE_ROOT = '/home/wuzhongyang/database/hdf5'
+    ASHARE_FILE_ROOT = '/home/wuzhongyang/database/ashare'
+    FUTURE_FILE_ROOT = '/home/wuzhongyang/database/future'
 else:
-    HDF5_FILE_ROOT = '/tmp/hdf5'
+    ASHARE_FILE_ROOT = '/tmp/hdf5'
 
-HDF5_FILE_CLASSIFY = HDF5_FILE_ROOT + '/classify.h5'
-HDF5_FILE_SHARE = HDF5_FILE_ROOT + '/share.h5'
-HDF5_FILE_INDEX = HDF5_FILE_ROOT + '/index.h5'
-HDF5_FILE_BASIC = HDF5_FILE_ROOT + '/basic.h5'
-HDF5_FILE_ERROR = HDF5_FILE_ROOT + '/error.h5'
-HDF5_FILE_FUNDAMENTAL = HDF5_FILE_ROOT + '/fundamental.h5'
-HDF5_FILE_SCREEN = HDF5_FILE_ROOT + '/screen.h5'
-HDF5_FILE_OTHER = HDF5_FILE_ROOT + '/other.h5'
-HDF5_FILE_FUTURE = HDF5_FILE_ROOT + '/future.h5'
+HDF5_FILE_CLASSIFY = ASHARE_FILE_ROOT + '/classify.h5'
+HDF5_FILE_SHARE = ASHARE_FILE_ROOT + '/share.h5'
+HDF5_FILE_INDEX = ASHARE_FILE_ROOT + '/index.h5'
+HDF5_FILE_BASIC = ASHARE_FILE_ROOT + '/basic.h5'
+HDF5_FILE_ERROR = ASHARE_FILE_ROOT + '/error.h5'
+HDF5_FILE_FUNDAMENTAL = ASHARE_FILE_ROOT + '/fundamental.h5'
+HDF5_FILE_SCREEN = ASHARE_FILE_ROOT + '/screen.h5'
+HDF5_FILE_OTHER = ASHARE_FILE_ROOT + '/other.h5'
+
+HDF5_FILE_BITMEX = FUTURE_FILE_ROOT + '/bitmex.h5'
 
 HDF5_ERROR_SHARE_GET = 'share_get'
 HDF5_ERROR_DETAIL_GET = 'detail_get'
@@ -155,4 +157,4 @@ STYPE_ASHARE = "ashare"
 STYPE_BITMEX = "bitmex"
 
 BUY_SIDE = "buy"
-SELL_SIDE = "buy"
+SELL_SIDE = "sell"

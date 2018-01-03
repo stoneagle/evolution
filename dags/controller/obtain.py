@@ -302,11 +302,9 @@ def bitmex(symbol, bin_size, count):
         conf.HDF5_RESOURCE_BITMEX,
         symbol + '-' + bin_size
     )
-    f = h5py.File(conf.HDF5_FILE_FUTURE, 'a')
-    if f.get(conf.HDF5_RESOURCE_BITMEX) is None:
-        f.create_group(conf.HDF5_RESOURCE_BITMEX)
-    if f[conf.HDF5_RESOURCE_BITMEX].get(symbol) is None:
-        f[conf.HDF5_RESOURCE_BITMEX].create_group(symbol)
+    f = h5py.File(conf.HDF5_FILE_BITMEX, 'a')
+    if f.get(symbol) is None:
+        f.create_group(symbol)
 
     # 处理D,5,1数据
     if bin_size in [
@@ -329,7 +327,7 @@ def bitmex(symbol, bin_size, count):
         # index_df = macd.value(df)
         # df = df.merge(index_df, left_index=True, right_index=True, how='left')
         # df = df.dropna().reset_index()
-        tool.merge_df_dataset(f[conf.HDF5_RESOURCE_BITMEX][symbol], bin_size, df)
+        tool.merge_df_dataset(f[symbol], bin_size, df)
 
     f.close()
     console.write_tail()
