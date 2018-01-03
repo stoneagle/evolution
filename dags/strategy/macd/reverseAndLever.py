@@ -116,11 +116,12 @@ class strategy(object):
 
             # 更新macd趋势列表
             trend_df = getattr(self, key)
+            df_length = len(trend_df)
             direct_turn = False
             if ktype in [conf.BINSIZE_ONE_MINUTE]:
                 direct_turn = False
             trend_df = trend.append_and_macd(trend_df, new_df, last_date, self.factor_macd_range, direct_turn)
-            setattr(self, key, trend_df.reset_index(drop=True))
+            setattr(self, key, trend_df.tail(df_length).reset_index(drop=True))
         return
 
     def check_all(self):
@@ -140,7 +141,8 @@ class strategy(object):
         """
         检查最新子级别macd趋势
         """
-        self.phase = phase.latest_dict(self.small, self.phase)
+        # 更新趋势聚合
+        self.merge_phase()
 
         now = self.small.iloc[-1]
         now_date = now[conf.HDF5_SHARE_DATE_INDEX]
@@ -163,6 +165,10 @@ class strategy(object):
         if phase_date == now_date:
             ret = self._get_side(phase_status)
         return ret
+
+    def merge_phase(self):
+        self.phase = phase.latest_dict(self.small, self.phase)
+        return
 
     def output(self):
         """

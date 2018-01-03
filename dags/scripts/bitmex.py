@@ -1,6 +1,6 @@
 from controller import watch, obtain
 from library import conf
-# from source.bitmex import future
+# from source.bitmex import future, account
 
 
 def test():
@@ -22,8 +22,10 @@ def test():
     # order
     # result = order.book(conf.BITMEX_XBTUSD, 10)
     # result = order.list(conf.BITMEX_XBTUSD, 10, 0)
-    # result = order.create(conf.BITMEX_XBTUSD, order.SIDE_BUY, 0.001, order.TYPE_LIMIT, 10000.00)
-    # result = order.amend('1c1bfbe6-6c2c-3d4a-3271-5145d3171a28', 0.002, 8000.00)
+    # result = order.create_simple(conf.BITMEX_XBTUSD, order.SIDE_BUY, 0.001, order.TYPE_LIMIT, 10000.00)
+    # result = order.create_contract(conf.BITMEX_XBTUSD, order.SIDE_BUY, 10, order.TYPE_LIMIT, 10000.00)
+    # result = order.amend_simple('1c1bfbe6-6c2c-3d4a-3271-5145d3171a28', 0.002, 8000.00)
+    # result = order.amend_contract('1c1bfbe6-6c2c-3d4a-3271-5145d3171a28', 20, 8000.00)
     # result = order.cancel_all_after(10000)
     # result = order.cancel('1c1bfbe6-6c2c-3d4a-3271-5145d3171a28')
     # result = order.cancel_all(conf.BITMEX_XBTUSD)
@@ -31,6 +33,7 @@ def test():
     # account
     # account.wallet_history(100, 0)
     # result = account.wallet()
+    # result = account.position(10)
     # print(result)
     return
 
