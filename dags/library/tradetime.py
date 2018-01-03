@@ -292,8 +292,9 @@ def check_pull_time(date_str, ktype, local=True):
         conf.KTYPE_THIRTY: 30,
         conf.KTYPE_DAY: 60 * 24,
         conf.BINSIZE_ONE_MINUTE: 1,
-        conf.BINSIZE_FIVE_MINUTE: 5,
-        conf.BINSIZE_THIRTY_MINUTE: 30,
+        # 因为bitmex的时间节点是往前递推，需要增加一根bar
+        conf.BINSIZE_FIVE_MINUTE: 5 + 5,
+        conf.BINSIZE_THIRTY_MINUTE: 30 + 30,
         conf.BINSIZE_FOUR_HOUR: 60 * 4,
         conf.BINSIZE_ONE_DAY: 60 * 24,
     }

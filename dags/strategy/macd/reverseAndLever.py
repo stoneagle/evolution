@@ -95,8 +95,6 @@ class strategy(object):
                 direct_turn = False
             df = trend.get_from_file(ktype, conf.STYPE_BITMEX, self.code, self.factor_macd_range, file_num, direct_turn)
             setattr(self, key, df)
-        if self.backtest is False:
-            self.update()
         return
 
     def update(self):
