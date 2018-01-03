@@ -127,9 +127,10 @@ class strategy(object):
             last_date = getattr(self, key).iloc[-1][conf.HDF5_SHARE_DATE_INDEX]
             # 根据时间节点判断是否拉取
             ktype = ktype_dict[key]
-            pull_flag = tradetime.check_pull_time(last_date, ktype)
-            if pull_flag is False:
-                continue
+            if self.rewrite is True:
+                pull_flag = tradetime.check_pull_time(last_date, ktype)
+                if pull_flag is False:
+                    continue
 
             if key == DF_INDEX:
                 new_df = trend.get_from_remote(ktype, self.stype, last_date, index, self.rewrite)
@@ -163,7 +164,9 @@ class strategy(object):
         """
         检查5min-macd最新趋势，是否存在买卖信号
         """
-        phase_start, phase_end, pre, now = phase.now_and_shake_before(self.five)
+        now = self.five.iloc[-1]
+        pre = self.five.iloc[-2]
+        phase_start, phase_end = phase.now(self.five)
         if phase_start is None:
             return False
 
@@ -198,7 +201,14 @@ class strategy(object):
             if now["status"] != action.STATUS_SHAKE:
                 # 波动结束趋势逆转
                 self.five_shake = False
-                if now["status"] != phase_end[action.INDEX_STATUS]:
+                # 跟shake前的状态进行比较
+                for i in range(2, now[action.INDEX_TREND_COUNT] + 2):
+                    shake_before = self.five.iloc[-i]
+                    if shake_before[action.INDEX_STATUS] == action.STATUS_SHAKE:
+                        continue
+                    else:
+                        break
+                if now["status"] != shake_before[action.INDEX_STATUS]:
                     ret = True
             else:
                 macd_diff = abs(now["macd"] - phase_end["macd"])
@@ -220,13 +230,17 @@ class strategy(object):
         """
         # 获取当前5min非shake的状态
         trade_dict = dict()
-        phase_start, phase_end, pre, now = phase.now_and_shake_before(self.five)
+        now = self.five.iloc[-1]
+        phase_start, phase_end = phase.now(self.five)
         phase_range = abs(phase_end["macd"] - phase_start["macd"])
-        phase_end_status = phase_end[action.INDEX_STATUS]
+        if now[action.INDEX_STATUS] == action.STATUS_SHAKE:
+            pre_phase_status = phase_end[action.INDEX_STATUS]
+        else:
+            pre_phase_status = phase_start[action.INDEX_STATUS]
         macd_diff = abs(now["macd"] - phase_end["macd"])
 
         # 判断交易点性质
-        if phase_end_status == action.STATUS_UP:
+        if pre_phase_status == action.STATUS_UP:
             if self.five_trend_reverse is True:
                 trade_type = "背离买点"
             else:
@@ -239,7 +253,7 @@ class strategy(object):
         trade_dict = dict()
         trade_dict[conf.HDF5_SHARE_DATE_INDEX] = now[conf.HDF5_SHARE_DATE_INDEX]
         trade_dict[TRADE_TYPE] = trade_type
-        trade_dict[DF_FIVE + TRADE_STATUS] = phase_end_status
+        trade_dict[DF_FIVE + TRADE_STATUS] = pre_phase_status
         trade_dict[DF_FIVE + TRADE_MACD_PHASE] = phase_range
         trade_dict[DF_FIVE + TRADE_MACD_DIFF] = round(macd_diff * 100 / phase_range, 0)
         trade_dict[DF_FIVE + TRADE_TREND_COUNT] = phase_end[action.INDEX_TREND_COUNT]
@@ -253,7 +267,7 @@ class strategy(object):
         }
         for dtype in dtype_dict:
             status, trend_count, macd_diff, phase_range = self.get_relate_status(dtype)
-            positions = self.count_positions(phase_end_status, status, positions)
+            positions = self.count_positions(pre_phase_status, status, positions)
             trade_dict[dtype + TRADE_STATUS] = status
             trade_dict[dtype + TRADE_MACD_PHASE] = phase_range
             trade_dict[dtype + TRADE_MACD_DIFF] = round(macd_diff * 100 / phase_range, 0)
@@ -348,16 +362,18 @@ class strategy(object):
             trend_df = self.index
         trend_df = trend_df[trend_df[conf.HDF5_SHARE_DATE_INDEX] <= now_date]
 
-        start, shake_before, pre, now = phase.now_and_shake_before(trend_df)
+        now = trend_df.iloc[-1]
+        pre = trend_df.iloc[-2]
+        phase_start, phase_end = phase.now(trend_df)
         # 如果最新状态是震荡，则追溯至非震荡状态的时间点，非震荡则直接获取状态
         if now[action.INDEX_STATUS] == action.STATUS_SHAKE:
-            status = shake_before[action.INDEX_STATUS] + "-" + now[action.INDEX_STATUS]
-            macd_diff = abs(now["macd"] - shake_before["macd"])
-            phase_range = abs(shake_before["macd"] - start["macd"])
-            trend_count = shake_before[action.INDEX_TREND_COUNT]
+            status = phase_end[action.INDEX_STATUS] + "-" + now[action.INDEX_STATUS]
+            macd_diff = abs(now["macd"] - phase_end["macd"])
+            phase_range = abs(phase_end["macd"] - phase_start["macd"])
+            trend_count = phase_end[action.INDEX_TREND_COUNT]
         else:
             macd_diff = abs(now["macd"] - pre["macd"])
-            phase_range = abs(shake_before["macd"] - start["macd"])
+            phase_range = abs(phase_end["macd"] - phase_start["macd"])
             status = now[action.INDEX_STATUS]
             trend_count = now[action.INDEX_TREND_COUNT]
         return status, trend_count, macd_diff, phase_range

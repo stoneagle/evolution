@@ -16,6 +16,7 @@ def exec(code_list, backtest, rewrite):
         obj.prepare()
         # 初始检查
         obj.check_all()
+        # print(obj.five[["date", "macd", "status", "close", "trend_count"]])
         strategy_dict[code] = obj
     if backtest is False:
         monitor()
