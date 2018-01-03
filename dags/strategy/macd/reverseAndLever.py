@@ -1,10 +1,11 @@
-from library import tool, conf, tradetime
-# from quota.util import action
+from library import tool, conf, tradetime, console
+from quota.util import action
 from strategy.common import trend, phase
 DF_SMALL = "small"
 DF_MEDIUM = "medium"
 DF_BIG = "big"
 TREND_REVERSE = "trend_reverse"
+PHASE_COLUMNS = [conf.HDF5_SHARE_DATE_INDEX, phase.MACD_DIFF, phase.PRICE_START, phase.PRICE_END, phase.DIF_END, phase.COUNT, action.INDEX_PHASE_STATUS]
 BITMEX_LEVEL_DICT = {
     conf.BINSIZE_ONE_MINUTE: conf.BINSIZE_FIVE_MINUTE,
     conf.BINSIZE_FIVE_MINUTE: conf.BINSIZE_THIRTY_MINUTE,
@@ -58,9 +59,7 @@ class strategy(object):
     # 存储小级别数据
     small = None
     # 存储小级别趋势数据
-    phase = tool.init_empty_df(None)
-    # 存储处理得到的买卖点
-    trade = tool.init_empty_df(None)
+    phase = tool.init_empty_df(PHASE_COLUMNS)
 
     def __init__(self, code, stype, backtest, rewrite, small_level, factor_macd_range=0.1):
         self.code = code
@@ -93,12 +92,11 @@ class strategy(object):
             file_num = num_dict[ktype]
             direct_turn = False
             if ktype in [conf.BINSIZE_ONE_MINUTE]:
-                direct_turn = True
+                direct_turn = False
             df = trend.get_from_file(ktype, conf.STYPE_BITMEX, self.code, self.factor_macd_range, file_num, direct_turn)
             setattr(self, key, df)
         if self.backtest is False:
             self.update()
-        self.phase = phase.latest_dict(self.small, self.phase)
         return
 
     def update(self):
@@ -120,7 +118,7 @@ class strategy(object):
             trend_df = getattr(self, key)
             direct_turn = False
             if ktype in [conf.BINSIZE_ONE_MINUTE]:
-                direct_turn = True
+                direct_turn = False
             trend_df = trend.append_and_macd(trend_df, new_df, last_date, self.factor_macd_range, direct_turn)
             setattr(self, key, trend_df.reset_index(drop=True))
         return
@@ -133,8 +131,7 @@ class strategy(object):
         for i in range(3, len(trend_df) + 1):
             self.small = trend_df.head(i)
             result = self.check_new()
-            if result is True:
-                self.save_trade()
+            if result is not False:
                 self.output()
         self.small = trend_df
         return
@@ -143,9 +140,8 @@ class strategy(object):
         """
         检查最新子级别macd趋势
         """
-        if self.backtest is False:
-            self.update()
-            self.phase = phase.latest_dict(self.small, self.phase)
+        self.phase = phase.latest_dict(self.small, self.phase)
+
         now = self.small.iloc[-1]
         now_date = now[conf.HDF5_SHARE_DATE_INDEX]
 
@@ -156,22 +152,47 @@ class strategy(object):
             result = trend.check_reverse(now_date, check_df)
             setattr(self, df_name + "_" + TREND_REVERSE, result)
 
-        # 检查small的phase背离
-        # for index, row in self.phase.iterrows():
-        #     date = row[conf.HDF5_SHARE_DATE_INDEX]
-        #     move_date = tradetime.move_delta(date, "M", -5)
-        #     relate_medium_row = self.medium[self.medium[conf.HDF5_SHARE_DATE_INDEX] >= move_date].iloc[0]
-        #     print(row["close"], row[action.INDEX_STATUS], relate_medium_row[action.INDEX_STATUS])
-        return
+        # TODO 检查small的phase背离
 
-    def save_trade(self):
-        """
-        存储买卖点
-        """
-        return
+        # 获取最新的phase状态
+        phase_now = self.phase.iloc[-1]
+        phase_status = phase_now[action.INDEX_PHASE_STATUS]
+        phase_date = phase_now[conf.HDF5_SHARE_DATE_INDEX]
+
+        ret = False
+        if phase_date == now_date:
+            ret = self._get_side(phase_status)
+        return ret
 
     def output(self):
         """
         打印结果
         """
+        trend_now = self.small.iloc[-1]
+        phase_now = self.phase.iloc[-1]
+        # phase_pre = self.phase.iloc[-2]
+        side = self._get_side(phase_now[action.INDEX_PHASE_STATUS])
+        console.write_msg("【%s, %s, %s】" % (self.code, trend_now[conf.HDF5_SHARE_DATE_INDEX], side))
+        if len(self.phase) > 1:
+            phase_pre = self.phase.iloc[-2]
+            msg = "上阶段，macd差值%f，price差值%d，连续%d次，dif位置%f"
+            console.write_msg(msg % (
+                phase_pre[phase.MACD_DIFF],
+                phase_pre[phase.PRICE_END] - phase_pre[phase.PRICE_START],
+                phase_pre[phase.COUNT],
+                phase_pre[phase.DIF_END]))
+        msg = "建议价格%d - %d"
+        console.write_msg(msg % (phase_now[phase.PRICE_START], trend_now["close"]))
+        msg = "medium级别背离情况：%s"
+        console.write_msg(msg % (self.medium_trend_reverse))
+        msg = "big级别背离情况：%s"
+        console.write_msg(msg % (self.big_trend_reverse))
+        console.write_blank()
         return
+
+    def _get_side(self, phase_status):
+        if phase_status == action.STATUS_UP:
+            ret = conf.BUY_SIDE
+        else:
+            ret = conf.SELL_SIDE
+        return ret
