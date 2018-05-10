@@ -50,6 +50,8 @@ def latest_dict(trend_df, phase_df):
     for index, row in trend_no_shake_df.iterrows():
         if index < len(trend_no_shake_df) - 1:
             next_row = trend_no_shake_df.iloc[index + 1]
+        else:
+            break
 
         if len(phase_row) == 0:
             phase_row[action.INDEX_PHASE_STATUS] = row[action.INDEX_PHASE_STATUS]
@@ -60,28 +62,26 @@ def latest_dict(trend_df, phase_df):
                 phase_row[PRICE_START] = phase_df.iloc[-1][PRICE_END]
             else:
                 phase_row[PRICE_START] = int(row["close"])
-            # move_date = tradetime.move_delta(phase_row[conf.HDF5_SHARE_DATE_INDEX], "M", -5)
-            # relate_medium_row = parent_trend_df[parent_trend_df[conf.HDF5_SHARE_DATE_INDEX] >= move_date].iloc[0]
-            # phase_row["parent_status"] = relate_medium_row[action.INDEX_STATUS]
-            continue
+        else:
+            t_count += 1
+            if phase_row[action.INDEX_PHASE_STATUS] != next_row[action.INDEX_PHASE_STATUS]:
+                if update_flag is True:
+                    phase_len = len(phase_df)
+                    phase_df.loc[phase_len - 1:phase_len, MACD_DIFF] = row["macd"] - m_start
+                    phase_df.loc[phase_len - 1:phase_len, PRICE_END] = row["close"]
+                    phase_df.loc[phase_len - 1:phase_len, DIF_END] = row["dif"]
+                    phase_df.loc[phase_len - 1:phase_len, COUNT] = int(t_count)
+                    update_flag = False
+                else:
+                    phase_row[MACD_DIFF] = row["macd"] - m_start
+                    phase_row[PRICE_END] = row["close"]
+                    phase_row[DIF_END] = row["dif"]
+                    phase_row[COUNT] = t_count
+                    phase_df = phase_df.append(phase_row, ignore_index=True)
+                phase_row = dict()
 
-        t_count += 1
-        if phase_row[action.INDEX_PHASE_STATUS] != next_row[action.INDEX_PHASE_STATUS]:
-            if update_flag is True:
-                phase_len = len(phase_df)
-                phase_df.loc[phase_len - 1:phase_len, MACD_DIFF] = row["macd"] - m_start
-                phase_df.loc[phase_len - 1:phase_len, PRICE_END] = row["close"]
-                phase_df.loc[phase_len - 1:phase_len, DIF_END] = row["dif"]
-                phase_df.loc[phase_len - 1:phase_len, COUNT] = int(t_count)
-                update_flag = False
-            else:
-                phase_row[MACD_DIFF] = row["macd"] - m_start
-                phase_row[PRICE_END] = row["close"]
-                phase_row[DIF_END] = row["dif"]
-                phase_row[COUNT] = t_count
-                phase_df = phase_df.append(phase_row, ignore_index=True)
-            phase_row = dict()
-
-    if len(phase_df) == 0 or (len(phase_df) > 0 and phase_df.iloc[-1][conf.HDF5_SHARE_DATE_INDEX] != phase_row[conf.HDF5_SHARE_DATE_INDEX]):
+    if len(phase_df) == 0:
+        phase_df = phase_df.append(phase_row, ignore_index=True)
+    elif len(phase_df) > 0 and phase_df.iloc[-1][conf.HDF5_SHARE_DATE_INDEX] != phase_row[conf.HDF5_SHARE_DATE_INDEX]:
         phase_df = phase_df.append(phase_row, ignore_index=True)
     return phase_df

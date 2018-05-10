@@ -10,6 +10,8 @@ def exec(code_list, backtest, rewrite):
     global strategy_dict
 
     # TODO 获取个股股东人数、解禁、股东出货等情况
+    # TODO 5min与1min的背离结合
+    # TODO 部分交易点，连续次数存在失真情况，例如天齐锂业的18-1-4
     for code in code_list:
         obj = fmwr.strategy(code, conf.STYPE_ASHARE, backtest, rewrite, factor_macd_range)
         # 初始化数据

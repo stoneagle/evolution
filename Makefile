@@ -21,6 +21,8 @@ rm-grafana:
 
 local-bash:
 	nohup bash ./exec.sh > ./logs/$(DATE).log 2>&1 &
+bitmex-bash:
+	nohup bash ./exec/bitmex.sh > ./logs/bitmex-$(DATE).log 2>&1 &
 bitmex-test:
 	LD_LIBRARY_PATH=/usr/lib python3 ./dags/route.py -s bitmex -f test 
 bitmex-watch:
