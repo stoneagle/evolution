@@ -1,0 +1,21 @@
+app:
+  mode: debug 
+quant:
+  redis:
+    name: quant 
+    host: redis
+    port: 6379
+    password: 
+    db: 0
+  database:
+    name: quant 
+    type: mysql
+    host: mysql
+    port: 3306
+    user: root
+    target: quant 
+    password: 123456
+    maxIdle: 10 
+    maxOpen: 5 
+    showsql: True
+    location: Asia/Shanghai
