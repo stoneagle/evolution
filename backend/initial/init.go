@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"quant/backend/common"
+	"quant/backend/models"
 	"time"
 
 	yaml "gopkg.in/yaml.v2"
@@ -40,11 +41,11 @@ func exec(dbConfig common.DBConf) {
 	engine.TZLocation = location
 	engine.StoreEngine("InnoDB")
 	engine.Charset("utf8")
-	err = engine.DropTables()
+	err = engine.DropTables(new(models.Stock), new(models.Signal), new(models.Pool), new(models.MapPoolItem), new(models.MapClassifyItem), new(models.Classify))
 	if err != nil {
 		panic(err)
 	}
-	err = engine.Sync2()
+	err = engine.Sync2(new(models.Stock), new(models.Signal), new(models.Pool), new(models.MapPoolItem), new(models.MapClassifyItem), new(models.Classify))
 	if err != nil {
 		panic(err)
 	}

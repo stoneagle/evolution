@@ -1,0 +1,38 @@
+version: '2'
+services:
+  redis:
+    image: redis:3.2
+    container_name: ${PROJECT_NAME}-${DEV_USER}-redis
+    expose:
+      - "6379"
+  mysql:
+    environment:
+      - MYSQL_ROOT_PASSWORD=123456
+    image: mysql:5.6.38
+    container_name: ${PROJECT_NAME}-${DEV_USER}-mysql
+    volumes:
+      - /home/${DEV_USER}/database/mysql:/var/lib/mysql
+    ports:
+      - "${DEV_DB_PORT}:3306"
+    networks:
+      - default
+  backend:
+    image: quant/golang:1.10 
+    container_name: ${PROJECT_NAME}-${DEV_USER}-golang
+    volumes:
+      # 挂载项目代码目录
+      - ../../backend:/go/src/quant/backend
+    working_dir: /go/src/quant/backend
+    entrypoint: 
+      - bee 
+      - run 
+    links:
+      - mysql:mysql.localhost
+    ports:
+      - "${DEV_PORT}:8080"
+    networks:
+      - default
+networks:
+  default:
+    external:
+      name: ${DEV_USER}

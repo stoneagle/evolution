@@ -4,6 +4,14 @@ PWD := $(shell pwd)
 USER := $(shell id -u)
 GROUP := $(shell id -g)
 DATE := $(shell date "+%F")
+PROJ := "quant"
+
+run-web: 
+	cd hack/swarm && docker-compose -f docker-compose.yml -p "$(PROJ)-$(USER)-web" up
+stop-web: 
+	cd hack/swarm && docker-compose -f docker-compose.yml -p "$(PROJ)-$(USER)-web" stop 
+rm-web: 
+	cd hack/swarm && docker-compose -f docker-compose.yml -p "$(PROJ)-$(USER)-web" rm 
 
 run-airflow: 
 	cd hack && docker-compose -f docker-compose-local.yml -p "airflow-$(USER)" up -d
@@ -51,5 +59,9 @@ build-img:
 init-plugin:
 	cd plugin/ashare && npm install --registry=http://rgistry.npm.taobao.org && ./node_modules/grunt/bin/grunt
 
+# build images
 build-grafana:
 	cd hack/dockerfile && docker build -f ./Dockerfile-grafana -t grafana/grafana:4.6.2-1000 .
+
+build-golang:
+	cd hack/dockerfile && docker build -f ./Dockerfile-golang -t quant/golang:1.10 .

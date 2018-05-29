@@ -10,3 +10,4 @@ tmp/
 
 ## backend
 backend/vendor
+backend/config/.config.yaml

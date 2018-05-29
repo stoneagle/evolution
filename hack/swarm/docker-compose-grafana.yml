@@ -1,0 +1,25 @@
+version: '2'
+services:
+  grafana:
+    image: grafana/grafana:4.6.2-1000
+    container_name: ${COMPOSE_PROJECT_NAME}-${DEV_USER}-grafana
+    volumes:
+      - ./config/grafana.ini:/etc/grafana/grafana.ini
+      - ../grafana:/var/lib/grafana
+    ports:
+      - "${DEV_GRAFANA}:3000"
+  influxdb:
+    environment:
+      - INFLUXDB_ADMIN_ENABLED=true
+    image: influxdb:1.4.2
+    container_name: ${COMPOSE_PROJECT_NAME}-${DEV_USER}-influxdb
+    volumes:
+      - /home/wuzhongyang/database/influxdb:/var/lib/influxdb
+      - ./config/influxdb.conf:/etc/influxdb/influxdb.conf
+    ports:
+      - "${DEV_INFLUXDB}:8086"
+      - "${DEV_INFLUXDB_TWO}:8083"
+networks:
+  default:
+    external:
+      name: ${DEV_USER}
