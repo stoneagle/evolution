@@ -1,10 +1,12 @@
-hash: 2b967c99e4fb7848e3ea09f89b923232144676645eb0135ac780a5dee2a40905
-updated: 2018-05-29T19:32:17.430034655+08:00
+hash: 8dc47f3ad2aaf663304d1c940f68450bc7e4f8cd976bc441f0a8f9d25d67a264
+updated: 2018-05-30T10:04:45.35758051+08:00
 imports:
+- name: github.com/gin-contrib/cors
+  version: cf4846e6a636a76237a28d9286f163c132e841bc
 - name: github.com/gin-contrib/sse
   version: 22d885f9ecc78bf4ee5d72b937e4bbcdc58e8cae
 - name: github.com/gin-gonic/gin
-  version: bf7803815b0baa22ff7a10457932882dfbf09925
+  version: 07cbe116a058f13026fa6b23f675155968d47cc3
   subpackages:
   - binding
   - json

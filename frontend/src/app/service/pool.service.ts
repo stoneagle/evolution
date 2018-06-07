@@ -4,14 +4,8 @@ import { Observable } from 'rxjs';
 import { of } from 'rxjs/observable/of';
 import { catchError, map, tap  } from 'rxjs/operators';
 import { Pool } from '../model/pool';
+import { Response } from '../model/base/response.model';
 import { Setting } from '../constants/app.setting';
-
-const httpOptions = {
-  headers: new HttpHeaders({ 
-    'Content-Type': 'application/json',
-    'Access-Control-Allow-Origin': '*'
-  })
-};
 
 @Injectable()
 export class PoolService {
@@ -22,7 +16,18 @@ export class PoolService {
   ) { }
 
   getPools(): Observable<Pool[]> {
-    return this.http.get<Pool[]>(Setting.BACKEND_ENDPOINT + this.poolUrl, httpOptions).pipe(
+    return this.http.get<Response>(Setting.BACKEND_ENDPOINT + this.poolUrl).pipe(
+      map(res => {
+        let ret:Pool[] = []; 
+        if (res) {
+          res.data.map(
+            one => {
+              ret.push(new Pool(one));
+            }
+          )
+        }
+        return ret; 
+      }),
       tap(pools => this.log(`fetched pools`)),
       catchError(this.handleError('getPools', []))
     )

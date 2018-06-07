@@ -14,3 +14,5 @@ import:
   - atomic
 - package: github.com/go-redis/redis
   version: ^6.10.2
+- package: github.com/gin-contrib/cors
+  version: ^1.2.0
