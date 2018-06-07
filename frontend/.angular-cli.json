@@ -6,7 +6,8 @@
   "apps": [
     {
       "root": "src",
-      "outDir": "dist",
+      "outDir": "../backend/static",
+      "deployUrl": "static",
       "assets": [
         "assets",
         "favicon.ico"
@@ -61,6 +62,10 @@
   "defaults": {
     "styleExt": "css",
     "component": {},
+    // "options": {
+    //   "browserTarget": "quant:build",
+    //   "proxyConfig": "proxy.conf.json"
+    // },
     "serve": {
       "host": "0.0.0.0",
       "port": 8080
