@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Pool } from '../../model/pool';
-import { PoolService } from '../../service/pool.service';
+import { PoolService } from '../../service/business/pool.service';
 
 @Component({
   providers: [PoolService],
