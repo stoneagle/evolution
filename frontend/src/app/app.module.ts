@@ -1,19 +1,17 @@
 import { APP_INITIALIZER } from '@angular/core';
 import { NgModule } from '@angular/core';
-
-import { AppComponent } from './app.component';
-import { HttpModule } from '@angular/http';
-import { ClarityModule  } from "@clr/angular";
-import { AppRouteModule } from './route/app-route.module';
-import { BaseModule } from './base/base.module';
-import { ControllerModule } from './controller/controller.module';
-
-import { HttpClient } from '@angular/common/http';
+import { HttpClient  } from '@angular/common/http';
 import { TranslateModule, TranslateLoader  } from '@ngx-translate/core';
 import { TranslateHttpLoader  } from '@ngx-translate/http-loader';
-import { AppConfig  } from './service/base/config.service';
-import { CustomInterceptor  } from './service/base/custom.interceptor';
 import { HTTP_INTERCEPTORS   } from '@angular/common/http';
+import { CustomInterceptor  } from './service/base/custom.interceptor';
+
+import { AppComponent } from './app.component';
+import { AppRouteModule } from './route/app-route.module';
+import { AppConfig  } from './service/base/config.service';
+import { ClarityModule  } from "@clr/angular";
+import { BaseModule } from './base/base.module';
+import { ControllerModule } from './controller/controller.module';
 
 export function initializeApp(appConfig: AppConfig) {
   return () => appConfig.load();
@@ -30,9 +28,8 @@ export function createTranslateLoader(http: HttpClient) {
   imports: [
     ClarityModule,
     AppRouteModule,
-    BaseModule,
-		HttpModule,
     ControllerModule,
+    BaseModule,
     TranslateModule.forRoot({
       loader: {
         provide: TranslateLoader,

@@ -1,7 +1,49 @@
 {
+  "APP": {
+    "TITLE": "流水"
+  },
+  "ASSETS": {
+    "TYPE": {
+      "STOCK": "股票"
+    }
+  },
+  "RESOURCE": {
+    "POOL": {
+      "CONCEPT": "组合池",
+      "NAME": "名称",
+      "STATUS": "状态",
+      "STRATEGY": "策略",
+      "TYPE": "类别"
+    },
+    "GENERAL": {
+      "CONCEPT": "通用",
+      "ID": "序号",
+      "OPERATION": "操作",
+      "CREATED": "创建时间",
+      "UPDATED": "更新时间",
+      "DELETED": "删除时间"
+    }
+  },
+  "SYSTEM": {
+    "USER": {
+      "NAME": "用户",
+      "SIGNIN": "登陆",
+      "SIGNOUT": "登出"
+    }
+  },
   "PROCESS": { 
-    "ADD": "添加成功", 
-    "ROLLBACK": "回滚成功",
-    "DELETE": "删除成功" 
+    "GET": "获取", 
+    "LIST": "罗列", 
+    "CREATE": "添加", 
+    "UPDATE": "更新",
+    "DELETE": "删除",
+    "SUBMIT": "提交",
+    "CANCEL": "取消",
+    "ROLLBACK": "回滚"
+  },
+  "RESULT": {
+    "SUCCESS": "成功",
+    "WARNING": "失败",
+    "ERROR": "异常"
   }
 }

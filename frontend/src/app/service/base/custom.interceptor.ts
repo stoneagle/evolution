@@ -10,11 +10,11 @@ export class CustomInterceptor implements HttpInterceptor {
 
     intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
         request = request.clone({
-            withCredentials: true,
             headers: new HttpHeaders({ 
               'Content-Type': 'application/json',
-              'Access-Control-Allow-Origin': '*'
-            })
+              'Access-Control-Allow-Origin': 'http://localhost:8080'
+            }),
+            withCredentials: true,
         });
         return next.handle(request);
     }

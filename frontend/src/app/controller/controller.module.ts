@@ -1,30 +1,38 @@
 import { NgModule } from '@angular/core';
+
+import { PoolComponent } from './pool/pool.component';
+import { SavePoolComponent } from './pool/save/save.component';
+import { PoolService } from '../service/business/pool.service';
+import { MessageHandlerService  } from '../service/base/message-handler.service';
+
 import { BrowserModule } from '@angular/platform-browser';
-import { CommonModule  } from '@angular/common';   
+import { BrowserAnimationsModule   } from '@angular/platform-browser/animations';
 import { ClarityModule  } from "@clr/angular"; 
 import { HttpClientModule  }    from '@angular/common/http';
+import { HttpModule   } from '@angular/http';
 import { FormsModule }   from '@angular/forms';
-import { PoolComponent } from './pool/pool.component';
-import { StockComponent } from './stock/stock.component';
-import { MessageService } from '../service/base/message.service';
-import { MessageHandlerService  } from '../service/base/message-handler.service';
+import { TranslateModule  } from "@ngx-translate/core";
 
 @NgModule({
   declarations: [
     PoolComponent,
-    StockComponent,
+    SavePoolComponent,
   ],
   imports: [   
     BrowserModule,
+    BrowserAnimationsModule,
     HttpClientModule,
+    HttpModule,
     FormsModule,
     ClarityModule,
+    TranslateModule,
   ],
   providers: [ 
-    MessageService,
+    PoolService,
     MessageHandlerService,
   ],
   exports: [
+    PoolComponent,
   ]
 })
 

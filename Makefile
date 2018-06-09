@@ -13,6 +13,9 @@ stop-web:
 rm-web: 
 	cd hack/swarm && docker-compose -f docker-compose.yml -p "$(PROJ)-$(USER)-web" rm 
 
+run-ng:
+	cd frontend && ng serve --environment=dev
+
 run-airflow: 
 	cd hack && docker-compose -f docker-compose-local.yml -p "airflow-$(USER)" up -d
 stop-airflow: 

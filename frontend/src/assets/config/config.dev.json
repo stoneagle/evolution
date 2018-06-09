@@ -2,6 +2,6 @@
   "app": {     
   },
   "apiServer": {
-    "endpoint": "http://localhost:6999/v1"
+    "endpoint": "http://localhost:8180/v1"
   }
 }

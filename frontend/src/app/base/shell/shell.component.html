@@ -1,22 +1,29 @@
-<div class="main-container">
-  <div class="alert alert-app-level">
-  </div>
-	<header class="header-6">
-		<div class="branding">
-			<a href="" class="nav-link">
-				<clr-icon shape="vm-bug"></clr-icon>
-				<span class="title">Flow</span>
-			</a>
-		</div>
-		<div class="header-nav">
-			<a href="./pool" class="active nav-link"><span class="nav-text">Pool</span></a>
-		</div>
-		<div class="header-actions">
-			<a href="javascript://" class="nav-link nav-icon">
-				<clr-icon shape="cog"></clr-icon>
-			</a>
-		</div>
-	</header>
+<clr-main-container>
+  <global-message [isAppLevel]="false"></global-message>
+  <clr-header class="header-5 header">
+    <div class="branding">
+      <a href="javascript:void(0);" class="nav-link">
+        <clr-icon shape="vm-bug"></clr-icon>
+        <span class="title">{{ 'APP.TITLE' | translate }}</span>
+      </a>
+    </div>
+    <div class="header-nav">
+      <a href="javascript:void(0);" class="active nav-link"><span class="nav-text">{{ 'ASSETS.TYPE.STOCK' | translate }}</span></a>
+    </div>
+    <div class="header-actions">
+      <clr-dropdown>
+          <button type="button" class="btn btn-outline-primary" clrDropdownTrigger>
+              {{ 'SYSTEM.USER.NAME' | translate }} 
+              <clr-icon shape="caret down"></clr-icon>
+          </button>
+          <clr-dropdown-menu clrPosition="bottom-right" *clrIfOpen>
+              <button type="button" (click)="logout()" clrDropdownItem>
+                {{ 'SYSTEM.USER.SIGNOUT' | translate }} 
+              </button>
+          </clr-dropdown-menu>
+      </clr-dropdown>
+    </div>
+  </clr-header>
   <div class="content-container">
     <div class="content-area">
       <router-outlet></router-outlet>
@@ -24,8 +31,8 @@
     <clr-vertical-nav [clrVerticalNavCollapsible]="true" [(clrVerticalNavCollapsed)]="collapsed">
       <a clrVerticalNavLink routerLink="./pool" routerLinkActive="active">
         <clr-icon clrVerticalNavIcon shape="user"></clr-icon>
-        Pool
+        {{ 'RESOURCE.POOL.CONCEPT' | translate }} 
       </a>
     </clr-vertical-nav>
   </div>
-</div>
+</clr-main-container>
