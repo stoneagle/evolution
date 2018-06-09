@@ -12,9 +12,9 @@ func Redirect(ctx *gin.Context, uri string) {
 
 func ResponseSuccess(ctx *gin.Context, data interface{}) {
 	ctx.JSON(http.StatusOK, gin.H{
-		"result": ErrorOk,
-		"data":   data,
-		"msg":    "success",
+		"code": ErrorOk,
+		"data": data,
+		"desc": "success",
 	})
 }
 
@@ -23,18 +23,18 @@ func ResponseErrorBusiness(ctx *gin.Context, code ErrorCode, desc string, err er
 		desc += ":" + err.Error()
 	}
 	ctx.JSON(http.StatusOK, gin.H{
-		"result": code,
-		"data":   struct{}{},
-		"msg":    desc,
+		"code": code,
+		"data": struct{}{},
+		"desc": desc,
 	})
 	ctx.Abort()
 }
 
 func ResponseErrorServer(ctx *gin.Context, desc string) {
 	ctx.JSON(http.StatusOK, gin.H{
-		"result": ErrorServer,
-		"data":   struct{}{},
-		"msg":    desc,
+		"code": ErrorServer,
+		"data": struct{}{},
+		"desc": desc,
 	})
 	ctx.Abort()
 }
