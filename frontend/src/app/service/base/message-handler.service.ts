@@ -8,7 +8,6 @@ import { TranslateService } from '@ngx-translate/core';
 
 @Injectable()
 export class MessageHandlerService {
-
     constructor(
       private msgService: MessageService,
       private translate: TranslateService,
@@ -48,14 +47,16 @@ export class MessageHandlerService {
 
     public showSuccess(message: string): void {
         if (message && message.trim() != "") {
-            this.msgService.announceMessage(200, message, AlertType.SUCCESS);
+          this.translate.get(message, { 'param': '' }).subscribe((res: string) => {
+            this.msgService.announceMessage(200, res, AlertType.SUCCESS);
+          });
         }
     }
 
     public showInfo(message: string): void {
-        if (message && message.trim() != "") {
-            this.msgService.announceMessage(200, message, AlertType.INFO);
-        }
+      if (message && message.trim() != "") {
+          this.msgService.announceMessage(200, message, AlertType.INFO);
+      }
     }
 
     public showWarning(message: string): void {

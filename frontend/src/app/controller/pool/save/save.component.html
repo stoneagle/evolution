@@ -1,0 +1,34 @@
+<clr-modal [(clrModalOpen)]="modelOpened">
+    <h3 class="modal-title" *ngIf="(pool.Id)">
+      {{ 'PROCESS.UPDATE' | translate }}{{ 'RESOURCE.POOL.CONCEPT' | translate }}
+    </h3>
+    <h3 class="modal-title" *ngIf="!(pool.Id)">
+      {{ 'PROCESS.CREATE' | translate }}{{ 'RESOURCE.POOL.CONCEPT' | translate }}
+    </h3>
+    <div class="modal-body">
+      <form #addForm="ngForm" (ngSubmit)="Submit()">
+        <div class="form-group">
+          <label for="name">{{ 'RESOURCE.POOL.NAME' | translate }}</label>
+          <input type="text" class="form-control" id="Name" required [(ngModel)]="pool.Name" name="Name" >
+        </div> 
+        <div class="form-group">
+          <label for="type">{{ 'RESOURCE.POOL.TYPE' | translate }}</label>
+          <div class="select">
+            <select id="type" [(ngModel)]="pool.Type" name="type">
+							<option [ngValue]=1>A股</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="strategy">{{ 'RESOURCE.POOL.STRATEGY' | translate }}</label>
+          <div class="select">
+            <select id="strategy" [(ngModel)]="pool.Strategy" name="strategy">
+							<option value="底背离">底背离</option>
+            </select>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-success">Submit</button>
+        <button type="button" class="btn btn-primary" (click)="modelOpened = false">Cancel</button>
+      </form>
+    </div>     
+</clr-modal>   
