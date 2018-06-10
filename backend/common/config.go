@@ -36,6 +36,10 @@ type Conf struct {
 	Quant struct {
 		Redis    RedisConf
 		Database DBConf
+		Rpc      struct {
+			Host string
+			Port string
+		}
 	}
 }
 

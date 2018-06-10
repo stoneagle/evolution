@@ -22,5 +22,9 @@ func (c *Config) Router(router *gin.RouterGroup) {
 }
 
 func (c *Config) Type(ctx *gin.Context) {
-	common.ResponseSuccess(ctx, struct{}{})
+	ret, err := c.Rpc.GetType()
+	if err != nil {
+		common.ResponseErrorBusiness(ctx, common.ErrorEngine, "get resource type error", err)
+	}
+	common.ResponseSuccess(ctx, ret)
 }

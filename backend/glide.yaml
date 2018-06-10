@@ -16,3 +16,10 @@ import:
   version: ^6.10.2
 - package: github.com/gin-contrib/cors
   version: ^1.2.0
+- package: git.apache.org/thrift.git
+  version: ^0.11.0
+  subpackages: 
+  - lib/go/thrift/...
+- package: golang.org/x/net
+  subpackages: 
+  - context    

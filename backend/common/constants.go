@@ -9,5 +9,6 @@ const (
 	ErrorMysql  ErrorCode = 3
 	ErrorRedis  ErrorCode = 4
 	ErrorAuth   ErrorCode = 5
+	ErrorEngine ErrorCode = 6
 	ErrorServer ErrorCode = 500
 )
