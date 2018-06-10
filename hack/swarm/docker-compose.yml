@@ -16,6 +16,20 @@ services:
       - "${DEV_DB_PORT}:3306"
     networks:
       - default
+  engine:
+    image: ${REGISTRY_PREFIX}:basic
+    container_name: ${PROJECT_NAME}-${DEV_USER}-engine
+    volumes:
+      # 挂载项目代码目录
+      - ../../dags:/usr/src/dags
+    working_dir: /usr/src/dags
+    entrypoint: 
+      - python3 
+      - ./server.py 
+    expose:
+      - "${DEV_ENG_PORT}"
+    networks:
+      - default
   backend:
     image: quant/golang:1.10 
     container_name: ${PROJECT_NAME}-${DEV_USER}-golang
@@ -28,6 +42,7 @@ services:
       - run 
     links:
       - mysql:mysql.localhost
+      - engine:engine.localhost
     ports:
       - "${DEV_PORT}:8080"
     networks:

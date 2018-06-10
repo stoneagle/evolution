@@ -10,3 +10,4 @@ TA-Lib
 influxdb
 wxpy
 pillow
+thrift

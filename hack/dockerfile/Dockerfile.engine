@@ -1,0 +1,29 @@
+FROM python:3.4.5
+
+RUN apt-get -y update && \ 
+    apt-get -y install zlib1g-dev libhdf5-dev  libhdf5-serial-dev wget g++ automake libevent-dev libssl-dev libtool make pkg-config
+
+# 安装talib相关文件
+RUN cd /tmp && \
+    wget https://jaist.dl.sourceforge.net/project/ta-lib/ta-lib/0.4.0/ta-lib-0.4.0-src.tar.gz && \
+    tar -zxvf ./ta-lib-0.4.0-src.tar.gz && \
+    cd ta-lib && \
+    ./configure --prefix=/usr && \
+    make && \
+    make install
+
+# RUN pip3 install -v --index https://pypi.tuna.tsinghua.edu.cn/simple --user numpy
+# COPY ./requirements.utils.txt /tmp/requirements.utils.txt
+# COPY ./requirements.tushare.txt /tmp/requirements.tushare.txt
+# RUN pip3 install -v --index https://pypi.tuna.tsinghua.edu.cn/simple --user -r /tmp/requirements.utils.txt && \
+#     pip3 install -v --index https://pypi.tuna.tsinghua.edu.cn/simple --user -r /tmp/requirements.tushare.txt
+
+# 需要配置代理
+RUN pip3 install --proxy=http://127.0.0.1:8118 -v --user numpy
+COPY ./requirements.utils.txt /tmp/requirements.utils.txt
+COPY ./requirements.tushare.txt /tmp/requirements.tushare.txt
+RUN pip3 install --proxy=http://127.0.0.1:8118 -v --user -r /tmp/requirements.utils.txt && \
+    pip3 install --proxy=http://127.0.0.1:8118 -v --user -r /tmp/requirements.tushare.txt
+
+COPY ./hdf5 /usr/local/hdf5
+RUN export HDF5_DIR=/usr/local/hdf5
