@@ -19,3 +19,6 @@ quant:
     maxOpen: 5 
     showsql: True
     location: Asia/Shanghai
+  rpc:
+    host: engine.localhost
+    port: 6666

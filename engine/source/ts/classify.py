@@ -14,6 +14,18 @@ THE_FIELDS = ['code', 'symbol', 'name', 'changepercent', 'trade', 'open', 'high'
 CLASSIFY_COLS = ['code']
 
 
+def get_json(ctype):
+    if ctype == "industry":
+        url = 'http://vip.stock.finance.sina.com.cn/q/view/newSinaHy.php'
+        df = _get_type_data(url)
+    elif ctype == "concept":
+        url = 'http://money.finance.sina.com.cn/q/view/newFLJK.php?param=class'
+        df = _get_type_data(url)
+    elif ctype == "hot":
+        df = _get_new_type_data()
+    return df
+
+
 def get_industry_classified(f):
     "由于tushare的延时会导致ip被封，提取该方法至脚本中"
     url = 'http://vip.stock.finance.sina.com.cn/q/view/newSinaHy.php'

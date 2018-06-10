@@ -1,18 +1,23 @@
-hash: 8dc47f3ad2aaf663304d1c940f68450bc7e4f8cd976bc441f0a8f9d25d67a264
-updated: 2018-05-30T10:04:45.35758051+08:00
+hash: 47c2b998bbe8162fc24ae432032b82a57d3935e1d87134aec572e2d405ce6c2c
+updated: 2018-06-10T17:31:02.095563157+08:00
 imports:
+- name: git.apache.org/thrift.git
+  version: 327ebb6c2b6df8bf075da02ef45a2a034e9b79ba
+  subpackages:
+  - lib/go/thrift
+  - lib/go/thrift/...
 - name: github.com/gin-contrib/cors
   version: cf4846e6a636a76237a28d9286f163c132e841bc
 - name: github.com/gin-contrib/sse
   version: 22d885f9ecc78bf4ee5d72b937e4bbcdc58e8cae
 - name: github.com/gin-gonic/gin
-  version: 07cbe116a058f13026fa6b23f675155968d47cc3
+  version: caf3e350a548af1add9def68087ac53d1d000caa
   subpackages:
   - binding
   - json
   - render
 - name: github.com/go-redis/redis
-  version: 0f9028adf0837cf93c9705817493e5f6997cf026
+  version: 83fb42932f6145ce52df09860384a4653d2d332a
   subpackages:
   - internal
   - internal/consistenthash
@@ -22,7 +27,7 @@ imports:
   - internal/singleflight
   - internal/util
 - name: github.com/go-sql-driver/mysql
-  version: a0583e0143b1624142adab07e0e97fe106d99561
+  version: d523deb1b23d913de5bdada721a6071e71283618
 - name: github.com/go-xorm/builder
   version: bad0a612f0d6277b953910822ab5dfb30dd18237
 - name: github.com/go-xorm/core
@@ -30,11 +35,11 @@ imports:
 - name: github.com/go-xorm/xorm
   version: d85bb4911c725a53b135fc12862748a41b6c07da
 - name: github.com/golang/protobuf
-  version: 3a3da3a4e26776cc22a79ef46d5d58477532dede
+  version: 05f48f4eaf0e05663b562bab533cdd472238ce29
   subpackages:
   - proto
 - name: github.com/json-iterator/go
-  version: 8744d7c5c7b40a53e018f78d8c508b3315260b96
+  version: 7cceb6c2e37f896dc3817e031f83dce25b180a8b
 - name: github.com/mattn/go-isatty
   version: 6ca4dbf54d38eea1a992b3c722a76a5d1c4cb25c
 - name: github.com/modern-go/concurrent
@@ -49,8 +54,18 @@ imports:
   version: eeedf312bc6c57391d84767a4cd413f02a917974
   subpackages:
   - atomic
-- name: golang.org/x/sys/unix
-  version: c11f84a56e43e20a78cee75a7c034031ecf57d1f
+- name: golang.org/x/net
+  version: 1e491301e022f8f977054da4c2d852decd59571f
+  subpackages:
+  - context
+- name: golang.org/x/sys
+  version: 9527bec2660bd847c050fda93a0f0c6dee0800bb
+  subpackages:
+  - unix
+- name: google.golang.org/appengine
+  version: b1f26356af11148e710935ed1ac8a7f5702c7612
+  subpackages:
+  - cloudsql
 - name: gopkg.in/go-playground/validator.v8
   version: 5f1438d3fca68893a817e4a66806cea46a9e4ebf
 - name: gopkg.in/yaml.v2

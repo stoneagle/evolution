@@ -13,7 +13,8 @@ if RUNMODE == "dev":
     ASHARE_FILE_ROOT = '/home/wuzhongyang/database/ashare'
     FUTURE_FILE_ROOT = '/home/wuzhongyang/database/future'
 else:
-    ASHARE_FILE_ROOT = '/tmp/hdf5'
+    ASHARE_FILE_ROOT = '/tmp/hdf5/ashare'
+    FUTURE_FILE_ROOT = '/tmp/hdf5/future'
 
 HDF5_FILE_CLASSIFY = ASHARE_FILE_ROOT + '/classify.h5'
 HDF5_FILE_SHARE = ASHARE_FILE_ROOT + '/share.h5'

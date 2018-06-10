@@ -4,67 +4,61 @@ PWD := $(shell pwd)
 USER := $(shell id -u)
 GROUP := $(shell id -g)
 DATE := $(shell date "+%F")
+REGISTRY_PREFIX := "stoneagle/quant-engine"
 PROJ := "quant"
 
+# backend
 run-web: 
+	export REGISTRY_PREFIX=$(REGISTRY_PREFIX) && \
 	cd hack/swarm && docker-compose -f docker-compose.yml -p "$(PROJ)-$(USER)-web" up
+
 stop-web: 
 	cd hack/swarm && docker-compose -f docker-compose.yml -p "$(PROJ)-$(USER)-web" stop 
+
 rm-web: 
 	cd hack/swarm && docker-compose -f docker-compose.yml -p "$(PROJ)-$(USER)-web" rm 
 
+build-golang:
+	cd hack/dockerfile && docker build -f ./Dockerfile-golang -t quant/golang:1.10 .
+
+# frontend
 run-ng:
 	cd frontend && ng serve --environment=dev
 
-run-airflow: 
-	cd hack && docker-compose -f docker-compose-local.yml -p "airflow-$(USER)" up -d
-stop-airflow: 
-	cd hack && docker-compose -f docker-compose-local.yml -p "airflow-$(USER)" stop 
-rm-airflow: 
-	cd hack && docker-compose -f docker-compose-local.yml -p "airflow-$(USER)" rm 
-
+# grafana 
 run-grafana: 
 	cd hack && docker-compose -f docker-compose-grafana.yml -p "grafana-$(USER)" up -d
+
 stop-grafana: 
 	cd hack && docker-compose -f docker-compose-grafana.yml -p "grafana-$(USER)" stop 
+
 rm-grafana: 
 	cd hack && docker-compose -f docker-compose-grafana.yml -p "grafana-$(USER)" rm 
-
-local-bash:
-	nohup bash ./exec.sh > ./logs/$(DATE).log 2>&1 &
-bitmex-bash:
-	nohup bash ./exec/bitmex.sh > ./logs/bitmex-$(DATE).log 2>&1 &
-bitmex-test:
-	LD_LIBRARY_PATH=/usr/lib python3 ./dags/route.py -s bitmex -f test 
-bitmex-watch:
-	LD_LIBRARY_PATH=/usr/lib python3 ./dags/route.py -s bitmex -f watch 
-ashare-test:
-	LD_LIBRARY_PATH=/usr/lib python3 ./dags/route.py -s ashare -f test 
-ashare-watch:
-	LD_LIBRARY_PATH=/usr/lib python3 ./dags/route.py -s ashare -f watch
-part-test:
-	LD_LIBRARY_PATH=/usr/lib python3 ./dags/route.py -s part -f test 
-
-build-talib:
-	mkdir tmp && cd tmp && \
-		wget http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz && \
-		tar -xvf ./ta-lib-0.4.0-src.tar.gz && cd ./ta-lib && ./configure --prefix=/usr && \
-		make && sudo make install && cd ../.. && \
-		rm -rf ./tmp 
-
-local-python:
-	pip3 install --index https://pypi.mirrors.ustc.edu.cn/simple/ --user -r ./hack/dockerfile/requirements.utils.txt && \
-	pip3 install --index https://pypi.mirrors.ustc.edu.cn/simple/ --user -r ./hack/dockerfile/requirements.tushare.txt
-
-build-img:
-	cd hack/dockerfile && docker build -f ./Dockerfile -t puckel/docker-airflow:1.8.2-assets-2 .
 
 init-plugin:
 	cd plugin/ashare && npm install --registry=http://rgistry.npm.taobao.org && ./node_modules/grunt/bin/grunt
 
-# build images
 build-grafana:
 	cd hack/dockerfile && docker build -f ./Dockerfile-grafana -t grafana/grafana:4.6.2-1000 .
 
-build-golang:
-	cd hack/dockerfile && docker build -f ./Dockerfile-golang -t quant/golang:1.10 .
+# thrift
+THRIFT_PREFIX = /tmp/thrift
+thrift-golang:
+	docker run -it --rm \
+		-u $(USER):$(GROUP) \
+		-v $(PWD)/backend:$(THRIFT_PREFIX)/backend \
+		-v $(PWD)/hack:$(THRIFT_PREFIX)/hack \
+		thrift:0.11.0 \
+		thrift --gen go -out $(THRIFT_PREFIX)/backend/rpc $(THRIFT_PREFIX)/hack/thrift/engine.thrift
+
+thrift-python:
+	docker run -it --rm \
+		-u $(USER):$(GROUP) \
+		-v $(PWD)/dags:$(THRIFT_PREFIX)/dags \
+		-v $(PWD)/hack:$(THRIFT_PREFIX)/hack \
+		thrift:0.11.0 \
+		thrift --gen py -out $(THRIFT_PREFIX)/dags/rpc $(THRIFT_PREFIX)/hack/thrift/engine.thrift
+
+# engine
+build-engine-basic:
+	cd ./hack/dockerfile && docker build -f ./Dockerfile.engine -t $(REGISTRY_PREFIX):quant . --network=host
