@@ -20,5 +20,5 @@ quant:
     showsql: True
     location: Asia/Shanghai
   rpc:
-    host: engine.localhost
+    host: engine
     port: 6666

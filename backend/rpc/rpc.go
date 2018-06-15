@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net"
 	"quant/backend/rpc/engine"
+	"quant/backend/rpc/models"
 
 	"git.apache.org/thrift.git/lib/go/thrift"
 )
@@ -43,14 +44,32 @@ func (r *Rpc) client() (client *engine.EngineServiceClient, transport *thrift.TS
 	return
 }
 
-func (r *Rpc) GetType() (ret map[string][]string, err error) {
-	ret = make(map[string][]string)
+func (r *Rpc) GetType(atype engine.AssetType) (ret map[string]map[string][]string, err error) {
+	ret = make(map[string]map[string][]string)
 	client, transport, err := r.client()
 	if err != nil {
 		return
 	}
 	defer transport.Close()
-	d, err := client.GetType(context.Background(), engine.QuantType_Stock)
+	d, err := client.GetType(context.Background(), atype)
+	if err != nil {
+		return
+	}
+	err = json.Unmarshal([]byte(d.Data), &ret)
+	if err != nil {
+		return
+	}
+	return
+}
+
+func (r *Rpc) GetClassify(atype engine.AssetType, ctype, source, sub string) (ret []models.Classify, err error) {
+	ret = []models.Classify{}
+	client, transport, err := r.client()
+	if err != nil {
+		return
+	}
+	defer transport.Close()
+	d, err := client.GetClassify(context.Background(), atype, ctype, source, sub)
 	if err != nil {
 		return
 	}
