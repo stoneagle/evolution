@@ -5,15 +5,15 @@ import json
 
 class EngineServiceHandler:
 
-    def getType(self, resource):
+    def getType(self, assetType):
         ret = ttypes.Response()
-        if resource == ttypes.QuantType.Stock:
-            ret.data = json.dumps({"ashare": ["tushare"]})
-        elif resource == ttypes.QuantType.Exchange:
-            ret.data = json.dumps({"bitcoin": ["bitmex"]})
+        if assetType == ttypes.AssetType.Stock:
+            ret.data = json.dumps({"ashare": {"tushare": ["industry", "concept", "hot"]}})
+        elif assetType == ttypes.AssetType.Exchange:
+            ret.data = json.dumps({"bitcoin": {"bitmex": ["default"]}})
         else:
             ret.code = ttypes.ResponseState.StateErrorBusiness
-            ret.desc = "source not exist"
+            ret.desc = "asset type not exist"
         return ret
 
     def getStrategy(self, stype):
@@ -27,22 +27,29 @@ class EngineServiceHandler:
             ret.desc = "stype not exist"
         return ret
 
-    def getClassify(self, stype, source):
+    def getClassify(self, assetType, ctype, source, sub):
         ret = ttypes.Response()
-        if stype == "bitmex":
-            if source == "bitmex":
-                ret.desc = "developed"
+        if assetType == ttypes.AssetType.Exchange:
+            if ctype == "bitmex":
+                if source == "default":
+                    ret.desc = "developed"
+                else:
+                    ret.code = ttypes.ResponseState.StateErrorBusiness
+                    ret.desc = "source not exist"
             else:
                 ret.code = ttypes.ResponseState.StateErrorBusiness
-                ret.desc = "source not exist"
-        elif stype == "ashare":
-            if source == "tushare":
-                ret.data = classify.get_json().to_json(orient='records')
-                ret.desc = "developed"
+                ret.desc = "ctype not exist"
+        elif assetType == ttypes.AssetType.Stock:
+            if ctype == "ashare":
+                if source == "tushare":
+                    ret.data = classify.get_json(sub).to_json(orient='records')
+                else:
+                    ret.code = ttypes.ResponseState.StateErrorBusiness
+                    ret.desc = "source not exist"
             else:
                 ret.code = ttypes.ResponseState.StateErrorBusiness
-                ret.desc = "source not exist"
+                ret.desc = "ctype not exist"
         else:
             ret.code = ttypes.ResponseState.StateErrorBusiness
-            ret.desc = "stype not exist"
+            ret.desc = "source not exist"
         return ret

@@ -16,7 +16,7 @@ from thrift.transport import TTransport
 all_structs = []
 
 
-class QuantType(object):
+class AssetType(object):
     Stock = 1
     Exchange = 2
 
