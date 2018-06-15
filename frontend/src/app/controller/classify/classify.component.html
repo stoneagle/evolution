@@ -1,0 +1,45 @@
+<button class="btn btn-primary" (click)="openSyncModel()">
+  {{ "PROCESS.SYNC" | translate }}
+</button>
+<span class="refresh-btn" (click)="refresh()">
+  <clr-icon shape="refresh"></clr-icon>
+</span>
+<clr-datagrid  (clrDgRefresh)="load($event)">
+  <!-- <clr-dg-column>{{ 'RESOURCE.GENERAL.ID' | translate }}</clr-dg-column> -->
+  <clr-dg-column>{{ 'RESOURCE.CLASSIFY.TYPE' | translate }}</clr-dg-column>
+  <clr-dg-column>{{ 'RESOURCE.CLASSIFY.SOURCE' | translate }}</clr-dg-column>
+  <clr-dg-column>{{ 'RESOURCE.CLASSIFY.SUB' | translate }}</clr-dg-column>
+  <clr-dg-column>{{ 'RESOURCE.CLASSIFY.NAME' | translate }}</clr-dg-column>
+  <clr-dg-column>{{ 'RESOURCE.CLASSIFY.TAG' | translate }}</clr-dg-column>
+  <clr-dg-column>{{ 'RESOURCE.GENERAL.CREATED' | translate }}</clr-dg-column>
+  <clr-dg-column>{{ 'RESOURCE.GENERAL.UPDATED' | translate }}</clr-dg-column>
+	<clr-dg-column>{{ 'RESOURCE.GENERAL.OPERATION' | translate }}</clr-dg-column>
+
+  <clr-dg-row *ngFor="let classify of classifys">
+    <!-- <clr-dg-cell>{{classify.Id}}</clr-dg-cell> -->
+    <clr-dg-cell>{{classify.Name}}</clr-dg-cell>
+    <clr-dg-cell>{{classify.Type}}</clr-dg-cell>
+    <clr-dg-cell>{{classify.Source}}</clr-dg-cell>
+    <clr-dg-cell>{{classify.Sub}}</clr-dg-cell>
+    <clr-dg-cell>{{classify.Tag}}</clr-dg-cell>
+    <clr-dg-cell>{{classify.CreatedAt | date: 'yy-MM-dd HH:mm:ss'}}</clr-dg-cell>
+    <clr-dg-cell>{{classify.UpdatedAt | date: 'yy-MM-dd HH:mm:ss'}}</clr-dg-cell>
+    <clr-dg-cell>
+      <div class="btn-group btn-primary btn-icon">
+        <!-- <button (click)="delete(classify)" class="btn btn-danger"> -->
+        <!--   <clr-icon shape="trash"></clr-icon> -->
+        <!--   <span class="clr-icon-title"></span> -->
+        <!-- </button> -->
+      </div>
+    </clr-dg-cell>  
+  </clr-dg-row>
+
+  <clr-dg-footer>
+    <clr-dg-pagination #pagination [clrDgPageSize]="pageSize" [(clrDgPage)]="currentPage" [clrDgTotalItems]="totalCount">
+      {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
+      / {{pagination.totalItems}} {{ 'RESOURCE.CLASSIFY.CONCEPT' | translate }}
+    </clr-dg-pagination>
+  </clr-dg-footer>
+</clr-datagrid>
+
+<sync-classify (sync)="syncd($event)"></sync-classify>

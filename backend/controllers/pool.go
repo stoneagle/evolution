@@ -96,7 +96,7 @@ func (c *Pool) Delete(ctx *gin.Context) {
 	pool := ctx.MustGet("pool").(models.Pool)
 	err := c.PoolSvc.Delete(pool.Id)
 	if err != nil {
-		common.ResponseErrorBusiness(ctx, common.ErrorMysql, "autobuild delete error", err)
+		common.ResponseErrorBusiness(ctx, common.ErrorMysql, "pool delete error", err)
 		return
 	}
 	common.ResponseSuccess(ctx, pool.Id)

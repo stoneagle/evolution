@@ -1,0 +1,61 @@
+{
+  "APP": {
+    "TITLE": "flow"
+  },
+  "ASSETS": {
+    "TYPE": {
+      "STOCK": "stock",
+      "EXCHANGE": "exchange",
+      "CONFIG": "config"
+    }
+  },
+  "RESOURCE": {
+    "POOL": {
+      "CONCEPT": "pool",
+      "NAME": "name",
+      "STATUS": "status",
+      "STRATEGY": "strategy",
+      "TYPE": "type"
+    },
+    "CLASSIFY": {
+      "CONCEPT": "classify",
+      "ASSET": "assets",
+      "NAME": "name",
+      "TAG": "tag",
+      "TYPE": "type",
+      "SOURCE": "source",
+      "SUB": "sub"
+    },
+    "GENERAL": {
+      "CONCEPT": "general",
+      "ID": "id",
+      "OPERATION": "operation",
+      "CREATED": "created",
+      "UPDATED": "updated",
+      "DELETED": "deleted"
+    }
+  },
+  "SYSTEM": {
+    "USER": {
+      "NAME": "name",
+      "SIGNIN": "sign-in",
+      "SIGNOUT": "sign-out"
+    }
+  },
+  "PROCESS": { 
+    "GET": "get", 
+    "LIST": "list", 
+    "SYNC": "sync", 
+    "CREATE": "create", 
+    "UPDATE": "update",
+    "DELETE": "delete",
+    "SUBMIT": "submit",
+    "CANCEL": "cancel",
+    "ROLLBACK": "rollback"
+  },
+  "RESULT": {
+    "SUCCESS": "success",
+    "WARNING": "warning",
+    "ERROR": "error"
+  }
+}

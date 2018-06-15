@@ -1,7 +1,7 @@
 namespace go engine 
 namespace py engine 
 
-enum QuantType {
+enum AssetType {
     Stock = 1,
     Exchange = 2
 }
@@ -19,7 +19,7 @@ struct Response {
 }
 
 service EngineService {
-    Response getType(1: QuantType resource);
+    Response getType(1: AssetType assetType);
     Response getStrategy(1: string stype);
-    Response getClassify(1: string stype, 2: string source);
+    Response getClassify(1: AssetType assetType, 2: string ctype, 3: string source, 4: string sub);
 }

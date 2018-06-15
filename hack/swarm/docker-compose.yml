@@ -21,8 +21,8 @@ services:
     container_name: ${PROJECT_NAME}-${DEV_USER}-engine
     volumes:
       # 挂载项目代码目录
-      - ../../dags:/usr/src/dags
-    working_dir: /usr/src/dags
+      - ../../engine:/usr/src/engine
+    working_dir: /usr/src/engine
     entrypoint: 
       - python3 
       - ./server.py 
@@ -42,7 +42,6 @@ services:
       - run 
     links:
       - mysql:mysql.localhost
-      - engine:engine.localhost
     ports:
       - "${DEV_PORT}:8080"
     networks:

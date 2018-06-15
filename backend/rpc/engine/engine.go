@@ -20,37 +20,37 @@ var _ = context.Background
 var _ = reflect.DeepEqual
 var _ = bytes.Equal
 
-type QuantType int64
+type AssetType int64
 const (
-  QuantType_Stock QuantType = 1
-  QuantType_Exchange QuantType = 2
+  AssetType_Stock AssetType = 1
+  AssetType_Exchange AssetType = 2
 )
 
-func (p QuantType) String() string {
+func (p AssetType) String() string {
   switch p {
-  case QuantType_Stock: return "Stock"
-  case QuantType_Exchange: return "Exchange"
+  case AssetType_Stock: return "Stock"
+  case AssetType_Exchange: return "Exchange"
   }
   return "<UNSET>"
 }
 
-func QuantTypeFromString(s string) (QuantType, error) {
+func AssetTypeFromString(s string) (AssetType, error) {
   switch s {
-  case "Stock": return QuantType_Stock, nil 
-  case "Exchange": return QuantType_Exchange, nil 
+  case "Stock": return AssetType_Stock, nil 
+  case "Exchange": return AssetType_Exchange, nil 
   }
-  return QuantType(0), fmt.Errorf("not a valid QuantType string")
+  return AssetType(0), fmt.Errorf("not a valid AssetType string")
 }
 
 
-func QuantTypePtr(v QuantType) *QuantType { return &v }
+func AssetTypePtr(v AssetType) *AssetType { return &v }
 
-func (p QuantType) MarshalText() ([]byte, error) {
+func (p AssetType) MarshalText() ([]byte, error) {
 return []byte(p.String()), nil
 }
 
-func (p *QuantType) UnmarshalText(text []byte) error {
-q, err := QuantTypeFromString(string(text))
+func (p *AssetType) UnmarshalText(text []byte) error {
+q, err := AssetTypeFromString(string(text))
 if (err != nil) {
 return err
 }
@@ -58,16 +58,16 @@ return err
 return nil
 }
 
-func (p *QuantType) Scan(value interface{}) error {
+func (p *AssetType) Scan(value interface{}) error {
 v, ok := value.(int64)
 if !ok {
 return errors.New("Scan value is not int64")
 }
-*p = QuantType(v)
+*p = AssetType(v)
 return nil
 }
 
-func (p * QuantType) Value() (driver.Value, error) {
+func (p * AssetType) Value() (driver.Value, error) {
   if p == nil {
     return nil, nil
   }
@@ -295,15 +295,17 @@ func (p *Response) String() string {
 
 type EngineService interface {
   // Parameters:
-  //  - Resource
-  GetType(ctx context.Context, resource QuantType) (r *Response, err error)
+  //  - AssetType
+  GetType(ctx context.Context, assetType AssetType) (r *Response, err error)
   // Parameters:
   //  - Stype
   GetStrategy(ctx context.Context, stype string) (r *Response, err error)
   // Parameters:
-  //  - Stype
+  //  - AssetType
+  //  - Ctype
   //  - Source
-  GetClassify(ctx context.Context, stype string, source string) (r *Response, err error)
+  //  - Sub
+  GetClassify(ctx context.Context, assetType AssetType, ctype string, source string, sub string) (r *Response, err error)
 }
 
 type EngineServiceClient struct {
@@ -331,10 +333,10 @@ func NewEngineServiceClient(c thrift.TClient) *EngineServiceClient {
 }
 
 // Parameters:
-//  - Resource
-func (p *EngineServiceClient) GetType(ctx context.Context, resource QuantType) (r *Response, err error) {
+//  - AssetType
+func (p *EngineServiceClient) GetType(ctx context.Context, assetType AssetType) (r *Response, err error) {
   var _args0 EngineServiceGetTypeArgs
-  _args0.Resource = resource
+  _args0.AssetType = assetType
   var _result1 EngineServiceGetTypeResult
   if err = p.c.Call(ctx, "getType", &_args0, &_result1); err != nil {
     return
@@ -355,12 +357,16 @@ func (p *EngineServiceClient) GetStrategy(ctx context.Context, stype string) (r 
 }
 
 // Parameters:
-//  - Stype
+//  - AssetType
+//  - Ctype
 //  - Source
-func (p *EngineServiceClient) GetClassify(ctx context.Context, stype string, source string) (r *Response, err error) {
+//  - Sub
+func (p *EngineServiceClient) GetClassify(ctx context.Context, assetType AssetType, ctype string, source string, sub string) (r *Response, err error) {
   var _args4 EngineServiceGetClassifyArgs
-  _args4.Stype = stype
+  _args4.AssetType = assetType
+  _args4.Ctype = ctype
   _args4.Source = source
+  _args4.Sub = sub
   var _result5 EngineServiceGetClassifyResult
   if err = p.c.Call(ctx, "getClassify", &_args4, &_result5); err != nil {
     return
@@ -432,7 +438,7 @@ func (p *engineServiceProcessorGetType) Process(ctx context.Context, seqId int32
   result := EngineServiceGetTypeResult{}
 var retval *Response
   var err2 error
-  if retval, err2 = p.handler.GetType(ctx, args.Resource); err2 != nil {
+  if retval, err2 = p.handler.GetType(ctx, args.AssetType); err2 != nil {
     x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing getType: " + err2.Error())
     oprot.WriteMessageBegin("getType", thrift.EXCEPTION, seqId)
     x.Write(oprot)
@@ -528,7 +534,7 @@ func (p *engineServiceProcessorGetClassify) Process(ctx context.Context, seqId i
   result := EngineServiceGetClassifyResult{}
 var retval *Response
   var err2 error
-  if retval, err2 = p.handler.GetClassify(ctx, args.Stype, args.Source); err2 != nil {
+  if retval, err2 = p.handler.GetClassify(ctx, args.AssetType, args.Ctype, args.Source, args.Sub); err2 != nil {
     x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing getClassify: " + err2.Error())
     oprot.WriteMessageBegin("getClassify", thrift.EXCEPTION, seqId)
     x.Write(oprot)
@@ -560,9 +566,9 @@ var retval *Response
 // HELPER FUNCTIONS AND STRUCTURES
 
 // Attributes:
-//  - Resource
+//  - AssetType
 type EngineServiceGetTypeArgs struct {
-  Resource QuantType `thrift:"resource,1" db:"resource" json:"resource"`
+  AssetType AssetType `thrift:"assetType,1" db:"assetType" json:"assetType"`
 }
 
 func NewEngineServiceGetTypeArgs() *EngineServiceGetTypeArgs {
@@ -570,8 +576,8 @@ func NewEngineServiceGetTypeArgs() *EngineServiceGetTypeArgs {
 }
 
 
-func (p *EngineServiceGetTypeArgs) GetResource() QuantType {
-  return p.Resource
+func (p *EngineServiceGetTypeArgs) GetAssetType() AssetType {
+  return p.AssetType
 }
 func (p *EngineServiceGetTypeArgs) Read(iprot thrift.TProtocol) error {
   if _, err := iprot.ReadStructBegin(); err != nil {
@@ -615,8 +621,8 @@ func (p *EngineServiceGetTypeArgs)  ReadField1(iprot thrift.TProtocol) error {
   if v, err := iprot.ReadI32(); err != nil {
   return thrift.PrependError("error reading field 1: ", err)
 } else {
-  temp := QuantType(v)
-  p.Resource = temp
+  temp := AssetType(v)
+  p.AssetType = temp
 }
   return nil
 }
@@ -635,12 +641,12 @@ func (p *EngineServiceGetTypeArgs) Write(oprot thrift.TProtocol) error {
 }
 
 func (p *EngineServiceGetTypeArgs) writeField1(oprot thrift.TProtocol) (err error) {
-  if err := oprot.WriteFieldBegin("resource", thrift.I32, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:resource: ", p), err) }
-  if err := oprot.WriteI32(int32(p.Resource)); err != nil {
-  return thrift.PrependError(fmt.Sprintf("%T.resource (1) field write error: ", p), err) }
+  if err := oprot.WriteFieldBegin("assetType", thrift.I32, 1); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:assetType: ", p), err) }
+  if err := oprot.WriteI32(int32(p.AssetType)); err != nil {
+  return thrift.PrependError(fmt.Sprintf("%T.assetType (1) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:resource: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:assetType: ", p), err) }
   return err
 }
 
@@ -943,11 +949,15 @@ func (p *EngineServiceGetStrategyResult) String() string {
 }
 
 // Attributes:
-//  - Stype
+//  - AssetType
+//  - Ctype
 //  - Source
+//  - Sub
 type EngineServiceGetClassifyArgs struct {
-  Stype string `thrift:"stype,1" db:"stype" json:"stype"`
-  Source string `thrift:"source,2" db:"source" json:"source"`
+  AssetType AssetType `thrift:"assetType,1" db:"assetType" json:"assetType"`
+  Ctype string `thrift:"ctype,2" db:"ctype" json:"ctype"`
+  Source string `thrift:"source,3" db:"source" json:"source"`
+  Sub string `thrift:"sub,4" db:"sub" json:"sub"`
 }
 
 func NewEngineServiceGetClassifyArgs() *EngineServiceGetClassifyArgs {
@@ -955,12 +965,20 @@ func NewEngineServiceGetClassifyArgs() *EngineServiceGetClassifyArgs {
 }
 
 
-func (p *EngineServiceGetClassifyArgs) GetStype() string {
-  return p.Stype
+func (p *EngineServiceGetClassifyArgs) GetAssetType() AssetType {
+  return p.AssetType
+}
+
+func (p *EngineServiceGetClassifyArgs) GetCtype() string {
+  return p.Ctype
 }
 
 func (p *EngineServiceGetClassifyArgs) GetSource() string {
   return p.Source
+}
+
+func (p *EngineServiceGetClassifyArgs) GetSub() string {
+  return p.Sub
 }
 func (p *EngineServiceGetClassifyArgs) Read(iprot thrift.TProtocol) error {
   if _, err := iprot.ReadStructBegin(); err != nil {
@@ -976,7 +994,7 @@ func (p *EngineServiceGetClassifyArgs) Read(iprot thrift.TProtocol) error {
     if fieldTypeId == thrift.STOP { break; }
     switch fieldId {
     case 1:
-      if fieldTypeId == thrift.STRING {
+      if fieldTypeId == thrift.I32 {
         if err := p.ReadField1(iprot); err != nil {
           return err
         }
@@ -988,6 +1006,26 @@ func (p *EngineServiceGetClassifyArgs) Read(iprot thrift.TProtocol) error {
     case 2:
       if fieldTypeId == thrift.STRING {
         if err := p.ReadField2(iprot); err != nil {
+          return err
+        }
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
+          return err
+        }
+      }
+    case 3:
+      if fieldTypeId == thrift.STRING {
+        if err := p.ReadField3(iprot); err != nil {
+          return err
+        }
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
+          return err
+        }
+      }
+    case 4:
+      if fieldTypeId == thrift.STRING {
+        if err := p.ReadField4(iprot); err != nil {
           return err
         }
       } else {
@@ -1011,10 +1049,11 @@ func (p *EngineServiceGetClassifyArgs) Read(iprot thrift.TProtocol) error {
 }
 
 func (p *EngineServiceGetClassifyArgs)  ReadField1(iprot thrift.TProtocol) error {
-  if v, err := iprot.ReadString(); err != nil {
+  if v, err := iprot.ReadI32(); err != nil {
   return thrift.PrependError("error reading field 1: ", err)
 } else {
-  p.Stype = v
+  temp := AssetType(v)
+  p.AssetType = temp
 }
   return nil
 }
@@ -1023,7 +1062,25 @@ func (p *EngineServiceGetClassifyArgs)  ReadField2(iprot thrift.TProtocol) error
   if v, err := iprot.ReadString(); err != nil {
   return thrift.PrependError("error reading field 2: ", err)
 } else {
+  p.Ctype = v
+}
+  return nil
+}
+
+func (p *EngineServiceGetClassifyArgs)  ReadField3(iprot thrift.TProtocol) error {
+  if v, err := iprot.ReadString(); err != nil {
+  return thrift.PrependError("error reading field 3: ", err)
+} else {
   p.Source = v
+}
+  return nil
+}
+
+func (p *EngineServiceGetClassifyArgs)  ReadField4(iprot thrift.TProtocol) error {
+  if v, err := iprot.ReadString(); err != nil {
+  return thrift.PrependError("error reading field 4: ", err)
+} else {
+  p.Sub = v
 }
   return nil
 }
@@ -1034,6 +1091,8 @@ func (p *EngineServiceGetClassifyArgs) Write(oprot thrift.TProtocol) error {
   if p != nil {
     if err := p.writeField1(oprot); err != nil { return err }
     if err := p.writeField2(oprot); err != nil { return err }
+    if err := p.writeField3(oprot); err != nil { return err }
+    if err := p.writeField4(oprot); err != nil { return err }
   }
   if err := oprot.WriteFieldStop(); err != nil {
     return thrift.PrependError("write field stop error: ", err) }
@@ -1043,22 +1102,42 @@ func (p *EngineServiceGetClassifyArgs) Write(oprot thrift.TProtocol) error {
 }
 
 func (p *EngineServiceGetClassifyArgs) writeField1(oprot thrift.TProtocol) (err error) {
-  if err := oprot.WriteFieldBegin("stype", thrift.STRING, 1); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:stype: ", p), err) }
-  if err := oprot.WriteString(string(p.Stype)); err != nil {
-  return thrift.PrependError(fmt.Sprintf("%T.stype (1) field write error: ", p), err) }
+  if err := oprot.WriteFieldBegin("assetType", thrift.I32, 1); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:assetType: ", p), err) }
+  if err := oprot.WriteI32(int32(p.AssetType)); err != nil {
+  return thrift.PrependError(fmt.Sprintf("%T.assetType (1) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:stype: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:assetType: ", p), err) }
   return err
 }
 
 func (p *EngineServiceGetClassifyArgs) writeField2(oprot thrift.TProtocol) (err error) {
-  if err := oprot.WriteFieldBegin("source", thrift.STRING, 2); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:source: ", p), err) }
-  if err := oprot.WriteString(string(p.Source)); err != nil {
-  return thrift.PrependError(fmt.Sprintf("%T.source (2) field write error: ", p), err) }
+  if err := oprot.WriteFieldBegin("ctype", thrift.STRING, 2); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:ctype: ", p), err) }
+  if err := oprot.WriteString(string(p.Ctype)); err != nil {
+  return thrift.PrependError(fmt.Sprintf("%T.ctype (2) field write error: ", p), err) }
   if err := oprot.WriteFieldEnd(); err != nil {
-    return thrift.PrependError(fmt.Sprintf("%T write field end error 2:source: ", p), err) }
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 2:ctype: ", p), err) }
+  return err
+}
+
+func (p *EngineServiceGetClassifyArgs) writeField3(oprot thrift.TProtocol) (err error) {
+  if err := oprot.WriteFieldBegin("source", thrift.STRING, 3); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 3:source: ", p), err) }
+  if err := oprot.WriteString(string(p.Source)); err != nil {
+  return thrift.PrependError(fmt.Sprintf("%T.source (3) field write error: ", p), err) }
+  if err := oprot.WriteFieldEnd(); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 3:source: ", p), err) }
+  return err
+}
+
+func (p *EngineServiceGetClassifyArgs) writeField4(oprot thrift.TProtocol) (err error) {
+  if err := oprot.WriteFieldBegin("sub", thrift.STRING, 4); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 4:sub: ", p), err) }
+  if err := oprot.WriteString(string(p.Sub)); err != nil {
+  return thrift.PrependError(fmt.Sprintf("%T.sub (4) field write error: ", p), err) }
+  if err := oprot.WriteFieldEnd(); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 4:sub: ", p), err) }
   return err
 }
 

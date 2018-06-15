@@ -4,7 +4,9 @@
   },
   "ASSETS": {
     "TYPE": {
-      "STOCK": "股票"
+      "STOCK": "股票",
+      "EXCHANGE": "期货",
+      "CONFIG": "配置"
     }
   },
   "RESOURCE": {
@@ -14,6 +16,15 @@
       "STATUS": "状态",
       "STRATEGY": "策略",
       "TYPE": "类别"
+    },
+    "CLASSIFY": {
+      "CONCEPT": "分类",
+      "ASSET": "资产",
+      "NAME": "名称",
+      "TAG": "标签",
+      "TYPE": "类别",
+      "SOURCE": "来源",
+      "SUB": "子分类"
     },
     "GENERAL": {
       "CONCEPT": "通用",
@@ -34,6 +45,7 @@
   "PROCESS": { 
     "GET": "获取", 
     "LIST": "罗列", 
+    "SYNC": "同步", 
     "CREATE": "添加", 
     "UPDATE": "更新",
     "DELETE": "删除",

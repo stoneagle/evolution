@@ -1,4 +1,5 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core'; import { Pool } from '../../../model/business/pool';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core'; 
+import { Pool } from '../../../model/business/pool';
 import { PoolService  } from '../../../service/business/pool.service';
 
 @Component({

@@ -39,7 +39,7 @@ export class PoolComponent implements OnInit {
 
   delete(pool: Pool): void {
     this.poolService.Delete(pool.Id)
-    .subscribe(autobuild => {
+    .subscribe(res => {
       this.refresh();
     })
   }

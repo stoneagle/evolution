@@ -13,13 +13,19 @@ run-web:
 	cd hack/swarm && docker-compose -f docker-compose.yml -p "$(PROJ)-$(USER)-web" up
 
 stop-web: 
+	export REGISTRY_PREFIX=$(REGISTRY_PREFIX) && \
 	cd hack/swarm && docker-compose -f docker-compose.yml -p "$(PROJ)-$(USER)-web" stop 
 
 rm-web: 
+	export REGISTRY_PREFIX=$(REGISTRY_PREFIX) && \
 	cd hack/swarm && docker-compose -f docker-compose.yml -p "$(PROJ)-$(USER)-web" rm 
 
 build-golang:
 	cd hack/dockerfile && docker build -f ./Dockerfile-golang -t quant/golang:1.10 .
+
+# init
+init-db:
+	docker exec -w /go/src/quant/backend/initial -it quant-wuzhongyang-golang go run init.go 
 
 # frontend
 run-ng:
@@ -54,10 +60,10 @@ thrift-golang:
 thrift-python:
 	docker run -it --rm \
 		-u $(USER):$(GROUP) \
-		-v $(PWD)/dags:$(THRIFT_PREFIX)/dags \
+		-v $(PWD)/engine:$(THRIFT_PREFIX)/engine \
 		-v $(PWD)/hack:$(THRIFT_PREFIX)/hack \
 		thrift:0.11.0 \
-		thrift --gen py -out $(THRIFT_PREFIX)/dags/rpc $(THRIFT_PREFIX)/hack/thrift/engine.thrift
+		thrift --gen py -out $(THRIFT_PREFIX)/engine/rpc $(THRIFT_PREFIX)/hack/thrift/engine.thrift
 
 # engine
 build-engine-basic:

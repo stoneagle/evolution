@@ -14,14 +14,14 @@ THE_FIELDS = ['code', 'symbol', 'name', 'changepercent', 'trade', 'open', 'high'
 CLASSIFY_COLS = ['code']
 
 
-def get_json(ctype):
-    if ctype == "industry":
+def get_json(sub):
+    if sub == "industry":
         url = 'http://vip.stock.finance.sina.com.cn/q/view/newSinaHy.php'
         df = _get_type_data(url)
-    elif ctype == "concept":
+    elif sub == "concept":
         url = 'http://money.finance.sina.com.cn/q/view/newFLJK.php?param=class'
         df = _get_type_data(url)
-    elif ctype == "hot":
+    elif sub == "hot":
         df = _get_new_type_data()
     return df
 

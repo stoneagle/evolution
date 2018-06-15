@@ -1,0 +1,51 @@
+<clr-modal [(clrModalOpen)]="modelOpened">
+    <h3 class="modal-title" >
+      {{ 'PROCESS.SYNC' | translate }}{{ 'RESOURCE.CLASSIFY.CONCEPT' | translate }}
+    </h3>
+    <div class="modal-body">
+      <form #syncForm="ngForm" (ngSubmit)="Sync()">
+        <div class="form-group">
+          <label for="Asset">{{ 'RESOURCE.CLASSIFY.ASSET' | translate }}</label>
+          <div class="select">
+            <select id="AssetString" [(ngModel)]="classify.AssetString" name="AssetString" required (ngModelChange)="AssetOnChange($event)" >
+              <option *ngFor="let key of getKeys(assetMap)" [ngValue]=key>
+								{{ "ASSETS.TYPE." + assetMap.get(key) | translate }}
+							</option>
+            </select>
+          </div>
+        </div> 
+        <div class="form-group">
+          <label for="Type">{{ 'RESOURCE.CLASSIFY.TYPE' | translate }}</label>
+          <div class="select">
+            <select id="Type" [(ngModel)]="classify.Type" name="Type" required (ngModelChange)="TypeOnChange($event)">
+              <option *ngFor="let key of getKeys(typeMap)" [ngValue]=key>
+								{{ typeMap.get(key) }}
+							</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="Source">{{ 'RESOURCE.CLASSIFY.SOURCE' | translate }}</label>
+          <div class="select">
+            <select id="Source" [(ngModel)]="classify.Source" name="Source" required (ngModelChange)="SourceOnChange($event)">
+              <option *ngFor="let key of getKeys(sourceMap)" [ngValue]=key>
+								{{ sourceMap.get(key) }}
+							</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="Sub">{{ 'RESOURCE.CLASSIFY.SUB' | translate }}</label>
+          <div class="select">
+            <select id="Sub" [(ngModel)]="classify.Sub" name="Sub" required >
+              <option *ngFor="let key of getKeys(subMap)" [ngValue]=key>
+								{{ subMap.get(key) }}
+							</option>
+            </select>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-success">{{ 'PROCESS.SYNC' | translate }}</button>
+        <button type="button" class="btn btn-primary" (click)="modelOpened = false">{{ 'PROCESS.CANCEL' | translate }}</button>
+      </form>
+    </div>     
+</clr-modal>   

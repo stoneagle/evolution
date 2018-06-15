@@ -19,10 +19,10 @@ all_structs = []
 
 
 class Iface(object):
-    def getType(self, resource):
+    def getType(self, assetType):
         """
         Parameters:
-         - resource
+         - assetType
         """
         pass
 
@@ -33,11 +33,13 @@ class Iface(object):
         """
         pass
 
-    def getClassify(self, stype, source):
+    def getClassify(self, assetType, ctype, source, sub):
         """
         Parameters:
-         - stype
+         - assetType
+         - ctype
          - source
+         - sub
         """
         pass
 
@@ -49,18 +51,18 @@ class Client(Iface):
             self._oprot = oprot
         self._seqid = 0
 
-    def getType(self, resource):
+    def getType(self, assetType):
         """
         Parameters:
-         - resource
+         - assetType
         """
-        self.send_getType(resource)
+        self.send_getType(assetType)
         return self.recv_getType()
 
-    def send_getType(self, resource):
+    def send_getType(self, assetType):
         self._oprot.writeMessageBegin('getType', TMessageType.CALL, self._seqid)
         args = getType_args()
-        args.resource = resource
+        args.assetType = assetType
         args.write(self._oprot)
         self._oprot.writeMessageEnd()
         self._oprot.trans.flush()
@@ -111,20 +113,24 @@ class Client(Iface):
             return result.success
         raise TApplicationException(TApplicationException.MISSING_RESULT, "getStrategy failed: unknown result")
 
-    def getClassify(self, stype, source):
+    def getClassify(self, assetType, ctype, source, sub):
         """
         Parameters:
-         - stype
+         - assetType
+         - ctype
          - source
+         - sub
         """
-        self.send_getClassify(stype, source)
+        self.send_getClassify(assetType, ctype, source, sub)
         return self.recv_getClassify()
 
-    def send_getClassify(self, stype, source):
+    def send_getClassify(self, assetType, ctype, source, sub):
         self._oprot.writeMessageBegin('getClassify', TMessageType.CALL, self._seqid)
         args = getClassify_args()
-        args.stype = stype
+        args.assetType = assetType
+        args.ctype = ctype
         args.source = source
+        args.sub = sub
         args.write(self._oprot)
         self._oprot.writeMessageEnd()
         self._oprot.trans.flush()
@@ -174,7 +180,7 @@ class Processor(Iface, TProcessor):
         iprot.readMessageEnd()
         result = getType_result()
         try:
-            result.success = self._handler.getType(args.resource)
+            result.success = self._handler.getType(args.assetType)
             msg_type = TMessageType.REPLY
         except TTransport.TTransportException:
             raise
@@ -220,7 +226,7 @@ class Processor(Iface, TProcessor):
         iprot.readMessageEnd()
         result = getClassify_result()
         try:
-            result.success = self._handler.getClassify(args.stype, args.source)
+            result.success = self._handler.getClassify(args.assetType, args.ctype, args.source, args.sub)
             msg_type = TMessageType.REPLY
         except TTransport.TTransportException:
             raise
@@ -243,12 +249,12 @@ class Processor(Iface, TProcessor):
 class getType_args(object):
     """
     Attributes:
-     - resource
+     - assetType
     """
 
 
-    def __init__(self, resource=None,):
-        self.resource = resource
+    def __init__(self, assetType=None,):
+        self.assetType = assetType
 
     def read(self, iprot):
         if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
@@ -261,7 +267,7 @@ class getType_args(object):
                 break
             if fid == 1:
                 if ftype == TType.I32:
-                    self.resource = iprot.readI32()
+                    self.assetType = iprot.readI32()
                 else:
                     iprot.skip(ftype)
             else:
@@ -274,9 +280,9 @@ class getType_args(object):
             oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
             return
         oprot.writeStructBegin('getType_args')
-        if self.resource is not None:
-            oprot.writeFieldBegin('resource', TType.I32, 1)
-            oprot.writeI32(self.resource)
+        if self.assetType is not None:
+            oprot.writeFieldBegin('assetType', TType.I32, 1)
+            oprot.writeI32(self.assetType)
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
         oprot.writeStructEnd()
@@ -297,7 +303,7 @@ class getType_args(object):
 all_structs.append(getType_args)
 getType_args.thrift_spec = (
     None,  # 0
-    (1, TType.I32, 'resource', None, None, ),  # 1
+    (1, TType.I32, 'assetType', None, None, ),  # 1
 )
 
 
@@ -487,14 +493,18 @@ getStrategy_result.thrift_spec = (
 class getClassify_args(object):
     """
     Attributes:
-     - stype
+     - assetType
+     - ctype
      - source
+     - sub
     """
 
 
-    def __init__(self, stype=None, source=None,):
-        self.stype = stype
+    def __init__(self, assetType=None, ctype=None, source=None, sub=None,):
+        self.assetType = assetType
+        self.ctype = ctype
         self.source = source
+        self.sub = sub
 
     def read(self, iprot):
         if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
@@ -506,13 +516,23 @@ class getClassify_args(object):
             if ftype == TType.STOP:
                 break
             if fid == 1:
-                if ftype == TType.STRING:
-                    self.stype = iprot.readString().decode('utf-8') if sys.version_info[0] == 2 else iprot.readString()
+                if ftype == TType.I32:
+                    self.assetType = iprot.readI32()
                 else:
                     iprot.skip(ftype)
             elif fid == 2:
                 if ftype == TType.STRING:
+                    self.ctype = iprot.readString().decode('utf-8') if sys.version_info[0] == 2 else iprot.readString()
+                else:
+                    iprot.skip(ftype)
+            elif fid == 3:
+                if ftype == TType.STRING:
                     self.source = iprot.readString().decode('utf-8') if sys.version_info[0] == 2 else iprot.readString()
+                else:
+                    iprot.skip(ftype)
+            elif fid == 4:
+                if ftype == TType.STRING:
+                    self.sub = iprot.readString().decode('utf-8') if sys.version_info[0] == 2 else iprot.readString()
                 else:
                     iprot.skip(ftype)
             else:
@@ -525,13 +545,21 @@ class getClassify_args(object):
             oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
             return
         oprot.writeStructBegin('getClassify_args')
-        if self.stype is not None:
-            oprot.writeFieldBegin('stype', TType.STRING, 1)
-            oprot.writeString(self.stype.encode('utf-8') if sys.version_info[0] == 2 else self.stype)
+        if self.assetType is not None:
+            oprot.writeFieldBegin('assetType', TType.I32, 1)
+            oprot.writeI32(self.assetType)
+            oprot.writeFieldEnd()
+        if self.ctype is not None:
+            oprot.writeFieldBegin('ctype', TType.STRING, 2)
+            oprot.writeString(self.ctype.encode('utf-8') if sys.version_info[0] == 2 else self.ctype)
             oprot.writeFieldEnd()
         if self.source is not None:
-            oprot.writeFieldBegin('source', TType.STRING, 2)
+            oprot.writeFieldBegin('source', TType.STRING, 3)
             oprot.writeString(self.source.encode('utf-8') if sys.version_info[0] == 2 else self.source)
+            oprot.writeFieldEnd()
+        if self.sub is not None:
+            oprot.writeFieldBegin('sub', TType.STRING, 4)
+            oprot.writeString(self.sub.encode('utf-8') if sys.version_info[0] == 2 else self.sub)
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
         oprot.writeStructEnd()
@@ -552,8 +580,10 @@ class getClassify_args(object):
 all_structs.append(getClassify_args)
 getClassify_args.thrift_spec = (
     None,  # 0
-    (1, TType.STRING, 'stype', 'UTF8', None, ),  # 1
-    (2, TType.STRING, 'source', 'UTF8', None, ),  # 2
+    (1, TType.I32, 'assetType', None, None, ),  # 1
+    (2, TType.STRING, 'ctype', 'UTF8', None, ),  # 2
+    (3, TType.STRING, 'source', 'UTF8', None, ),  # 3
+    (4, TType.STRING, 'sub', 'UTF8', None, ),  # 4
 )
 
 
