@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { AppConfig } from './service/base/config.service';
 import { TranslateService  } from '@ngx-translate/core';
 
 @Component({
@@ -12,7 +13,8 @@ export class AppComponent {
   constructor(
     translate: TranslateService
   ) {
-    translate.setDefaultLang('zh-cn');
-    translate.use('zh-cn');
+    let lang = AppConfig.settings.app.language;
+    translate.setDefaultLang(lang);
+    translate.use(lang);
   }
 }

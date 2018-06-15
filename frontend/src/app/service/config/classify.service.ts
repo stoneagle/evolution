@@ -3,29 +3,29 @@ import { HttpClient, HttpHeaders  } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { of } from 'rxjs/observable/of';
 import { catchError, map, tap  } from 'rxjs/operators';
-import { Pool } from '../../model/business/pool';
+import { Classify } from '../../model/config/classify';
 import { Response } from '../../model/base/response.model';
 import { AppConfig } from '../base/config.service';
 import { MessageHandlerService  } from '../base/message-handler.service';
 
 @Injectable()
-export class PoolService {
-  private uri = '/pool';
+export class ClassifyService {
+  private uri = '/classify';
 
   constructor(
     private http: HttpClient,
     private messageHandlerService: MessageHandlerService,
   ) { }
 
-  List(): Observable<Pool[]> {
+  List(): Observable<Classify[]> {
     return this.http.get<Response>(AppConfig.settings.apiServer.endpoint + this.uri).pipe(
       catchError(this.handleError<Response>('PROCESS.LIST')),
       map(res => {
-        let ret:Pool[] = []; 
+        let ret:Classify[] = []; 
         if (res && res.code == 0) {
           res.data.map(
             one => {
-              ret.push(new Pool(one));
+              ret.push(new Classify(one));
             }
           )
         }
@@ -34,37 +34,30 @@ export class PoolService {
     )
   }
 
-  Get(id: number): Observable<Pool> {
+  Get(id: number): Observable<Classify> {
     return this.http.get<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/${id}`).pipe(
       catchError(this.handleError<Response>('PROCESS.GET')),
       map(res => {
         if (res && res.code == 0) {
-          return new Pool(res.data);
+          return new Classify(res.data);
         } else {
-          return new Pool();
+          return new Classify();
         }
       }),
     )
   }
 
-  Add(pool: Pool): Observable<Pool> {
-      return this.http.post<Response>(AppConfig.settings.apiServer.endpoint + this.uri, JSON.stringify(pool)).pipe(
-      tap(res => this.log('PROCESS.ADD', res)),
-      catchError(this.handleError<Response>('PROCESS.ADD')),
+  Sync(classify: Classify): Observable<Boolean> {
+    return this.http.post<Response>(AppConfig.settings.apiServer.endpoint + this.uri + '/sync', JSON.stringify(classify)).pipe(
+      tap(res => this.log('PROCESS.SYNC', res)),
+      catchError(this.handleError<Response>('PROCESS.SYNC')),
         map(res => {
           if (res && res.code == 0) {
-            return new Pool(res.data);
+            return true;
           } else {
-            return new Pool();
+            return false;
           }
         }),
-    );
-  }
-
-  Update(pool: Pool): Observable<Response> {
-      return this.http.put<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/${pool.Id}`, JSON.stringify(pool)).pipe(
-      tap(res => this.log('PROCESS.UPDATE', res)),
-      catchError(this.handleError<Response>('PROCESS.UPDATE')),
     );
   }
 

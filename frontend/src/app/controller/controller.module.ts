@@ -2,7 +2,11 @@ import { NgModule } from '@angular/core';
 
 import { PoolComponent } from './pool/pool.component';
 import { SavePoolComponent } from './pool/save/save.component';
+import { ClassifyComponent } from './classify/classify.component';
+import { SyncClassifyComponent } from './classify/sync/sync.component';
 import { PoolService } from '../service/business/pool.service';
+import { ClassifyService } from '../service/config/classify.service';
+import { ConfigService } from '../service/config/config.service';
 import { MessageHandlerService  } from '../service/base/message-handler.service';
 
 import { BrowserModule } from '@angular/platform-browser';
@@ -17,6 +21,8 @@ import { TranslateModule  } from "@ngx-translate/core";
   declarations: [
     PoolComponent,
     SavePoolComponent,
+    ClassifyComponent,
+    SyncClassifyComponent,
   ],
   imports: [   
     BrowserModule,
@@ -29,6 +35,8 @@ import { TranslateModule  } from "@ngx-translate/core";
   ],
   providers: [ 
     PoolService,
+    ClassifyService,
+    ConfigService,
     MessageHandlerService,
   ],
   exports: [

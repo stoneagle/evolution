@@ -1,5 +1,6 @@
 {
   "app": {     
+    "language": "zh-cn"
   },
   "apiServer": {
     "endpoint": "http://localhost:8180/v1"
