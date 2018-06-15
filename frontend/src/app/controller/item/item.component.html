@@ -1,0 +1,41 @@
+<button class="btn btn-primary" (click)="openSyncModel()">
+  {{ "PROCESS.SYNC" | translate }}
+</button>
+<span class="refresh-btn" (click)="refresh()">
+  <clr-icon shape="refresh"></clr-icon>
+</span>
+<clr-datagrid  (clrDgRefresh)="load($event)">
+  <!-- <clr-dg-column>{{ 'RESOURCE.GENERAL.ID' | translate }}</clr-dg-column> -->
+  <clr-dg-column>{{ 'RESOURCE.ITEM.CODE' | translate }}</clr-dg-column>
+  <clr-dg-column>{{ 'RESOURCE.ITEM.NAME' | translate }}</clr-dg-column>
+  <clr-dg-column>{{ 'RESOURCE.ITEM.STATUS' | translate }}</clr-dg-column>
+  <clr-dg-column>{{ 'RESOURCE.GENERAL.CREATED' | translate }}</clr-dg-column>
+  <clr-dg-column>{{ 'RESOURCE.GENERAL.UPDATED' | translate }}</clr-dg-column>
+	<clr-dg-column>{{ 'RESOURCE.GENERAL.OPERATION' | translate }}</clr-dg-column>
+
+  <clr-dg-row *ngFor="let item of items">
+    <!-- <clr-dg-cell>{{item.Id}}</clr-dg-cell> -->
+    <clr-dg-cell>{{item.Code}}</clr-dg-cell>
+    <clr-dg-cell>{{item.Name}}</clr-dg-cell>
+    <clr-dg-cell>{{item.Status}}</clr-dg-cell>
+    <clr-dg-cell>{{item.CreatedAt | date: 'yy-MM-dd HH:mm:ss'}}</clr-dg-cell>
+    <clr-dg-cell>{{item.UpdatedAt | date: 'yy-MM-dd HH:mm:ss'}}</clr-dg-cell>
+    <clr-dg-cell>
+      <div class="btn-group btn-primary btn-icon">
+        <!-- <button (click)="delete(item)" class="btn btn-danger"> -->
+        <!--   <clr-icon shape="trash"></clr-icon> -->
+        <!--   <span class="clr-icon-title"></span> -->
+        <!-- </button> -->
+      </div>
+    </clr-dg-cell>  
+  </clr-dg-row>
+
+  <clr-dg-footer>
+    <clr-dg-pagination #pagination [clrDgPageSize]="pageSize" [(clrDgPage)]="currentPage" [clrDgTotalItems]="totalCount">
+      {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
+      / {{pagination.totalItems}} {{ 'RESOURCE.ITEM.CONCEPT' | translate }}
+    </clr-dg-pagination>
+  </clr-dg-footer>
+</clr-datagrid>
+
+<sync-item (sync)="syncd($event)"></sync-item>

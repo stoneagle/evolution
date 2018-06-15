@@ -17,6 +17,12 @@
       "STRATEGY": "strategy",
       "TYPE": "type"
     },
+    "ITEM": {
+      "CONCEPT": "item",
+      "CODE": "code",
+      "NAME": "name",
+      "STATUS": "status"
+    },
     "CLASSIFY": {
       "CONCEPT": "classify",
       "ASSET": "assets",

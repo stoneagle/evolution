@@ -17,6 +17,12 @@
       "STRATEGY": "策略",
       "TYPE": "类别"
     },
+    "ITEM": {
+      "CONCEPT": "标的",
+      "CODE": "代号",
+      "NAME": "名称",
+      "STATUS": "状态"
+    },
     "CLASSIFY": {
       "CONCEPT": "分类",
       "ASSET": "资产",
