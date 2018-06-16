@@ -4,8 +4,8 @@ PWD := $(shell pwd)
 USER := $(shell id -u)
 GROUP := $(shell id -g)
 DATE := $(shell date "+%F")
-REGISTRY_PREFIX := "stoneagle/quant-engine"
-PROJ := "quant"
+REGISTRY_PREFIX := stoneagle/quant-engine
+PROJ := quant
 
 # backend
 run-web: 

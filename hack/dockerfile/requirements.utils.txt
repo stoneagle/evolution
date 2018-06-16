@@ -11,3 +11,4 @@ influxdb
 wxpy
 pillow
 thrift
+watchdog
