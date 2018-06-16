@@ -26,6 +26,7 @@ func (c *Classify) Router(router *gin.RouterGroup) {
 	classify := router.Group("classify")
 	classify.GET("/:id", initClassify(c.ClassifySvc), c.One)
 	classify.GET("", c.List)
+	classify.POST("", c.ListByAssetSource)
 	classify.POST("/sync", c.Sync)
 	classify.DELETE("/:id", initClassify(c.ClassifySvc), c.Delete)
 }
@@ -55,6 +56,22 @@ func (c *Classify) One(ctx *gin.Context) {
 
 func (c *Classify) List(ctx *gin.Context) {
 	classifies, err := c.ClassifySvc.List()
+	if err != nil {
+		common.ResponseErrorBusiness(ctx, common.ErrorMysql, "classify get error", err)
+		return
+	}
+	common.ResponseSuccess(ctx, classifies)
+}
+
+func (c *Classify) ListByAssetSource(ctx *gin.Context) {
+	var classify models.Classify
+	if err := ctx.ShouldBindJSON(&classify); err != nil {
+		common.ResponseErrorBusiness(ctx, common.ErrorParams, "params error: ", err)
+		return
+	}
+
+	atype, err := engine.AssetTypeFromString(classify.AssetString)
+	classifies, err := c.ClassifySvc.ListByAssetSource(atype, classify.Type, classify.Main, classify.Sub)
 	if err != nil {
 		common.ResponseErrorBusiness(ctx, common.ErrorMysql, "classify get error", err)
 		return

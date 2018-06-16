@@ -16,6 +16,7 @@ type Bootstrapper struct {
 	AppOwner     string
 	AppSpawnDate time.Time
 	Config       *common.Conf
+	Websocket    *common.Websocket
 }
 
 func New(appName, appOwner string, cfgs ...Configurator) *Bootstrapper {
@@ -24,9 +25,9 @@ func New(appName, appOwner string, cfgs ...Configurator) *Bootstrapper {
 		AppOwner:     appOwner,
 		AppSpawnDate: time.Now(),
 		App:          gin.New(),
+		Websocket:    common.NewWebsocket(),
 		Config:       common.GetConfig(),
 	}
-
 	return b
 }
 

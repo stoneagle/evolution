@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"encoding/json"
 	"quant/backend/common"
 	"quant/backend/models"
 	"quant/backend/services"
@@ -13,22 +14,27 @@ type Item struct {
 	Base
 	ItemSvc     *services.Item
 	ClassifySvc *services.Classify
+	Ws          *common.Websocket
 }
 
-func NewItem() *Item {
+func NewItem(ws *common.Websocket) *Item {
 	Item := &Item{}
 	Item.Prepare()
 	Item.ItemSvc = services.NewItem(Item.Engine, Item.Cache)
 	Item.ClassifySvc = services.NewClassify(Item.Engine, Item.Cache)
+	Item.Ws = ws
 	return Item
 }
 
 func (c *Item) Router(router *gin.RouterGroup) {
 	item := router.Group("item")
-	item.POST("/sync/source", c.SyncSource)
-	item.POST("/sync/classify", c.SyncClassify)
-	item.GET("/:id", initItem(c.ItemSvc), c.One)
 	item.GET("", c.List)
+	item.GET("/get/:id", initItem(c.ItemSvc), c.One)
+	item.GET("/sync/classify/ws", func(ctx *gin.Context) {
+		wsCtx := c.Ws.BuildContext(c.WsSyncClassify)
+		c.Ws.Intence.HandleRequestWithKeys(ctx.Writer, ctx.Request, wsCtx)
+	})
+	item.POST("/sync/classify", c.SyncClassify)
 }
 
 func initItem(svc *services.Item) gin.HandlerFunc {
@@ -91,6 +97,29 @@ func (c *Item) SyncClassify(ctx *gin.Context) {
 	common.ResponseSuccess(ctx, struct{}{})
 }
 
-func (c *Item) SyncSource(ctx *gin.Context) {
-	common.ResponseSuccess(ctx, struct{}{})
+func (c *Item) WsSyncClassify(sourceJson []byte) common.WebsocketResponse {
+	var classify models.Classify
+	err := json.Unmarshal(sourceJson, &classify)
+	if err != nil {
+		return c.Ws.ResponseError(common.ErrorParams, "source json unmarshal failed", err)
+	}
+
+	items, err := c.Rpc.GetItem(classify)
+	if err != nil {
+		return c.Ws.ResponseError(common.ErrorEngine, "get item error", err)
+	}
+
+	itemBatch := []models.Item{}
+	for _, i := range items {
+		one := models.Item{}
+		one.Name = i.Name
+		one.Code = i.Code
+		itemBatch = append(itemBatch, one)
+	}
+
+	err = c.ItemSvc.BatchSave(classify, itemBatch)
+	if err != nil {
+		return c.Ws.ResponseError(common.ErrorMysql, "classify save error", err)
+	}
+	return c.Ws.ResponseMessage(classify.Name + " sync success")
 }

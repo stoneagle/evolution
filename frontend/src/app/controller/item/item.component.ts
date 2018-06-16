@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Item } from '../../model/business/item';
 import { ItemService } from '../../service/business/item.service';
+import { ClassifyService } from '../../service/business/classify.service';
 import { AssetSource } from '../../model/config/config';
 import { AssetSourceComponent } from '../config/asset-source/asset-source.component';
 
@@ -22,7 +23,8 @@ export class ItemComponent implements OnInit {
   syncModelOpened: boolean = false;
 
   constructor(
-    private itemService: ItemService
+    private itemService: ItemService,
+    private classifyService: ClassifyService
   ) { }
 
   ngOnInit() {
@@ -32,11 +34,16 @@ export class ItemComponent implements OnInit {
 
   Sync($event: any): void {
     if ($event) {
-      this.itemService.SyncSource($event)
-      .subscribe(res => {
-        this.syncModelOpened = false;
-        this.refresh();
-      })
+      this.classifyService.ListByAssetSource($event).subscribe(res => {
+        if (res.length > 0) {
+          this.syncModelOpened = false;
+          this.itemService.WsSyncSource(res).subscribe(res => {
+            if (res) {
+              this.refresh();
+            }
+          })
+        }
+      });
     } else {
       this.syncModelOpened = false;
     }

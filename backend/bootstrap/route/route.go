@@ -20,7 +20,7 @@ func Configure(b *bootstrap.Bootstrapper) {
 		c.NewPool().Router(v1)
 		c.NewClassify().Router(v1)
 		c.NewConfig().Router(v1)
-		c.NewItem().Router(v1)
+		c.NewItem(b.Websocket).Router(v1)
 		c.NewSignal().Router(v1)
 	}
 }

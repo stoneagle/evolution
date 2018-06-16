@@ -35,6 +35,23 @@ export class ClassifyService {
     )
   }
 
+  ListByAssetSource(assetSource: AssetSource): Observable<Classify[]> {
+    return this.http.post<Response>(AppConfig.settings.apiServer.endpoint + this.uri, JSON.stringify(assetSource)).pipe(
+      catchError(this.handleError<Response>('PROCESS.LIST')),
+      map(res => {
+        let ret:Classify[] = []; 
+        if (res && res.code == 0) {
+          res.data.map(
+            one => {
+              ret.push(new Classify(one));
+            }
+          )
+        }
+        return ret; 
+      }),
+    )
+  }
+
   Get(id: number): Observable<Classify> {
     return this.http.get<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/${id}`).pipe(
       catchError(this.handleError<Response>('PROCESS.GET')),

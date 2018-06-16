@@ -14,7 +14,7 @@ import (
         "strconv"
         "strings"
         "git.apache.org/thrift.git/lib/go/thrift"
-        "engine"
+        "quant/backend/rpc/engine"
 )
 
 

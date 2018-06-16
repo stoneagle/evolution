@@ -55,7 +55,8 @@ thrift-golang:
 		-v $(PWD)/backend:$(THRIFT_PREFIX)/backend \
 		-v $(PWD)/hack:$(THRIFT_PREFIX)/hack \
 		thrift:0.11.0 \
-		thrift --gen go -out $(THRIFT_PREFIX)/backend/rpc $(THRIFT_PREFIX)/hack/thrift/engine.thrift
+		thrift --gen go -out $(THRIFT_PREFIX)/backend/rpc $(THRIFT_PREFIX)/hack/thrift/engine.thrift && \
+	sed -i 's:"engine":"quant/backend/rpc/engine":' ./backend/rpc/engine/*/*.go
 
 thrift-python:
 	docker run -it --rm \

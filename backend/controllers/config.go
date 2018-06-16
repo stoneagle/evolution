@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"quant/backend/common"
 	"quant/backend/rpc/engine"
 
@@ -44,6 +43,5 @@ func (c *Config) Asset(ctx *gin.Context) {
 		engine.AssetType_Stock:    "STOCK",
 		engine.AssetType_Exchange: "EXCHANGE",
 	}
-	fmt.Printf("%v", asset)
 	common.ResponseSuccess(ctx, asset)
 }

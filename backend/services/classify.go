@@ -2,6 +2,7 @@ package services
 
 import (
 	"quant/backend/models"
+	"quant/backend/rpc/engine"
 	"time"
 
 	"github.com/go-redis/redis"
@@ -29,6 +30,12 @@ func (s *Classify) One(id int) (classify models.Classify, err error) {
 func (s *Classify) List() (classifies []models.Classify, err error) {
 	classifies = make([]models.Classify, 0)
 	err = s.engine.Find(&classifies)
+	return
+}
+
+func (s *Classify) ListByAssetSource(asset engine.AssetType, ctype, main, sub string) (classifies []models.Classify, err error) {
+	classifies = make([]models.Classify, 0)
+	err = s.engine.Where("asset = ?", asset).And("type = ?", ctype).And("main = ?", main).And("sub = ?", sub).Find(&classifies)
 	return
 }
 
