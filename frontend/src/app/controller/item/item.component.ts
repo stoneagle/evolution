@@ -32,7 +32,7 @@ export class ItemComponent implements OnInit {
 
   Sync($event: any): void {
     if ($event) {
-      this.itemService.Sync($event)
+      this.itemService.SyncSource($event)
       .subscribe(res => {
         this.syncModelOpened = false;
         this.refresh();

@@ -6,6 +6,8 @@ import { catchError, map, tap  } from 'rxjs/operators';
 import { Item } from '../../model/business/item';
 import { Response } from '../../model/base/response.model';
 import { AppConfig } from '../base/config.service';
+import { Classify } from '../../model/business/classify';
+import { AssetSource } from '../../model/config/config';
 import { MessageHandlerService  } from '../base/message-handler.service';
 
 @Injectable()
@@ -47,8 +49,22 @@ export class ItemService {
     )
   }
 
-  Sync(item: Item): Observable<Boolean> {
-    return this.http.post<Response>(AppConfig.settings.apiServer.endpoint + this.uri + '/sync', JSON.stringify(item)).pipe(
+  SyncClassify(classify: Classify): Observable<Boolean> {
+    return this.http.post<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/sync/classify`, JSON.stringify(classify)).pipe(
+      tap(res => this.log('PROCESS.SYNC', res)),
+      catchError(this.handleError<Response>('PROCESS.SYNC')),
+        map(res => {
+          if (res && res.code == 0) {
+            return true;
+          } else {
+            return false;
+          }
+        }),
+    );
+  }
+
+  SyncSource(assetSource: AssetSource): Observable<Boolean> {
+    return this.http.post<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/sync/source`, JSON.stringify(assetSource)).pipe(
       tap(res => this.log('PROCESS.SYNC', res)),
       catchError(this.handleError<Response>('PROCESS.SYNC')),
         map(res => {

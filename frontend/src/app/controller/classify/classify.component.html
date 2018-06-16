@@ -28,6 +28,10 @@
     <clr-dg-cell>{{classify.UpdatedAt | date: 'yy-MM-dd HH:mm:ss'}}</clr-dg-cell>
     <clr-dg-cell>
       <div class="btn-group btn-primary btn-icon">
+        <button (click)="syncItem(classify)" class="btn">
+          <clr-icon shape="sync"></clr-icon>
+          <span class="clr-icon-title"></span>
+        </button>
         <!-- <button (click)="delete(classify)" class="btn btn-danger"> -->
         <!--   <clr-icon shape="trash"></clr-icon> -->
         <!--   <span class="clr-icon-title"></span> -->

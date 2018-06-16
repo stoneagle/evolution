@@ -27,6 +27,7 @@ if len(sys.argv) <= 1 or sys.argv[1] == '--help':
     print('  Response getType(AssetType assetType)')
     print('  Response getStrategy(string stype)')
     print('  Response getClassify(AssetType assetType, string ctype, string source, string sub)')
+    print('  Response getItem(AssetType assetType, string ctype, string source, string tag, string name)')
     print('')
     sys.exit(0)
 
@@ -123,6 +124,12 @@ elif cmd == 'getClassify':
         print('getClassify requires 4 args')
         sys.exit(1)
     pp.pprint(client.getClassify(eval(args[0]), args[1], args[2], args[3],))
+
+elif cmd == 'getItem':
+    if len(args) != 5:
+        print('getItem requires 5 args')
+        sys.exit(1)
+    pp.pprint(client.getItem(eval(args[0]), args[1], args[2], args[3], args[4],))
 
 else:
     print('Unrecognized method %s' % cmd)

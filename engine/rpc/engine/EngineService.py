@@ -43,6 +43,17 @@ class Iface(object):
         """
         pass
 
+    def getItem(self, assetType, ctype, source, tag, name):
+        """
+        Parameters:
+         - assetType
+         - ctype
+         - source
+         - tag
+         - name
+        """
+        pass
+
 
 class Client(Iface):
     def __init__(self, iprot, oprot=None):
@@ -150,6 +161,45 @@ class Client(Iface):
             return result.success
         raise TApplicationException(TApplicationException.MISSING_RESULT, "getClassify failed: unknown result")
 
+    def getItem(self, assetType, ctype, source, tag, name):
+        """
+        Parameters:
+         - assetType
+         - ctype
+         - source
+         - tag
+         - name
+        """
+        self.send_getItem(assetType, ctype, source, tag, name)
+        return self.recv_getItem()
+
+    def send_getItem(self, assetType, ctype, source, tag, name):
+        self._oprot.writeMessageBegin('getItem', TMessageType.CALL, self._seqid)
+        args = getItem_args()
+        args.assetType = assetType
+        args.ctype = ctype
+        args.source = source
+        args.tag = tag
+        args.name = name
+        args.write(self._oprot)
+        self._oprot.writeMessageEnd()
+        self._oprot.trans.flush()
+
+    def recv_getItem(self):
+        iprot = self._iprot
+        (fname, mtype, rseqid) = iprot.readMessageBegin()
+        if mtype == TMessageType.EXCEPTION:
+            x = TApplicationException()
+            x.read(iprot)
+            iprot.readMessageEnd()
+            raise x
+        result = getItem_result()
+        result.read(iprot)
+        iprot.readMessageEnd()
+        if result.success is not None:
+            return result.success
+        raise TApplicationException(TApplicationException.MISSING_RESULT, "getItem failed: unknown result")
+
 
 class Processor(Iface, TProcessor):
     def __init__(self, handler):
@@ -158,6 +208,7 @@ class Processor(Iface, TProcessor):
         self._processMap["getType"] = Processor.process_getType
         self._processMap["getStrategy"] = Processor.process_getStrategy
         self._processMap["getClassify"] = Processor.process_getClassify
+        self._processMap["getItem"] = Processor.process_getItem
 
     def process(self, iprot, oprot):
         (name, type, seqid) = iprot.readMessageBegin()
@@ -239,6 +290,29 @@ class Processor(Iface, TProcessor):
             msg_type = TMessageType.EXCEPTION
             result = TApplicationException(TApplicationException.INTERNAL_ERROR, 'Internal error')
         oprot.writeMessageBegin("getClassify", msg_type, seqid)
+        result.write(oprot)
+        oprot.writeMessageEnd()
+        oprot.trans.flush()
+
+    def process_getItem(self, seqid, iprot, oprot):
+        args = getItem_args()
+        args.read(iprot)
+        iprot.readMessageEnd()
+        result = getItem_result()
+        try:
+            result.success = self._handler.getItem(args.assetType, args.ctype, args.source, args.tag, args.name)
+            msg_type = TMessageType.REPLY
+        except TTransport.TTransportException:
+            raise
+        except TApplicationException as ex:
+            logging.exception('TApplication exception in handler')
+            msg_type = TMessageType.EXCEPTION
+            result = ex
+        except Exception:
+            logging.exception('Unexpected exception in handler')
+            msg_type = TMessageType.EXCEPTION
+            result = TApplicationException(TApplicationException.INTERNAL_ERROR, 'Internal error')
+        oprot.writeMessageBegin("getItem", msg_type, seqid)
         result.write(oprot)
         oprot.writeMessageEnd()
         oprot.trans.flush()
@@ -644,6 +718,176 @@ class getClassify_result(object):
         return not (self == other)
 all_structs.append(getClassify_result)
 getClassify_result.thrift_spec = (
+    (0, TType.STRUCT, 'success', [Response, None], None, ),  # 0
+)
+
+
+class getItem_args(object):
+    """
+    Attributes:
+     - assetType
+     - ctype
+     - source
+     - tag
+     - name
+    """
+
+
+    def __init__(self, assetType=None, ctype=None, source=None, tag=None, name=None,):
+        self.assetType = assetType
+        self.ctype = ctype
+        self.source = source
+        self.tag = tag
+        self.name = name
+
+    def read(self, iprot):
+        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
+            iprot._fast_decode(self, iprot, [self.__class__, self.thrift_spec])
+            return
+        iprot.readStructBegin()
+        while True:
+            (fname, ftype, fid) = iprot.readFieldBegin()
+            if ftype == TType.STOP:
+                break
+            if fid == 1:
+                if ftype == TType.I32:
+                    self.assetType = iprot.readI32()
+                else:
+                    iprot.skip(ftype)
+            elif fid == 2:
+                if ftype == TType.STRING:
+                    self.ctype = iprot.readString().decode('utf-8') if sys.version_info[0] == 2 else iprot.readString()
+                else:
+                    iprot.skip(ftype)
+            elif fid == 3:
+                if ftype == TType.STRING:
+                    self.source = iprot.readString().decode('utf-8') if sys.version_info[0] == 2 else iprot.readString()
+                else:
+                    iprot.skip(ftype)
+            elif fid == 4:
+                if ftype == TType.STRING:
+                    self.tag = iprot.readString().decode('utf-8') if sys.version_info[0] == 2 else iprot.readString()
+                else:
+                    iprot.skip(ftype)
+            elif fid == 5:
+                if ftype == TType.STRING:
+                    self.name = iprot.readString().decode('utf-8') if sys.version_info[0] == 2 else iprot.readString()
+                else:
+                    iprot.skip(ftype)
+            else:
+                iprot.skip(ftype)
+            iprot.readFieldEnd()
+        iprot.readStructEnd()
+
+    def write(self, oprot):
+        if oprot._fast_encode is not None and self.thrift_spec is not None:
+            oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
+            return
+        oprot.writeStructBegin('getItem_args')
+        if self.assetType is not None:
+            oprot.writeFieldBegin('assetType', TType.I32, 1)
+            oprot.writeI32(self.assetType)
+            oprot.writeFieldEnd()
+        if self.ctype is not None:
+            oprot.writeFieldBegin('ctype', TType.STRING, 2)
+            oprot.writeString(self.ctype.encode('utf-8') if sys.version_info[0] == 2 else self.ctype)
+            oprot.writeFieldEnd()
+        if self.source is not None:
+            oprot.writeFieldBegin('source', TType.STRING, 3)
+            oprot.writeString(self.source.encode('utf-8') if sys.version_info[0] == 2 else self.source)
+            oprot.writeFieldEnd()
+        if self.tag is not None:
+            oprot.writeFieldBegin('tag', TType.STRING, 4)
+            oprot.writeString(self.tag.encode('utf-8') if sys.version_info[0] == 2 else self.tag)
+            oprot.writeFieldEnd()
+        if self.name is not None:
+            oprot.writeFieldBegin('name', TType.STRING, 5)
+            oprot.writeString(self.name.encode('utf-8') if sys.version_info[0] == 2 else self.name)
+            oprot.writeFieldEnd()
+        oprot.writeFieldStop()
+        oprot.writeStructEnd()
+
+    def validate(self):
+        return
+
+    def __repr__(self):
+        L = ['%s=%r' % (key, value)
+             for key, value in self.__dict__.items()]
+        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+    def __ne__(self, other):
+        return not (self == other)
+all_structs.append(getItem_args)
+getItem_args.thrift_spec = (
+    None,  # 0
+    (1, TType.I32, 'assetType', None, None, ),  # 1
+    (2, TType.STRING, 'ctype', 'UTF8', None, ),  # 2
+    (3, TType.STRING, 'source', 'UTF8', None, ),  # 3
+    (4, TType.STRING, 'tag', 'UTF8', None, ),  # 4
+    (5, TType.STRING, 'name', 'UTF8', None, ),  # 5
+)
+
+
+class getItem_result(object):
+    """
+    Attributes:
+     - success
+    """
+
+
+    def __init__(self, success=None,):
+        self.success = success
+
+    def read(self, iprot):
+        if iprot._fast_decode is not None and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None:
+            iprot._fast_decode(self, iprot, [self.__class__, self.thrift_spec])
+            return
+        iprot.readStructBegin()
+        while True:
+            (fname, ftype, fid) = iprot.readFieldBegin()
+            if ftype == TType.STOP:
+                break
+            if fid == 0:
+                if ftype == TType.STRUCT:
+                    self.success = Response()
+                    self.success.read(iprot)
+                else:
+                    iprot.skip(ftype)
+            else:
+                iprot.skip(ftype)
+            iprot.readFieldEnd()
+        iprot.readStructEnd()
+
+    def write(self, oprot):
+        if oprot._fast_encode is not None and self.thrift_spec is not None:
+            oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
+            return
+        oprot.writeStructBegin('getItem_result')
+        if self.success is not None:
+            oprot.writeFieldBegin('success', TType.STRUCT, 0)
+            self.success.write(oprot)
+            oprot.writeFieldEnd()
+        oprot.writeFieldStop()
+        oprot.writeStructEnd()
+
+    def validate(self):
+        return
+
+    def __repr__(self):
+        L = ['%s=%r' % (key, value)
+             for key, value in self.__dict__.items()]
+        return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
+
+    def __ne__(self, other):
+        return not (self == other)
+all_structs.append(getItem_result)
+getItem_result.thrift_spec = (
     (0, TType.STRUCT, 'success', [Response, None], None, ),  # 0
 )
 fix_spec(all_structs)

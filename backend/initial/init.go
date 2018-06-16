@@ -41,11 +41,11 @@ func exec(dbConfig common.DBConf) {
 	engine.TZLocation = location
 	engine.StoreEngine("InnoDB")
 	engine.Charset("utf8")
-	err = engine.DropTables(new(models.Signal), new(models.Pool), new(models.MapPoolItem), new(models.Classify), new(models.Item))
+	// err = engine.DropTables(new(models.Signal), new(models.Pool), new(models.MapPoolItem), new(models.Classify), new(models.Item))
 	if err != nil {
 		panic(err)
 	}
-	err = engine.Sync2(new(models.Signal), new(models.Pool), new(models.MapPoolItem), new(models.Classify), new(models.Item))
+	err = engine.Sync2(new(models.Signal), new(models.Pool), new(models.Classify), new(models.Item), new(models.MapPoolItem), new(models.MapClassifyItem))
 	if err != nil {
 		panic(err)
 	}

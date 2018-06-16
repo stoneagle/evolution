@@ -2,7 +2,7 @@ import { Serializable } from '../base/serializable.model';
 
 export class Classify extends Serializable {
   Id: number;
-  Asset: number;
+  Asset: string;
   AssetString: string;
   Type: string;
   Main: string;

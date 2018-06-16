@@ -25,6 +25,7 @@ func Usage() {
   fmt.Fprintln(os.Stderr, "  Response getType(AssetType assetType)")
   fmt.Fprintln(os.Stderr, "  Response getStrategy(string stype)")
   fmt.Fprintln(os.Stderr, "  Response getClassify(AssetType assetType, string ctype, string source, string sub)")
+  fmt.Fprintln(os.Stderr, "  Response getItem(AssetType assetType, string ctype, string source, string tag, string name)")
   fmt.Fprintln(os.Stderr)
   os.Exit(0)
 }
@@ -166,6 +167,29 @@ func main() {
     argvalue3 := flag.Arg(4)
     value3 := argvalue3
     fmt.Print(client.GetClassify(context.Background(), value0, value1, value2, value3))
+    fmt.Print("\n")
+    break
+  case "getItem":
+    if flag.NArg() - 1 != 5 {
+      fmt.Fprintln(os.Stderr, "GetItem requires 5 args")
+      flag.Usage()
+    }
+    tmp0, err := (strconv.Atoi(flag.Arg(1)))
+    if err != nil {
+      Usage()
+     return
+    }
+    argvalue0 := engine.AssetType(tmp0)
+    value0 := argvalue0
+    argvalue1 := flag.Arg(2)
+    value1 := argvalue1
+    argvalue2 := flag.Arg(3)
+    value2 := argvalue2
+    argvalue3 := flag.Arg(4)
+    value3 := argvalue3
+    argvalue4 := flag.Arg(5)
+    value4 := argvalue4
+    fmt.Print(client.GetItem(context.Background(), value0, value1, value2, value3, value4))
     fmt.Print("\n")
     break
   case "":
