@@ -1,7 +1,8 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { Classify } from '../../model/config/classify';
-import { ClassifyService } from '../../service/config/classify.service';
-import { SyncClassifyComponent } from './sync/sync.component';
+import { Classify } from '../../model/business/classify';
+import { ClassifyService } from '../../service/business/classify.service';
+import { AssetSource } from '../../model/config/config';
+import { AssetSourceComponent } from '../config/asset-source/asset-source.component';
 
 @Component({
   selector: 'app-classify',
@@ -9,14 +10,16 @@ import { SyncClassifyComponent } from './sync/sync.component';
   styleUrls: ['./classify.component.css']
 })
 export class ClassifyComponent implements OnInit {
-  @ViewChild(SyncClassifyComponent)
-  syncClassify: SyncClassifyComponent;
+  @ViewChild(AssetSourceComponent)
+  assetSource: AssetSourceComponent;
 
   classifys: Classify[];
 
   pageSize: number = 10;
   totalCount: number = 0;
   currentPage: number = 1;
+
+  syncModelOpened: boolean = false;
 
   constructor(
     private classifyService: ClassifyService
@@ -27,14 +30,21 @@ export class ClassifyComponent implements OnInit {
     this.refresh();
   }
 
-  syncd(syncd: boolean): void {
-    if (syncd) {
-      this.refresh();
+  Sync($event: any): void {
+    if ($event) {
+      this.classifyService.Sync($event)
+      .subscribe(res => {
+        this.syncModelOpened = false;
+        this.refresh();
+      })
+    } else {
+      this.syncModelOpened = false;
     }
   }
 
-  openSyncModel(id?: number): void {
-    this.syncClassify.New(id);
+  openSyncModel(): void {
+    this.syncModelOpened = true;
+    this.assetSource.New()
   }
 
   delete(classify: Classify): void {

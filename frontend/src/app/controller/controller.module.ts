@@ -3,12 +3,12 @@ import { NgModule } from '@angular/core';
 import { PoolComponent } from './pool/pool.component';
 import { SavePoolComponent } from './pool/save/save.component';
 import { ClassifyComponent } from './classify/classify.component';
-import { SyncClassifyComponent } from './classify/sync/sync.component';
 import { ItemComponent } from './item/item.component';
-import { SyncItemComponent } from './item/sync/sync.component';
+import { AssetSourceComponent } from './config/asset-source/asset-source.component';
+
 import { PoolService } from '../service/business/pool.service';
 import { ConfigService } from '../service/config/config.service';
-import { ClassifyService } from '../service/config/classify.service';
+import { ClassifyService } from '../service/business/classify.service';
 import { ItemService } from '../service/business/item.service';
 import { MessageHandlerService  } from '../service/base/message-handler.service';
 
@@ -25,9 +25,8 @@ import { TranslateModule  } from "@ngx-translate/core";
     PoolComponent,
     SavePoolComponent,
     ClassifyComponent,
-    SyncClassifyComponent,
     ItemComponent,
-    SyncItemComponent,
+    AssetSourceComponent,
   ],
   imports: [   
     BrowserModule,

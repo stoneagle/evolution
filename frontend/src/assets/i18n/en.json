@@ -14,8 +14,7 @@
       "CONCEPT": "pool",
       "NAME": "name",
       "STATUS": "status",
-      "STRATEGY": "strategy",
-      "TYPE": "type"
+      "STRATEGY": "strategy"
     },
     "ITEM": {
       "CONCEPT": "item",
@@ -25,11 +24,14 @@
     },
     "CLASSIFY": {
       "CONCEPT": "classify",
-      "ASSET": "assets",
       "NAME": "name",
-      "TAG": "tag",
+      "TAG": "tag"
+    },
+    "CONFIG": {
+      "CONCEPT": "config",
+      "ASSET": "assets",
       "TYPE": "type",
-      "SOURCE": "source",
+      "MAIN": "main",
       "SUB": "sub"
     },
     "GENERAL": {

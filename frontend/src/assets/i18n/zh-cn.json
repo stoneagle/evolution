@@ -25,11 +25,14 @@
     },
     "CLASSIFY": {
       "CONCEPT": "分类",
-      "ASSET": "资产",
       "NAME": "名称",
-      "TAG": "标签",
+      "TAG": "标签"
+    },
+    "CONFIG": {
+      "CONCEPT": "配置",
+      "ASSET": "资产",
       "TYPE": "类别",
-      "SOURCE": "来源",
+      "MAIN": "主来源",
       "SUB": "子分类"
     },
     "GENERAL": {

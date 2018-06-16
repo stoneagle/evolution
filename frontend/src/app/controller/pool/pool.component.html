@@ -9,7 +9,8 @@
   <clr-dg-column>{{ 'RESOURCE.POOL.NAME' | translate }}</clr-dg-column>
   <clr-dg-column>{{ 'RESOURCE.POOL.STATUS' | translate }}</clr-dg-column>
   <clr-dg-column>{{ 'RESOURCE.POOL.STRATEGY' | translate }}</clr-dg-column>
-  <clr-dg-column>{{ 'RESOURCE.POOL.TYPE' | translate }}</clr-dg-column>
+  <clr-dg-column>{{ 'RESOURCE.CONFIG.ASSET' | translate }}</clr-dg-column>
+  <clr-dg-column>{{ 'RESOURCE.CONFIG.TYPE' | translate }}</clr-dg-column>
   <clr-dg-column>{{ 'RESOURCE.GENERAL.CREATED' | translate }}</clr-dg-column>
   <clr-dg-column>{{ 'RESOURCE.GENERAL.UPDATED' | translate }}</clr-dg-column>
 	<clr-dg-column>{{ 'RESOURCE.GENERAL.OPERATION' | translate }}</clr-dg-column>
@@ -19,6 +20,7 @@
       <clr-dg-cell>{{pool.Name}}</clr-dg-cell>
       <clr-dg-cell>{{pool.Status}}</clr-dg-cell>
       <clr-dg-cell>{{pool.Strategy}}</clr-dg-cell>
+      <clr-dg-cell>{{pool.Asset}}</clr-dg-cell>
       <clr-dg-cell>{{pool.Type}}</clr-dg-cell>
       <clr-dg-cell>{{pool.CreatedAt | date: 'yy-MM-dd HH:mm:ss'}}</clr-dg-cell>
       <clr-dg-cell>{{pool.UpdatedAt | date: 'yy-MM-dd HH:mm:ss'}}</clr-dg-cell>

@@ -75,7 +75,7 @@ func (c *Classify) Sync(ctx *gin.Context) {
 		return
 	}
 
-	classifySlice, err := c.Rpc.GetClassify(atype, classify.Type, classify.Source, classify.Sub)
+	classifySlice, err := c.Rpc.GetClassify(atype, classify.Type, classify.Main, classify.Sub)
 	if err != nil {
 		common.ResponseErrorBusiness(ctx, common.ErrorEngine, "classify get error", err)
 		return
@@ -83,14 +83,13 @@ func (c *Classify) Sync(ctx *gin.Context) {
 
 	classifyBatch := []models.Classify{}
 	for _, c := range classifySlice {
-		one := models.Classify{
-			Name:   c.Name,
-			Tag:    c.Tag,
-			Asset:  atype,
-			Type:   classify.Type,
-			Source: classify.Source,
-			Sub:    classify.Sub,
-		}
+		one := models.Classify{}
+		one.Name = c.Name
+		one.Tag = c.Tag
+		one.AssetType.Asset = atype
+		one.AssetType.Type = classify.Type
+		one.Source.Main = classify.Main
+		one.Source.Sub = classify.Sub
 		classifyBatch = append(classifyBatch, one)
 	}
 	err = c.ClassifySvc.BatchSave(classifyBatch)

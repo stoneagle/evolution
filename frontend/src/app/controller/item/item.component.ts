@@ -1,7 +1,8 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Item } from '../../model/business/item';
 import { ItemService } from '../../service/business/item.service';
-import { SyncItemComponent } from './sync/sync.component';
+import { AssetSource } from '../../model/config/config';
+import { AssetSourceComponent } from '../config/asset-source/asset-source.component';
 
 @Component({
   selector: 'app-item',
@@ -9,14 +10,16 @@ import { SyncItemComponent } from './sync/sync.component';
   styleUrls: ['./item.component.css']
 })
 export class ItemComponent implements OnInit {
-  @ViewChild(SyncItemComponent)
-  syncItem: SyncItemComponent;
+  @ViewChild(AssetSourceComponent)
+  assetSource: AssetSourceComponent;
 
   items: Item[];
 
   pageSize: number = 10;
   totalCount: number = 0;
   currentPage: number = 1;
+
+  syncModelOpened: boolean = false;
 
   constructor(
     private itemService: ItemService
@@ -27,14 +30,21 @@ export class ItemComponent implements OnInit {
     this.refresh();
   }
 
-  syncd(syncd: boolean): void {
-    if (syncd) {
-      this.refresh();
+  Sync($event: any): void {
+    if ($event) {
+      this.itemService.Sync($event)
+      .subscribe(res => {
+        this.syncModelOpened = false;
+        this.refresh();
+      })
+    } else {
+      this.syncModelOpened = false;
     }
   }
 
   openSyncModel(id?: number): void {
-    this.syncItem.New(id);
+    this.syncModelOpened = true;
+    this.assetSource.New()
   }
 
   delete(item: Item): void {

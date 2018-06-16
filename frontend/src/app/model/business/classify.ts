@@ -5,7 +5,7 @@ export class Classify extends Serializable {
   Asset: number;
   AssetString: string;
   Type: string;
-  Source: string;
+  Main: string;
   Sub: string;
   Name: string;
   Tag: string;

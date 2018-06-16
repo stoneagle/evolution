@@ -3,9 +3,10 @@ import { HttpClient, HttpHeaders  } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { of } from 'rxjs/observable/of';
 import { catchError, map, tap  } from 'rxjs/operators';
-import { Classify } from '../../model/config/classify';
+import { Classify } from '../../model/business/classify';
 import { Response } from '../../model/base/response.model';
 import { AppConfig } from '../base/config.service';
+import { AssetSource } from '../../model/config/config';
 import { MessageHandlerService  } from '../base/message-handler.service';
 
 @Injectable()
@@ -47,8 +48,8 @@ export class ClassifyService {
     )
   }
 
-  Sync(classify: Classify): Observable<Boolean> {
-    return this.http.post<Response>(AppConfig.settings.apiServer.endpoint + this.uri + '/sync', JSON.stringify(classify)).pipe(
+  Sync(assetSource: AssetSource): Observable<Boolean> {
+    return this.http.post<Response>(AppConfig.settings.apiServer.endpoint + this.uri + '/sync', JSON.stringify(assetSource)).pipe(
       tap(res => this.log('PROCESS.SYNC', res)),
       catchError(this.handleError<Response>('PROCESS.SYNC')),
         map(res => {
