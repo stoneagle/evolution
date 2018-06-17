@@ -6,6 +6,8 @@ export class Message {
   alertType: AlertType;
   isAppLevel: boolean = false;
 
+  constructor() {}
+
   get type(): string {
     switch (this.alertType) {
       case AlertType.DANGER:
@@ -21,13 +23,12 @@ export class Message {
     }
   }
 
-  constructor() { }
-
   static newMessage(statusCode: number, message: string, alertType: AlertType): Message {
-    let m = new Message();
+    let m        = new Message();
     m.statusCode = statusCode;
-    m.message = message;
-    m.alertType = alertType;
+    m.message    = message;
+    m.alertType  = alertType;
+
     return m;
   }
 

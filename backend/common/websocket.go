@@ -47,10 +47,13 @@ func (ws *Websocket) BuildContext(callback WsCallback) map[string]interface{} {
 func (ws *Websocket) HandleMessage(s *melody.Session, msg []byte) {
 	var res WebsocketResponse
 	ctx := s.Keys
+
+	GetLogger().Infow("websocket-request:【" + string(msg) + "】")
+
 	res = ctx[wsCBKey].(WsCallback)(msg)
 	ret, _ := json.Marshal(&res)
 
-	GetLogger().Infow(string(ret))
+	GetLogger().Infow("websocket-response:【" + string(ret) + "】")
 
 	s.Write(ret)
 }
@@ -78,7 +81,19 @@ func (ws *Websocket) ResponseMessage(data interface{}) WebsocketResponse {
 	}
 }
 
-func (ws *Websocket) ResponseError(errorCode ErrorCode, desc string, err error) WebsocketResponse {
+func (ws *Websocket) ResponseBusinessError(errorCode ErrorCode, desc string, err error) WebsocketResponse {
+	if err != nil {
+		desc += ":" + err.Error()
+	}
+	return WebsocketResponse{
+		Status: WsMessage,
+		Code:   errorCode,
+		Data:   struct{}{},
+		Desc:   desc,
+	}
+}
+
+func (ws *Websocket) ResponseServerError(errorCode ErrorCode, desc string, err error) WebsocketResponse {
 	if err != nil {
 		desc += ":" + err.Error()
 	}

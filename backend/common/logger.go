@@ -20,7 +20,7 @@ func GetLogger() *zap.SugaredLogger {
 			MessageKey:     "M",
 			StacktraceKey:  "S",
 			LineEnding:     zapcore.DefaultLineEnding,
-			EncodeLevel:    zapcore.CapitalLevelEncoder,
+			EncodeLevel:    zapcore.CapitalColorLevelEncoder,
 			EncodeDuration: zapcore.StringDurationEncoder,
 			EncodeCaller:   zapcore.ShortCallerEncoder,
 			EncodeTime:     TimeEncoder,

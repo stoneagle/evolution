@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from "@angular/router";
 import { AppConfig } from '../../service/base/config.service';
-import { BaseService  } from '../../service/base/base.service';
+import { SignService  } from '../../service/base/sign.service';
 
 @Component({
   selector: 'app-sign-in',
@@ -14,21 +14,17 @@ export class SignInComponent implements OnInit {
   password: string;
 
   constructor(
-    private baseService: BaseService,
+    private signService: SignService,
     private router: Router
   ) { }
 
   ngOnInit() {
-    // this.CompanyName = AppConfig.settings.app.company;
     this.CompanyName = 'quant';
   }
 
   submit() {
-    this.baseService.login(this.username, this.password)
+    this.signService.login(this.username, this.password)
     .subscribe(res => {
-      if (!this.baseService.checkLoginError()) {
-        this.router.navigate(['/quant']);
-      }
     })
   }
 }

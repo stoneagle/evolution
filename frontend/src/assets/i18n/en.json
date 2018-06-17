@@ -63,7 +63,9 @@
   },
   "RESULT": {
     "SUCCESS": "success",
-    "WARNING": "warning",
-    "ERROR": "error"
+    "EXEC": "exec",
+    "FAIL": "fail",
+    "EXCEPTION": "exception",
+    "UNKNOWN": "unknown"
   }
 }

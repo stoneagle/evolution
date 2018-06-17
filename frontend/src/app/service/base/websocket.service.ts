@@ -34,6 +34,7 @@ export class WebsocketService {
       complete: () => {
         if (ws.readyState === WebSocket.OPEN) {
           ws.close();
+          this.subject = null;
         }
       }
     }

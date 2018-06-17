@@ -101,12 +101,12 @@ func (c *Item) WsSyncClassify(sourceJson []byte) common.WebsocketResponse {
 	var classify models.Classify
 	err := json.Unmarshal(sourceJson, &classify)
 	if err != nil {
-		return c.Ws.ResponseError(common.ErrorParams, "source json unmarshal failed", err)
+		return c.Ws.ResponseBusinessError(common.ErrorParams, "source json unmarshal failed", err)
 	}
 
 	items, err := c.Rpc.GetItem(classify)
 	if err != nil {
-		return c.Ws.ResponseError(common.ErrorEngine, "get item error", err)
+		return c.Ws.ResponseBusinessError(common.ErrorEngine, "get item error", err)
 	}
 
 	itemBatch := []models.Item{}
@@ -119,7 +119,7 @@ func (c *Item) WsSyncClassify(sourceJson []byte) common.WebsocketResponse {
 
 	err = c.ItemSvc.BatchSave(classify, itemBatch)
 	if err != nil {
-		return c.Ws.ResponseError(common.ErrorMysql, "classify save error", err)
+		return c.Ws.ResponseBusinessError(common.ErrorMysql, "classify save error", err)
 	}
 	return c.Ws.ResponseMessage(classify.Name + " sync success")
 }

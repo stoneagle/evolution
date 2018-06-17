@@ -4,63 +4,58 @@ import { Observable } from 'rxjs';
 import { of } from 'rxjs/observable/of';
 import { catchError, map, tap  } from 'rxjs/operators';
 import { AppConfig } from './config.service';
+import { Response } from '../../model/base/response.model';
 import { MessageHandlerService  } from '../base/message-handler.service';
+import { WsStatus } from '../../shared/shared.const';
 
 @Injectable()
 export class BaseService {
-  currentUser: string = null;
-  loginError: boolean = false;
+  protected resource: string;
+  protected operation: string;
 
   constructor(
-    private http: HttpClient,
-    private messageHandlerService: MessageHandlerService 
-  ) { }
-
-  clear(): void {
-    this.currentUser = null;
+    protected http: HttpClient,
+    protected messageHandlerService: MessageHandlerService ,
+  ) { 
   }
 
-  getCurrentUser(): string {
-    return this.currentUser;
-  }
-
-  checkLoginError(): boolean {
-    return this.loginError;
-  }
-
-  login(username: string, password: string): Observable<Response> {
-    this.loginError = false;
-    let httpOptions = {
-      headers: new HttpHeaders({ 
-        'Authorization': "Basic " + btoa(`${username}:${password}`) , 
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Access-Control-Allow-Origin': '*'
-      })
-    };
-
-    return this.http.get<Response>(AppConfig.settings.apiServer.endpoint + `/login`, httpOptions).pipe(
-      catchError(this.handleError<Response>('login'))
-    );
-  }
-
-  logout(): Observable<Response> {
-    let httpOptions = {
-      headers: new HttpHeaders({ 
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Access-Control-Allow-Origin': '*'
-      })
-    };
-
-    return this.http.get<Response>(AppConfig.settings.apiServer.endpoint + `/logout`, httpOptions).pipe(
-      catchError(this.handleError<Response>('logout'))
-    );
-  }
-
-  private handleError<T> (operation = 'operation', result?: T) {
+  protected handleError<T> (result?: T) {
     return (error: any): Observable<T> => {
-      this.messageHandlerService.handleError(error);
-      this.loginError = true;
+      this.messageHandlerService.handleError(this.resource, this.operation, error);
       return of(result as T);
     }
+  }
+
+  protected log(res: Response, message?: string) {
+    if (res.code != 0) {
+      this.messageHandlerService.showWarning(this.resource, this.operation, res.desc);
+    } else {   
+      this.messageHandlerService.showSuccess(this.resource, this.operation, message);
+    }   
+  }
+
+  protected logWs(res: Response): boolean {
+    if (!res || res.code != 0) {
+      this.messageHandlerService.showWarning(this.resource, this.operation, res.desc);
+      return false;
+    }
+
+    if (res.status == WsStatus.Error) {
+      this.messageHandlerService.showWarning(this.resource, this.operation, res.desc);
+    } else if (res.status == WsStatus.Message) {
+      this.messageHandlerService.showInfo(this.resource, this.operation, res.data);
+    } 
+    return true
+  }
+
+  protected async delay(ms: number) {
+    await new Promise(resolve => setTimeout(
+        () => resolve(), 1000
+      )
+    ).then(
+      () => {
+        // console.log("trigger")
+      }
+    );
   }
 }
