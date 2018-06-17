@@ -17,13 +17,22 @@
       "STRATEGY": "策略",
       "TYPE": "类别"
     },
+    "ITEM": {
+      "CONCEPT": "标的",
+      "CODE": "代号",
+      "NAME": "名称",
+      "STATUS": "状态"
+    },
     "CLASSIFY": {
       "CONCEPT": "分类",
-      "ASSET": "资产",
       "NAME": "名称",
-      "TAG": "标签",
+      "TAG": "标签"
+    },
+    "CONFIG": {
+      "CONCEPT": "配置",
+      "ASSET": "资产",
       "TYPE": "类别",
-      "SOURCE": "来源",
+      "MAIN": "主来源",
       "SUB": "子分类"
     },
     "GENERAL": {
@@ -55,7 +64,9 @@
   },
   "RESULT": {
     "SUCCESS": "成功",
-    "WARNING": "失败",
-    "ERROR": "异常"
+    "EXEC": "执行",
+    "FAIL": "失败",
+    "EXCEPTION": "异常",
+    "UNKNOWN": "未知"
   }
 }

@@ -6,19 +6,24 @@ import { catchError, map, tap  } from 'rxjs/operators';
 import { Response } from '../../model/base/response.model';
 import { AppConfig } from '../base/config.service';
 import { MessageHandlerService  } from '../base/message-handler.service';
+import { BaseService  } from '../base/base.service';
 
 @Injectable()
-export class ConfigService {
+export class ConfigService extends BaseService {
   private uri = '/config';
 
   constructor(
-    private http: HttpClient,
-    private messageHandlerService: MessageHandlerService,
-  ) { }
+    protected http: HttpClient,
+    protected messageHandlerService: MessageHandlerService,
+  ) { 
+    super(http, messageHandlerService);
+    this.resource = "RESOURCE.CONFIG.CONCEPT";
+  }
 
   AssetList(): Observable<Map<string, string>> {
+    this.operation = 'PROCESS.LIST';
     return this.http.get<Response>(AppConfig.settings.apiServer.endpoint + this.uri + "/asset").pipe(
-      catchError(this.handleError<Response>('PROCESS.LIST')),
+      catchError(this.handleError<Response>()),
       map(res => {
         let ret:Map<string, string> = new Map();
         if (res && res.code == 0) {
@@ -32,8 +37,9 @@ export class ConfigService {
   }
 
   TypeList(resource: string): Observable<Map<string, Map<string, string[]>>> {
+    this.operation = 'PROCESS.LIST';
     return this.http.get<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/type/${resource}`).pipe(
-      catchError(this.handleError<Response>('PROCESS.LIST')),
+      catchError(this.handleError<Response>()),
       map(res => {
         let ret:Map<string, Map<string, string[]>> = new Map();
         if (res && res.code == 0) {
@@ -48,20 +54,5 @@ export class ConfigService {
         return ret;
       }),
     )
-  }
-
-  private handleError<T> (operation = 'operation', result?: T) {
-    return (error: any): Observable<T> => {
-      this.messageHandlerService.handleError(error);
-      return of(result as T);
-    }
-  }
-
-  private log(message: string, res: Response) {
-    if (res.code != 0) {
-      this.messageHandlerService.showWarning(res.desc);
-    } else {   
-      this.messageHandlerService.showSuccess(message);
-    }   
   }
 }

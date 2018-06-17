@@ -5,6 +5,10 @@ import { AlertType } from '../../shared/shared.const';
 
 @Injectable()
 export class MessageService {
+  constructor(
+  ) { 
+  }
+
   messageAnnouncedSource = new Subject<Message>();
   appLevelAnnouncedSource = new Subject<Message>();
   clearSource = new Subject<boolean>();

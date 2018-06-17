@@ -4,5 +4,6 @@ export interface IConfig {
   };
   apiServer: {
     endpoint: string;
+    websocket: string;
   }
 }

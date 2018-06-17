@@ -4,8 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"net"
+	"quant/backend/models"
 	"quant/backend/rpc/engine"
-	"quant/backend/rpc/models"
+	rmodels "quant/backend/rpc/models"
 
 	"git.apache.org/thrift.git/lib/go/thrift"
 )
@@ -62,14 +63,32 @@ func (r *Rpc) GetType(atype engine.AssetType) (ret map[string]map[string][]strin
 	return
 }
 
-func (r *Rpc) GetClassify(atype engine.AssetType, ctype, source, sub string) (ret []models.Classify, err error) {
-	ret = []models.Classify{}
+func (r *Rpc) GetClassify(atype engine.AssetType, ctype, source, sub string) (ret []rmodels.Classify, err error) {
+	ret = []rmodels.Classify{}
 	client, transport, err := r.client()
 	if err != nil {
 		return
 	}
 	defer transport.Close()
 	d, err := client.GetClassify(context.Background(), atype, ctype, source, sub)
+	if err != nil {
+		return
+	}
+	err = json.Unmarshal([]byte(d.Data), &ret)
+	if err != nil {
+		return
+	}
+	return
+}
+
+func (r *Rpc) GetItem(classify models.Classify) (ret []rmodels.Item, err error) {
+	ret = []rmodels.Item{}
+	client, transport, err := r.client()
+	if err != nil {
+		return
+	}
+	defer transport.Close()
+	d, err := client.GetItem(context.Background(), classify.AssetType.Asset, classify.AssetType.Type, classify.Source.Main, classify.Tag, classify.Name)
 	if err != nil {
 		return
 	}

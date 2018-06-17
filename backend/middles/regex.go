@@ -19,7 +19,7 @@ func Regex(numberName string, rtype RegexType) gin.HandlerFunc {
 		var regexRule string
 		switch rtype {
 		case RegexNumber:
-			regexRule = `[0-9]`
+			regexRule = `[0-9]*`
 		default:
 			common.ResponseErrorBusiness(ctx, common.ErrorParams, "regex type illegal", nil)
 		}

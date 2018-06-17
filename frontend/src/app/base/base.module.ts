@@ -10,7 +10,7 @@ import { TranslateModule  } from "@ngx-translate/core";
 import { SignInComponent } from './sign-in/sign-in.component';
 import { ShellComponent } from './shell/shell.component';
 import { MessageComponent } from './message/message.component';
-import { BaseService  } from '../service/base/base.service';
+import { SignService  } from '../service/base/sign.service';
 import { MessageService } from '../service/base/message.service';
 
 @NgModule({
@@ -28,7 +28,7 @@ import { MessageService } from '../service/base/message.service';
     TranslateModule,
   ],
   providers: [ 
-    BaseService,
+    SignService,
     MessageService,
   ],
   exports: [

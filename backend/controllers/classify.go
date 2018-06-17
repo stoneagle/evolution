@@ -24,8 +24,9 @@ func NewClassify() *Classify {
 
 func (c *Classify) Router(router *gin.RouterGroup) {
 	classify := router.Group("classify")
-	classify.GET("/:id", initClassify(c.ClassifySvc), c.One)
-	classify.GET("", c.List)
+	classify.GET("/get/:id", initClassify(c.ClassifySvc), c.One)
+	classify.GET("/list", c.List)
+	classify.POST("/list", c.ListByAssetSource)
 	classify.POST("/sync", c.Sync)
 	classify.DELETE("/:id", initClassify(c.ClassifySvc), c.Delete)
 }
@@ -62,6 +63,22 @@ func (c *Classify) List(ctx *gin.Context) {
 	common.ResponseSuccess(ctx, classifies)
 }
 
+func (c *Classify) ListByAssetSource(ctx *gin.Context) {
+	var classify models.Classify
+	if err := ctx.ShouldBindJSON(&classify); err != nil {
+		common.ResponseErrorBusiness(ctx, common.ErrorParams, "params error: ", err)
+		return
+	}
+
+	atype, err := engine.AssetTypeFromString(classify.AssetString)
+	classifies, err := c.ClassifySvc.ListByAssetSource(atype, classify.Type, classify.Main, classify.Sub)
+	if err != nil {
+		common.ResponseErrorBusiness(ctx, common.ErrorMysql, "classify get error", err)
+		return
+	}
+	common.ResponseSuccess(ctx, classifies)
+}
+
 func (c *Classify) Sync(ctx *gin.Context) {
 	var classify models.Classify
 	if err := ctx.ShouldBindJSON(&classify); err != nil {
@@ -75,7 +92,7 @@ func (c *Classify) Sync(ctx *gin.Context) {
 		return
 	}
 
-	classifySlice, err := c.Rpc.GetClassify(atype, classify.Type, classify.Source, classify.Sub)
+	classifySlice, err := c.Rpc.GetClassify(atype, classify.Type, classify.Main, classify.Sub)
 	if err != nil {
 		common.ResponseErrorBusiness(ctx, common.ErrorEngine, "classify get error", err)
 		return
@@ -83,14 +100,13 @@ func (c *Classify) Sync(ctx *gin.Context) {
 
 	classifyBatch := []models.Classify{}
 	for _, c := range classifySlice {
-		one := models.Classify{
-			Name:   c.Name,
-			Tag:    c.Tag,
-			Asset:  atype,
-			Type:   classify.Type,
-			Source: classify.Source,
-			Sub:    classify.Sub,
-		}
+		one := models.Classify{}
+		one.Name = c.Name
+		one.Tag = c.Tag
+		one.AssetType.Asset = atype
+		one.AssetType.Type = classify.Type
+		one.Source.Main = classify.Main
+		one.Source.Sub = classify.Sub
 		classifyBatch = append(classifyBatch, one)
 	}
 	err = c.ClassifySvc.BatchSave(classifyBatch)

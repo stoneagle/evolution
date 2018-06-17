@@ -14,16 +14,24 @@
       "CONCEPT": "pool",
       "NAME": "name",
       "STATUS": "status",
-      "STRATEGY": "strategy",
-      "TYPE": "type"
+      "STRATEGY": "strategy"
+    },
+    "ITEM": {
+      "CONCEPT": "item",
+      "CODE": "code",
+      "NAME": "name",
+      "STATUS": "status"
     },
     "CLASSIFY": {
       "CONCEPT": "classify",
-      "ASSET": "assets",
       "NAME": "name",
-      "TAG": "tag",
+      "TAG": "tag"
+    },
+    "CONFIG": {
+      "CONCEPT": "config",
+      "ASSET": "assets",
       "TYPE": "type",
-      "SOURCE": "source",
+      "MAIN": "main",
       "SUB": "sub"
     },
     "GENERAL": {
@@ -55,7 +63,9 @@
   },
   "RESULT": {
     "SUCCESS": "success",
-    "WARNING": "warning",
-    "ERROR": "error"
+    "EXEC": "exec",
+    "FAIL": "fail",
+    "EXCEPTION": "exception",
+    "UNKNOWN": "unknown"
   }
 }

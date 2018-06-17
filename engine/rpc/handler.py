@@ -1,5 +1,6 @@
 from rpc.engine import ttypes
 from source.ts import classify
+from library import conf
 import json
 
 
@@ -43,6 +44,23 @@ class EngineServiceHandler:
             if ctype == "ashare":
                 if source == "tushare":
                     ret.data = classify.get_json(sub).to_json(orient='records')
+                else:
+                    ret.code = ttypes.ResponseState.StateErrorBusiness
+                    ret.desc = "source not exist"
+            else:
+                ret.code = ttypes.ResponseState.StateErrorBusiness
+                ret.desc = "ctype not exist"
+        else:
+            ret.code = ttypes.ResponseState.StateErrorBusiness
+            ret.desc = "source not exist"
+        return ret
+
+    def getItem(self, assetType, ctype, source, tag, name):
+        ret = ttypes.Response()
+        if assetType == ttypes.AssetType.Stock:
+            if ctype == "ashare":
+                if source == "tushare":
+                    ret.data = classify.get_detail(tag, name, retry_count=1, pause=conf.REQUEST_BLANK).to_json(orient='records')
                 else:
                     ret.code = ttypes.ResponseState.StateErrorBusiness
                     ret.desc = "source not exist"

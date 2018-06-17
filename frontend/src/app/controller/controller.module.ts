@@ -3,11 +3,16 @@ import { NgModule } from '@angular/core';
 import { PoolComponent } from './pool/pool.component';
 import { SavePoolComponent } from './pool/save/save.component';
 import { ClassifyComponent } from './classify/classify.component';
-import { SyncClassifyComponent } from './classify/sync/sync.component';
+import { ItemComponent } from './item/item.component';
+import { AssetSourceComponent } from './config/asset-source/asset-source.component';
+
 import { PoolService } from '../service/business/pool.service';
-import { ClassifyService } from '../service/config/classify.service';
 import { ConfigService } from '../service/config/config.service';
+import { ClassifyService } from '../service/business/classify.service';
+import { ItemService } from '../service/business/item.service';
 import { MessageHandlerService  } from '../service/base/message-handler.service';
+import { SocketService } from '../service/base/socket.service';
+import { WebsocketService } from '../service/base/websocket.service';
 
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule   } from '@angular/platform-browser/animations';
@@ -22,7 +27,8 @@ import { TranslateModule  } from "@ngx-translate/core";
     PoolComponent,
     SavePoolComponent,
     ClassifyComponent,
-    SyncClassifyComponent,
+    ItemComponent,
+    AssetSourceComponent,
   ],
   imports: [   
     BrowserModule,
@@ -35,9 +41,12 @@ import { TranslateModule  } from "@ngx-translate/core";
   ],
   providers: [ 
     PoolService,
-    ClassifyService,
     ConfigService,
+    ClassifyService,
+    ItemService,
     MessageHandlerService,
+    SocketService,
+    WebsocketService,
   ],
   exports: [
     PoolComponent,

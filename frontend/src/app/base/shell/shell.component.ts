@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from "@angular/router";
-import { BaseService  } from '../../service/base/base.service';
+import { SignService  } from '../../service/base/sign.service';
 
 @Component({
   selector: 'app-shell',
@@ -10,7 +10,7 @@ import { BaseService  } from '../../service/base/base.service';
 export class ShellComponent implements OnInit {
 
   constructor(
-    private baseService: BaseService,
+    private signService: SignService,
     private router: Router
   ) { }
 
@@ -18,7 +18,7 @@ export class ShellComponent implements OnInit {
   }
 
   logout(): void {
-    this.baseService.logout()
+    this.signService.logout()
     .subscribe(res => {
       this.router.navigate(['/login']);
     })

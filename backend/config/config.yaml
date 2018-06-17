@@ -17,7 +17,7 @@ quant:
     password: 123456
     maxIdle: 10 
     maxOpen: 5 
-    showsql: True
+    showsql: False 
     location: Asia/Shanghai
   rpc:
     host: engine
