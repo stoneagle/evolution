@@ -1,5 +1,5 @@
-hash: 13e1cc6029f4bc6f8de03ddc7e49bffcc9985520adda0091e9e8c3da6a184954
-updated: 2018-06-16T15:11:07.927836156+08:00
+hash: dd5362b11d6eeaf91b2f875d9629c7684a08dae8a8eb02c66e005fc0f9a05734
+updated: 2018-06-17T14:49:47.283375026+08:00
 imports:
 - name: git.apache.org/thrift.git
   version: 327ebb6c2b6df8bf075da02ef45a2a034e9b79ba
@@ -35,7 +35,7 @@ imports:
 - name: github.com/go-xorm/xorm
   version: d85bb4911c725a53b135fc12862748a41b6c07da
 - name: github.com/golang/protobuf
-  version: 5831880292e721c76b58a16ecc60adc27d8e6355
+  version: 9f81198da99b79e14d70ca2c3cc1bbe44c6e69b6
   subpackages:
   - proto
 - name: github.com/gorilla/websocket
@@ -52,10 +52,19 @@ imports:
   version: f3cacc17c85ecb7f1b6a9e373ee85d1480919868
   subpackages:
   - codec
+- name: go.uber.org/atomic
+  version: 1ea20fb1cbb1cc08cbd0d913a96dead89aa18289
+- name: go.uber.org/multierr
+  version: 3c4937480c32f4c13a875a1829af76c98ca3d40a
 - name: go.uber.org/zap
   version: eeedf312bc6c57391d84767a4cd413f02a917974
   subpackages:
   - atomic
+  - buffer
+  - internal/bufferpool
+  - internal/color
+  - internal/exit
+  - zapcore
 - name: golang.org/x/net
   version: db08ff08e8622530d9ed3a0e8ac279f6d4c02196
   subpackages:

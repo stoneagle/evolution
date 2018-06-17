@@ -49,6 +49,9 @@ func (ws *Websocket) HandleMessage(s *melody.Session, msg []byte) {
 	ctx := s.Keys
 	res = ctx[wsCBKey].(WsCallback)(msg)
 	ret, _ := json.Marshal(&res)
+
+	GetLogger().Infow(string(ret))
+
 	s.Write(ret)
 }
 

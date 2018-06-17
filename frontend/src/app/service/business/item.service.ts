@@ -27,7 +27,7 @@ export class ItemService {
   ) { }
 
   List(): Observable<Item[]> {
-    return this.http.get<Response>(AppConfig.settings.apiServer.endpoint + this.uri).pipe(
+    return this.http.get<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`).pipe(
       catchError(this.handleError<Response>('PROCESS.LIST')),
       map(res => {
         let ret:Item[] = []; 
@@ -44,7 +44,7 @@ export class ItemService {
   }
 
   Get(id: number): Observable<Item> {
-    return this.http.get<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/${id}`).pipe(
+    return this.http.get<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/get/${id}`).pipe(
       catchError(this.handleError<Response>('PROCESS.GET')),
       map(res => {
         if (res && res.code == 0) {

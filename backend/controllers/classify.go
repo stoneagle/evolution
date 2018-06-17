@@ -24,9 +24,9 @@ func NewClassify() *Classify {
 
 func (c *Classify) Router(router *gin.RouterGroup) {
 	classify := router.Group("classify")
-	classify.GET("/:id", initClassify(c.ClassifySvc), c.One)
-	classify.GET("", c.List)
-	classify.POST("", c.ListByAssetSource)
+	classify.GET("/get/:id", initClassify(c.ClassifySvc), c.One)
+	classify.GET("/list", c.List)
+	classify.POST("/list", c.ListByAssetSource)
 	classify.POST("/sync", c.Sync)
 	classify.DELETE("/:id", initClassify(c.ClassifySvc), c.Delete)
 }

@@ -19,7 +19,7 @@ export class ClassifyService {
   ) { }
 
   List(): Observable<Classify[]> {
-    return this.http.get<Response>(AppConfig.settings.apiServer.endpoint + this.uri).pipe(
+    return this.http.get<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`).pipe(
       catchError(this.handleError<Response>('PROCESS.LIST')),
       map(res => {
         let ret:Classify[] = []; 
@@ -36,7 +36,7 @@ export class ClassifyService {
   }
 
   ListByAssetSource(assetSource: AssetSource): Observable<Classify[]> {
-    return this.http.post<Response>(AppConfig.settings.apiServer.endpoint + this.uri, JSON.stringify(assetSource)).pipe(
+    return this.http.post<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`, JSON.stringify(assetSource)).pipe(
       catchError(this.handleError<Response>('PROCESS.LIST')),
       map(res => {
         let ret:Classify[] = []; 
@@ -53,7 +53,7 @@ export class ClassifyService {
   }
 
   Get(id: number): Observable<Classify> {
-    return this.http.get<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/${id}`).pipe(
+    return this.http.get<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/get/${id}`).pipe(
       catchError(this.handleError<Response>('PROCESS.GET')),
       map(res => {
         if (res && res.code == 0) {

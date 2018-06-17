@@ -23,8 +23,8 @@ func NewPool() *Pool {
 
 func (c *Pool) Router(router *gin.RouterGroup) {
 	pool := router.Group("pool")
-	pool.GET("/:id", initPool(c.PoolSvc), c.One)
-	pool.GET("", c.List)
+	pool.GET("/get/:id", initPool(c.PoolSvc), c.One)
+	pool.GET("/list", c.List)
 	pool.POST("", c.Add)
 	pool.PUT("/:id", initPool(c.PoolSvc), c.Update)
 	pool.DELETE("/:id", initPool(c.PoolSvc), c.Delete)

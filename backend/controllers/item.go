@@ -28,7 +28,7 @@ func NewItem(ws *common.Websocket) *Item {
 
 func (c *Item) Router(router *gin.RouterGroup) {
 	item := router.Group("item")
-	item.GET("", c.List)
+	item.GET("/list", c.List)
 	item.GET("/get/:id", initItem(c.ItemSvc), c.One)
 	item.GET("/sync/classify/ws", func(ctx *gin.Context) {
 		wsCtx := c.Ws.BuildContext(c.WsSyncClassify)
