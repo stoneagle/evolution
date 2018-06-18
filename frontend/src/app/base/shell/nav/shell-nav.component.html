@@ -1,0 +1,17 @@
+<section class="sidenav-content" *ngIf="(nav == 'stock')">
+	<a href="#" routerLink="/stock/pool" class="nav-link active">
+		<clr-icon shape="user"></clr-icon>
+		{{ 'RESOURCE.POOL.CONCEPT' | translate }} 
+	</a>
+</section>
+
+<section class="sidenav-content" *ngIf="(nav == 'config')">
+	<a href="#" routerLink="/config/classify" class="nav-link">
+		<clr-icon shape="user"></clr-icon>
+		{{ 'RESOURCE.CLASSIFY.CONCEPT' | translate }} 
+	</a>
+	<a href="#" routerLink="/config/item" class="nav-link">
+		<clr-icon shape="user"></clr-icon>
+		{{ 'RESOURCE.ITEM.CONCEPT' | translate }} 
+	</a>
+</section>
