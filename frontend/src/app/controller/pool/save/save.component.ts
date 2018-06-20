@@ -1,6 +1,7 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core'; 
+import { Component, OnInit, Output, Input, EventEmitter } from '@angular/core'; 
 import { Pool } from '../../../model/business/pool';
 import { PoolService  } from '../../../service/business/pool.service';
+import { ConfigService  } from '../../../service/config/config.service';
 
 @Component({
   selector: 'save-pool',
@@ -9,6 +10,8 @@ import { PoolService  } from '../../../service/business/pool.service';
 })
 
 export class SavePoolComponent implements OnInit {
+  typeMap: Map<string, string> = new Map();
+  strategyMap: Map<string, string> = new Map();
   pool: Pool = new Pool;
   modelOpened: boolean = false;
 
@@ -16,23 +19,39 @@ export class SavePoolComponent implements OnInit {
 
   constructor(
     private poolService: PoolService,
+    private configService: ConfigService,
   ) { }
 
   ngOnInit() {
   }
 
-  New(id?: number): void {
-    if (id) {
-      this.poolService.Get(id)
+  New(asset:string, id?: number): void {
+    this.configService.TypeList(asset)
       .subscribe(res => {
-        this.pool = res;
-        this.modelOpened = true;
+        res.forEach((mainMap, ctype) => {
+          this.typeMap.set(ctype, ctype);
+        });
+        if (id) {
+          this.poolService.Get(id)
+          .subscribe(res => {
+            this.pool = res;
+            this.modelOpened = true;
+          })
+        } else {
+          this.pool = new Pool();
+          this.pool.AssetString = asset;
+          this.modelOpened = true;
+        }
       })
-    } else {
-      this.pool = new Pool();
-      this.modelOpened = true;
-    }
   }            
+
+  TypeOnChange(ctype) {
+    this.configService.StrategyList(ctype).subscribe(res => {
+      this.strategyMap = res;
+      this.pool.Type = ctype; 
+      this.pool.Strategy = this.strategyMap.keys().next().value;
+    });
+  }
 
   Submit(): void {
     if (this.pool.Id == null) {
@@ -48,5 +67,9 @@ export class SavePoolComponent implements OnInit {
         this.save.emit(true);
       })
     }
+  }
+
+  getKeys(map) {
+    return Array.from(map.keys());
   }
 }

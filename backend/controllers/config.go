@@ -20,6 +20,7 @@ func NewConfig() *Config {
 func (c *Config) Router(router *gin.RouterGroup) {
 	config := router.Group("config")
 	config.GET("/type/:asset", c.Type)
+	config.GET("/strategy/:ctype", c.Strategy)
 	config.GET("/asset", c.Asset)
 }
 
@@ -33,6 +34,16 @@ func (c *Config) Type(ctx *gin.Context) {
 	ret, err := c.Rpc.GetType(atype)
 	if err != nil {
 		common.ResponseErrorBusiness(ctx, common.ErrorEngine, "get asset type error", err)
+		return
+	}
+	common.ResponseSuccess(ctx, ret)
+}
+
+func (c *Config) Strategy(ctx *gin.Context) {
+	ctype := ctx.Param("ctype")
+	ret, err := c.Rpc.GetStrategy(ctype)
+	if err != nil {
+		common.ResponseErrorBusiness(ctx, common.ErrorEngine, "get ctype error", err)
 		return
 	}
 	common.ResponseSuccess(ctx, ret)

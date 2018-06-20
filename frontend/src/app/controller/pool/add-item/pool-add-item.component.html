@@ -1,0 +1,54 @@
+<clr-modal [(clrModalOpen)]="modelOpened" [clrModalSize]="'xl'">
+    <h3 class="modal-title">
+      {{ 'PROCESS.CREATE' | translate }}{{ 'RESOURCE.POOL.CONCEPT' | translate }}{{ 'RESOURCE.ITEM.CONCEPT' | translate }}
+    </h3>
+    <div class="modal-body clr-row">
+      <form #addForm="ngForm" (ngSubmit)="Submit()">
+        <clr-datagrid (clrDgRefresh)="showLoad($event)" [(clrDgSelected)]="selectedShowItems" (clrDgSelectedChange)="selectedShowItemsChange()" >
+          <clr-dg-action-bar>
+            <div class="btn-group">
+              <button type="button" class="btn btn-sm btn-secondary" (click)="onAdd()"><clr-icon shape="plus"></clr-icon>{{ 'PROCESS.CREATE' | translate }}</button>
+            </div>
+          </clr-dg-action-bar>
+          <clr-dg-column [clrDgField]="'Code'" >{{ 'RESOURCE.ITEM.CODE' | translate }}</clr-dg-column>
+          <clr-dg-column [clrDgField]="'Name'" >{{ 'RESOURCE.ITEM.NAME' | translate }}</clr-dg-column>
+          <clr-dg-column>{{ 'RESOURCE.ITEM.STATUS' | translate }}</clr-dg-column>
+          <clr-dg-row *ngFor="let item of showItems" [clrDgItem]="item" >
+            <clr-dg-cell>{{item.Code}}</clr-dg-cell>
+            <clr-dg-cell>{{item.Name}}</clr-dg-cell>
+            <clr-dg-cell>{{item.Status}}</clr-dg-cell>
+          </clr-dg-row>
+          <clr-dg-footer>
+            <clr-dg-pagination #showPagination [clrDgPageSize]="showPageSize" [(clrDgPage)]="showCurrentPage" [clrDgTotalItems]="showTotalCount">
+              {{showPagination.firstItem + 1}} - {{showPagination.lastItem + 1}}
+              / {{showPagination.totalItems}} {{ 'RESOURCE.ITEM.CONCEPT' | translate }}
+            </clr-dg-pagination>
+          </clr-dg-footer>
+        </clr-datagrid>
+        <clr-datagrid (clrDgRefresh)="submitLoad($event)" [(clrDgSelected)]="selectedSubmitItems" (clrDgSelectedChange)="selectedSubmitItemsChange()" >
+          <clr-dg-action-bar>
+            <div class="btn-group">
+              <button type="button" class="btn btn-sm btn-secondary" (click)="onDelete()"><clr-icon shape="close"></clr-icon>{{ 'PROCESS.DELETE' | translate }}</button>
+            </div>
+          </clr-dg-action-bar>
+          <clr-dg-column>{{ 'RESOURCE.ITEM.CODE' | translate }}</clr-dg-column>
+          <clr-dg-column>{{ 'RESOURCE.ITEM.NAME' | translate }}</clr-dg-column>
+          <clr-dg-column>{{ 'RESOURCE.ITEM.STATUS' | translate }}</clr-dg-column>
+          <clr-dg-row *ngFor="let item of submitItems" [clrDgItem]="item" >
+            <clr-dg-cell>{{item.Code}}</clr-dg-cell>
+            <clr-dg-cell>{{item.Name}}</clr-dg-cell>
+            <clr-dg-cell>{{item.Status}}</clr-dg-cell>
+          </clr-dg-row>
+          <clr-dg-footer>
+            <clr-dg-pagination #submitPagination [clrDgPageSize]="submitPageSize" [(clrDgPage)]="submitCurrentPage" [clrDgTotalItems]="submitTotalCount">
+              {{submitPagination.firstItem + 1}} - {{submitPagination.lastItem + 1}}
+              / {{submitPagination.totalItems}} {{ 'RESOURCE.ITEM.CONCEPT' | translate }}
+            </clr-dg-pagination>
+          </clr-dg-footer>
+        </clr-datagrid>
+
+        <button type="submit" class="btn btn-success">{{ 'PROCESS.SUBMIT' | translate }}</button>
+        <button type="button" class="btn btn-primary" (click)="modelOpened = false">{{ 'PROCESS.CANCEL' | translate }}</button>
+      </form>
+    </div>     
+</clr-modal>   

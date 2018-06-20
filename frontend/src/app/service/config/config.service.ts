@@ -55,4 +55,20 @@ export class ConfigService extends BaseService {
       }),
     )
   }
+
+  StrategyList(ctype: string): Observable<Map<string, string>> {
+    this.operation = 'PROCESS.LIST';
+    return this.http.get<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/strategy/${ctype}`).pipe(
+      catchError(this.handleError<Response>()),
+      map(res => {
+        let ret:Map<string, string> = new Map();
+        if (res && res.code == 0) {
+          for (let key in res.data) {
+            ret.set(res.data[key], res.data[key]);
+          }
+        }
+        return ret;
+      }),
+    )
+  }
 }

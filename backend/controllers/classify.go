@@ -60,6 +60,7 @@ func (c *Classify) List(ctx *gin.Context) {
 		common.ResponseErrorBusiness(ctx, common.ErrorMysql, "classify get error", err)
 		return
 	}
+
 	common.ResponseSuccess(ctx, classifies)
 }
 
@@ -71,6 +72,11 @@ func (c *Classify) ListByAssetSource(ctx *gin.Context) {
 	}
 
 	atype, err := engine.AssetTypeFromString(classify.AssetString)
+	if err != nil {
+		common.ResponseErrorBusiness(ctx, common.ErrorEngine, "asset type illegal", err)
+		return
+	}
+
 	classifies, err := c.ClassifySvc.ListByAssetSource(atype, classify.Type, classify.Main, classify.Sub)
 	if err != nil {
 		common.ResponseErrorBusiness(ctx, common.ErrorMysql, "classify get error", err)

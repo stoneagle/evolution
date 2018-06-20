@@ -9,6 +9,8 @@ import { TranslateModule  } from "@ngx-translate/core";
 
 import { SignInComponent } from './sign-in/sign-in.component';
 import { ShellComponent } from './shell/shell.component';
+import { DefaultComponent } from './default/default.component';
+import { ShellNavComponent } from './shell/nav/shell-nav.component';
 import { MessageComponent } from './message/message.component';
 import { SignService  } from '../service/base/sign.service';
 import { MessageService } from '../service/base/message.service';
@@ -18,6 +20,8 @@ import { MessageService } from '../service/base/message.service';
     SignInComponent,
     MessageComponent,
     ShellComponent,
+    DefaultComponent,
+    ShellNavComponent,
   ],
   imports: [   
     AppRouteModule,

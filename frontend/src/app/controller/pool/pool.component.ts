@@ -1,4 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { Router, ActivatedRoute } from "@angular/router";
 import { Pool } from '../../model/business/pool';
 import { PoolService } from '../../service/business/pool.service';
 import { SavePoolComponent } from './save/save.component';
@@ -19,8 +20,11 @@ export class PoolComponent implements OnInit {
   currentPage: number = 1;
 
   constructor(
-    private poolService: PoolService
-  ) { }
+    private poolService: PoolService,
+    private router: Router, 
+    private route: ActivatedRoute 
+  ) { 
+  }
 
   ngOnInit() {
     this.pageSize = 10;
@@ -34,7 +38,11 @@ export class PoolComponent implements OnInit {
   }
 
   openSaveModel(id?: number): void {
-    this.savePool.New(id);
+    switch(this.route.parent.snapshot.routeConfig.path) {
+      case 'stock':
+        this.savePool.New("Stock", id);
+        break;
+    }
   }
 
   delete(pool: Pool): void {
@@ -56,10 +64,14 @@ export class PoolComponent implements OnInit {
   }
 
   refreshPools(from: number, to: number): void {
-    this.poolService.List()
-    .subscribe(res => {
+    this.poolService.List().subscribe(res => {
       this.totalCount = res.length;
       this.pools = res.slice(from, to);
     })
+  }
+
+  enterItemList(id: number):void {
+    let linkUrl = ['stock', 'pool', id]; 
+    this.router.navigate(linkUrl);
   }
 }

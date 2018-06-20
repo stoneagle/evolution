@@ -15,6 +15,7 @@ export class ItemComponent implements OnInit {
   assetSource: AssetSourceComponent;
 
   items: Item[];
+  allItems: Item[] = [];
 
   pageSize: number = 10;
   totalCount: number = 0;
@@ -55,15 +56,18 @@ export class ItemComponent implements OnInit {
   }
 
   delete(item: Item): void {
-    this.itemService.Delete(item.Id)
-    .subscribe(res => {
+    this.itemService.Delete(item.Id).subscribe(res => {
       this.refresh();
     })
   }
 
   load(state: any): void {
     if (state && state.page) {
-      this.refreshItem(state.page.from, state.page.to + 1);
+      if (this.allItems.length == 0) {
+        this.refreshItem(state.page.from, state.page.to + 1);
+      } else {
+        this.items = this.allItems.slice(state.page.from, state.page.to + 1);
+      }
     }
   }
 
@@ -73,10 +77,18 @@ export class ItemComponent implements OnInit {
   }
 
   refreshItem(from: number, to: number): void {
-    this.itemService.List()
-    .subscribe(res => {
+    this.itemService.List().subscribe(res => {
       this.totalCount = res.length;
+      this.allItems = res;
       this.items = res.slice(from, to);
     })
+  }
+
+  listClassifyName(item: Item): string {
+    let ret: string = '';
+    item.Classify.forEach((classify, key) => {
+      ret += classify.Name + "\r\n";
+    });
+    return ret;
   }
 }

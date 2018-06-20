@@ -27,9 +27,9 @@ export class ItemService extends BaseService {
     this.resource = 'RESOURCE.ITEM.CONCEPT';
   }
 
-  List(): Observable<Item[]> {
+  List(item?: Item): Observable<Item[]> {
     this.operation = 'PROCESS.LIST';
-    return this.http.get<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`).pipe(
+    return this.http.post<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`, JSON.stringify(item)).pipe(
       catchError(this.handleError<Response>()),
       map(res => {
         let ret:Item[] = []; 

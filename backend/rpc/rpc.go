@@ -63,6 +63,24 @@ func (r *Rpc) GetType(atype engine.AssetType) (ret map[string]map[string][]strin
 	return
 }
 
+func (r *Rpc) GetStrategy(stype string) (ret []string, err error) {
+	ret = []string{}
+	client, transport, err := r.client()
+	if err != nil {
+		return
+	}
+	defer transport.Close()
+	d, err := client.GetStrategy(context.Background(), stype)
+	if err != nil {
+		return
+	}
+	err = json.Unmarshal([]byte(d.Data), &ret)
+	if err != nil {
+		return
+	}
+	return
+}
+
 func (r *Rpc) GetClassify(atype engine.AssetType, ctype, source, sub string) (ret []rmodels.Classify, err error) {
 	ret = []rmodels.Classify{}
 	client, transport, err := r.client()
