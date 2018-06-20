@@ -1,13 +1,16 @@
 import { Serializable } from '../base/serializable.model';
+import { Item } from './item'
 
 export class Pool extends Serializable {
   Id: number;
   Name: string;
   Status: string;
-  Strategy: number;
-  Asset: number;
-  Type: number;
+  Asset: string;
+  AssetString: string;
+  Type: string;
+  Strategy: string;
   CreatedAt: string;
   UpdatedAt: string;
   DeletedAt: string;
+  Item: Item[];
 }

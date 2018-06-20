@@ -19,7 +19,7 @@ export class ShellComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute 
   ) { 
-    this.nav = this.route.snapshot.data['nav'];
+    this.nav = this.route.snapshot.routeConfig.path;
   }
 
   ngOnInit() {

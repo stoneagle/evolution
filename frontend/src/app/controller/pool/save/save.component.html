@@ -12,23 +12,27 @@
           <input type="text" class="form-control" id="Name" required [(ngModel)]="pool.Name" name="Name" >
         </div> 
         <div class="form-group">
-          <label for="type">{{ 'RESOURCE.POOL.TYPE' | translate }}</label>
+          <label for="type">{{ 'RESOURCE.CONFIG.TYPE' | translate }}</label>
           <div class="select">
-            <select id="type" [(ngModel)]="pool.Type" name="type">
-							<option [ngValue]=1>A股</option>
+            <select id="Type" [(ngModel)]="pool.Type" name="Type" required (ngModelChange)="TypeOnChange($event)">
+              <option *ngFor="let key of getKeys(typeMap)" [ngValue]=key>
+                {{ typeMap.get(key) }}
+              </option>
             </select>
           </div>
         </div>
         <div class="form-group">
           <label for="strategy">{{ 'RESOURCE.POOL.STRATEGY' | translate }}</label>
           <div class="select">
-            <select id="strategy" [(ngModel)]="pool.Strategy" name="strategy">
-							<option value="底背离">底背离</option>
+            <select id="Strategy" [(ngModel)]="pool.Strategy" name="Strategy" required>
+              <option *ngFor="let key of getKeys(strategyMap)" [ngValue]=key>
+                {{ strategyMap.get(key) }}
+              </option>
             </select>
           </div>
         </div>
-        <button type="submit" class="btn btn-success">Submit</button>
-        <button type="button" class="btn btn-primary" (click)="modelOpened = false">Cancel</button>
+        <button type="submit" class="btn btn-success">{{ 'PROCESS.SUBMIT' | translate }}</button>
+        <button type="button" class="btn btn-primary" (click)="modelOpened = false">{{ 'PROCESS.CANCEL' | translate }}</button>
       </form>
     </div>     
 </clr-modal>   

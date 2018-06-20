@@ -1,16 +1,20 @@
-<button class="btn btn-primary" (click)="openSyncModel()">
-  {{ "PROCESS.SYNC" | translate }}
+<button class="btn btn-primary" (click)="openAddModel()">
+  {{ "PROCESS.CREATE" | translate }}
 </button>
 <span class="refresh-btn" (click)="refresh()">
   <clr-icon shape="refresh"></clr-icon>
 </span>
-<clr-datagrid  (clrDgRefresh)="load($event)">
-  <!-- <clr-dg-column>{{ 'RESOURCE.GENERAL.ID' | translate }}</clr-dg-column> -->
-  <clr-dg-column>{{ 'RESOURCE.CONFIG.ASSET' | translate }}</clr-dg-column>
-  <clr-dg-column>{{ 'RESOURCE.CONFIG.TYPE' | translate }}</clr-dg-column>
-  <clr-dg-column>{{ 'RESOURCE.CONFIG.MAIN' | translate }}</clr-dg-column>
-  <clr-dg-column>{{ 'RESOURCE.CONFIG.SUB' | translate }}</clr-dg-column>
-  <clr-dg-column>{{ 'RESOURCE.CLASSIFY.CONCEPT' | translate }}{{ 'RESOURCE.CLASSIFY.NAME' | translate }}</clr-dg-column>
+<clr-datagrid  (clrDgRefresh)="load($event)" [(clrDgSelected)]="selectedDeleteItems">
+  <clr-dg-action-bar>
+    <div class="btn-group">
+      <button type="button" class="btn btn-sm btn-secondary" (click)="onDelete()"><clr-icon shape="close"></clr-icon>{{ 'PROCESS.DELETE' | translate }}</button>
+    </div>
+  </clr-dg-action-bar>
+  <clr-dg-column >
+    <ng-container *clrDgHideableColumn="{hidden: true}">
+      {{ 'RESOURCE.GENERAL.ID' | translate }}
+    </ng-container>
+  </clr-dg-column>
   <clr-dg-column>{{ 'RESOURCE.ITEM.CODE' | translate }}</clr-dg-column>
   <clr-dg-column>{{ 'RESOURCE.ITEM.NAME' | translate }}</clr-dg-column>
   <clr-dg-column>{{ 'RESOURCE.ITEM.STATUS' | translate }}</clr-dg-column>
@@ -18,13 +22,8 @@
   <clr-dg-column>{{ 'RESOURCE.GENERAL.UPDATED' | translate }}</clr-dg-column>
 	<clr-dg-column>{{ 'RESOURCE.GENERAL.OPERATION' | translate }}</clr-dg-column>
 
-  <clr-dg-row *ngFor="let item of items">
-    <!-- <clr-dg-cell>{{item.Id}}</clr-dg-cell> -->
-    <clr-dg-cell>{{item.Classify[0].Asset}}</clr-dg-cell>
-    <clr-dg-cell>{{item.Classify[0].Type}}</clr-dg-cell>
-    <clr-dg-cell>{{item.Classify[0].Main}}</clr-dg-cell>
-    <clr-dg-cell>{{item.Classify[0].Sub}}</clr-dg-cell>
-    <clr-dg-cell>{{listClassifyName(item)}}</clr-dg-cell>
+  <clr-dg-row *ngFor="let item of items" [clrDgItem]="item" >
+    <clr-dg-cell>{{item.Id}}</clr-dg-cell>
     <clr-dg-cell>{{item.Code}}</clr-dg-cell>
     <clr-dg-cell>{{item.Name}}</clr-dg-cell>
     <clr-dg-cell>{{item.Status}}</clr-dg-cell>
@@ -48,4 +47,4 @@
   </clr-dg-footer>
 </clr-datagrid>
 
-<asset-source (sync)="Sync($event)" [modelOpened]="syncModelOpened" ></asset-source>
+<pool-add-item (add)="added($event)"></pool-add-item>

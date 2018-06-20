@@ -1,6 +1,8 @@
 import { NgModule } from '@angular/core';
 
 import { PoolComponent } from './pool/pool.component';
+import { PoolAddItemComponent } from './pool/add-item/pool-add-item.component';
+import { PoolListItemComponent } from './pool/list-item/pool-list-item.component';
 import { SavePoolComponent } from './pool/save/save.component';
 import { ClassifyComponent } from './classify/classify.component';
 import { ItemComponent } from './item/item.component';
@@ -25,6 +27,8 @@ import { TranslateModule  } from "@ngx-translate/core";
 @NgModule({
   declarations: [
     PoolComponent,
+    PoolAddItemComponent,
+    PoolListItemComponent,
     SavePoolComponent,
     ClassifyComponent,
     ItemComponent,

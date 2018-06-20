@@ -1,4 +1,5 @@
 import { Serializable } from '../base/serializable.model';
+import { Classify } from './classify'
 
 export class Item extends Serializable {
   Id: number;
@@ -7,4 +8,5 @@ export class Item extends Serializable {
   Status: string;
   CreatedAt: string;
   UpdatedAt: string;
+  Classify: Classify[];
 }
