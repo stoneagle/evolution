@@ -85,8 +85,51 @@ func (s *Item) One(id int) (item models.Item, err error) {
 	return
 }
 
-func (s *Item) List() (items []models.Item, err error) {
+func (s *Item) List(item *models.Item) (items []models.Item, err error) {
 	items = make([]models.Item, 0)
-	err = s.engine.Find(&items)
+	condition := item.BuildCondition()
+	sql := s.engine.Where(condition)
+	err = sql.Find(&items)
+	return
+}
+
+func (s *Item) ListWithClassify(item *models.Item) (items []models.Item, err error) {
+	itemsJoin := make([]models.MapClassifyItemJoin, 0)
+	// be careful with the sequense of join table and struct relationship
+	sql := s.engine.Unscoped().Table("map_classify_item").Join("INNER", "classify", "classify.id = map_classify_item.classify_id").Join("INNER", "item", "item.id = map_classify_item.item_id")
+
+	condition := item.BuildCondition()
+	sql = sql.Where(condition)
+
+	err = sql.Find(&itemsJoin)
+	if err != nil {
+		return
+	}
+
+	return s.formatJoin(itemsJoin), err
+}
+
+func (s *Item) formatJoin(itemsJoin []models.MapClassifyItemJoin) (items []models.Item) {
+	itemsMap := make(map[int]models.Item)
+	for _, one := range itemsJoin {
+		if target, ok := itemsMap[one.Item.Id]; !ok {
+			item := one.Item
+			item.Classify = make([]models.Classify, 0)
+			classify := one.Classify
+			if classify.Id != 0 {
+				item.Classify = append(item.Classify, classify)
+			}
+			itemsMap[one.Item.Id] = item
+		} else if one.Item.Id != 0 {
+			classify := one.Classify
+			target.Classify = append(target.Classify, classify)
+			itemsMap[one.Item.Id] = target
+		}
+	}
+
+	items = make([]models.Item, 0)
+	for _, one := range itemsMap {
+		items = append(items, one)
+	}
 	return
 }

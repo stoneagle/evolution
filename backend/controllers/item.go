@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"quant/backend/common"
 	"quant/backend/models"
+	"quant/backend/rpc/engine"
 	"quant/backend/services"
 	"strconv"
 
@@ -28,7 +29,7 @@ func NewItem(ws *common.Websocket) *Item {
 
 func (c *Item) Router(router *gin.RouterGroup) {
 	item := router.Group("item")
-	item.GET("/list", c.List)
+	item.POST("/list", c.List)
 	item.GET("/get/:id", initItem(c.ItemSvc), c.One)
 	item.GET("/sync/classify/ws", func(ctx *gin.Context) {
 		wsCtx := c.Ws.BuildContext(c.WsSyncClassify)
@@ -61,7 +62,22 @@ func (c *Item) One(ctx *gin.Context) {
 }
 
 func (c *Item) List(ctx *gin.Context) {
-	items, err := c.ItemSvc.List()
+	var item models.Item
+	if err := ctx.ShouldBindJSON(&item); err != nil {
+		common.ResponseErrorBusiness(ctx, common.ErrorParams, "params error: ", err)
+		return
+	}
+
+	if len(item.Classify) > 0 && item.Classify[0].AssetString != "" {
+		atype, err := engine.AssetTypeFromString(item.Classify[0].AssetString)
+		if err != nil {
+			common.ResponseErrorBusiness(ctx, common.ErrorEngine, "asset type illegal", err)
+			return
+		}
+		item.Classify[0].Asset = atype
+	}
+
+	items, err := c.ItemSvc.ListWithClassify(&item)
 	if err != nil {
 		common.ResponseErrorBusiness(ctx, common.ErrorMysql, "item get error", err)
 		return

@@ -1,11 +1,13 @@
-hash: dd5362b11d6eeaf91b2f875d9629c7684a08dae8a8eb02c66e005fc0f9a05734
-updated: 2018-06-17T14:49:47.283375026+08:00
+hash: 464ce5a0b0e8d38d469400c267e65c76a23eaa7aa2021faed75c9bfdf2705f9c
+updated: 2018-06-18T19:58:33.177292576+08:00
 imports:
 - name: git.apache.org/thrift.git
   version: 327ebb6c2b6df8bf075da02ef45a2a034e9b79ba
   subpackages:
   - lib/go/thrift
   - lib/go/thrift/...
+- name: github.com/fatih/structs
+  version: a720dfa8df582c51dee1b36feabb906bde1588bd
 - name: github.com/gin-contrib/cors
   version: cf4846e6a636a76237a28d9286f163c132e841bc
 - name: github.com/gin-contrib/sse

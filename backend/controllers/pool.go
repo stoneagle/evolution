@@ -3,6 +3,7 @@ package controllers
 import (
 	"quant/backend/common"
 	"quant/backend/models"
+	"quant/backend/rpc/engine"
 	"quant/backend/services"
 	"strconv"
 
@@ -26,6 +27,8 @@ func (c *Pool) Router(router *gin.RouterGroup) {
 	pool.GET("/get/:id", initPool(c.PoolSvc), c.One)
 	pool.GET("/list", c.List)
 	pool.POST("", c.Add)
+	pool.POST("/items/add", c.AddItems)
+	pool.POST("/items/delete", c.DeleteBatchItems)
 	pool.PUT("/:id", initPool(c.PoolSvc), c.Update)
 	pool.DELETE("/:id", initPool(c.PoolSvc), c.Delete)
 }
@@ -69,7 +72,14 @@ func (c *Pool) Add(ctx *gin.Context) {
 		return
 	}
 
-	err := c.PoolSvc.Add(&pool)
+	atype, err := engine.AssetTypeFromString(pool.AssetString)
+	if err != nil {
+		common.ResponseErrorBusiness(ctx, common.ErrorEngine, "asset type illegal", err)
+		return
+	}
+	pool.Asset = atype
+
+	err = c.PoolSvc.Add(&pool)
 	if err != nil {
 		common.ResponseErrorBusiness(ctx, common.ErrorMysql, "pool insert error", err)
 		return
@@ -100,4 +110,34 @@ func (c *Pool) Delete(ctx *gin.Context) {
 		return
 	}
 	common.ResponseSuccess(ctx, pool.Id)
+}
+
+func (c *Pool) AddItems(ctx *gin.Context) {
+	var pool models.Pool
+	if err := ctx.ShouldBindJSON(&pool); err != nil {
+		common.ResponseErrorBusiness(ctx, common.ErrorParams, "params error: ", err)
+		return
+	}
+
+	err := c.PoolSvc.AddItems(&pool)
+	if err != nil {
+		common.ResponseErrorBusiness(ctx, common.ErrorMysql, "pool items join insert error", err)
+		return
+	}
+	common.ResponseSuccess(ctx, struct{}{})
+}
+
+func (c *Pool) DeleteBatchItems(ctx *gin.Context) {
+	var pool models.Pool
+	if err := ctx.ShouldBindJSON(&pool); err != nil {
+		common.ResponseErrorBusiness(ctx, common.ErrorParams, "params error: ", err)
+		return
+	}
+
+	err := c.PoolSvc.DeleteItems(&pool)
+	if err != nil {
+		common.ResponseErrorBusiness(ctx, common.ErrorMysql, "pool items join delete error", err)
+		return
+	}
+	common.ResponseSuccess(ctx, struct{}{})
 }
