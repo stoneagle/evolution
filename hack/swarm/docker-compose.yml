@@ -40,6 +40,7 @@ services:
     volumes:
       # 挂载项目代码目录
       - ../../engine:/usr/src/engine
+      - ../../hdf5:/tmp/hdf5
     working_dir: /usr/src/engine
     command: bash -c "pip3 install watchdog && python3 ./reload.py python3 ./server.py"
     expose:

@@ -2,7 +2,9 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from "@angular/router";
 import { Item } from '../../../model/business/item';
 import { Pool } from '../../../model/business/pool';
+import { Classify } from '../../../model/business/classify';
 import { PoolService } from '../../../service/business/pool.service';
+import { ItemService } from '../../../service/business/item.service';
 import { PoolAddItemComponent } from '../add-item/pool-add-item.component';
 
 @Component({
@@ -23,7 +25,8 @@ export class PoolListItemComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private poolService: PoolService
+    private poolService: PoolService,
+    private itemService: ItemService
   ) { 
     this.route.params.subscribe( params => {
       this.pool = new Pool();
@@ -75,6 +78,11 @@ export class PoolListItemComponent implements OnInit {
       this.pool = res;
       this.totalCount = res.Item.length;
       this.items = res.Item.slice(from, to);
+    })
+  }
+
+  syncPoint(item: Item): void {
+    this.itemService.SyncPoint(item.Id).subscribe(res => {
     })
   }
 }

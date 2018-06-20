@@ -80,27 +80,30 @@ func (s *Item) BatchSave(classify models.Classify, itemBatch []models.Item) (err
 }
 
 func (s *Item) One(id int) (item models.Item, err error) {
-	item = models.Item{}
-	_, err = s.engine.Where("id = ?", id).Get(&item)
-	return
+	itemsJoin := make([]models.MapClassifyItemJoin, 0)
+	sql := s.engine.Unscoped().Table("map_classify_item").Join("INNER", "classify", "classify.id = map_classify_item.classify_id").Join("INNER", "item", "item.id = map_classify_item.item_id")
+
+	sql = sql.Where("item.id = ?", id)
+	err = sql.Find(&itemsJoin)
+	if err != nil {
+		return
+	}
+
+	if len(itemsJoin) == 0 {
+		item = models.Item{}
+		_, err = s.engine.Where("id = ?", id).Get(&item)
+		return
+	}
+	return s.formatJoin(itemsJoin)[0], err
 }
 
 func (s *Item) List(item *models.Item) (items []models.Item, err error) {
-	items = make([]models.Item, 0)
-	condition := item.BuildCondition()
-	sql := s.engine.Where(condition)
-	err = sql.Find(&items)
-	return
-}
-
-func (s *Item) ListWithClassify(item *models.Item) (items []models.Item, err error) {
 	itemsJoin := make([]models.MapClassifyItemJoin, 0)
 	// be careful with the sequense of join table and struct relationship
 	sql := s.engine.Unscoped().Table("map_classify_item").Join("INNER", "classify", "classify.id = map_classify_item.classify_id").Join("INNER", "item", "item.id = map_classify_item.item_id")
 
 	condition := item.BuildCondition()
 	sql = sql.Where(condition)
-
 	err = sql.Find(&itemsJoin)
 	if err != nil {
 		return

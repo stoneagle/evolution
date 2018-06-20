@@ -3,6 +3,7 @@ package rpc
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"net"
 	"quant/backend/models"
 	"quant/backend/rpc/engine"
@@ -115,4 +116,20 @@ func (r *Rpc) GetItem(classify models.Classify) (ret []rmodels.Item, err error) 
 		return
 	}
 	return
+}
+
+func (r *Rpc) GetItemPoint(classify models.Classify, code string) (err error) {
+	client, transport, err := r.client()
+	if err != nil {
+		return
+	}
+	defer transport.Close()
+	d, err := client.GetItemPoint(context.Background(), classify.AssetType.Asset, classify.AssetType.Type, classify.Source.Main, code)
+	if err != nil {
+		return
+	}
+	if d.Code != engine.ResponseState_StateOk {
+		return errors.New(d.Desc)
+	}
+	return nil
 }

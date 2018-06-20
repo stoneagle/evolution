@@ -28,6 +28,7 @@ if len(sys.argv) <= 1 or sys.argv[1] == '--help':
     print('  Response getStrategy(string stype)')
     print('  Response getClassify(AssetType assetType, string ctype, string source, string sub)')
     print('  Response getItem(AssetType assetType, string ctype, string source, string tag, string name)')
+    print('  Response getItemPoint(AssetType assetType, string ctype, string source, string tag)')
     print('')
     sys.exit(0)
 
@@ -130,6 +131,12 @@ elif cmd == 'getItem':
         print('getItem requires 5 args')
         sys.exit(1)
     pp.pprint(client.getItem(eval(args[0]), args[1], args[2], args[3], args[4],))
+
+elif cmd == 'getItemPoint':
+    if len(args) != 4:
+        print('getItemPoint requires 4 args')
+        sys.exit(1)
+    pp.pprint(client.getItemPoint(eval(args[0]), args[1], args[2], args[3],))
 
 else:
     print('Unrecognized method %s' % cmd)

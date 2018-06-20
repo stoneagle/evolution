@@ -2,6 +2,8 @@ package common
 
 import (
 	"net/http"
+	"runtime"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -27,6 +29,10 @@ func ResponseSuccess(ctx *gin.Context, data interface{}) {
 func ResponseErrorBusiness(ctx *gin.Context, code ErrorCode, desc string, err error) {
 	if err != nil {
 		desc += ":" + err.Error()
+		_, fn, line, _ := runtime.Caller(1)
+		GetLogger().Infow("response-error-response:【" + fn + ":" + strconv.Itoa(line) + ":" + desc + "】")
+	} else {
+		GetLogger().Infow("response-error-response:【" + desc + "】")
 	}
 	ctx.JSON(http.StatusOK, Response{
 		Code: code,

@@ -51,7 +51,11 @@ export class ItemService extends BaseService {
       catchError(this.handleError<Response>()),
       map(res => {
         if (res && res.code == 0) {
-          return new Item(res.data);
+          let item = new Item(res.data);
+          if (item.Classify == null) {
+            item.Classify = [];
+          }
+          return item;
         } else {
           return new Item();
         }
@@ -62,6 +66,21 @@ export class ItemService extends BaseService {
   SyncClassify(classify: Classify): Observable<Boolean> {
     this.operation = 'PROCESS.SYNC';
     return this.http.post<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/sync/classify`, JSON.stringify(classify)).pipe(
+      tap(res => this.log(res)),
+      catchError(this.handleError<Response>()),
+      map(res => {
+        if (res && res.code == 0) {
+          return true;
+        } else {
+          return false;
+        }
+      }),
+    );
+  }
+
+  SyncPoint(id: number): Observable<Boolean> {
+    this.operation = 'PROCESS.SYNC';
+    return this.http.get<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/point/${id}`).pipe(
       tap(res => this.log(res)),
       catchError(this.handleError<Response>()),
       map(res => {

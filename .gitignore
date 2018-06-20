@@ -6,6 +6,7 @@ grafana/sessions
 hack/dockerfile/hdf5/
 tmp/
 .env
+hdf5
 
 ## backend
 backend/vendor

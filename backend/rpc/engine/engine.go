@@ -313,6 +313,12 @@ type EngineService interface {
   //  - Tag
   //  - Name
   GetItem(ctx context.Context, assetType AssetType, ctype string, source string, tag string, name string) (r *Response, err error)
+  // Parameters:
+  //  - AssetType
+  //  - Ctype
+  //  - Source
+  //  - Tag
+  GetItemPoint(ctx context.Context, assetType AssetType, ctype string, source string, tag string) (r *Response, err error)
 }
 
 type EngineServiceClient struct {
@@ -401,6 +407,24 @@ func (p *EngineServiceClient) GetItem(ctx context.Context, assetType AssetType, 
   return _result7.GetSuccess(), nil
 }
 
+// Parameters:
+//  - AssetType
+//  - Ctype
+//  - Source
+//  - Tag
+func (p *EngineServiceClient) GetItemPoint(ctx context.Context, assetType AssetType, ctype string, source string, tag string) (r *Response, err error) {
+  var _args8 EngineServiceGetItemPointArgs
+  _args8.AssetType = assetType
+  _args8.Ctype = ctype
+  _args8.Source = source
+  _args8.Tag = tag
+  var _result9 EngineServiceGetItemPointResult
+  if err = p.c.Call(ctx, "getItemPoint", &_args8, &_result9); err != nil {
+    return
+  }
+  return _result9.GetSuccess(), nil
+}
+
 type EngineServiceProcessor struct {
   processorMap map[string]thrift.TProcessorFunction
   handler EngineService
@@ -421,12 +445,13 @@ func (p *EngineServiceProcessor) ProcessorMap() map[string]thrift.TProcessorFunc
 
 func NewEngineServiceProcessor(handler EngineService) *EngineServiceProcessor {
 
-  self8 := &EngineServiceProcessor{handler:handler, processorMap:make(map[string]thrift.TProcessorFunction)}
-  self8.processorMap["getType"] = &engineServiceProcessorGetType{handler:handler}
-  self8.processorMap["getStrategy"] = &engineServiceProcessorGetStrategy{handler:handler}
-  self8.processorMap["getClassify"] = &engineServiceProcessorGetClassify{handler:handler}
-  self8.processorMap["getItem"] = &engineServiceProcessorGetItem{handler:handler}
-return self8
+  self10 := &EngineServiceProcessor{handler:handler, processorMap:make(map[string]thrift.TProcessorFunction)}
+  self10.processorMap["getType"] = &engineServiceProcessorGetType{handler:handler}
+  self10.processorMap["getStrategy"] = &engineServiceProcessorGetStrategy{handler:handler}
+  self10.processorMap["getClassify"] = &engineServiceProcessorGetClassify{handler:handler}
+  self10.processorMap["getItem"] = &engineServiceProcessorGetItem{handler:handler}
+  self10.processorMap["getItemPoint"] = &engineServiceProcessorGetItemPoint{handler:handler}
+return self10
 }
 
 func (p *EngineServiceProcessor) Process(ctx context.Context, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
@@ -437,12 +462,12 @@ func (p *EngineServiceProcessor) Process(ctx context.Context, iprot, oprot thrif
   }
   iprot.Skip(thrift.STRUCT)
   iprot.ReadMessageEnd()
-  x9 := thrift.NewTApplicationException(thrift.UNKNOWN_METHOD, "Unknown function " + name)
+  x11 := thrift.NewTApplicationException(thrift.UNKNOWN_METHOD, "Unknown function " + name)
   oprot.WriteMessageBegin(name, thrift.EXCEPTION, seqId)
-  x9.Write(oprot)
+  x11.Write(oprot)
   oprot.WriteMessageEnd()
   oprot.Flush()
-  return false, x9
+  return false, x11
 
 }
 
@@ -621,6 +646,54 @@ var retval *Response
     result.Success = retval
 }
   if err2 = oprot.WriteMessageBegin("getItem", thrift.REPLY, seqId); err2 != nil {
+    err = err2
+  }
+  if err2 = result.Write(oprot); err == nil && err2 != nil {
+    err = err2
+  }
+  if err2 = oprot.WriteMessageEnd(); err == nil && err2 != nil {
+    err = err2
+  }
+  if err2 = oprot.Flush(); err == nil && err2 != nil {
+    err = err2
+  }
+  if err != nil {
+    return
+  }
+  return true, err
+}
+
+type engineServiceProcessorGetItemPoint struct {
+  handler EngineService
+}
+
+func (p *engineServiceProcessorGetItemPoint) Process(ctx context.Context, seqId int32, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
+  args := EngineServiceGetItemPointArgs{}
+  if err = args.Read(iprot); err != nil {
+    iprot.ReadMessageEnd()
+    x := thrift.NewTApplicationException(thrift.PROTOCOL_ERROR, err.Error())
+    oprot.WriteMessageBegin("getItemPoint", thrift.EXCEPTION, seqId)
+    x.Write(oprot)
+    oprot.WriteMessageEnd()
+    oprot.Flush()
+    return false, err
+  }
+
+  iprot.ReadMessageEnd()
+  result := EngineServiceGetItemPointResult{}
+var retval *Response
+  var err2 error
+  if retval, err2 = p.handler.GetItemPoint(ctx, args.AssetType, args.Ctype, args.Source, args.Tag); err2 != nil {
+    x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing getItemPoint: " + err2.Error())
+    oprot.WriteMessageBegin("getItemPoint", thrift.EXCEPTION, seqId)
+    x.Write(oprot)
+    oprot.WriteMessageEnd()
+    oprot.Flush()
+    return true, err2
+  } else {
+    result.Success = retval
+}
+  if err2 = oprot.WriteMessageBegin("getItemPoint", thrift.REPLY, seqId); err2 != nil {
     err = err2
   }
   if err2 = result.Write(oprot); err == nil && err2 != nil {
@@ -1658,6 +1731,306 @@ func (p *EngineServiceGetItemResult) String() string {
     return "<nil>"
   }
   return fmt.Sprintf("EngineServiceGetItemResult(%+v)", *p)
+}
+
+// Attributes:
+//  - AssetType
+//  - Ctype
+//  - Source
+//  - Tag
+type EngineServiceGetItemPointArgs struct {
+  AssetType AssetType `thrift:"assetType,1" db:"assetType" json:"assetType"`
+  Ctype string `thrift:"ctype,2" db:"ctype" json:"ctype"`
+  Source string `thrift:"source,3" db:"source" json:"source"`
+  Tag string `thrift:"tag,4" db:"tag" json:"tag"`
+}
+
+func NewEngineServiceGetItemPointArgs() *EngineServiceGetItemPointArgs {
+  return &EngineServiceGetItemPointArgs{}
+}
+
+
+func (p *EngineServiceGetItemPointArgs) GetAssetType() AssetType {
+  return p.AssetType
+}
+
+func (p *EngineServiceGetItemPointArgs) GetCtype() string {
+  return p.Ctype
+}
+
+func (p *EngineServiceGetItemPointArgs) GetSource() string {
+  return p.Source
+}
+
+func (p *EngineServiceGetItemPointArgs) GetTag() string {
+  return p.Tag
+}
+func (p *EngineServiceGetItemPointArgs) Read(iprot thrift.TProtocol) error {
+  if _, err := iprot.ReadStructBegin(); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
+  }
+
+
+  for {
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
+    if err != nil {
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
+    }
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
+    case 1:
+      if fieldTypeId == thrift.I32 {
+        if err := p.ReadField1(iprot); err != nil {
+          return err
+        }
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
+          return err
+        }
+      }
+    case 2:
+      if fieldTypeId == thrift.STRING {
+        if err := p.ReadField2(iprot); err != nil {
+          return err
+        }
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
+          return err
+        }
+      }
+    case 3:
+      if fieldTypeId == thrift.STRING {
+        if err := p.ReadField3(iprot); err != nil {
+          return err
+        }
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
+          return err
+        }
+      }
+    case 4:
+      if fieldTypeId == thrift.STRING {
+        if err := p.ReadField4(iprot); err != nil {
+          return err
+        }
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
+          return err
+        }
+      }
+    default:
+      if err := iprot.Skip(fieldTypeId); err != nil {
+        return err
+      }
+    }
+    if err := iprot.ReadFieldEnd(); err != nil {
+      return err
+    }
+  }
+  if err := iprot.ReadStructEnd(); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+  }
+  return nil
+}
+
+func (p *EngineServiceGetItemPointArgs)  ReadField1(iprot thrift.TProtocol) error {
+  if v, err := iprot.ReadI32(); err != nil {
+  return thrift.PrependError("error reading field 1: ", err)
+} else {
+  temp := AssetType(v)
+  p.AssetType = temp
+}
+  return nil
+}
+
+func (p *EngineServiceGetItemPointArgs)  ReadField2(iprot thrift.TProtocol) error {
+  if v, err := iprot.ReadString(); err != nil {
+  return thrift.PrependError("error reading field 2: ", err)
+} else {
+  p.Ctype = v
+}
+  return nil
+}
+
+func (p *EngineServiceGetItemPointArgs)  ReadField3(iprot thrift.TProtocol) error {
+  if v, err := iprot.ReadString(); err != nil {
+  return thrift.PrependError("error reading field 3: ", err)
+} else {
+  p.Source = v
+}
+  return nil
+}
+
+func (p *EngineServiceGetItemPointArgs)  ReadField4(iprot thrift.TProtocol) error {
+  if v, err := iprot.ReadString(); err != nil {
+  return thrift.PrependError("error reading field 4: ", err)
+} else {
+  p.Tag = v
+}
+  return nil
+}
+
+func (p *EngineServiceGetItemPointArgs) Write(oprot thrift.TProtocol) error {
+  if err := oprot.WriteStructBegin("getItemPoint_args"); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err) }
+  if p != nil {
+    if err := p.writeField1(oprot); err != nil { return err }
+    if err := p.writeField2(oprot); err != nil { return err }
+    if err := p.writeField3(oprot); err != nil { return err }
+    if err := p.writeField4(oprot); err != nil { return err }
+  }
+  if err := oprot.WriteFieldStop(); err != nil {
+    return thrift.PrependError("write field stop error: ", err) }
+  if err := oprot.WriteStructEnd(); err != nil {
+    return thrift.PrependError("write struct stop error: ", err) }
+  return nil
+}
+
+func (p *EngineServiceGetItemPointArgs) writeField1(oprot thrift.TProtocol) (err error) {
+  if err := oprot.WriteFieldBegin("assetType", thrift.I32, 1); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 1:assetType: ", p), err) }
+  if err := oprot.WriteI32(int32(p.AssetType)); err != nil {
+  return thrift.PrependError(fmt.Sprintf("%T.assetType (1) field write error: ", p), err) }
+  if err := oprot.WriteFieldEnd(); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 1:assetType: ", p), err) }
+  return err
+}
+
+func (p *EngineServiceGetItemPointArgs) writeField2(oprot thrift.TProtocol) (err error) {
+  if err := oprot.WriteFieldBegin("ctype", thrift.STRING, 2); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 2:ctype: ", p), err) }
+  if err := oprot.WriteString(string(p.Ctype)); err != nil {
+  return thrift.PrependError(fmt.Sprintf("%T.ctype (2) field write error: ", p), err) }
+  if err := oprot.WriteFieldEnd(); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 2:ctype: ", p), err) }
+  return err
+}
+
+func (p *EngineServiceGetItemPointArgs) writeField3(oprot thrift.TProtocol) (err error) {
+  if err := oprot.WriteFieldBegin("source", thrift.STRING, 3); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 3:source: ", p), err) }
+  if err := oprot.WriteString(string(p.Source)); err != nil {
+  return thrift.PrependError(fmt.Sprintf("%T.source (3) field write error: ", p), err) }
+  if err := oprot.WriteFieldEnd(); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 3:source: ", p), err) }
+  return err
+}
+
+func (p *EngineServiceGetItemPointArgs) writeField4(oprot thrift.TProtocol) (err error) {
+  if err := oprot.WriteFieldBegin("tag", thrift.STRING, 4); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field begin error 4:tag: ", p), err) }
+  if err := oprot.WriteString(string(p.Tag)); err != nil {
+  return thrift.PrependError(fmt.Sprintf("%T.tag (4) field write error: ", p), err) }
+  if err := oprot.WriteFieldEnd(); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write field end error 4:tag: ", p), err) }
+  return err
+}
+
+func (p *EngineServiceGetItemPointArgs) String() string {
+  if p == nil {
+    return "<nil>"
+  }
+  return fmt.Sprintf("EngineServiceGetItemPointArgs(%+v)", *p)
+}
+
+// Attributes:
+//  - Success
+type EngineServiceGetItemPointResult struct {
+  Success *Response `thrift:"success,0" db:"success" json:"success,omitempty"`
+}
+
+func NewEngineServiceGetItemPointResult() *EngineServiceGetItemPointResult {
+  return &EngineServiceGetItemPointResult{}
+}
+
+var EngineServiceGetItemPointResult_Success_DEFAULT *Response
+func (p *EngineServiceGetItemPointResult) GetSuccess() *Response {
+  if !p.IsSetSuccess() {
+    return EngineServiceGetItemPointResult_Success_DEFAULT
+  }
+return p.Success
+}
+func (p *EngineServiceGetItemPointResult) IsSetSuccess() bool {
+  return p.Success != nil
+}
+
+func (p *EngineServiceGetItemPointResult) Read(iprot thrift.TProtocol) error {
+  if _, err := iprot.ReadStructBegin(); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T read error: ", p), err)
+  }
+
+
+  for {
+    _, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
+    if err != nil {
+      return thrift.PrependError(fmt.Sprintf("%T field %d read error: ", p, fieldId), err)
+    }
+    if fieldTypeId == thrift.STOP { break; }
+    switch fieldId {
+    case 0:
+      if fieldTypeId == thrift.STRUCT {
+        if err := p.ReadField0(iprot); err != nil {
+          return err
+        }
+      } else {
+        if err := iprot.Skip(fieldTypeId); err != nil {
+          return err
+        }
+      }
+    default:
+      if err := iprot.Skip(fieldTypeId); err != nil {
+        return err
+      }
+    }
+    if err := iprot.ReadFieldEnd(); err != nil {
+      return err
+    }
+  }
+  if err := iprot.ReadStructEnd(); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+  }
+  return nil
+}
+
+func (p *EngineServiceGetItemPointResult)  ReadField0(iprot thrift.TProtocol) error {
+  p.Success = &Response{}
+  if err := p.Success.Read(iprot); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T error reading struct: ", p.Success), err)
+  }
+  return nil
+}
+
+func (p *EngineServiceGetItemPointResult) Write(oprot thrift.TProtocol) error {
+  if err := oprot.WriteStructBegin("getItemPoint_result"); err != nil {
+    return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err) }
+  if p != nil {
+    if err := p.writeField0(oprot); err != nil { return err }
+  }
+  if err := oprot.WriteFieldStop(); err != nil {
+    return thrift.PrependError("write field stop error: ", err) }
+  if err := oprot.WriteStructEnd(); err != nil {
+    return thrift.PrependError("write struct stop error: ", err) }
+  return nil
+}
+
+func (p *EngineServiceGetItemPointResult) writeField0(oprot thrift.TProtocol) (err error) {
+  if p.IsSetSuccess() {
+    if err := oprot.WriteFieldBegin("success", thrift.STRUCT, 0); err != nil {
+      return thrift.PrependError(fmt.Sprintf("%T write field begin error 0:success: ", p), err) }
+    if err := p.Success.Write(oprot); err != nil {
+      return thrift.PrependError(fmt.Sprintf("%T error writing struct: ", p.Success), err)
+    }
+    if err := oprot.WriteFieldEnd(); err != nil {
+      return thrift.PrependError(fmt.Sprintf("%T write field end error 0:success: ", p), err) }
+  }
+  return err
+}
+
+func (p *EngineServiceGetItemPointResult) String() string {
+  if p == nil {
+    return "<nil>"
+  }
+  return fmt.Sprintf("EngineServiceGetItemPointResult(%+v)", *p)
 }
 
 

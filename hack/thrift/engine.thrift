@@ -23,4 +23,5 @@ service EngineService {
     Response getStrategy(1: string stype);
     Response getClassify(1: AssetType assetType, 2: string ctype, 3: string source, 4: string sub);
     Response getItem(1: AssetType assetType, 2: string ctype, 3: string source, 4: string tag, 5: string name);
+    Response getItemPoint(1: AssetType assetType, 2: string ctype, 3: string source, 4: string code);
 }

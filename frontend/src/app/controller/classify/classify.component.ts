@@ -34,8 +34,7 @@ export class ClassifyComponent implements OnInit {
 
   Sync($event: any): void {
     if ($event) {
-      this.classifyService.Sync($event)
-      .subscribe(res => {
+      this.classifyService.Sync($event).subscribe(res => {
         this.syncModelOpened = false;
         this.refresh();
       })
@@ -45,8 +44,7 @@ export class ClassifyComponent implements OnInit {
   }
 
   syncItem(classify: Classify): void {
-    this.itemService.SyncClassify(classify)
-    .subscribe(res => {
+    this.itemService.SyncClassify(classify).subscribe(res => {
     })
   }
 
@@ -56,8 +54,7 @@ export class ClassifyComponent implements OnInit {
   }
 
   delete(classify: Classify): void {
-    this.classifyService.Delete(classify.Id)
-    .subscribe(res => {
+    this.classifyService.Delete(classify.Id).subscribe(res => {
       this.refresh();
     })
   }
@@ -74,8 +71,7 @@ export class ClassifyComponent implements OnInit {
   }
 
   refreshClassify(from: number, to: number): void {
-    this.classifyService.List()
-    .subscribe(res => {
+    this.classifyService.List().subscribe(res => {
       this.totalCount = res.length;
       this.classifys = res.slice(from, to);
     })

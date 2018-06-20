@@ -1,7 +1,9 @@
 from rpc.engine import ttypes
 from source.ts import classify
 from library import conf
+from controller import obtain
 import json
+import h5py
 
 
 class EngineServiceHandler:
@@ -61,6 +63,26 @@ class EngineServiceHandler:
             if ctype == "ashare":
                 if source == "tushare":
                     ret.data = classify.get_detail(tag, name, retry_count=1, pause=conf.REQUEST_BLANK).to_json(orient='records')
+                else:
+                    ret.code = ttypes.ResponseState.StateErrorBusiness
+                    ret.desc = "source not exist"
+            else:
+                ret.code = ttypes.ResponseState.StateErrorBusiness
+                ret.desc = "ctype not exist"
+        else:
+            ret.code = ttypes.ResponseState.StateErrorBusiness
+            ret.desc = "source not exist"
+        return ret
+
+    def getItemPoint(self, assetType, ctype, source, code):
+        ret = ttypes.Response()
+        if assetType == ttypes.AssetType.Stock:
+            if ctype == "ashare":
+                if source == "tushare":
+                    f = h5py.File(conf.HDF5_FILE_SHARE, 'a')
+                    obtain.code_share(f, code)
+                    f.close()
+                    ret.data = "true";
                 else:
                     ret.code = ttypes.ResponseState.StateErrorBusiness
                     ret.desc = "source not exist"

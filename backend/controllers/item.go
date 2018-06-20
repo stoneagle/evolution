@@ -31,6 +31,7 @@ func (c *Item) Router(router *gin.RouterGroup) {
 	item := router.Group("item")
 	item.POST("/list", c.List)
 	item.GET("/get/:id", initItem(c.ItemSvc), c.One)
+	item.GET("/point/:id", initItem(c.ItemSvc), c.SyncPoint)
 	item.GET("/sync/classify/ws", func(ctx *gin.Context) {
 		wsCtx := c.Ws.BuildContext(c.WsSyncClassify)
 		c.Ws.Intence.HandleRequestWithKeys(ctx.Writer, ctx.Request, wsCtx)
@@ -77,7 +78,7 @@ func (c *Item) List(ctx *gin.Context) {
 		item.Classify[0].Asset = atype
 	}
 
-	items, err := c.ItemSvc.ListWithClassify(&item)
+	items, err := c.ItemSvc.List(&item)
 	if err != nil {
 		common.ResponseErrorBusiness(ctx, common.ErrorMysql, "item get error", err)
 		return
@@ -138,4 +139,14 @@ func (c *Item) WsSyncClassify(sourceJson []byte) common.WebsocketResponse {
 		return c.Ws.ResponseBusinessError(common.ErrorMysql, "classify save error", err)
 	}
 	return c.Ws.ResponseMessage(classify.Name + " sync success")
+}
+
+func (c *Item) SyncPoint(ctx *gin.Context) {
+	item := ctx.MustGet("item").(models.Item)
+	err := c.Rpc.GetItemPoint(item.Classify[0], item.Code)
+	if err != nil {
+		common.ResponseErrorBusiness(ctx, common.ErrorEngine, "get item point error", err)
+		return
+	}
+	common.ResponseSuccess(ctx, struct{}{})
 }
