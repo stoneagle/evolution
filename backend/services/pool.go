@@ -1,6 +1,7 @@
 package services
 
 import (
+	"fmt"
 	"quant/backend/models"
 
 	"github.com/go-redis/redis"
@@ -30,8 +31,11 @@ func (s *Pool) One(id int) (pool models.Pool, err error) {
 	}
 
 	if len(itemsJoin) == 0 {
-		return models.Pool{}, nil
+		pool = models.Pool{}
+		_, err = s.engine.Where("id = ?", id).Get(&pool)
+		return
 	}
+	fmt.Println("%v\r\n", itemsJoin)
 	return s.formatJoin(itemsJoin)[0], err
 }
 

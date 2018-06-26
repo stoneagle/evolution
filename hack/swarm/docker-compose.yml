@@ -5,6 +5,16 @@ services:
     container_name: ${PROJECT_NAME}-${DEV_USER}-redis
     expose:
       - "6379"
+  influxdb:
+    environment:
+      - INFLUXDB_ADMIN_ENABLED=true
+    image: influxdb:1.5.3
+    container_name: ${PROJECT_NAME}-${DEV_USER}-influxdb
+    volumes:
+      - /home/${DEV_USER}/database/influxdb:/var/lib/influxdb
+      - ../config/influxdb.conf:/etc/influxdb/influxdb.conf
+    ports:
+      - "${DEV_INFLUXDB}:8086"
   mysql:
     environment:
       - MYSQL_ROOT_PASSWORD=123456
@@ -40,6 +50,7 @@ services:
     volumes:
       # 挂载项目代码目录
       - ../../engine:/usr/src/engine
+      - ../../hdf5:/tmp/hdf5
     working_dir: /usr/src/engine
     command: bash -c "pip3 install watchdog && python3 ./reload.py python3 ./server.py"
     expose:

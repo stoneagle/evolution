@@ -37,3 +37,7 @@ import:
   version: ^0.2.0
 - package: github.com/fatih/structs
   version: ^1.0.0
+- package: github.com/influxdata/influxdb
+  version: ^1.5.3
+  subpackages:
+  - client/v2

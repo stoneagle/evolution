@@ -64,7 +64,11 @@ export class PoolService extends BaseService {
       catchError(this.handleError<Response>()),
       map(res => {
         if (res && res.code == 0) {
-          return new Pool(res.data);
+          let pool = new Pool(res.data);
+          if (pool.Item == null) {
+            pool.Item = [];
+          }
+          return pool;
         } else {
           return new Pool();
         }
