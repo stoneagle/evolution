@@ -1,6 +1,7 @@
 .PHONY: run-web, stop-web rm-web
 
 PWD := $(shell pwd)
+USERNAME := $(shell id -nu)
 USER := $(shell id -u)
 GROUP := $(shell id -g)
 DATE := $(shell date "+%F")
@@ -27,20 +28,19 @@ build-golang:
 init-db:
 	docker exec -w /go/src/quant/backend/initial -it quant-wuzhongyang-golang go run init.go 
 
+init-influxdb:
+	sudo docker run --rm \
+		-e INFLUXDB_DB=quant -e INFLUXDB_ADMIN_ENABLED=true \
+		-e INFLUXDB_ADMIN_USER=admin -e INFLUXDB_ADMIN_PASSWORD=a1b2c3d4E \
+		-e INFLUXDB_USER=quant -e INFLUXDB_USER_PASSWORD=a1b2c3d4E \
+		-v /home/$(USERNAME)/database/influxdb:/var/lib/influxdb \
+		influxdb:1.5.3 /init-influxdb.sh
+
 # frontend
 run-ng:
 	cd frontend && ng serve --environment=dev
 
 # grafana 
-run-grafana: 
-	cd hack && docker-compose -f docker-compose-grafana.yml -p "grafana-$(USER)" up -d
-
-stop-grafana: 
-	cd hack && docker-compose -f docker-compose-grafana.yml -p "grafana-$(USER)" stop 
-
-rm-grafana: 
-	cd hack && docker-compose -f docker-compose-grafana.yml -p "grafana-$(USER)" rm 
-
 init-plugin:
 	cd plugin/ashare && npm install --registry=http://rgistry.npm.taobao.org && ./node_modules/grunt/bin/grunt
 
