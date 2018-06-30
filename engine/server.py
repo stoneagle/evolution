@@ -9,7 +9,7 @@ import sys
 sys.path.append('/usr/lib64/python3.4/site-packages')
 
 
-__HOST = 'engine'
+__HOST = 'quant-engine'
 __PORT = 6666
 
 

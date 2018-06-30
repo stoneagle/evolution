@@ -1,33 +1,7 @@
 version: '2'
 services:
-  redis:
-    image: redis:3.2
-    container_name: ${PROJECT_NAME}-${DEV_USER}-redis
-    expose:
-      - "6379"
-  influxdb:
-    environment:
-      - INFLUXDB_ADMIN_ENABLED=true
-    image: influxdb:1.5.3
-    container_name: ${PROJECT_NAME}-${DEV_USER}-influxdb
-    volumes:
-      - /home/${DEV_USER}/database/influxdb:/var/lib/influxdb
-      - ../config/influxdb.conf:/etc/influxdb/influxdb.conf
-    ports:
-      - "${DEV_INFLUXDB}:8086"
-  mysql:
-    environment:
-      - MYSQL_ROOT_PASSWORD=123456
-    image: mysql:5.6.38
-    container_name: ${PROJECT_NAME}-${DEV_USER}-mysql
-    volumes:
-      - /home/${DEV_USER}/database/mysql:/var/lib/mysql
-    ports:
-      - "${DEV_DB_PORT}:3306"
-    networks:
-      - default
-  backend:
-    image: quant/golang:1.10 
+  quant-backend:
+    image: ${REGISTRY_PREFIX}:golang-beego-1.10 
     container_name: ${PROJECT_NAME}-${DEV_USER}-golang
     volumes:
       # 挂载项目代码目录
@@ -36,16 +10,14 @@ services:
     entrypoint: 
       - bee 
       - run 
-    links:
-      - mysql:mysql.localhost
-    ports:
-      - "${DEV_PORT}:8080"
+    expose:
+      - "${QUANT_PORT}"
     networks:
       - default
-  engine:
+  quant-engine:
     environment:
       - PYTHONUNBUFFERED=0
-    image: ${REGISTRY_PREFIX}:basic
+    image: ${REGISTRY_PREFIX}:quant-engine
     container_name: ${PROJECT_NAME}-${DEV_USER}-engine
     volumes:
       # 挂载项目代码目录
@@ -54,7 +26,17 @@ services:
     working_dir: /usr/src/engine
     command: bash -c "pip3 install watchdog && python3 ./reload.py python3 ./server.py"
     expose:
-      - "${DEV_ENG_PORT}"
+      - "${ENGINE_PORT}"
+    networks:
+      - default
+  quant-envoy:
+    image: ${REGISTRY_PREFIX}:envoy
+    container_name: ${PROJECT_NAME}-${DEV_USER}-envoy
+    command: envoy -c /etc/quant-envoy.yaml --service-cluster quant-envoy
+    volumes:
+      - ./envoy.yaml:/etc/quant-envoy.yaml
+    expose:
+      - "80"
     networks:
       - default
 networks:

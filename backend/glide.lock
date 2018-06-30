@@ -1,5 +1,5 @@
 hash: 1f45c3a8dca6a50f5a4b937062e418c5c7c85ad8613c7202cb42cc449c66b9e4
-updated: 2018-06-20T10:06:08.937983088+08:00
+updated: 2018-06-30T09:12:44.651572329+08:00
 imports:
 - name: git.apache.org/thrift.git
   version: 327ebb6c2b6df8bf075da02ef45a2a034e9b79ba
@@ -13,7 +13,7 @@ imports:
 - name: github.com/gin-contrib/sse
   version: 22d885f9ecc78bf4ee5d72b937e4bbcdc58e8cae
 - name: github.com/gin-gonic/gin
-  version: caf3e350a548af1add9def68087ac53d1d000caa
+  version: eb9f313144e6768d91421855810ed5937ce348c5
   subpackages:
   - binding
   - json
@@ -37,13 +37,13 @@ imports:
 - name: github.com/go-xorm/xorm
   version: d85bb4911c725a53b135fc12862748a41b6c07da
 - name: github.com/golang/protobuf
-  version: 9f81198da99b79e14d70ca2c3cc1bbe44c6e69b6
+  version: 9eb2c01ac278a5d89ce4b2be68fe4500955d8179
   subpackages:
   - proto
 - name: github.com/gorilla/websocket
   version: ea4d1f681babbce9545c9c5f3d5194a789c89f5b
 - name: github.com/influxdata/influxdb
-  version: ff05f89bf284621c754aafe7bba709dd2371fe9c
+  version: 62ab18a0f43ee342b84debaaae5486b8b2d8682c
   subpackages:
   - client/v2
 - name: github.com/json-iterator/go
@@ -55,7 +55,7 @@ imports:
 - name: github.com/modern-go/reflect2
   version: 58118c1ea9161250907268a484af4dd6ed314280
 - name: github.com/ugorji/go
-  version: f3cacc17c85ecb7f1b6a9e373ee85d1480919868
+  version: 7d51bbe6161dcb8f32a1252c27668ce36e3ef16b
   subpackages:
   - codec
 - name: go.uber.org/atomic
@@ -72,11 +72,11 @@ imports:
   - internal/exit
   - zapcore
 - name: golang.org/x/net
-  version: db08ff08e8622530d9ed3a0e8ac279f6d4c02196
+  version: 4cb1c02c05b0e749b0365f61ae859a8e0cfceed9
   subpackages:
   - context
 - name: golang.org/x/sys
-  version: fc8bd948cf46f9c7af0f07d34151ce25fe90e477
+  version: 7138fd3d9dc8335c567ca206f4333fb75eb05d56
   subpackages:
   - unix
 - name: google.golang.org/appengine

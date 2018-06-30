@@ -5,24 +5,18 @@ USERNAME := $(shell id -nu)
 USER := $(shell id -u)
 GROUP := $(shell id -g)
 DATE := $(shell date "+%F")
-REGISTRY_PREFIX := stoneagle/quant-engine
+REGISTRY_DEVELOP_PREFIX := stoneagle/develop
 PROJ := quant
 
 # backend
 run-web: 
-	export REGISTRY_PREFIX=$(REGISTRY_PREFIX) && \
 	cd hack/swarm && docker-compose -f docker-compose.yml -p "$(PROJ)-$(USER)-web" up
 
 stop-web: 
-	export REGISTRY_PREFIX=$(REGISTRY_PREFIX) && \
 	cd hack/swarm && docker-compose -f docker-compose.yml -p "$(PROJ)-$(USER)-web" stop 
 
 rm-web: 
-	export REGISTRY_PREFIX=$(REGISTRY_PREFIX) && \
 	cd hack/swarm && docker-compose -f docker-compose.yml -p "$(PROJ)-$(USER)-web" rm 
-
-build-golang:
-	cd hack/dockerfile && docker build -f ./Dockerfile-golang -t quant/golang:1.10 .
 
 # init
 init-db:
@@ -68,4 +62,8 @@ thrift-python:
 
 # engine
 build-engine-basic:
-	cd ./hack/dockerfile && docker build -f ./Dockerfile.engine -t $(REGISTRY_PREFIX):quant . --network=host
+	cd ./hack/dockerfile && docker build -f ./Dockerfile.engine -t $(REGISTRY_DEVELOP_PREFIX):quant-engine . --network=host
+
+build-golang:
+	cd hack/dockerfile && docker build -f ./Dockerfile-golang -t $(REGISTRY_DEVELOP_PREFIX):golang-beego-1.10 .
+
