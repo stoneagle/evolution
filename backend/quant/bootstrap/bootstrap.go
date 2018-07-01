@@ -43,15 +43,14 @@ func (b *Bootstrapper) Bootstrap() *Bootstrapper {
 			AllowHeaders:     []string{"Content-Type", "Access-Control-Allow-Origin", "Authorization"},
 			AllowMethods:     []string{"GET", "POST", "DELETE", "PUT", "PATCH"},
 			AllowCredentials: true,
-			AllowOrigins:     []string{"http://localhost:8180", "http://localhost:8181"},
+			AllowOrigins:     b.Config.Quant.System.Cors,
 			ExposeHeaders:    []string{"Content-Length"},
 			AllowOriginFunc: func(origin string) bool {
-				return origin == "http://localhost:8181"
+				return origin == "http://localhost:8080"
 			},
 			MaxAge: 12 * time.Hour,
 		}))
 	}
-
 	return b
 }
 

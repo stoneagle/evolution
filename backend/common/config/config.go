@@ -37,6 +37,7 @@ type Conf struct {
 	Quant struct {
 		System struct {
 			Prefix string
+			Cors   []string
 		}
 		Redis    RedisConf
 		Database DBConf
@@ -50,7 +51,8 @@ type Conf struct {
 var onceConfig *Conf = &Conf{}
 
 func Get() *Conf {
-	if (Conf{}) == *onceConfig {
+	if "" == onceConfig.App.Mode {
+		// if (Conf{}) == *onceConfig {
 		configPath := os.Getenv("ConfigPath")
 		if configPath == "" {
 			configPath = "../config/.config.yaml"
