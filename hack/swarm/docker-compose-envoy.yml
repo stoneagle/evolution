@@ -1,0 +1,16 @@
+version: '2'
+services:
+  evolution-envoy:
+    image: ${REGISTRY_PREFIX}:envoy
+    container_name: ${PROJECT_NAME}-${DEV_USER}-envoy
+    command: envoy -c /etc/evolution-envoy.yaml --service-cluster evolution-envoy
+    volumes:
+      - ./envoy.yaml:/etc/evolution-envoy.yaml
+    expose:
+      - "80"
+    networks:
+      - default
+networks:
+  default:
+    external:
+      name: ${DEV_USER}

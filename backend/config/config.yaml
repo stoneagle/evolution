@@ -1,6 +1,9 @@
 app:
   mode: debug 
+  log: /go/src/evolution/backend/logs
 quant:
+  system:
+    prefix: evolution/quant
   redis:
     name: quant 
     host: redis
