@@ -6,21 +6,27 @@ USER := $(shell id -u)
 GROUP := $(shell id -g)
 DATE := $(shell date "+%F")
 REGISTRY_DEVELOP_PREFIX := stoneagle/develop
-PROJ := quant
+PROJ := evo 
 
-# backend
-run-web: 
-	cd hack/swarm && docker-compose -f docker-compose.yml -p "$(PROJ)-$(USER)-web" up
+# quant 
+run-quant: 
+	cd hack/swarm && docker-compose -f docker-compose-quant.yml -p "$(PROJ)-$(USER)-quant" up
+stop-quant: 
+	cd hack/swarm && docker-compose -f docker-compose-quant.yml -p "$(PROJ)-$(USER)-quant" stop 
+rm-quant: 
+	cd hack/swarm && docker-compose -f docker-compose-quant.yml -p "$(PROJ)-$(USER)-quant" rm 
 
-stop-web: 
-	cd hack/swarm && docker-compose -f docker-compose.yml -p "$(PROJ)-$(USER)-web" stop 
-
-rm-web: 
-	cd hack/swarm && docker-compose -f docker-compose.yml -p "$(PROJ)-$(USER)-web" rm 
+# envoy 
+run-envoy: 
+	cd hack/swarm && docker-compose -f docker-compose-envoy.yml -p "$(PROJ)-$(USER)-envoy" up -d
+stop-envoy: 
+	cd hack/swarm && docker-compose -f docker-compose-envoy.yml -p "$(PROJ)-$(USER)-envoy" stop 
+rm-envoy: 
+	cd hack/swarm && docker-compose -f docker-compose-envoy.yml -p "$(PROJ)-$(USER)-envoy" rm 
 
 # init
-init-db:
-	docker exec -w /go/src/quant/backend/initial -it quant-wuzhongyang-golang go run init.go 
+init-quant-db:
+	docker exec -w /go/src/evolution/backend/quant/initial -it quant-wuzhongyang-golang go run init.go 
 
 init-influxdb:
 	sudo docker run --rm \
@@ -46,11 +52,11 @@ THRIFT_PREFIX = /tmp/thrift
 thrift-golang:
 	docker run -it --rm \
 		-u $(USER):$(GROUP) \
-		-v $(PWD)/backend:$(THRIFT_PREFIX)/backend \
+		-v $(PWD)/quant:$(THRIFT_PREFIX)/quant \
 		-v $(PWD)/hack:$(THRIFT_PREFIX)/hack \
 		thrift:0.11.0 \
-		thrift --gen go -out $(THRIFT_PREFIX)/backend/rpc $(THRIFT_PREFIX)/hack/thrift/engine.thrift && \
-	sed -i 's:"engine":"quant/backend/rpc/engine":' ./backend/rpc/engine/*/*.go
+		thrift --gen go -out $(THRIFT_PREFIX)/quant/rpc $(THRIFT_PREFIX)/hack/thrift/engine.thrift && \
+	sed -i 's:"engine":"evolution/quant/rpc/engine":' ./quant/rpc/engine/*/*.go
 
 thrift-python:
 	docker run -it --rm \
@@ -63,7 +69,3 @@ thrift-python:
 # engine
 build-engine-basic:
 	cd ./hack/dockerfile && docker build -f ./Dockerfile.engine -t $(REGISTRY_DEVELOP_PREFIX):quant-engine . --network=host
-
-build-golang:
-	cd hack/dockerfile && docker build -f ./Dockerfile-golang -t $(REGISTRY_DEVELOP_PREFIX):golang-beego-1.10 .
-

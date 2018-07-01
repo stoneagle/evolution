@@ -1,16 +1,17 @@
+## project
+*.swp
 logs
-hack/.env
 grafana/plugins/**/node_modules
 grafana/sessions
-*.swp
+
+## hack
+hack/swarm/.env
 hack/dockerfile/hdf5/
-tmp/
-.env
-hdf5
 
 ## backend
 backend/vendor
-backend/backend
+backend/logs
+backend/quant/quant
 backend/config/.config.yaml
 
 ## engine

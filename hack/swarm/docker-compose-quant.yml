@@ -1,0 +1,35 @@
+version: '2'
+services:
+  quant-backend:
+    image: ${REGISTRY_PREFIX}:golang-beego-1.10 
+    container_name: ${PROJECT_NAME}-${DEV_USER}-golang
+    volumes:
+      # 挂载项目代码目录
+      - ../../backend:/go/src/evolution/backend
+    working_dir: /go/src/evolution/backend/quant
+    entrypoint: 
+      - bee 
+      - run 
+    expose:
+      - "${QUANT_PORT}"
+    networks:
+      - default
+  quant-engine:
+    environment:
+      - PYTHONUNBUFFERED=0
+    image: ${REGISTRY_PREFIX}:quant-engine
+    container_name: ${PROJECT_NAME}-${DEV_USER}-engine
+    volumes:
+      # 挂载项目代码目录
+      - ../../engine:/usr/src/engine
+      - ../../hdf5:/tmp/hdf5
+    working_dir: /usr/src/engine
+    command: bash -c "pip3 install watchdog && python3 ./reload.py python3 ./server.py"
+    expose:
+      - "${ENGINE_PORT}"
+    networks:
+      - default
+networks:
+  default:
+    external:
+      name: ${DEV_USER}

@@ -1,12 +1,12 @@
-import { Injectable } from '@angular/core';
+import { Injectable }               from '@angular/core';
 import { HttpClient, HttpHeaders  } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { of } from 'rxjs/observable/of';
-import { catchError, map, tap  } from 'rxjs/operators';
-import { AppConfig } from './config.service';
-import { Response } from '../../model/base/response.model';
-import { MessageHandlerService  } from '../base/message-handler.service';
-import { WsStatus } from '../../shared/shared.const';
+import { Observable }               from 'rxjs';
+import { of }                       from 'rxjs/observable/of';
+import { catchError, map, tap  }    from 'rxjs/operators';
+import { AppConfig }                from './config.service';
+import { MessageHandlerService  }   from '../base/message-handler.service';
+import { Response }                 from '../../model/base/response.model';
+import { WsStatus }                 from '../../shared/shared.const';
 
 @Injectable()
 export class BaseService {

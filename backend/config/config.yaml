@@ -1,6 +1,10 @@
 app:
   mode: debug 
+  log: /go/src/evolution/backend/logs
 quant:
+  system:
+    prefix: evolution/quant
+    cors: ["http://192.168.0.119:8888"]
   redis:
     name: quant 
     host: redis

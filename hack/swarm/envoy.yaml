@@ -18,18 +18,18 @@ static_resources:
               - "*"
               routes:
               - match:
-                  prefix: "/quant/backend"
+                  prefix: "/evolution/quant"
                 route:
-                  cluster: backend
+                  cluster: quant 
               - match:
-                  prefix: "/quant/engine"
+                  prefix: "/evolution/engine"
                 route:
                   cluster: engine 
           http_filters:
           - name: envoy.router
             config: {}
   clusters:
-  - name: backend 
+  - name: quant
     connect_timeout: 0.5s
     type: strict_dns
     lb_policy: round_robin
@@ -43,7 +43,7 @@ static_resources:
     lb_policy: round_robin
     hosts:
     - socket_address:
-        address: engine-backend
+        address: quant-engine
         port_value: 6666
 admin:
   access_log_path: "/dev/null"

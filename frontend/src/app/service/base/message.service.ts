@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Subject } from 'rxjs/Subject';
-import { Message } from '../../model/base/message';
-import { AlertType } from '../../shared/shared.const';
+import { Subject }    from 'rxjs/Subject';
+import { Message }    from '../../model/base/message';
+import { AlertType }  from '../../shared/shared.const';
 
 @Injectable()
 export class MessageService {

@@ -1,19 +1,19 @@
-import { NgModule } from '@angular/core';
-import { AppRouteModule } from '../route/app-route.module';
-import { BrowserModule } from '@angular/platform-browser';
-import { CommonModule  } from '@angular/common';   
-import { ClarityModule  } from "@clr/angular"; 
-import { HttpClientModule  }    from '@angular/common/http';
-import { FormsModule }   from '@angular/forms';
-import { TranslateModule  } from "@ngx-translate/core";
+import { NgModule }          from '@angular/core';
+import { BrowserModule }     from '@angular/platform-browser';
+import { CommonModule  }     from '@angular/common';
+import { HttpClientModule  } from '@angular/common/http';
+import { FormsModule }       from '@angular/forms';
+import { ClarityModule  }    from "@clr/angular";
+import { TranslateModule  }  from "@ngx-translate/core";
 
-import { SignInComponent } from './sign-in/sign-in.component';
-import { ShellComponent } from './shell/shell.component';
-import { DefaultComponent } from './default/default.component';
+import { DefaultComponent }  from './default/default.component';
+import { MessageComponent }  from './message/message.component';
+import { SignInComponent }   from './sign-in/sign-in.component';
+import { ShellComponent }    from './shell/shell.component';
 import { ShellNavComponent } from './shell/nav/shell-nav.component';
-import { MessageComponent } from './message/message.component';
-import { SignService  } from '../service/base/sign.service';
-import { MessageService } from '../service/base/message.service';
+import { AppRouteModule }    from '../route/app-route.module';
+import { SignService  }      from '../service/base/sign.service';
+import { MessageService }    from '../service/base/message.service';
 
 @NgModule({
   declarations: [
