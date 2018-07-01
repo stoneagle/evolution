@@ -16,6 +16,19 @@
       "PROJECT": {
         "CONCEPT": "项目",
         "NAME": "名称"
+      },
+      "COUNTRY": {
+        "CONCEPT": "国家",
+        "NAME": "名称",
+        "ENNAME": "英文名称"
+      },
+      "GENERAL": {
+        "CONCEPT": "通用",
+        "ID": "序号",
+        "OPERATION": "操作",
+        "CREATED": "创建时间",
+        "UPDATED": "更新时间",
+        "DELETED": "删除时间"
       }
     }
   },

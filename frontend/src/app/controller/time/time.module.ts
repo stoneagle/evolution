@@ -7,15 +7,19 @@ import { FormsModule }               from '@angular/forms';
 import { ClarityModule  }            from "@clr/angular";
 import { TranslateModule  }          from "@ngx-translate/core";
 
-
 import { ProjectComponent }         from './project/project.component';
 import { ProjectService }            from '../../service/time/project.service';
+import { CountryComponent }         from './country/country.component';
+import { SaveCountryComponent }         from './country/save/save.component';
+import { CountryService }            from '../../service/time/country.service';
 import { MessageHandlerService  } from '../../service/base/message-handler.service';
 
 
 @NgModule({
   declarations: [
     ProjectComponent,
+    CountryComponent,
+    SaveCountryComponent,
   ],
   imports: [   
     BrowserModule,
@@ -28,6 +32,7 @@ import { MessageHandlerService  } from '../../service/base/message-handler.servi
   ],
   providers: [ 
     ProjectService,
+    CountryService,
     MessageHandlerService,
   ],
   exports: [

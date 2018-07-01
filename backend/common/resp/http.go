@@ -52,7 +52,7 @@ func FormatResponseLog(ctx *gin.Context, response Response) {
 
 func FormatErrorLog(err error) {
 	if err != nil {
-		_, fn, line, _ := runtime.Caller(1)
+		_, fn, line, _ := runtime.Caller(2)
 		logger.Get().Infow("response-error:【" + fn + ":" + strconv.Itoa(line) + ":" + err.Error() + "】")
 	}
 }

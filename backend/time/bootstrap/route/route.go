@@ -10,5 +10,6 @@ func Configure(b *bootstrap.Bootstrapper) {
 	v1 := b.App.Group(prefix)
 	{
 		controllers.NewTask().Router(v1)
+		controllers.NewCountry().Router(v1)
 	}
 }

@@ -5,5 +5,9 @@ export interface IConfig {
   apiServer: {
     endpoint: string;
     websocket: string;
+    prefix: {
+      quant: string;
+      time: string;
+    }
   }
 }

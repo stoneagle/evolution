@@ -8,49 +8,46 @@ import (
 )
 
 type Task struct {
-	engine *xorm.Engine
-	cache  *redis.Client
+	Basic
 }
 
 func NewTask(engine *xorm.Engine, cache *redis.Client) *Task {
-	return &Task{
-		engine: engine,
-		cache:  cache,
-	}
+	ret := Task{}
+	ret.Engine = engine
+	ret.Cache = cache
+	return &ret
 }
 
-func (s *Task) One(id int) (task models.Task, err error) {
-	task = models.Task{}
-	_, err = s.engine.Where("id = ?", id).Get(&task)
-	return
-}
-
-func (s *Task) List() (tasks []models.Task, err error) {
-	tasks = make([]models.Task, 0)
-	err = s.engine.Find(&tasks)
-	return
+func (s *Task) One(id int) (interface{}, error) {
+	model := models.Task{}
+	_, err := s.Engine.Where("id = ?", id).Get(&model)
+	return model, err
 }
 
 func (s *Task) UpdateByMap(id int, task map[string]interface{}) (err error) {
-	_, err = s.engine.Table(new(models.Task)).Id(id).Update(&task)
+	_, err = s.Engine.Table(new(models.Task)).Id(id).Update(&task)
 	return
 }
 
-func (s *Task) Update(id int, task *models.Task) (err error) {
-	_, err = s.engine.Id(id).Update(task)
+func (s *Task) List(tasks []models.Task) (err error) {
+	err = s.Engine.Find(&tasks)
 	return
 }
 
-func (s *Task) Add(task *models.Task) (err error) {
-	_, err = s.engine.Insert(task)
+func (s *Task) Add(model models.Task) (err error) {
+	_, err = s.Engine.Insert(&model)
 	return
 }
 
-func (s *Task) Delete(id int) (err error) {
-	var task models.Task
-	_, err = s.engine.Id(id).Get(&task)
+func (s *Task) Update(id int, model models.Task) (err error) {
+	_, err = s.Engine.Id(id).Update(&model)
+	return
+}
+
+func (s *Task) Delete(id int, model models.Task) (err error) {
+	_, err = s.Engine.Id(id).Get(&model)
 	if err == nil {
-		_, err = s.engine.Id(id).Delete(&task)
+		_, err = s.Engine.Id(id).Delete(&model)
 	}
 	return
 }

@@ -25,12 +25,12 @@ func NewTask() *Task {
 }
 
 func (c *Task) Router(router *gin.RouterGroup) {
-	task := router.Group("task")
-	task.GET("/get/:id", middles.One(c.TaskSvc, c.Name), c.One)
+	task := router.Group("task").Use(middles.One(c.TaskSvc, c.Name))
+	task.GET("/get/:id", c.One)
 	task.GET("/list", c.List)
 	task.POST("", c.Add)
-	task.PUT("/:id", middles.One(c.TaskSvc, c.Name), c.Update)
-	task.DELETE("/:id", middles.One(c.TaskSvc, c.Name), c.Delete)
+	task.PUT("/:id", c.Update)
+	task.DELETE("/:id", c.Delete)
 }
 
 func (c *Task) One(ctx *gin.Context) {
@@ -39,7 +39,8 @@ func (c *Task) One(ctx *gin.Context) {
 }
 
 func (c *Task) List(ctx *gin.Context) {
-	tasks, err := c.TaskSvc.List()
+	tasks := make([]models.Task, 0)
+	err := c.TaskSvc.List(tasks)
 	if err != nil {
 		resp.ErrorBusiness(ctx, resp.ErrorMysql, "task get error", err)
 		return
@@ -54,7 +55,7 @@ func (c *Task) Add(ctx *gin.Context) {
 		return
 	}
 
-	err := c.TaskSvc.Add(&task)
+	err := c.TaskSvc.Add(task)
 	if err != nil {
 		resp.ErrorBusiness(ctx, resp.ErrorMysql, "task insert error", err)
 		return
@@ -69,7 +70,7 @@ func (c *Task) Update(ctx *gin.Context) {
 		return
 	}
 
-	err := c.TaskSvc.Update(task.Id, &task)
+	err := c.TaskSvc.Update(task.Id, task)
 	if err != nil {
 		resp.ErrorBusiness(ctx, resp.ErrorMysql, "task update error", err)
 		return
@@ -79,7 +80,7 @@ func (c *Task) Update(ctx *gin.Context) {
 
 func (c *Task) Delete(ctx *gin.Context) {
 	task := ctx.MustGet("task").(models.Task)
-	err := c.TaskSvc.Delete(task.Id)
+	err := c.TaskSvc.Delete(task.Id, task)
 	if err != nil {
 		resp.ErrorBusiness(ctx, resp.ErrorMysql, "task delete error", err)
 		return

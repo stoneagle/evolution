@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router, ActivatedRoute }       from "@angular/router";
+import { Location  }                    from '@angular/common';
 import { SignService  }                 from '../../service/base/sign.service';
 import { ShellNavComponent }            from './nav/shell-nav.component';
 
@@ -17,13 +18,16 @@ export class ShellComponent implements OnInit {
   constructor(
     private signService: SignService,
     private router: Router,
+    private location: Location,
     private route: ActivatedRoute 
   ) { 
     // this.nav = this.route.snapshot.routeConfig.path;
   }
 
   ngOnInit() {
-    console.log(this.nav);
+    if (this.nav === undefined) {
+      this.nav = location.pathname.split("/")[1];
+    }
   }
 
   logout(): void {
