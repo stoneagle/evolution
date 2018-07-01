@@ -53,7 +53,6 @@ import { WebsocketService }       from '../../service/base/websocket.service';
     WebsocketService,
   ],
   exports: [
-    PoolComponent,
   ]
 })
 

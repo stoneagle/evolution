@@ -76,19 +76,19 @@ export class MessageHandlerService {
     let result: string;
     switch (alertType) {
       case AlertType.INFO:
-        result = "RESULT.EXEC";
+        result = "SYSTEM.RESULT.EXEC";
         break;
       case AlertType.SUCCESS:
-        result = "RESULT.SUCCESS";
+        result = "SYSTEM.RESULT.SUCCESS";
         break;
       case AlertType.WARNING:
-        result = "RESULT.FAIL";
+        result = "SYSTEM.RESULT.FAIL";
         break;
       case AlertType.DANGER:
-        result = "RESULT.EXCEPTION";
+        result = "SYSTEM.RESULT.EXCEPTION";
         break;
       default:
-        result = "RESULT.UNKNOWN";
+        result = "SYSTEM.RESULT.UNKNOWN";
         break;
     }
 

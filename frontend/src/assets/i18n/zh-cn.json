@@ -1,47 +1,67 @@
 {
   "APP": {
-    "TITLE": "流水"
+    "TITLE": "进化"
   },
-  "ASSETS": {
-    "TYPE": {
-      "STOCK": "股票",
-      "EXCHANGE": "期货",
-      "CONFIG": "配置"
+  "TIME": {
+    "TITLE": "萌芽",
+    "ASSETS": {
+      "TYPE": {
+        "SCHEDULE": "日程",
+        "TARGET": "目标",
+        "ENTITY": "实体",
+        "CONFIG": "配置"
+      }
+    },
+    "RESOURCE": {
+      "PROJECT": {
+        "CONCEPT": "项目",
+        "NAME": "名称"
+      }
     }
   },
-  "RESOURCE": {
-    "POOL": {
-      "CONCEPT": "组合池",
-      "NAME": "名称",
-      "STATUS": "状态",
-      "STRATEGY": "策略",
-      "TYPE": "类别"
+  "FLOW": {
+    "TITLE": "流水",
+    "ASSETS": {
+      "TYPE": {
+        "STOCK": "股票",
+        "EXCHANGE": "期货",
+        "CONFIG": "配置"
+      }
     },
-    "ITEM": {
-      "CONCEPT": "标的",
-      "CODE": "代号",
-      "NAME": "名称",
-      "STATUS": "状态"
-    },
-    "CLASSIFY": {
-      "CONCEPT": "分类",
-      "NAME": "名称",
-      "TAG": "标签"
-    },
-    "CONFIG": {
-      "CONCEPT": "配置",
-      "ASSET": "资产",
-      "TYPE": "类别",
-      "MAIN": "主来源",
-      "SUB": "子分类"
-    },
-    "GENERAL": {
-      "CONCEPT": "通用",
-      "ID": "序号",
-      "OPERATION": "操作",
-      "CREATED": "创建时间",
-      "UPDATED": "更新时间",
-      "DELETED": "删除时间"
+    "RESOURCE": {
+      "POOL": {
+        "CONCEPT": "组合池",
+        "NAME": "名称",
+        "STATUS": "状态",
+        "STRATEGY": "策略",
+        "TYPE": "类别"
+      },
+      "ITEM": {
+        "CONCEPT": "标的",
+        "CODE": "代号",
+        "NAME": "名称",
+        "STATUS": "状态"
+      },
+      "CLASSIFY": {
+        "CONCEPT": "分类",
+        "NAME": "名称",
+        "TAG": "标签"
+      },
+      "CONFIG": {
+        "CONCEPT": "配置",
+        "ASSET": "资产",
+        "TYPE": "类别",
+        "MAIN": "主来源",
+        "SUB": "子分类"
+      },
+      "GENERAL": {
+        "CONCEPT": "通用",
+        "ID": "序号",
+        "OPERATION": "操作",
+        "CREATED": "创建时间",
+        "UPDATED": "更新时间",
+        "DELETED": "删除时间"
+      }
     }
   },
   "SYSTEM": {
@@ -49,24 +69,24 @@
       "NAME": "用户",
       "SIGNIN": "登陆",
       "SIGNOUT": "登出"
+    },
+    "PROCESS": { 
+      "GET": "获取", 
+      "LIST": "罗列", 
+      "SYNC": "同步", 
+      "CREATE": "添加", 
+      "UPDATE": "更新",
+      "DELETE": "删除",
+      "SUBMIT": "提交",
+      "CANCEL": "取消",
+      "ROLLBACK": "回滚"
+    },
+    "RESULT": {
+      "SUCCESS": "成功",
+      "EXEC": "执行",
+      "FAIL": "失败",
+      "EXCEPTION": "异常",
+      "UNKNOWN": "未知"
     }
-  },
-  "PROCESS": { 
-    "GET": "获取", 
-    "LIST": "罗列", 
-    "SYNC": "同步", 
-    "CREATE": "添加", 
-    "UPDATE": "更新",
-    "DELETE": "删除",
-    "SUBMIT": "提交",
-    "CANCEL": "取消",
-    "ROLLBACK": "回滚"
-  },
-  "RESULT": {
-    "SUCCESS": "成功",
-    "EXEC": "执行",
-    "FAIL": "失败",
-    "EXCEPTION": "异常",
-    "UNKNOWN": "未知"
   }
 }

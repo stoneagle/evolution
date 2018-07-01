@@ -24,11 +24,11 @@ export class ItemService extends BaseService {
     private websocketService: WebsocketService,
   ) { 
     super(http, messageHandlerService);
-    this.resource = 'RESOURCE.ITEM.CONCEPT';
+    this.resource = 'FLOW.RESOURCE.ITEM.CONCEPT';
   }
 
   List(item?: Item): Observable<Item[]> {
-    this.operation = 'PROCESS.LIST';
+    this.operation = 'SYSTEM.PROCESS.LIST';
     return this.http.post<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`, JSON.stringify(item)).pipe(
       catchError(this.handleError<Response>()),
       map(res => {
@@ -46,7 +46,7 @@ export class ItemService extends BaseService {
   }
 
   Get(id: number): Observable<Item> {
-    this.operation = 'PROCESS.GET';
+    this.operation = 'SYSTEM.PROCESS.GET';
     return this.http.get<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/get/${id}`).pipe(
       catchError(this.handleError<Response>()),
       map(res => {
@@ -64,7 +64,7 @@ export class ItemService extends BaseService {
   }
 
   SyncClassify(classify: Classify): Observable<Boolean> {
-    this.operation = 'PROCESS.SYNC';
+    this.operation = 'SYSTEM.PROCESS.SYNC';
     return this.http.post<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/sync/classify`, JSON.stringify(classify)).pipe(
       tap(res => this.log(res)),
       catchError(this.handleError<Response>()),
@@ -79,7 +79,7 @@ export class ItemService extends BaseService {
   }
 
   SyncPoint(id: number): Observable<Boolean> {
-    this.operation = 'PROCESS.SYNC';
+    this.operation = 'SYSTEM.PROCESS.SYNC';
     return this.http.get<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/point/${id}`).pipe(
       tap(res => this.log(res)),
       catchError(this.handleError<Response>()),
@@ -94,7 +94,7 @@ export class ItemService extends BaseService {
   }
 
   WsSyncSource(classifyBatch: Classify[]): Observable<Boolean> {
-    this.operation = 'PROCESS.SYNC';
+    this.operation = 'SYSTEM.PROCESS.SYNC';
 
     let url = AppConfig.settings.apiServer.websocket + this.uri + `/sync/classify/ws`;
     this.connection = this.websocketService.connect(url);
@@ -123,7 +123,7 @@ export class ItemService extends BaseService {
   }
 
   Delete(id: number): Observable<Response> {
-    this.operation = 'PROCESS.DELETE';
+    this.operation = 'SYSTEM.PROCESS.DELETE';
     return this.http.delete<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/${id}`).pipe(
       tap(res => this.log(res)),
       catchError(this.handleError<Response>())

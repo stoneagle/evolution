@@ -8,10 +8,10 @@
       </a>
     </div>
     <div class="header-nav">
-      <a href="javascript:void(0);" (click)="changeNav('stock')" [ngClass]="nav=='stock' ? 'active nav-link' : 'nav-link'" ><span class="nav-text">{{ 'ASSETS.TYPE.STOCK' | translate }}</span></a>
+      <a href="javascript:void(0);" (click)="changeNav('flow')" [ngClass]="nav=='flow' ? 'active nav-link' : 'nav-link'" ><span class="nav-text">{{ 'FLOW.TITLE' | translate }}</span></a>
     </div>
     <div class="header-nav">
-      <a href="javascript:void(0);" (click)="changeNav('config')" [ngClass]="nav=='config' ? 'active nav-link' : 'nav-link'" ><span class="nav-text">{{ 'ASSETS.TYPE.CONFIG' | translate }}</span></a>
+      <a href="javascript:void(0);" (click)="changeNav('time')" [ngClass]="nav=='time' ? 'active nav-link' : 'nav-link'" ><span class="nav-text">{{ 'TIME.TITLE' | translate }}</span></a>
     </div>
     <div class="header-actions">
       <clr-dropdown>
@@ -28,25 +28,46 @@
     </div>
   </clr-header>
   <div class="content-container">
-		<nav class="sidenav">
-			<shell-nav [nav]="nav" ></shell-nav>
-		</nav>
+		<!-- <nav class="sidenav"> -->
+		<!-- 	<shell-nav [nav]="nav" ></shell-nav> -->
+		<!-- </nav> -->
     <div class="content-area">
       <router-outlet></router-outlet>
     </div>
-    <!-- <clr-vertical-nav [clrVerticalNavCollapsible]="true" [(clrVerticalNavCollapsed)]="collapsed"> -->
-    <!--   <a clrVerticalNavLink routerLink="./pool" routerLinkActive="active"> -->
-    <!--     <clr-icon clrVerticalNavIcon shape="user"></clr-icon> -->
-    <!--     {{ 'RESOURCE.POOL.CONCEPT' | translate }} --> 
-    <!--   </a> -->
-    <!--   <a clrVerticalNavLink routerLink="./classify" routerLinkActive="active"> -->
-    <!--     <clr-icon clrVerticalNavIcon shape="user"></clr-icon> -->
-    <!--     {{ 'RESOURCE.CLASSIFY.CONCEPT' | translate }} --> 
-    <!--   </a> -->
-    <!--   <a clrVerticalNavLink routerLink="./item" routerLinkActive="active"> -->
-    <!--     <clr-icon clrVerticalNavIcon shape="user"></clr-icon> -->
-    <!--     {{ 'RESOURCE.ITEM.CONCEPT' | translate }} --> 
-    <!--   </a> -->
-    <!-- </clr-vertical-nav> -->
+    <!-- TODO nav组件整合 -->
+    <clr-vertical-nav *ngIf="(nav == 'flow')"  [clrVerticalNavCollapsible]="true" [(clrVerticalNavCollapsed)]="collapsed">
+      <clr-vertical-nav-group routerLinkActive="active">
+        <clr-icon shape="user" clrVerticalNavIcon></clr-icon>
+        {{ 'FLOW.ASSETS.TYPE.STOCK' | translate }}
+        <clr-vertical-nav-group-children>
+          <a href="#" routerLink="/flow/stock/pool" class="nav-link">
+            {{ 'FLOW.RESOURCE.POOL.CONCEPT' | translate }} 
+          </a>
+        </clr-vertical-nav-group-children>
+      </clr-vertical-nav-group>
+      <clr-vertical-nav-group routerLinkActive="active">
+        <clr-icon shape="user" clrVerticalNavIcon></clr-icon>
+        {{ 'FLOW.ASSETS.TYPE.CONFIG' | translate }}
+        <clr-vertical-nav-group-children>
+          <a href="#" routerLink="/flow/config/classify" class="nav-link">
+            {{ 'FLOW.RESOURCE.CLASSIFY.CONCEPT' | translate }} 
+          </a>
+          <a href="#" routerLink="/flow/config/item" class="nav-link">
+            {{ 'FLOW.RESOURCE.ITEM.CONCEPT' | translate }} 
+          </a>
+        </clr-vertical-nav-group-children>
+      </clr-vertical-nav-group>
+    </clr-vertical-nav>
+    <clr-vertical-nav *ngIf="(nav == 'time')"  [clrVerticalNavCollapsible]="true" [(clrVerticalNavCollapsed)]="collapsed">
+      <clr-vertical-nav-group routerLinkActive="active">
+        <clr-icon shape="user" clrVerticalNavIcon></clr-icon>
+        {{ 'TIME.ASSETS.TYPE.SCHEDULE' | translate }}
+        <clr-vertical-nav-group-children>
+          <a href="#" routerLink="/time/schedule/project" class="nav-link">
+            {{ 'TIME.RESOURCE.PROJECT.CONCEPT' | translate }} 
+          </a>
+        </clr-vertical-nav-group-children>
+      </clr-vertical-nav-group>
+    </clr-vertical-nav>
   </div>
 </clr-main-container>

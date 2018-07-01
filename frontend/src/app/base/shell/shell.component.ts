@@ -19,16 +19,16 @@ export class ShellComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute 
   ) { 
-    this.nav = this.route.snapshot.routeConfig.path;
+    // this.nav = this.route.snapshot.routeConfig.path;
   }
 
   ngOnInit() {
+    console.log(this.nav);
   }
 
   logout(): void {
-    this.signService.logout()
-    .subscribe(res => {
-      this.router.navigate(['/stock']);
+    this.signService.logout().subscribe(res => {
+      this.router.navigate(['/flow/stock']);
     })
   }
 

@@ -1,20 +1,20 @@
 <button class="btn btn-primary" (click)="openSyncModel()">
-  {{ "PROCESS.SYNC" | translate }}
+  {{ "SYSTEM.PROCESS.SYNC" | translate }}
 </button>
 <span class="refresh-btn" (click)="refresh()">
   <clr-icon shape="refresh"></clr-icon>
 </span>
 <clr-datagrid  (clrDgRefresh)="load($event)">
-  <!-- <clr-dg-column>{{ 'RESOURCE.GENERAL.ID' | translate }}</clr-dg-column> -->
-  <clr-dg-column>{{ 'RESOURCE.CLASSIFY.NAME' | translate }}</clr-dg-column>
-  <clr-dg-column>{{ 'RESOURCE.CLASSIFY.TAG' | translate }}</clr-dg-column>
-  <clr-dg-column>{{ 'RESOURCE.CONFIG.ASSET' | translate }}</clr-dg-column>
-  <clr-dg-column>{{ 'RESOURCE.CONFIG.TYPE' | translate }}</clr-dg-column>
-  <clr-dg-column>{{ 'RESOURCE.CONFIG.MAIN' | translate }}</clr-dg-column>
-  <clr-dg-column>{{ 'RESOURCE.CONFIG.SUB' | translate }}</clr-dg-column>
-  <clr-dg-column>{{ 'RESOURCE.GENERAL.CREATED' | translate }}</clr-dg-column>
-  <clr-dg-column>{{ 'RESOURCE.GENERAL.UPDATED' | translate }}</clr-dg-column>
-	<clr-dg-column>{{ 'RESOURCE.GENERAL.OPERATION' | translate }}</clr-dg-column>
+  <!-- <clr-dg-column>{{ 'FLOW.RESOURCE.GENERAL.ID' | translate }}</clr-dg-column> -->
+  <clr-dg-column>{{ 'FLOW.RESOURCE.CLASSIFY.NAME' | translate }}</clr-dg-column>
+  <clr-dg-column>{{ 'FLOW.RESOURCE.CLASSIFY.TAG' | translate }}</clr-dg-column>
+  <clr-dg-column>{{ 'FLOW.RESOURCE.CONFIG.ASSET' | translate }}</clr-dg-column>
+  <clr-dg-column>{{ 'FLOW.RESOURCE.CONFIG.TYPE' | translate }}</clr-dg-column>
+  <clr-dg-column>{{ 'FLOW.RESOURCE.CONFIG.MAIN' | translate }}</clr-dg-column>
+  <clr-dg-column>{{ 'FLOW.RESOURCE.CONFIG.SUB' | translate }}</clr-dg-column>
+  <clr-dg-column>{{ 'FLOW.RESOURCE.GENERAL.CREATED' | translate }}</clr-dg-column>
+  <clr-dg-column>{{ 'FLOW.RESOURCE.GENERAL.UPDATED' | translate }}</clr-dg-column>
+	<clr-dg-column>{{ 'FLOW.RESOURCE.GENERAL.OPERATION' | translate }}</clr-dg-column>
 
   <clr-dg-row *ngFor="let classify of classifys">
     <!-- <clr-dg-cell>{{classify.Id}}</clr-dg-cell> -->
@@ -43,7 +43,7 @@
   <clr-dg-footer>
     <clr-dg-pagination #pagination [clrDgPageSize]="pageSize" [(clrDgPage)]="currentPage" [clrDgTotalItems]="totalCount">
       {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
-      / {{pagination.totalItems}} {{ 'RESOURCE.CLASSIFY.CONCEPT' | translate }}
+      / {{pagination.totalItems}} {{ 'FLOW.RESOURCE.CLASSIFY.CONCEPT' | translate }}
     </clr-dg-pagination>
   </clr-dg-footer>
 </clr-datagrid>

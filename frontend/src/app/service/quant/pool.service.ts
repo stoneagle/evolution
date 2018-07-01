@@ -19,11 +19,11 @@ export class PoolService extends BaseService {
     protected messageHandlerService: MessageHandlerService,
   ) { 
     super(http, messageHandlerService);
-    this.resource = 'RESOURCE.POOL.CONCEPT';
+    this.resource = 'FLOW.RESOURCE.POOL.CONCEPT';
   }
 
   List(): Observable<Pool[]> {
-    this.operation = 'PROCESS.LIST';
+    this.operation = 'SYSTEM.PROCESS.LIST';
     return this.http.get<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`).pipe(
       catchError(this.handleError<Response>()),
       map(res => {
@@ -41,7 +41,7 @@ export class PoolService extends BaseService {
   }
 
   ListItem(pool: Pool): Observable<Item[]> {
-    this.operation = 'PROCESS.LIST';
+    this.operation = 'SYSTEM.PROCESS.LIST';
     return this.http.post<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/list/item`, JSON.stringify(pool)).pipe(
       catchError(this.handleError<Response>()),
       map(res => {
@@ -59,7 +59,7 @@ export class PoolService extends BaseService {
   }
 
   Get(id: number): Observable<Pool> {
-    this.operation = 'PROCESS.GET';
+    this.operation = 'SYSTEM.PROCESS.GET';
     return this.http.get<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/get/${id}`).pipe(
       catchError(this.handleError<Response>()),
       map(res => {
@@ -77,7 +77,7 @@ export class PoolService extends BaseService {
   }
 
   Add(pool: Pool): Observable<Pool> {
-    this.operation = 'PROCESS.CREATE';
+    this.operation = 'SYSTEM.PROCESS.CREATE';
     return this.http.post<Response>(AppConfig.settings.apiServer.endpoint + this.uri, JSON.stringify(pool)).pipe(
     tap(res => this.log(res)),
     catchError(this.handleError<Response>()),
@@ -92,7 +92,7 @@ export class PoolService extends BaseService {
   }
 
   AddItems(pool: Pool): Observable<Boolean> {
-    this.operation = 'PROCESS.CREATE';
+    this.operation = 'SYSTEM.PROCESS.CREATE';
     return this.http.post<Response>(AppConfig.settings.apiServer.endpoint + this.uri + "/items/add", JSON.stringify(pool)).pipe(
     tap(res => this.log(res)),
     catchError(this.handleError<Response>()),
@@ -107,7 +107,7 @@ export class PoolService extends BaseService {
   }
 
   DeleteItems(pool: Pool): Observable<Boolean> {
-    this.operation = 'PROCESS.CREATE';
+    this.operation = 'SYSTEM.PROCESS.CREATE';
     return this.http.post<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/items/delete`, JSON.stringify(pool)).pipe(
     tap(res => this.log(res)),
     catchError(this.handleError<Response>()),
@@ -122,7 +122,7 @@ export class PoolService extends BaseService {
   }
 
   Update(pool: Pool): Observable<Response> {
-    this.operation = 'PROCESS.UPDATE';
+    this.operation = 'SYSTEM.PROCESS.UPDATE';
     return this.http.put<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/${pool.Id}`, JSON.stringify(pool)).pipe(
       tap(res => this.log(res)),
       catchError(this.handleError<Response>()),
@@ -130,7 +130,7 @@ export class PoolService extends BaseService {
   }
 
   Delete(id: number): Observable<Response> {
-    this.operation = 'PROCESS.DELETE';
+    this.operation = 'SYSTEM.PROCESS.DELETE';
     return this.http.delete<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/${id}`).pipe(
       tap(res => this.log(res)),
       catchError(this.handleError<Response>())

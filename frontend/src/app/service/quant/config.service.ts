@@ -17,11 +17,11 @@ export class ConfigService extends BaseService {
     protected messageHandlerService: MessageHandlerService,
   ) { 
     super(http, messageHandlerService);
-    this.resource = "RESOURCE.CONFIG.CONCEPT";
+    this.resource = "FLOW.RESOURCE.CONFIG.CONCEPT";
   }
 
   AssetList(): Observable<Map<string, string>> {
-    this.operation = 'PROCESS.LIST';
+    this.operation = 'SYSTEM.PROCESS.LIST';
     return this.http.get<Response>(AppConfig.settings.apiServer.endpoint + this.uri + "/asset").pipe(
       catchError(this.handleError<Response>()),
       map(res => {
@@ -37,7 +37,7 @@ export class ConfigService extends BaseService {
   }
 
   TypeList(resource: string): Observable<Map<string, Map<string, string[]>>> {
-    this.operation = 'PROCESS.LIST';
+    this.operation = 'SYSTEM.PROCESS.LIST';
     return this.http.get<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/type/${resource}`).pipe(
       catchError(this.handleError<Response>()),
       map(res => {
@@ -57,7 +57,7 @@ export class ConfigService extends BaseService {
   }
 
   StrategyList(ctype: string): Observable<Map<string, string>> {
-    this.operation = 'PROCESS.LIST';
+    this.operation = 'SYSTEM.PROCESS.LIST';
     return this.http.get<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/strategy/${ctype}`).pipe(
       catchError(this.handleError<Response>()),
       map(res => {

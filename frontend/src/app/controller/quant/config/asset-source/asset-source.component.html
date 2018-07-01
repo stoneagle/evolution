@@ -1,21 +1,21 @@
 <clr-modal [(clrModalOpen)]="modelOpened">
   <h3 class="modal-title" >
-    {{ 'PROCESS.SYNC' | translate }}
+    {{ 'SYSTEM.PROCESS.SYNC' | translate }}
   </h3>
   <div class="modal-body">
     <form #syncForm="ngForm" (ngSubmit)="Submit()">
       <div class="form-group">
-        <label for="Asset">{{ 'RESOURCE.CONFIG.ASSET' | translate }}</label>
+        <label for="Asset">{{ 'FLOW.RESOURCE.CONFIG.ASSET' | translate }}</label>
         <div class="select">
           <select id="AssetString" [(ngModel)]="assetSource.AssetString" name="AssetString" required (ngModelChange)="AssetOnChange($event)" >
             <option *ngFor="let key of getKeys(assetMap)" [ngValue]=key>
-              {{ "ASSETS.TYPE." + assetMap.get(key) | translate }}
+              {{ "FLOW.ASSETS.TYPE." + assetMap.get(key) | translate }}
             </option>
           </select>
         </div>
       </div> 
       <div class="form-group">
-        <label for="Type">{{ 'RESOURCE.CONFIG.TYPE' | translate }}</label>
+        <label for="Type">{{ 'FLOW.RESOURCE.CONFIG.TYPE' | translate }}</label>
         <div class="select">
           <select id="Type" [(ngModel)]="assetSource.Type" name="Type" required (ngModelChange)="TypeOnChange($event)">
             <option *ngFor="let key of getKeys(typeMap)" [ngValue]=key>
@@ -25,7 +25,7 @@
         </div>
       </div>
       <div class="form-group">
-        <label for="Main">{{ 'RESOURCE.CONFIG.MAIN' | translate }}</label>
+        <label for="Main">{{ 'FLOW.RESOURCE.CONFIG.MAIN' | translate }}</label>
         <div class="select">
           <select id="Main" [(ngModel)]="assetSource.Main" name="Main" required (ngModelChange)="MainOnChange($event)">
             <option *ngFor="let key of getKeys(mainMap)" [ngValue]=key>
@@ -35,7 +35,7 @@
         </div>
       </div>
       <div class="form-group">
-        <label for="Sub">{{ 'RESOURCE.CONFIG.SUB' | translate }}</label>
+        <label for="Sub">{{ 'FLOW.RESOURCE.CONFIG.SUB' | translate }}</label>
         <div class="select">
           <select id="Sub" [(ngModel)]="assetSource.Sub" name="Sub" required >
             <option *ngFor="let key of getKeys(subMap)" [ngValue]=key>
@@ -44,8 +44,8 @@
           </select>
         </div>
       </div>
-      <button type="submit" class="btn btn-success">{{ 'PROCESS.SYNC' | translate }}</button>
-      <button type="button" class="btn btn-primary" (click)="Cancel()">{{ 'PROCESS.CANCEL' | translate }}</button>
+      <button type="submit" class="btn btn-success">{{ 'SYSTEM.PROCESS.SYNC' | translate }}</button>
+      <button type="button" class="btn btn-primary" (click)="Cancel()">{{ 'SYSTEM.PROCESS.CANCEL' | translate }}</button>
     </form>
   </div>     
 </clr-modal>   

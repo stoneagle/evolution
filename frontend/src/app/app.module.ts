@@ -11,6 +11,7 @@ import { AppConfig  }         from './service/base/config.service';
 import { CustomInterceptor  } from './service/base/custom.interceptor';
 import { BaseModule }         from './base/base.module';
 import { QuantModule }        from './controller/quant/quant.module';
+import { TimeModule }        from './controller/time/time.module';
 
 export function initializeApp(appConfig: AppConfig) {
   return () => appConfig.load();
@@ -27,7 +28,6 @@ export function createTranslateLoader(http: HttpClient) {
   imports: [
     ClarityModule,
     AppRouteModule,
-    QuantModule,
     BaseModule,
     TranslateModule.forRoot({
       loader: {
@@ -35,7 +35,9 @@ export function createTranslateLoader(http: HttpClient) {
         useFactory: (createTranslateLoader),
         deps: [HttpClient]
       }
-    })
+    }),
+    QuantModule,
+    TimeModule,
   ],
   providers: [
     AppConfig,

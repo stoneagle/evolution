@@ -1,18 +1,18 @@
 <clr-modal [(clrModalOpen)]="modelOpened">
     <h3 class="modal-title" *ngIf="(pool.Id)">
-      {{ 'PROCESS.UPDATE' | translate }}{{ 'RESOURCE.POOL.CONCEPT' | translate }}
+      {{ 'SYSTEM.PROCESS.UPDATE' | translate }}{{ 'FLOW.RESOURCE.POOL.CONCEPT' | translate }}
     </h3>
     <h3 class="modal-title" *ngIf="!(pool.Id)">
-      {{ 'PROCESS.CREATE' | translate }}{{ 'RESOURCE.POOL.CONCEPT' | translate }}
+      {{ 'SYSTEM.PROCESS.CREATE' | translate }}{{ 'FLOW.RESOURCE.POOL.CONCEPT' | translate }}
     </h3>
     <div class="modal-body">
       <form #addForm="ngForm" (ngSubmit)="Submit()">
         <div class="form-group">
-          <label for="name">{{ 'RESOURCE.POOL.NAME' | translate }}</label>
+          <label for="name">{{ 'FLOW.RESOURCE.POOL.NAME' | translate }}</label>
           <input type="text" class="form-control" id="Name" required [(ngModel)]="pool.Name" name="Name" >
         </div> 
         <div class="form-group">
-          <label for="type">{{ 'RESOURCE.CONFIG.TYPE' | translate }}</label>
+          <label for="type">{{ 'FLOW.RESOURCE.CONFIG.TYPE' | translate }}</label>
           <div class="select">
             <select id="Type" [(ngModel)]="pool.Type" name="Type" required (ngModelChange)="TypeOnChange($event)">
               <option *ngFor="let key of getKeys(typeMap)" [ngValue]=key>
@@ -22,7 +22,7 @@
           </div>
         </div>
         <div class="form-group">
-          <label for="strategy">{{ 'RESOURCE.POOL.STRATEGY' | translate }}</label>
+          <label for="strategy">{{ 'FLOW.RESOURCE.POOL.STRATEGY' | translate }}</label>
           <div class="select">
             <select id="Strategy" [(ngModel)]="pool.Strategy" name="Strategy" required>
               <option *ngFor="let key of getKeys(strategyMap)" [ngValue]=key>
@@ -31,8 +31,8 @@
             </select>
           </div>
         </div>
-        <button type="submit" class="btn btn-success">{{ 'PROCESS.SUBMIT' | translate }}</button>
-        <button type="button" class="btn btn-primary" (click)="modelOpened = false">{{ 'PROCESS.CANCEL' | translate }}</button>
+        <button type="submit" class="btn btn-success">{{ 'SYSTEM.PROCESS.SUBMIT' | translate }}</button>
+        <button type="button" class="btn btn-primary" (click)="modelOpened = false">{{ 'SYSTEM.PROCESS.CANCEL' | translate }}</button>
       </form>
     </div>     
 </clr-modal>   
