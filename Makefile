@@ -6,7 +6,7 @@ USER := $(shell id -u)
 GROUP := $(shell id -g)
 DATE := $(shell date "+%F")
 REGISTRY_DEVELOP_PREFIX := stoneagle/develop
-PROJ := evo 
+PROJ := evolution
 
 # quant 
 run-quant: 
@@ -15,6 +15,14 @@ stop-quant:
 	cd hack/swarm && docker-compose -f docker-compose-quant.yml -p "$(PROJ)-$(USER)-quant" stop 
 rm-quant: 
 	cd hack/swarm && docker-compose -f docker-compose-quant.yml -p "$(PROJ)-$(USER)-quant" rm 
+	
+# time 
+run-time: 
+	cd hack/swarm && docker-compose -f docker-compose-time.yml -p "$(PROJ)-$(USER)-time" up
+stop-time: 
+	cd hack/swarm && docker-compose -f docker-compose-time.yml -p "$(PROJ)-$(USER)-time" stop
+rm-time: 
+	cd hack/swarm && docker-compose -f docker-compose-time.yml -p "$(PROJ)-$(USER)-time" rm
 
 # envoy 
 run-envoy: 
@@ -26,7 +34,9 @@ rm-envoy:
 
 # init
 init-quant-db:
-	docker exec -w /go/src/evolution/backend/quant/initial -it quant-wuzhongyang-golang go run init.go 
+	docker exec -w /go/src/evolution/backend/quant/initial -it evolution-wuzhongyang-quant-backend go run init.go 
+init-time-db:
+	docker exec -w /go/src/evolution/backend/time/initial -it evolution-wuzhongyang-time-backend go run init.go 
 
 init-influxdb:
 	sudo docker run --rm \

@@ -22,6 +22,10 @@ static_resources:
                 route:
                   cluster: quant 
               - match:
+                  prefix: "/evolution/time"
+                route:
+                  cluster: time 
+              - match:
                   prefix: "/evolution/engine"
                 route:
                   cluster: engine 
@@ -36,6 +40,14 @@ static_resources:
     hosts:
     - socket_address:
         address: quant-backend
+        port_value: 8080
+  - name: time 
+    connect_timeout: 0.5s
+    type: strict_dns
+    lb_policy: round_robin
+    hosts:
+    - socket_address:
+        address: time-backend
         port_value: 8080
   - name: engine 
     connect_timeout: 0.5s

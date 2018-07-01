@@ -1,0 +1,14 @@
+package route
+
+import (
+	"evolution/backend/time/bootstrap"
+	"evolution/backend/time/controllers"
+)
+
+func Configure(b *bootstrap.Bootstrapper) {
+	prefix := b.Config.Time.System.Prefix + "/v1"
+	v1 := b.App.Group(prefix)
+	{
+		controllers.NewTask().Router(v1)
+	}
+}

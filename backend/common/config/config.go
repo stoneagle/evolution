@@ -46,6 +46,14 @@ type Conf struct {
 			Port string
 		}
 	}
+	Time struct {
+		System struct {
+			Prefix string
+			Cors   []string
+		}
+		Redis    RedisConf
+		Database DBConf
+	}
 }
 
 var onceConfig *Conf = &Conf{}

@@ -26,3 +26,25 @@ quant:
   rpc:
     host: engine
     port: 6666
+time:
+  system:
+    prefix: evolution/time
+    cors: ["http://192.168.0.119:8888"]
+  redis:
+    name: time
+    host: redis
+    port: 6379
+    password: 
+    db: 0
+  database:
+    name: time 
+    type: mysql
+    host: mysql
+    port: 3306
+    user: root
+    target: time 
+    password: 123456
+    maxIdle: 10 
+    maxOpen: 5 
+    showsql: True
+    location: Asia/Shanghai
