@@ -1,8 +1,8 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { Router, ActivatedRoute } from "@angular/router";
-import { Pool } from '../../model/business/pool';
-import { PoolService } from '../../service/business/pool.service';
-import { SavePoolComponent } from './save/save.component';
+import { Router, ActivatedRoute }       from "@angular/router";
+import { Pool }                         from '../../../model/quant/pool';
+import { PoolService }                  from '../../../service/quant/pool.service';
+import { SavePoolComponent }            from './save/save.component';
 
 @Component({
   selector: 'app-pool',

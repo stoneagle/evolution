@@ -1,7 +1,8 @@
-import { Component, OnInit, Output, Input, EventEmitter, ViewChild } from '@angular/core'; 
-import { NgForm  } from '@angular/forms';
-import { AssetSource } from '../../../model/config/config';
-import { ConfigService  } from '../../../service/config/config.service';
+import { Component, OnInit, Output, Input, EventEmitter, ViewChild } from '@angular/core';
+import { NgForm  }                                                   from '@angular/forms';
+
+import { AssetSource }    from '../../../../model/quant/config';
+import { ConfigService  } from '../../../../service/quant/config.service';
 
 @Component({
   selector: 'asset-source',

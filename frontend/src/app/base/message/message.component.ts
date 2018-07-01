@@ -1,9 +1,10 @@
 import { Component, Input, OnInit, OnDestroy, ElementRef } from '@angular/core';
-import { Router } from '@angular/router';
-import { Subscription } from 'rxjs/Subscription';
-import { Message } from '../../model/base/message';
-import { MessageService } from '../../service/base/message.service';
-import { TranslateService } from '@ngx-translate/core';
+import { Router }                                          from '@angular/router';
+import { Subscription }                                    from 'rxjs/Subscription';
+import { TranslateService }                                from '@ngx-translate/core';
+
+import { Message }                                                  from '../../model/base/message';
+import { MessageService }                                           from '../../service/base/message.service';
 import { AlertType, dismissInterval, httpStatusCode, CommonRoutes } from '../../shared/shared.const';
 
 @Component({

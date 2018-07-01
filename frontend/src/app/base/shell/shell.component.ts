@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { Router, ActivatedRoute } from "@angular/router";
-import { SignService  } from '../../service/base/sign.service';
-import { ShellNavComponent } from './nav/shell-nav.component';
+import { Router, ActivatedRoute }       from "@angular/router";
+import { SignService  }                 from '../../service/base/sign.service';
+import { ShellNavComponent }            from './nav/shell-nav.component';
 
 @Component({
   selector: 'app-shell',

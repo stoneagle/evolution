@@ -1,12 +1,12 @@
-import { Injectable } from '@angular/core';
+import { Injectable }               from '@angular/core';
 import { HttpClient, HttpHeaders  } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { of } from 'rxjs/observable/of';
-import { catchError, map, tap  } from 'rxjs/operators';
-import { Response } from '../../model/base/response.model';
-import { AppConfig } from '../base/config.service';
-import { MessageHandlerService  } from '../base/message-handler.service';
-import { BaseService  } from '../base/base.service';
+import { Observable }               from 'rxjs';
+import { of }                       from 'rxjs/observable/of';
+import { catchError, map, tap  }    from 'rxjs/operators';
+import { Response }                 from '../../model/base/response.model';
+import { AppConfig }                from '../base/config.service';
+import { MessageHandlerService  }   from '../base/message-handler.service';
+import { BaseService  }             from '../base/base.service';
 
 @Injectable()
 export class ConfigService extends BaseService {

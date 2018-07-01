@@ -1,7 +1,8 @@
 import { Component, OnInit, Output, Input, EventEmitter } from '@angular/core'; 
-import { Pool } from '../../../model/business/pool';
-import { PoolService  } from '../../../service/business/pool.service';
-import { ConfigService  } from '../../../service/config/config.service';
+
+import { Pool }           from '../../../../model/quant/pool';
+import { PoolService  }   from '../../../../service/quant/pool.service';
+import { ConfigService  } from '../../../../service/quant/config.service';
 
 @Component({
   selector: 'save-pool',

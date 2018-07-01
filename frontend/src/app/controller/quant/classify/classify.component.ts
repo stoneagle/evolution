@@ -1,8 +1,9 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { Classify } from '../../model/business/classify';
-import { ClassifyService } from '../../service/business/classify.service';
-import { ItemService } from '../../service/business/item.service';
-import { AssetSource } from '../../model/config/config';
+
+import { Classify }             from '../../../model/quant/classify';
+import { ClassifyService }      from '../../../service/quant/classify.service';
+import { ItemService }          from '../../../service/quant/item.service';
+import { AssetSource }          from '../../../model/quant/config';
 import { AssetSourceComponent } from '../config/asset-source/asset-source.component';
 
 @Component({

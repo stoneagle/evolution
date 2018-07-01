@@ -3,7 +3,7 @@
     "language": "zh-cn"
   },
   "apiServer": {
-    "endpoint": "http://localhost:8180/v1",
-    "websocket": "ws://localhost:8180/v1"
+    "endpoint": "http://192.168.0.119:8000/evolution/quant/v1",
+    "websocket": "ws://192.168.0.119:8000/evolution/quant/v1"
   }
 }
