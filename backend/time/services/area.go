@@ -66,7 +66,7 @@ func (s *Area) List() (areas []models.Area, err error) {
 	return
 }
 
-func (s *Area) TransferListToTree(areas []models.Area) (areaTrees map[int]models.AreaTree, err error) {
+func (s *Area) TransferListToTree(areas []models.Area, fieldMap map[int]string) (areaTrees map[int]models.AreaTree, err error) {
 	areaTrees = make(map[int]models.AreaTree)
 	for _, one := range areas {
 		node := models.AreaNode{
@@ -75,7 +75,7 @@ func (s *Area) TransferListToTree(areas []models.Area) (areaTrees map[int]models
 			Children: make([]models.AreaNode, 0),
 		}
 
-		fieldName, exist := models.AreaFieldMap[one.FieldId]
+		fieldName, exist := fieldMap[one.FieldId]
 		if !exist {
 			err = errors.New("field Id not exist")
 			return

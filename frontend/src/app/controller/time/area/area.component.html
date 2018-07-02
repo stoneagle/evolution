@@ -8,6 +8,7 @@
         (nodeRenamed)="handleRenamed($event)"
         (nodeMoved)="handleMoved($event)"
         (nodeCreated)="handleCreated($event, 0)"
+        (menuItemSelected)="handleCustom($event, 0)"
       ></tree>
     </clr-tab-content>
 	</clr-tab>
@@ -20,6 +21,7 @@
         (nodeRenamed)="handleRenamed($event)"
         (nodeMoved)="handleMoved($event)"
         (nodeCreated)="handleCreated($event, key)"
+        (menuItemSelected)="handleCustom($event, key)"
       ></tree>
     </clr-tab-content>
 	</clr-tab>

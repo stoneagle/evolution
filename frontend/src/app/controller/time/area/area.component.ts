@@ -1,9 +1,9 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { TreeModel, NodeEvent } from 'ng2-tree';
+import { TreeModel, TreeModelSettings, NodeEvent } from 'ng2-tree';
 
 import { Area }             from '../../../model/time/area';
 import { AreaService }      from '../../../service/time/area.service';
-import { ConfigService }      from '../../../service/time/config.service';
+import { FieldService }      from '../../../service/time/field.service';
 
 @Component({
   selector: 'time-area',
@@ -13,7 +13,7 @@ import { ConfigService }      from '../../../service/time/config.service';
 export class AreaComponent implements OnInit {
   constructor(
     private areaService: AreaService,
-    private configService: ConfigService,
+    private fieldService: FieldService,
   ) { }
 
   areaMap : Map<number, string> = new Map(); 
@@ -21,7 +21,7 @@ export class AreaComponent implements OnInit {
   tree: TreeModel;
 
   ngOnInit() {
-    this.configService.FieldMap().subscribe(res => {
+    this.fieldService.Map().subscribe(res => {
       this.areaMap = res;
       this.areaMap.delete(0);
       this.refresh(this.currentField);
@@ -40,6 +40,13 @@ export class AreaComponent implements OnInit {
     this.currentField = fieldId;
     this.areaService.ListOneTree(this.currentField).subscribe(res => {
       this.tree = res;
+      res.settings = new TreeModelSettings();
+			res.settings.menuItems = [
+        { action: 0, name: '新节点', cssClass: 'fa fa-arrow-right' },
+        { action: 2, name: '重命名', cssClass: 'fa fa-arrow-right' },
+        { action: 3, name: '删除', cssClass: 'fa fa-arrow-right' },
+        { action: 4, name: '新增实体', cssClass:'fa fa-arrow-right'}
+      ];
     })
   }
 
@@ -85,6 +92,11 @@ export class AreaComponent implements OnInit {
         this.refresh(this.currentField);
       })
     }
+  }
+
+  handleCustom(e: NodeEvent, field: number): void {
+    console.log(e);
+    console.log(field);
   }
 
   getKeys(map) {

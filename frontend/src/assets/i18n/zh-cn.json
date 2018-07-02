@@ -48,13 +48,20 @@
         },
         "QUEST": {
           "CONCEPT": "探索",
-          "NAME": "名称"
+          "NAME": "名称",
+          "DESC": "描述",
+          "AREA": "所属领域"
         },
         "LIFE": {
           "CONCEPT": "生活",
           "NAME": "名称",
           "DESC": "描述"
         }
+      },
+      "FIELD": {
+        "CONCEPT": "方向",
+        "NAME": "名称",
+        "DESC": "描述"
       },
       "GENERAL": {
         "CONCEPT": "通用",

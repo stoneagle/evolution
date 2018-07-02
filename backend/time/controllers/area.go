@@ -12,8 +12,9 @@ import (
 
 type Area struct {
 	Base
-	Name    string
-	AreaSvc *services.Area
+	Name     string
+	AreaSvc  *services.Area
+	FieldSvc *services.Field
 }
 
 func NewArea() *Area {
@@ -22,6 +23,7 @@ func NewArea() *Area {
 	}
 	Area.Prepare()
 	Area.AreaSvc = services.NewArea(Area.Engine, Area.Cache)
+	Area.FieldSvc = services.NewField(Area.Engine, Area.Cache)
 	return Area
 }
 
@@ -56,7 +58,14 @@ func (c *Area) ListAllTree(ctx *gin.Context) {
 		resp.ErrorBusiness(ctx, resp.ErrorMysql, "area get error", err)
 		return
 	}
-	areaTrees, err := c.AreaSvc.TransferListToTree(areas)
+
+	fieldMap, err := c.FieldSvc.Map()
+	if err != nil {
+		resp.ErrorBusiness(ctx, resp.ErrorMysql, "field Id Map get faield", err)
+		return
+	}
+
+	areaTrees, err := c.AreaSvc.TransferListToTree(areas, fieldMap)
 	if err != nil {
 		resp.ErrorBusiness(ctx, resp.ErrorDataService, "area tree transfer error", err)
 		return
@@ -80,7 +89,13 @@ func (c *Area) ListOneTree(ctx *gin.Context) {
 		resp.ErrorBusiness(ctx, resp.ErrorMysql, "area get error", err)
 		return
 	}
-	areaTrees, err := c.AreaSvc.TransferListToTree(areas)
+
+	fieldMap, err := c.FieldSvc.Map()
+	if err != nil {
+		resp.ErrorBusiness(ctx, resp.ErrorMysql, "field Id Map get faield", err)
+		return
+	}
+	areaTrees, err := c.AreaSvc.TransferListToTree(areas, fieldMap)
 	if err != nil {
 		resp.ErrorBusiness(ctx, resp.ErrorDataService, "area tree transfer error", err)
 		return
@@ -88,7 +103,7 @@ func (c *Area) ListOneTree(ctx *gin.Context) {
 
 	_, ok := areaTrees[fieldId]
 	if !ok {
-		fieldName, exist := models.AreaFieldMap[fieldId]
+		fieldName, exist := fieldMap[fieldId]
 		if !exist {
 			resp.ErrorBusiness(ctx, resp.ErrorDataService, "area tree transfer error:field id not exist", nil)
 			return

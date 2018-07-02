@@ -2,6 +2,7 @@ package main
 
 import (
 	"evolution/backend/common/config"
+	"evolution/backend/time/models"
 	"fmt"
 	"io/ioutil"
 	"time"
@@ -39,12 +40,12 @@ func exec(dbConfig config.DBConf, mode string) {
 	engine.StoreEngine("InnoDB")
 	engine.Charset("utf8")
 	if mode == "debug" {
-		err = engine.DropTables()
+		err = engine.DropTables(new(models.Field))
 		if err != nil {
 			panic(err)
 		}
 	}
-	err = engine.Sync2()
+	err = engine.Sync2(new(models.Field))
 	if err != nil {
 		panic(err)
 	}
