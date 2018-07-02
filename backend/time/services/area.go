@@ -48,9 +48,21 @@ func (s *Area) Delete(id int, model models.Area) (err error) {
 	return
 }
 
-func (s *Area) List() (countries []models.Area, err error) {
-	countries = make([]models.Area, 0)
-	err = s.Engine.Where("del = ?", 0).Asc("parent").Find(&countries)
+func (s *Area) ListWithCondition(area *models.Area) (areas []models.Area, err error) {
+	areas = make([]models.Area, 0)
+	sql := s.Engine.Where("del = ?", 0).Asc("parent")
+	condition := area.BuildCondition()
+	sql = sql.Where(condition)
+	err = sql.Find(&areas)
+	if err != nil {
+		return
+	}
+	return
+}
+
+func (s *Area) List() (areas []models.Area, err error) {
+	areas = make([]models.Area, 0)
+	err = s.Engine.Where("del = ?", 0).Asc("parent").Find(&areas)
 	return
 }
 
@@ -63,7 +75,7 @@ func (s *Area) TransferListToTree(areas []models.Area) (areaTrees map[int]models
 			Children: make([]models.AreaNode, 0),
 		}
 
-		fieldName, exist := models.AreaFiledMap[one.FieldId]
+		fieldName, exist := models.AreaFieldMap[one.FieldId]
 		if !exist {
 			err = errors.New("field Id not exist")
 			return

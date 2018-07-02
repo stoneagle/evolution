@@ -3,6 +3,7 @@ import { TreeModel, NodeEvent } from 'ng2-tree';
 
 import { Area }             from '../../../model/time/area';
 import { AreaService }      from '../../../service/time/area.service';
+import { ConfigService }      from '../../../service/time/config.service';
 
 @Component({
   selector: 'time-area',
@@ -10,22 +11,35 @@ import { AreaService }      from '../../../service/time/area.service';
   styleUrls: ['./area.component.css']
 })
 export class AreaComponent implements OnInit {
-  // TODO tab单个动态记载+active的初始化异常
-  
   constructor(
     private areaService: AreaService,
+    private configService: ConfigService,
   ) { }
 
-  treeMap : Map<number, TreeModel> = new Map(); 
+  areaMap : Map<number, string> = new Map(); 
+  currentField: number = 0;
   tree: TreeModel;
 
   ngOnInit() {
-    this.refresh();
+    this.configService.FieldMap().subscribe(res => {
+      this.areaMap = res;
+      this.areaMap.delete(0);
+      this.refresh(this.currentField);
+    })
   }
 
-  refresh() {
-    this.areaService.List().subscribe(res => {
-      this.treeMap = res;
+  checkActive(fieldId: number): boolean {
+    let ret = false;
+    if (fieldId === this.currentField) {
+      ret = true;
+    }
+    return ret
+  }
+
+  refresh(fieldId: number) {
+    this.currentField = fieldId;
+    this.areaService.ListOneTree(this.currentField).subscribe(res => {
+      this.tree = res;
     })
   }
 
@@ -34,7 +48,7 @@ export class AreaComponent implements OnInit {
       let area = new Area();
       area.Id = +e.node.id;
       this.areaService.Delete(area.Id).subscribe(res => {
-        this.refresh();
+        this.refresh(this.currentField);
       })
     }
   }
@@ -44,7 +58,7 @@ export class AreaComponent implements OnInit {
     area.Name = e.node.value;
     area.Id = +e.node.id;
     this.areaService.Update(area).subscribe(res => {
-      this.refresh();
+      this.refresh(this.currentField);
     })
   }
 
@@ -54,7 +68,7 @@ export class AreaComponent implements OnInit {
     area.Del = 0;
     area.Parent = +e.node.parent.id;
     this.areaService.Update(area).subscribe(res => {
-      this.refresh();
+      this.refresh(this.currentField);
     })
   }
 
@@ -68,7 +82,7 @@ export class AreaComponent implements OnInit {
       e.node.removeItselfFromParent();
     } else {
       this.areaService.Add(area).subscribe(res => {
-        this.refresh();
+        this.refresh(this.currentField);
       })
     }
   }

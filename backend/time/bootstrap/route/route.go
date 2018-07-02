@@ -12,9 +12,11 @@ func Configure(b *bootstrap.Bootstrapper) {
 		controllers.NewTask().Router(v1)
 		controllers.NewCountry().Router(v1)
 		controllers.NewArea().Router(v1)
+		controllers.NewConfig().Router(v1)
 		entity := v1.Group("entity")
 		{
 			controllers.NewEntityLife().Router(entity)
+			controllers.NewEntityQuest().Router(entity)
 		}
 	}
 }

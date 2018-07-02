@@ -22,9 +22,23 @@ export class AreaService extends BaseService {
     this.resource = 'TIME.RESOURCE.AREA.CONCEPT';
   }
 
-  List(): Observable<Map<number, TreeModel>> {
+  ListFieldMap(): Observable<Map<number, string>> {
     this.operation = 'SYSTEM.PROCESS.LIST';
-    return this.http.get<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`).pipe(
+    return this.http.get<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/field`).pipe(
+      catchError(this.handleError<Response>()),
+      map(res => {
+        let ret:Map<number, string> = new Map(); 
+        if (res && res.code == 0) {
+          ret = res.data;
+        }
+        return ret; 
+      }),
+    )
+  }
+
+  ListAllTree(): Observable<Map<number, TreeModel>> {
+    this.operation = 'SYSTEM.PROCESS.LIST';
+    return this.http.get<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/list/tree/all`).pipe(
       catchError(this.handleError<Response>()),
       map(res => {
         let ret:Map<number, TreeModel> = new Map(); 
@@ -32,6 +46,38 @@ export class AreaService extends BaseService {
           for (let key in res.data) {
             ret.set(+key, res.data[key]);
           }
+        }
+        return ret; 
+      }),
+    )
+  }
+
+  ListOneTree(fieldId: number): Observable<TreeModel> {
+    this.operation = 'SYSTEM.PROCESS.LIST';
+    return this.http.get<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/list/tree/one/${fieldId}`).pipe(
+      catchError(this.handleError<Response>()),
+      map(res => {
+        let ret:TreeModel; 
+        if (res && res.code == 0) {
+          ret = res.data;
+        }
+        return ret; 
+      }),
+    )
+  }
+
+  List(): Observable<Area[]> {
+    this.operation = 'SYSTEM.PROCESS.LIST';
+    return this.http.get<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`).pipe(
+      catchError(this.handleError<Response>()),
+      map(res => {
+        let ret:Area[] = []; 
+        if (res && res.code == 0) {
+          res.data.map(
+            one => {
+              ret.push(new Area(one));
+            }
+          )
         }
         return ret; 
       }),
