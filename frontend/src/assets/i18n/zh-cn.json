@@ -24,7 +24,37 @@
       },
       "AREA": {
         "CONCEPT": "领域",
-        "NAME": "名称"
+        "NAME": "名称",
+        "PARENT": "父节点",
+        "FIELDID": "方向"
+      },
+      "ENTITY": {
+        "CONCEPT": "实体",
+        "SKILL": {
+          "CONCEPT": "技能",
+          "NAME": "名称"
+        },
+        "ASSET": {
+          "CONCEPT": "资产",
+          "NAME": "名称"
+        },
+        "CIRCLE": {
+          "CONCEPT": "圈子",
+          "NAME": "名称"
+        },
+        "WORK": {
+          "CONCEPT": "作品",
+          "NAME": "名称"
+        },
+        "QUEST": {
+          "CONCEPT": "探索",
+          "NAME": "名称"
+        },
+        "LIFE": {
+          "CONCEPT": "生活",
+          "NAME": "名称",
+          "DESC": "描述"
+        }
       },
       "GENERAL": {
         "CONCEPT": "通用",

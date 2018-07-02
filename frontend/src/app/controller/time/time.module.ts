@@ -13,7 +13,11 @@ import { ProjectService }         from '../../service/time/project.service';
 import { CountryComponent }       from './country/country.component';
 import { SaveCountryComponent }   from './country/save/save.component';
 import { AreaComponent }          from './area/area.component';
+import { EntityLifeComponent }       from './entity/life/life.component';
+import { SaveEntityLifeComponent }   from './entity/life/save/save.component';
+
 import { CountryService }         from '../../service/time/country.service';
+import { EntityLifeService }         from '../../service/time/entity-life.service';
 import { AreaService }         from '../../service/time/area.service';
 import { MessageHandlerService  } from '../../service/base/message-handler.service';
 
@@ -23,6 +27,8 @@ import { MessageHandlerService  } from '../../service/base/message-handler.servi
     ProjectComponent,
     CountryComponent,
     SaveCountryComponent,
+    EntityLifeComponent,
+    SaveEntityLifeComponent,
     AreaComponent,
   ],
   imports: [   
@@ -39,6 +45,7 @@ import { MessageHandlerService  } from '../../service/base/message-handler.servi
     AreaService,
     ProjectService,
     CountryService,
+    EntityLifeService,
     MessageHandlerService,
   ],
   exports: [
