@@ -14,3 +14,32 @@ type Area struct {
 	Ctime   time.Time `xorm:"not null default 'CURRENT_TIMESTAMP' comment('创建时间') TIMESTAMP"`
 	Utime   time.Time `xorm:"not null default 'CURRENT_TIMESTAMP' comment('更新时间') TIMESTAMP"`
 }
+
+type AreaTree struct {
+	Value    string     `json:"value"`
+	Children []AreaNode `json:"children"`
+}
+
+type AreaNode struct {
+	Id       int        `json:"id"`
+	Value    string     `json:"value"`
+	Children []AreaNode `json:"children"`
+}
+
+const (
+	AreaFieldSkill  int = 1
+	AreaFieldAsset  int = 2
+	AreaFieldWork   int = 3
+	AreaFieldCircle int = 4
+	AreaFieldQuest  int = 5
+)
+
+var (
+	AreaFiledMap map[int]string = map[int]string{
+		AreaFieldSkill:  "知识",
+		AreaFieldAsset:  "财富",
+		AreaFieldWork:   "文化",
+		AreaFieldCircle: "社交",
+		AreaFieldQuest:  "挑战",
+	}
+)

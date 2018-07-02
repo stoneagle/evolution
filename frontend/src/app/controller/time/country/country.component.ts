@@ -19,8 +19,6 @@ export class CountryComponent implements OnInit {
   totalCount: number = 0;
   currentPage: number = 1;
 
-  syncModelOpened: boolean = false;
-
   constructor(
     private countryService: CountryService,
   ) { }

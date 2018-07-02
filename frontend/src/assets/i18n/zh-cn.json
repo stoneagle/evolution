@@ -22,6 +22,10 @@
         "NAME": "名称",
         "ENNAME": "英文名称"
       },
+      "AREA": {
+        "CONCEPT": "领域",
+        "NAME": "名称"
+      },
       "GENERAL": {
         "CONCEPT": "通用",
         "ID": "序号",

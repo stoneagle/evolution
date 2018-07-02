@@ -11,5 +11,6 @@ func Configure(b *bootstrap.Bootstrapper) {
 	{
 		controllers.NewTask().Router(v1)
 		controllers.NewCountry().Router(v1)
+		controllers.NewArea().Router(v1)
 	}
 }

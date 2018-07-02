@@ -6,12 +6,15 @@ import { HttpModule   }              from '@angular/http';
 import { FormsModule }               from '@angular/forms';
 import { ClarityModule  }            from "@clr/angular";
 import { TranslateModule  }          from "@ngx-translate/core";
+import { TreeModule }                from 'ng2-tree';
 
-import { ProjectComponent }         from './project/project.component';
-import { ProjectService }            from '../../service/time/project.service';
-import { CountryComponent }         from './country/country.component';
-import { SaveCountryComponent }         from './country/save/save.component';
-import { CountryService }            from '../../service/time/country.service';
+import { ProjectComponent }       from './project/project.component';
+import { ProjectService }         from '../../service/time/project.service';
+import { CountryComponent }       from './country/country.component';
+import { SaveCountryComponent }   from './country/save/save.component';
+import { AreaComponent }          from './area/area.component';
+import { CountryService }         from '../../service/time/country.service';
+import { AreaService }         from '../../service/time/area.service';
 import { MessageHandlerService  } from '../../service/base/message-handler.service';
 
 
@@ -20,6 +23,7 @@ import { MessageHandlerService  } from '../../service/base/message-handler.servi
     ProjectComponent,
     CountryComponent,
     SaveCountryComponent,
+    AreaComponent,
   ],
   imports: [   
     BrowserModule,
@@ -29,8 +33,10 @@ import { MessageHandlerService  } from '../../service/base/message-handler.servi
     FormsModule,
     ClarityModule,
     TranslateModule,
+    TreeModule,
   ],
   providers: [ 
+    AreaService,
     ProjectService,
     CountryService,
     MessageHandlerService,

@@ -1,0 +1,19 @@
+<clr-tabs>
+	<clr-tab *ngIf="(false)" >
+		<button clrTabLink>xxx</button>
+		<clr-tab-content *clrIfActive="true">
+		</clr-tab-content>
+	</clr-tab>
+	<clr-tab *ngFor="let key of getKeys(treeMap)">
+		<button clrTabLink>{{ treeMap.get(key).value }}</button>
+		<clr-tab-content *clrIfActive>
+			<tree 
+				[tree]="treeMap.get(key)"
+				(nodeRemoved)="handleRemoved($event)"
+				(nodeRenamed)="handleRenamed($event)"
+				(nodeMoved)="handleMoved($event)"
+				(nodeCreated)="handleCreated($event, key)"
+			></tree>
+		</clr-tab-content>
+	</clr-tab>
+</clr-tabs>
