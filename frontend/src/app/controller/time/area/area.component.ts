@@ -4,6 +4,7 @@ import { TreeModel, TreeModelSettings, NodeEvent } from 'ng2-tree';
 import { Area }             from '../../../model/time/area';
 import { AreaService }      from '../../../service/time/area.service';
 import { FieldService }      from '../../../service/time/field.service';
+import { EntityComponent } from '../entity/entity.component';
 
 @Component({
   selector: 'time-area',
@@ -11,20 +12,30 @@ import { FieldService }      from '../../../service/time/field.service';
   styleUrls: ['./area.component.css']
 })
 export class AreaComponent implements OnInit {
+  @ViewChild(EntityComponent)
+  entityComponent: EntityComponent;
+
   constructor(
     private areaService: AreaService,
     private fieldService: FieldService,
   ) { }
 
-  areaMap : Map<number, string> = new Map(); 
-  currentField: number = 0;
+  // 必须设置一个active，才能避免错误
+  areaFirstField: number;
+  areaFirstName: string;
+  areaMap: Map<number, string> = new Map(); 
+  currentField: number;
   tree: TreeModel;
 
   ngOnInit() {
     this.fieldService.Map().subscribe(res => {
       this.areaMap = res;
-      this.areaMap.delete(0);
+      this.areaFirstField = this.areaMap.keys().next().value;
+      this.areaFirstName = this.areaMap.get(this.areaFirstField);
+      this.currentField = this.areaFirstField;
+      this.areaMap.delete(this.areaFirstField);
       this.refresh(this.currentField);
+      this.entityComponent.initCurrentField(this.currentField);
     })
   }
 
@@ -79,11 +90,11 @@ export class AreaComponent implements OnInit {
     })
   }
 
-  handleCreated(e: NodeEvent, field: number): void {
+  handleCreated(e: NodeEvent): void {
     let area = new Area();
     area.Name = e.node.value;
     area.Parent = +e.node.parent.id;
-    area.FieldId = field;
+    area.FieldId = this.currentField;
     area.Del = 0;
     if (e.node.children == null) {
       e.node.removeItselfFromParent();
@@ -94,9 +105,10 @@ export class AreaComponent implements OnInit {
     }
   }
 
-  handleCustom(e: NodeEvent, field: number): void {
-    console.log(e);
-    console.log(field);
+  handleCustom(e: NodeEvent): void {
+    if (e.node.children.length == 0) {
+      this.entityComponent.openSaveModelWithArea(+e.node.id);
+    }
   }
 
   getKeys(map) {

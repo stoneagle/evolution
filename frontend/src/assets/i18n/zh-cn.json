@@ -30,33 +30,10 @@
       },
       "ENTITY": {
         "CONCEPT": "实体",
-        "SKILL": {
-          "CONCEPT": "技能",
-          "NAME": "名称"
-        },
-        "ASSET": {
-          "CONCEPT": "资产",
-          "NAME": "名称"
-        },
-        "CIRCLE": {
-          "CONCEPT": "圈子",
-          "NAME": "名称"
-        },
-        "WORK": {
-          "CONCEPT": "作品",
-          "NAME": "名称"
-        },
-        "QUEST": {
-          "CONCEPT": "探索",
-          "NAME": "名称",
-          "DESC": "描述",
-          "AREA": "所属领域"
-        },
-        "LIFE": {
-          "CONCEPT": "生活",
-          "NAME": "名称",
-          "DESC": "描述"
-        }
+        "NAME": "名称",
+        "DESC": "描述",
+        "YEAR": "年份",
+        "AREA": "所属领域"
       },
       "FIELD": {
         "CONCEPT": "方向",

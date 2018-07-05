@@ -40,12 +40,12 @@ func exec(dbConfig config.DBConf, mode string) {
 	engine.StoreEngine("InnoDB")
 	engine.Charset("utf8")
 	if mode == "debug" {
-		err = engine.DropTables(new(models.Field))
+		err = engine.DropTables(new(models.Field), new(models.Entity))
 		if err != nil {
 			panic(err)
 		}
 	}
-	err = engine.Sync2(new(models.Field))
+	err = engine.Sync2(new(models.Field), new(models.Entity))
 	if err != nil {
 		panic(err)
 	}

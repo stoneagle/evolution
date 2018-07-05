@@ -1,6 +1,10 @@
 import { Basic } from './basic';
+import { Area } from './area';
 
-export class EntityLife extends Basic {
+export class Entity extends Basic {
   Name: string;
   Desc: string;
+  AreaId: number;
+  Year: number;
+  Area: Area;
 }

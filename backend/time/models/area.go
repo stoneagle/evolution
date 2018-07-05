@@ -36,17 +36,6 @@ const (
 	AreaFieldQuest
 )
 
-var (
-	AreaFieldMap map[int]string = map[int]string{
-		AreaFieldLife:   "日常",
-		AreaFieldSkill:  "知识",
-		AreaFieldAsset:  "财富",
-		AreaFieldWork:   "文化",
-		AreaFieldCircle: "社交",
-		AreaFieldQuest:  "挑战",
-	}
-)
-
 func (m *Area) TableName() string {
 	return "area"
 }

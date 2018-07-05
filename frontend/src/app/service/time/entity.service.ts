@@ -6,31 +6,31 @@ import { catchError, map, tap  }    from 'rxjs/operators';
 import { AppConfig }                from '../base/config.service';
 import { MessageHandlerService  }   from '../base/message-handler.service';
 import { BaseService  }             from '../base/base.service';
-import { EntityLife }               from '../../model/time/entity';
+import { Entity }                 from '../../model/time/entity';
 import { Response }                 from '../../model/base/response.model';
 
 @Injectable()
-export class EntityLifeService extends BaseService {
-  private uri = AppConfig.settings.apiServer.prefix.time + '/entity/life';
+export class EntityService extends BaseService {
+  private uri = AppConfig.settings.apiServer.prefix.time + '/entity';
 
   constructor(
     protected http: HttpClient,
     protected messageHandlerService: MessageHandlerService,
   ) {
     super(http, messageHandlerService);
-    this.resource = 'TIME.RESOURCE.ENTITY.LIFE.CONCEPT';
+    this.resource = 'TIME.RESOURCE.ENTITY.CONCEPT';
   }
 
-  List(): Observable<EntityLife[]> {
+  List(): Observable<Entity[]> {
     this.operation = 'SYSTEM.PROCESS.LIST';
     return this.http.get<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`).pipe(
       catchError(this.handleError<Response>()),
       map(res => {
-        let ret:EntityLife[] = []; 
+        let ret:Entity[] = []; 
         if (res && res.code == 0) {
           res.data.map(
             one => {
-              ret.push(new EntityLife(one));
+              ret.push(new Entity(one));
             }
           )
         }
@@ -39,38 +39,56 @@ export class EntityLifeService extends BaseService {
     )
   }
 
-  Get(id: number): Observable<EntityLife> {
+  ListWithCondition(entity: Entity): Observable<Entity[]> {
+    this.operation = 'SYSTEM.PROCESS.LIST';
+    return this.http.post<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`, JSON.stringify(entity)).pipe(
+      catchError(this.handleError<Response>()),
+      map(res => {
+        let ret:Entity[] = []; 
+        if (res && res.code == 0) {
+          res.data.map(
+            one => {
+              ret.push(new Entity(one));
+            }
+          )
+        }
+        return ret; 
+      }),
+    )
+  }
+
+  Get(id: number): Observable<Entity> {
     this.operation = 'SYSTEM.PROCESS.GET';
     return this.http.get<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/get/${id}`).pipe(
       catchError(this.handleError<Response>()),
       map(res => {
         if (res && res.code == 0) {
-          return new EntityLife(res.data);
+          return new Entity(res.data);
         } else {
-          return new EntityLife();
+          return new Entity();
         }
       }),
     )
   }
 
-  Add(entityLife: EntityLife): Observable<EntityLife> {
+  Add(entity: Entity): Observable<Entity> {
     this.operation = 'SYSTEM.PROCESS.CREATE';
-    return this.http.post<Response>(AppConfig.settings.apiServer.endpoint + this.uri, JSON.stringify(entityLife)).pipe(
+    return this.http.post<Response>(AppConfig.settings.apiServer.endpoint + this.uri, JSON.stringify(entity)).pipe(
     tap(res => this.log(res)),
     catchError(this.handleError<Response>()),
       map(res => {
         if (res && res.code == 0) {
-          return new EntityLife(res.data);
+          return new Entity(res.data);
         } else {
-          return new EntityLife();
+          return new Entity();
         }
       }),
     );
   }
 
-  Update(entityLife: EntityLife): Observable<Response> {
+  Update(entity: Entity): Observable<Response> {
     this.operation = 'SYSTEM.PROCESS.UPDATE';
-    return this.http.put<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/${entityLife.Id}`, JSON.stringify(entityLife)).pipe(
+    return this.http.put<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/${entity.Id}`, JSON.stringify(entity)).pipe(
       tap(res => this.log(res)),
       catchError(this.handleError<Response>()),
     );

@@ -6,25 +6,29 @@
 </span>
 <clr-datagrid  (clrDgRefresh)="load($event)">
   <!-- <clr-dg-column>{{ 'TIME.RESOURCE.GENERAL.ID' | translate }}</clr-dg-column> -->
-  <clr-dg-column>{{ 'TIME.RESOURCE.ENTITY.LIFE.NAME' | translate }}</clr-dg-column>
-  <clr-dg-column>{{ 'TIME.RESOURCE.ENTITY.LIFE.DESC' | translate }}</clr-dg-column>
+  <clr-dg-column>{{ 'TIME.RESOURCE.ENTITY.NAME' | translate }}</clr-dg-column>
+  <clr-dg-column>{{ 'TIME.RESOURCE.ENTITY.DESC' | translate }}</clr-dg-column>
+  <clr-dg-column>{{ 'TIME.RESOURCE.ENTITY.YEAR' | translate }}</clr-dg-column>
+  <clr-dg-column>{{ 'TIME.RESOURCE.ENTITY.AREA' | translate }}</clr-dg-column>
   <clr-dg-column>{{ 'TIME.RESOURCE.GENERAL.CREATED' | translate }}</clr-dg-column>
   <clr-dg-column>{{ 'TIME.RESOURCE.GENERAL.UPDATED' | translate }}</clr-dg-column>
 	<clr-dg-column>{{ 'TIME.RESOURCE.GENERAL.OPERATION' | translate }}</clr-dg-column>
 
-  <clr-dg-row *ngFor="let life of lifes">
-    <!-- <clr-dg-cell>{{life.Id}}</clr-dg-cell> -->
-    <clr-dg-cell>{{life.Name}}</clr-dg-cell>
-    <clr-dg-cell>{{life.Desc}}</clr-dg-cell>
-    <clr-dg-cell>{{life.Ctime | date: 'yy-MM-dd HH:mm:ss'}}</clr-dg-cell>
-    <clr-dg-cell>{{life.Utime | date: 'yy-MM-dd HH:mm:ss'}}</clr-dg-cell>
+  <clr-dg-row *ngFor="let entity of entities">
+    <!-- <clr-dg-cell>{{entity.Id}}</clr-dg-cell> -->
+    <clr-dg-cell>{{entity.Name}}</clr-dg-cell>
+    <clr-dg-cell>{{entity.Desc}}</clr-dg-cell>
+    <clr-dg-cell>{{entity.Year}}</clr-dg-cell>
+    <clr-dg-cell>{{entity.Area.Name}}</clr-dg-cell>
+    <clr-dg-cell>{{entity.Ctime | date: 'yy-MM-dd HH:mm:ss'}}</clr-dg-cell>
+    <clr-dg-cell>{{entity.Utime | date: 'yy-MM-dd HH:mm:ss'}}</clr-dg-cell>
     <clr-dg-cell>
       <div class="btn-group btn-primary btn-icon">
-        <button (click)="openSaveModel(life.Id)" class="btn">
+        <button (click)="openSaveModel(entity.Id)" class="btn">
           <clr-icon shape="wrench"></clr-icon>
           <span class="clr-icon-title"></span>
         </button>
-        <button (click)="delete(life)" class="btn btn-danger">
+        <button (click)="delete(entity)" class="btn btn-danger">
           <clr-icon shape="trash"></clr-icon>
           <span class="clr-icon-title"></span>
         </button>
@@ -35,9 +39,9 @@
   <clr-dg-footer>
     <clr-dg-pagination #pagination [clrDgPageSize]="pageSize" [(clrDgPage)]="currentPage" [clrDgTotalItems]="totalCount">
       {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
-      / {{pagination.totalItems}} {{ 'TIME.RESOURCE.ENTITY.LIFE.CONCEPT' | translate }}
+      / {{pagination.totalItems}} {{ 'TIME.RESOURCE.ENTITY.CONCEPT' | translate }}
     </clr-dg-pagination>
   </clr-dg-footer>
 </clr-datagrid>
 
-<time-save-entity-life (save)="saved($event)"></time-save-entity-life>
+<time-save-entity (save)="saved($event)" [areaMaps]="areaMaps"></time-save-entity>

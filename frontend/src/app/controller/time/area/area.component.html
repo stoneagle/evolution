@@ -1,28 +1,42 @@
 <clr-tabs>
-	<clr-tab >
-		<button (click)="refresh(0)" clrTabLink>日常</button>
-    <clr-tab-content *clrIfActive="true">
-      <tree 
-        [tree]="tree"
-        (nodeRemoved)="handleRemoved($event)"
-        (nodeRenamed)="handleRenamed($event)"
-        (nodeMoved)="handleMoved($event)"
-        (nodeCreated)="handleCreated($event, 0)"
-        (menuItemSelected)="handleCustom($event, 0)"
-      ></tree>
-    </clr-tab-content>
+	<clr-tab>
+		<button (click)="refresh(areaFirstField)" clrTabLink>{{ areaFirstName }}</button>
+		<clr-tab-content *clrIfActive="active">
+			<div class="row">
+				<div class="col-xs-4">
+					<tree 
+						[tree]="tree"
+						(nodeRemoved)="handleRemoved($event)"
+						(nodeRenamed)="handleRenamed($event)"
+						(nodeMoved)="handleMoved($event)"
+						(nodeCreated)="handleCreated($event)"
+						(menuItemSelected)="handleCustom($event)"
+					></tree>
+				</div>
+				<div class="col-xs-8">
+					<time-entity [currentField]="areaFirstField"></time-entity>
+				</div>
+			</div>
+		</clr-tab-content>
 	</clr-tab>
 	<clr-tab *ngFor="let key of getKeys(areaMap)">
 		<button (click)="refresh(key)" clrTabLink>{{ areaMap.get(key) }}</button>
-    <clr-tab-content *clrIfActive>
-      <tree 
-        [tree]="tree"
-        (nodeRemoved)="handleRemoved($event)"
-        (nodeRenamed)="handleRenamed($event)"
-        (nodeMoved)="handleMoved($event)"
-        (nodeCreated)="handleCreated($event, key)"
-        (menuItemSelected)="handleCustom($event, key)"
-      ></tree>
-    </clr-tab-content>
+		<clr-tab-content *clrIfActive>
+			<div class="row">
+				<div class="col-xs-4">
+					<tree 
+						[tree]="tree"
+						(nodeRemoved)="handleRemoved($event)"
+						(nodeRenamed)="handleRenamed($event)"
+						(nodeMoved)="handleMoved($event)"
+						(nodeCreated)="handleCreated($event)"
+						(menuItemSelected)="handleCustom($event)"
+					></tree>
+				</div>
+				<div class="col-xs-8">
+					<time-entity [currentField]="currentField"></time-entity>
+				</div>
+			</div>
+		</clr-tab-content>
 	</clr-tab>
 </clr-tabs>

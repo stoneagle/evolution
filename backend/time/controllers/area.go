@@ -31,6 +31,7 @@ func (c *Area) Router(router *gin.RouterGroup) {
 	area := router.Group("area").Use(middles.One(c.AreaSvc, c.Name))
 	area.GET("/get/:id", c.One)
 	area.GET("/list/all", c.List)
+	area.POST("/list", c.ListWithCondition)
 	area.GET("/list/tree/one/:fieldId", c.ListOneTree)
 	area.GET("/list/tree/all", c.ListAllTree)
 	area.POST("", c.Add)
@@ -45,6 +46,21 @@ func (c *Area) One(ctx *gin.Context) {
 
 func (c *Area) List(ctx *gin.Context) {
 	areas, err := c.AreaSvc.List()
+	if err != nil {
+		resp.ErrorBusiness(ctx, resp.ErrorMysql, "area get error", err)
+		return
+	}
+	resp.Success(ctx, areas)
+}
+
+func (c *Area) ListWithCondition(ctx *gin.Context) {
+	var area models.Area
+	if err := ctx.ShouldBindJSON(&area); err != nil {
+		resp.ErrorBusiness(ctx, resp.ErrorParams, "params error: ", err)
+		return
+	}
+
+	areas, err := c.AreaSvc.ListWithCondition(&area)
 	if err != nil {
 		resp.ErrorBusiness(ctx, resp.ErrorMysql, "area get error", err)
 		return

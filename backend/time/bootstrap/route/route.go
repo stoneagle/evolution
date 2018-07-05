@@ -13,10 +13,6 @@ func Configure(b *bootstrap.Bootstrapper) {
 		controllers.NewCountry().Router(v1)
 		controllers.NewArea().Router(v1)
 		controllers.NewField().Router(v1)
-		entity := v1.Group("entity")
-		{
-			controllers.NewEntityLife().Router(entity)
-			controllers.NewEntityQuest().Router(entity)
-		}
+		controllers.NewEntity().Router(v1)
 	}
 }
