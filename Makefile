@@ -24,6 +24,14 @@ stop-time:
 rm-time: 
 	cd hack/swarm && docker-compose -f docker-compose-time.yml -p "$(PROJ)-$(USER)-time" rm
 
+# system 
+run-system: 
+	cd hack/swarm && docker-compose -f docker-compose-system.yml -p "$(PROJ)-$(USER)-system" up
+stop-system: 
+	cd hack/swarm && docker-compose -f docker-compose-system.yml -p "$(PROJ)-$(USER)-system" stop
+rm-system: 
+	cd hack/swarm && docker-compose -f docker-compose-system.yml -p "$(PROJ)-$(USER)-system" rm
+
 # envoy 
 run-envoy: 
 	cd hack/swarm && docker-compose -f docker-compose-envoy.yml -p "$(PROJ)-$(USER)-envoy" up -d
@@ -37,6 +45,8 @@ init-quant-db:
 	docker exec -w /go/src/evolution/backend/quant/initial -it evolution-wuzhongyang-quant-backend go run init.go 
 init-time-db:
 	docker exec -w /go/src/evolution/backend/time/initial -it evolution-wuzhongyang-time-backend go run init.go 
+init-system-db:
+	docker exec -w /go/src/evolution/backend/system/initial -it evolution-wuzhongyang-system-backend go run init.go 
 
 # transfer
 transfer-time-db:

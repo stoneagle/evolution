@@ -7,7 +7,8 @@
     "websocket": "ws://192.168.0.119:8000/evolution/quant/v1",
     "prefix": {
       "quant": "/quant/v1",
-      "time": "/time/v1"
+      "time": "/time/v1",
+      "system": "/system/v1"
     }
   }
 }

@@ -52,7 +52,7 @@ type Conf struct {
 		Redis    RedisConf
 		Database DBConf
 	}
-	User struct {
+	System struct {
 		System   System
 		Redis    RedisConf
 		Database DBConf

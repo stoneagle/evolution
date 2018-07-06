@@ -1,4 +1,4 @@
-import { Basic } from './basic';
+import { Basic } from '../base/basic';
 
 export class Field extends Basic {
   Name: string;

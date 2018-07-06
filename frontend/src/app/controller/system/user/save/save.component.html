@@ -1,0 +1,26 @@
+<clr-modal [(clrModalOpen)]="modelOpened">
+    <h3 class="modal-title" *ngIf="(user.Id)">
+      {{ 'SYSTEM.PROCESS.UPDATE' | translate }}{{ 'SYSTEM.RESOURCE.USER.CONCEPT' | translate }}
+    </h3>
+    <h3 class="modal-title" *ngIf="!(user.Id)">
+      {{ 'SYSTEM.PROCESS.CREATE' | translate }}{{ 'SYSTEM.RESOURCE.USER.CONCEPT' | translate }}
+    </h3>
+    <div class="modal-body">
+      <form #addForm="ngForm" (ngSubmit)="Submit()">
+        <div class="form-group">
+          <label for="name">{{ 'SYSTEM.RESOURCE.USER.NAME' | translate }}</label>
+          <input type="text" class="form-control" id="Name" required [(ngModel)]="user.Name" name="Name" >
+        </div> 
+        <div class="form-group">
+          <label for="email">{{ 'SYSTEM.RESOURCE.USER.EMAIL' | translate }}</label>
+          <input type="text" class="form-control" id="Email" required [(ngModel)]="user.Email" name="Email" >
+        </div> 
+        <div class="form-group">
+          <label for="password">{{ 'SYSTEM.RESOURCE.USER.PASSWORD' | translate }}</label>
+          <input type="text" class="form-control" id="Password" required [(ngModel)]="user.Password" name="Password" >
+        </div> 
+        <button type="submit" class="btn btn-success">{{ 'SYSTEM.PROCESS.SUBMIT' | translate }}</button>
+        <button type="button" class="btn btn-primary" (click)="modelOpened = false">{{ 'SYSTEM.PROCESS.CANCEL' | translate }}</button>
+      </form>
+    </div>     
+</clr-modal>   

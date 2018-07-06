@@ -103,12 +103,31 @@
     }
   },
   "SYSTEM": {
-    "USER": {
-      "NAME": "用户",
-      "SIGNIN": "登陆",
-      "SIGNOUT": "登出"
+    "TITLE": "系统",
+    "ASSETS": {
+      "TYPE": {
+        "USER": "用户"
+      }
+    },
+    "RESOURCE": {
+      "USER": {
+        "CONCEPT": "用户",
+        "NAME": "名称",
+        "EMAIL": "邮箱",
+        "PASSWORD": "密码"
+      },
+      "GENERAL": {
+        "CONCEPT": "通用",
+        "ID": "序号",
+        "OPERATION": "操作",
+        "CREATED": "创建时间",
+        "UPDATED": "更新时间",
+        "DELETED": "删除时间"
+      }
     },
     "PROCESS": { 
+      "SIGNIN": "登陆",
+      "SIGNOUT": "登出",
       "GET": "获取", 
       "LIST": "罗列", 
       "SYNC": "同步", 

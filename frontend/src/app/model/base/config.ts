@@ -8,6 +8,7 @@ export interface IConfig {
     prefix: {
       quant: string;
       time: string;
+      system: string;
     }
   }
 }

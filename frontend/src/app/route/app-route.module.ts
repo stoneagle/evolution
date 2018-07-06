@@ -12,6 +12,7 @@ import { CountryComponent as TimeCountry } from '../controller/time/country/coun
 import { FieldComponent as TimeField }     from '../controller/time/field/field.component';
 import { EntityComponent as TimeEntity }   from '../controller/time/entity/entity.component';
 import { AreaComponent as TimeArea }       from '../controller/time/area/area.component';
+import { UserComponent as SystemUser }     from '../controller/system/user/user.component';
 import { ShellComponent }                  from '../base/shell/shell.component';
 import { DefaultComponent }                from '../base/default/default.component';
 import { SignInComponent }                 from '../base/sign-in/sign-in.component';
@@ -58,6 +59,18 @@ const routes: Routes = [
           { path: 'country', component: TimeCountry },
           { path: 'field', component: TimeField },
           { path: 'area', component: TimeArea },
+        ]
+      },
+    ]
+  }, 
+  { 
+    path: 'system', component: ShellComponent, 
+    children:[
+      { 
+        path: 'user',
+        children:[
+          { path: '', component: DefaultComponent }, 
+          { path: 'resource', component: SystemUser },
         ]
       },
     ]

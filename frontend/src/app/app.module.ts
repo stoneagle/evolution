@@ -11,7 +11,8 @@ import { AppConfig  }         from './service/base/config.service';
 import { CustomInterceptor  } from './service/base/custom.interceptor';
 import { BaseModule }         from './base/base.module';
 import { QuantModule }        from './controller/quant/quant.module';
-import { TimeModule }        from './controller/time/time.module';
+import { TimeModule }         from './controller/time/time.module';
+import { SystemModule }       from './controller/system/system.module';
 
 export function initializeApp(appConfig: AppConfig) {
   return () => appConfig.load();
@@ -38,6 +39,7 @@ export function createTranslateLoader(http: HttpClient) {
     }),
     QuantModule,
     TimeModule,
+    SystemModule,
   ],
   providers: [
     AppConfig,

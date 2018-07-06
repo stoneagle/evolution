@@ -13,6 +13,7 @@ backend/vendor
 backend/logs
 backend/quant/quant
 backend/time/time
+backend/system/system
 backend/config/.config.yaml
 backend/time/models/transfer/.config.yaml
 

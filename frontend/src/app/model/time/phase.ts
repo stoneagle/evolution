@@ -1,4 +1,4 @@
-import { Basic } from './basic';
+import { Basic } from '../base/basic';
 
 export class Phase extends Basic {
   Name: string;

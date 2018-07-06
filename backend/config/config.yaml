@@ -46,10 +46,10 @@ time:
     maxOpen: 5 
     showsql: True
     location: Asia/Shanghai
-user:
+system:
   system:
-    name: user
-    prefix: evolution/user
+    name: system 
+    prefix: evolution/system
     cors: ["http://192.168.0.119:8888"]
   redis:
     host: redis

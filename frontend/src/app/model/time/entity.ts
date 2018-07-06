@@ -1,4 +1,4 @@
-import { Basic } from './basic';
+import { Basic } from '../base/basic';
 import { Area } from './area';
 
 export class Entity extends Basic {
