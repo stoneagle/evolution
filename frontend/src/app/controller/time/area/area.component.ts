@@ -83,7 +83,6 @@ export class AreaComponent implements OnInit {
   handleMoved(e: NodeEvent): void {
     let area = new Area();
     area.Id = +e.node.id;
-    area.Del = 0;
     area.Parent = +e.node.parent.id;
     this.areaService.Update(area).subscribe(res => {
       this.refresh(this.currentField);
@@ -95,7 +94,6 @@ export class AreaComponent implements OnInit {
     area.Name = e.node.value;
     area.Parent = +e.node.parent.id;
     area.FieldId = this.currentField;
-    area.Del = 0;
     if (e.node.children == null) {
       e.node.removeItselfFromParent();
     } else {
