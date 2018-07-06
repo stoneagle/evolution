@@ -16,8 +16,8 @@
     <!-- <clr-dg-cell>{{country.Id}}</clr-dg-cell> -->
     <clr-dg-cell>{{country.Name}}</clr-dg-cell>
     <clr-dg-cell>{{country.EnName}}</clr-dg-cell>
-    <clr-dg-cell>{{country.Ctime | date: 'yy-MM-dd HH:mm:ss'}}</clr-dg-cell>
-    <clr-dg-cell>{{country.Utime | date: 'yy-MM-dd HH:mm:ss'}}</clr-dg-cell>
+    <clr-dg-cell>{{country.CreatedAt | date: 'yy-MM-dd HH:mm:ss'}}</clr-dg-cell>
+    <clr-dg-cell>{{country.UpdatedAt | date: 'yy-MM-dd HH:mm:ss'}}</clr-dg-cell>
     <clr-dg-cell>
       <div class="btn-group btn-primary btn-icon">
         <button (click)="openSaveModel(country.Id)" class="btn">

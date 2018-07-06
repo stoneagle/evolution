@@ -16,8 +16,8 @@
     <clr-dg-cell>{{field.Id}}</clr-dg-cell>
     <clr-dg-cell>{{field.Name}}</clr-dg-cell>
     <clr-dg-cell>{{field.Desc}}</clr-dg-cell>
-    <clr-dg-cell>{{field.Ctime | date: 'yy-MM-dd HH:mm:ss'}}</clr-dg-cell>
-    <clr-dg-cell>{{field.Utime | date: 'yy-MM-dd HH:mm:ss'}}</clr-dg-cell>
+    <clr-dg-cell>{{field.CreatedAt | date: 'yy-MM-dd HH:mm:ss'}}</clr-dg-cell>
+    <clr-dg-cell>{{field.UpdatedAt | date: 'yy-MM-dd HH:mm:ss'}}</clr-dg-cell>
     <clr-dg-cell>
       <div class="btn-group btn-primary btn-icon">
         <button (click)="openSaveModel(field.Id)" class="btn">

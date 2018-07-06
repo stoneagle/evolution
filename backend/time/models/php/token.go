@@ -1,4 +1,4 @@
-package models
+package php
 
 type Token struct {
 	UserId    int    `xorm:"not null pk unique(token_unique) INT(11)"`

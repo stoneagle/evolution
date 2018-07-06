@@ -8,12 +8,10 @@ import (
 )
 
 type Area struct {
-	GeneralWithId `xorm:"extends"`
-	Name          string `xorm:"not null default '' comment('名称') VARCHAR(255)" structs:"name,omitempty"`
-	Parent        int    `xorm:"not null default 0 comment('父id') INT(11)" structs:"parent,omitempty"`
-	Del           int    `xorm:"not null default 0 comment('软删除') TINYINT(1)" structs:"del,omitempty"`
-	Level         int    `xorm:"not null default 0 comment('所属层级') SMALLINT(6)" structs:"level,omitempty"`
-	FieldId       int    `xorm:"not null default 0 comment('所属范畴id') SMALLINT(6)" structs:"field_id,omitempty"`
+	GeneralWithDeleted `xorm:"extends"`
+	Name               string `xorm:"unique not null default '' comment('名称') VARCHAR(255)" structs:"name,omitempty"`
+	Parent             int    `xorm:"unique(name) not null default 0 comment('父id') INT(11)" structs:"parent,omitempty"`
+	FieldId            int    `xorm:"not null default 0 comment('所属范畴id') SMALLINT(6)" structs:"field_id,omitempty"`
 }
 
 type AreaTree struct {

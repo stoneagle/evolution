@@ -1,4 +1,4 @@
-package models
+package php
 
 type User struct {
 	Id               int    `xorm:"not null pk autoincr INT(11)"`

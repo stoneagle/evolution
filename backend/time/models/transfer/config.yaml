@@ -1,0 +1,12 @@
+database:
+  name: php 
+  type: mysql
+  host: 
+  port: 3306
+  user:  
+  target: time
+  password: 
+  maxIdle: 10 
+  maxOpen: 5 
+  showsql: True
+  location: Asia/Shanghai

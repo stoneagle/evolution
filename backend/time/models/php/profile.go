@@ -1,4 +1,4 @@
-package models
+package php
 
 type Profile struct {
 	UserId        int    `xorm:"not null pk INT(11)"`

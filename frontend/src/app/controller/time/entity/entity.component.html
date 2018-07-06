@@ -20,8 +20,8 @@
     <clr-dg-cell>{{entity.Desc}}</clr-dg-cell>
     <clr-dg-cell>{{entity.Year}}</clr-dg-cell>
     <clr-dg-cell>{{entity.Area.Name}}</clr-dg-cell>
-    <clr-dg-cell>{{entity.Ctime | date: 'yy-MM-dd HH:mm:ss'}}</clr-dg-cell>
-    <clr-dg-cell>{{entity.Utime | date: 'yy-MM-dd HH:mm:ss'}}</clr-dg-cell>
+    <clr-dg-cell>{{entity.UpdatedAt | date: 'yy-MM-dd HH:mm:ss'}}</clr-dg-cell>
+    <clr-dg-cell>{{entity.CreatedAt | date: 'yy-MM-dd HH:mm:ss'}}</clr-dg-cell>
     <clr-dg-cell>
       <div class="btn-group btn-primary btn-icon">
         <button (click)="openSaveModel(entity.Id)" class="btn">
