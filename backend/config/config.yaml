@@ -4,7 +4,10 @@ app:
 quant:
   system:
     name: quant
+    host: http://quant-backend:8080 
+    version: v1 
     prefix: evolution/quant
+    auth: "BasicAuth" 
     cors: ["http://192.168.0.119:8888"]
   redis:
     host: redis
@@ -28,7 +31,10 @@ quant:
 time:
   system:
     name: time
+    host: http://time-backend:8080 
+    version: v1 
     prefix: evolution/time
+    auth: "BasicAuth" 
     cors: ["http://192.168.0.119:8888"]
   redis:
     host: redis
@@ -49,6 +55,8 @@ time:
 system:
   system:
     name: system 
+    host: http://system-backend:8080 
+    version: v1 
     prefix: evolution/system
     cors: ["http://192.168.0.119:8888"]
   redis:

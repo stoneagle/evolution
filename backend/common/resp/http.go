@@ -28,7 +28,7 @@ func Success(ctx *gin.Context, data interface{}) {
 		Desc: "success",
 	}
 	ctx.JSON(http.StatusOK, res)
-	FormatResponseLog(ctx, res)
+	FormatResponseLog(res)
 }
 
 func ErrorBusiness(ctx *gin.Context, code ErrorCode, desc string, err error) {
@@ -37,13 +37,13 @@ func ErrorBusiness(ctx *gin.Context, code ErrorCode, desc string, err error) {
 		Data: struct{}{},
 		Desc: desc,
 	}
-	FormatResponseLog(ctx, res)
+	FormatResponseLog(res)
 	FormatErrorLog(err)
 	ctx.JSON(http.StatusOK, res)
 	ctx.Abort()
 }
 
-func FormatResponseLog(ctx *gin.Context, response Response) {
+func FormatResponseLog(response Response) {
 	logResponse, _ := json.Marshal(response)
 	if string(logResponse) != "" {
 		logger.Get().Infow("response:【" + string(logResponse) + "】")
