@@ -13,6 +13,7 @@ func Configure(b *bootstrap.Bootstrapper) {
 		controllers.NewCountry().Router(v1)
 		controllers.NewArea().Router(v1)
 		controllers.NewField().Router(v1)
+		controllers.NewPhase().Router(v1)
 		controllers.NewEntity().Router(v1)
 	}
 }

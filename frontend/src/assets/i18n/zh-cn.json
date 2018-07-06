@@ -40,6 +40,13 @@
         "NAME": "名称",
         "DESC": "描述"
       },
+      "PHASE": {
+        "CONCEPT": "阶段",
+        "NAME": "名称",
+        "DESC": "描述",
+        "LEVEL": "级别",
+        "FIELD": "所属方向"
+      },
       "GENERAL": {
         "CONCEPT": "通用",
         "ID": "序号",

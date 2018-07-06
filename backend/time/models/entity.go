@@ -1,8 +1,6 @@
 package models
 
 import (
-	"reflect"
-
 	"github.com/fatih/structs"
 	"github.com/go-xorm/builder"
 )
@@ -27,20 +25,13 @@ func (m *Entity) TableName() string {
 
 func (m *Entity) BuildCondition() (condition builder.Eq) {
 	keyPrefix := m.TableName() + "."
-	condition = builder.Eq{}
+	params := structs.Map(m)
+	condition = m.General.BuildCondition(params, keyPrefix)
 
 	areaCondition := m.Area.BuildCondition()
 	if len(areaCondition) > 0 {
 		for k, v := range areaCondition {
 			condition[k] = v
-		}
-	}
-
-	params := structs.Map(m)
-	for key, value := range params {
-		keyType := reflect.ValueOf(value).Kind()
-		if keyType != reflect.Map && keyType != reflect.Slice && keyType != reflect.Struct {
-			condition[keyPrefix+key] = value
 		}
 	}
 	return condition

@@ -1,0 +1,26 @@
+<clr-modal [(clrModalOpen)]="modelOpened">
+    <h3 class="modal-title" *ngIf="(phase.Id)">
+      {{ 'SYSTEM.PROCESS.UPDATE' | translate }}{{ 'TIME.RESOURCE.PHASE.CONCEPT' | translate }}
+    </h3>
+    <h3 class="modal-title" *ngIf="!(phase.Id)">
+      {{ 'SYSTEM.PROCESS.CREATE' | translate }}{{ 'TIME.RESOURCE.PHASE.CONCEPT' | translate }}
+    </h3>
+    <div class="modal-body">
+      <form #addForm="ngForm" (ngSubmit)="Submit()">
+        <div class="form-group">
+          <label for="name">{{ 'TIME.RESOURCE.PHASE.NAME' | translate }}</label>
+          <input type="text" class="form-control" id="Name" required [(ngModel)]="phase.Name" name="Name" >
+        </div> 
+        <div class="form-group">
+          <label for="desc">{{ 'TIME.RESOURCE.PHASE.DESC' | translate }}</label>
+          <input type="text" class="form-control" id="Desc" required [(ngModel)]="phase.Desc" name="Desc" >
+        </div> 
+        <div class="form-group">
+          <label for="level">{{ 'TIME.RESOURCE.PHASE.LEVEL' | translate }}</label>
+          <input type="number" class="form-control" id="Level" required readonly [(ngModel)]="phase.Level" name="Level" >
+        </div> 
+        <button type="submit" class="btn btn-success">{{ 'SYSTEM.PROCESS.SUBMIT' | translate }}</button>
+        <button type="button" class="btn btn-primary" (click)="modelOpened = false">{{ 'SYSTEM.PROCESS.CANCEL' | translate }}</button>
+      </form>
+    </div>     
+</clr-modal>   

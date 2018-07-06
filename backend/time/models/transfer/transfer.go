@@ -3,7 +3,6 @@ package main
 import (
 	"evolution/backend/common/config"
 	"evolution/backend/time/models"
-	"evolution/backend/time/models/php"
 	"fmt"
 	"io/ioutil"
 	"time"
@@ -66,15 +65,16 @@ func main() {
 	srcEng.Charset("utf8")
 	// srcEng.ShowSQL(true)
 
-	new(php.Area).Transfer(srcEng, destEng)
-	new(php.Country).Transfer(srcEng, destEng)
-	initField(destEng)
-	new(php.EntityAsset).Transfer(srcEng, destEng)
-	new(php.EntityCircle).Transfer(srcEng, destEng)
-	new(php.EntityLife).Transfer(srcEng, destEng)
-	new(php.EntityQuest).Transfer(srcEng, destEng)
-	new(php.EntityWork).Transfer(srcEng, destEng)
-	new(php.EntitySkill).Transfer(srcEng, destEng)
+	// new(php.Area).Transfer(srcEng, destEng)
+	// new(php.Country).Transfer(srcEng, destEng)
+	// initField(destEng)
+	initPhase(destEng)
+	// new(php.EntityAsset).Transfer(srcEng, destEng)
+	// new(php.EntityCircle).Transfer(srcEng, destEng)
+	// new(php.EntityLife).Transfer(srcEng, destEng)
+	// new(php.EntityQuest).Transfer(srcEng, destEng)
+	// new(php.EntityWork).Transfer(srcEng, destEng)
+	// new(php.EntitySkill).Transfer(srcEng, destEng)
 }
 
 func initField(des *xorm.Engine) {
@@ -98,5 +98,33 @@ func initField(des *xorm.Engine) {
 		fmt.Printf("field transfer error:%v\r\n", err.Error())
 	} else {
 		fmt.Printf("field transfer success:%v\r\n", affected)
+	}
+}
+
+func initPhase(des *xorm.Engine) {
+	initMap := map[int][]string{
+		1: []string{"探索", "学习", "原理", "突破"},
+		2: []string{"探索", "实践", "行业", "发展"},
+		3: []string{"探索", "欣赏", "思想", "创作"},
+		4: []string{"探索", "融入", "影响", "领导"},
+		5: []string{"探索", "尝试", "挑战", "记录"},
+		6: []string{"杂务", "规划"},
+	}
+	news := make([]models.Phase, 0)
+	for k, slice := range initMap {
+		for l, v := range slice {
+			tmp := models.Phase{}
+			tmp.Name = v
+			tmp.Desc = ""
+			tmp.Level = l + 1
+			tmp.FieldId = k
+			news = append(news, tmp)
+		}
+	}
+	affected, err := des.Insert(&news)
+	if err != nil {
+		fmt.Printf("phase transfer error:%v\r\n", err.Error())
+	} else {
+		fmt.Printf("phase transfer success:%v\r\n", affected)
 	}
 }

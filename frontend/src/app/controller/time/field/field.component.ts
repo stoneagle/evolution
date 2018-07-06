@@ -3,6 +3,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { Field }              from '../../../model/time/field';
 import { FieldService }       from '../../../service/time/field.service';
 import { SaveFieldComponent } from './save/save.component';
+import { PhaseComponent } from '../phase/phase.component';
 
 @Component({
   selector: 'time-field',
@@ -12,6 +13,8 @@ import { SaveFieldComponent } from './save/save.component';
 export class FieldComponent implements OnInit {
   @ViewChild(SaveFieldComponent)
   saveField: SaveFieldComponent;
+  @ViewChild(PhaseComponent)
+  phaseField: PhaseComponent;
 
   fields: Field[];
 
@@ -36,6 +39,12 @@ export class FieldComponent implements OnInit {
 
   openSaveModel(id?: number): void {
     this.saveField.New(id);
+  }
+
+  openPhaseSaveModel(): void {
+    if (this.phaseField != undefined) {
+      this.phaseField.openSaveModel();
+    }
   }
 
   delete(field: Field): void {

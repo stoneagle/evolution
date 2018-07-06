@@ -8,17 +8,20 @@ import { ClarityModule  }            from "@clr/angular";
 import { TranslateModule  }          from "@ngx-translate/core";
 import { TreeModule }                from 'ng2-tree';
 
-import { ProjectComponent }         from './project/project.component';
-import { ProjectService }           from '../../service/time/project.service';
-import { CountryComponent }         from './country/country.component';
-import { SaveCountryComponent }     from './country/save/save.component';
-import { EntityComponent }         from './entity/entity.component';
-import { SaveEntityComponent }     from './entity/save/save.component';
-import { FieldComponent }           from './field/field.component';
-import { SaveFieldComponent }       from './field/save/save.component';
-import { AreaComponent }            from './area/area.component';
+import { ProjectComponent }     from './project/project.component';
+import { ProjectService }       from '../../service/time/project.service';
+import { CountryComponent }     from './country/country.component';
+import { SaveCountryComponent } from './country/save/save.component';
+import { PhaseComponent }       from './phase/phase.component';
+import { SavePhaseComponent }   from './phase/save/save.component';
+import { EntityComponent }      from './entity/entity.component';
+import { SaveEntityComponent }  from './entity/save/save.component';
+import { FieldComponent }       from './field/field.component';
+import { SaveFieldComponent }   from './field/save/save.component';
+import { AreaComponent }        from './area/area.component';
 
 import { CountryService }         from '../../service/time/country.service';
+import { PhaseService }           from '../../service/time/phase.service';
 import { FieldService }           from '../../service/time/field.service';
 import { EntityService }          from '../../service/time/entity.service';
 import { AreaService }            from '../../service/time/area.service';
@@ -32,6 +35,8 @@ import { MessageHandlerService  } from '../../service/base/message-handler.servi
     SaveCountryComponent,
     EntityComponent,
     SaveEntityComponent,
+    PhaseComponent,
+    SavePhaseComponent,
     FieldComponent,
     SaveFieldComponent,
     AreaComponent,
@@ -51,6 +56,7 @@ import { MessageHandlerService  } from '../../service/base/message-handler.servi
     ProjectService,
     CountryService,
     FieldService,
+    PhaseService,
     EntityService,
     MessageHandlerService,
   ],
