@@ -38,6 +38,10 @@ init-quant-db:
 init-time-db:
 	docker exec -w /go/src/evolution/backend/time/initial -it evolution-wuzhongyang-time-backend go run init.go 
 
+# transfer
+transfer-time-db:
+	docker exec -w /go/src/evolution/backend/time/models/transfer -it evolution-wuzhongyang-time-backend go run transfer.go 
+
 init-influxdb:
 	sudo docker run --rm \
 		-e INFLUXDB_DB=quant -e INFLUXDB_ADMIN_ENABLED=true \
