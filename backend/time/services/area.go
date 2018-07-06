@@ -50,7 +50,7 @@ func (s *Area) Delete(id int, model models.Area) (err error) {
 
 func (s *Area) ListWithCondition(area *models.Area) (areas []models.Area, err error) {
 	areas = make([]models.Area, 0)
-	sql := s.Engine.Where("del = ?", 0).Asc("parent")
+	sql := s.Engine.Asc("parent")
 	condition := area.BuildCondition()
 	sql = sql.Where(condition)
 	err = sql.Find(&areas)
@@ -62,12 +62,15 @@ func (s *Area) ListWithCondition(area *models.Area) (areas []models.Area, err er
 
 func (s *Area) List() (areas []models.Area, err error) {
 	areas = make([]models.Area, 0)
-	err = s.Engine.Where("del = ?", 0).Asc("parent").Find(&areas)
+	err = s.Engine.Asc("parent").Find(&areas)
 	return
 }
 
 func (s *Area) TransferListToTree(areas []models.Area, fieldMap map[int]string) (areaTrees map[int]models.AreaTree, err error) {
 	areaTrees = make(map[int]models.AreaTree)
+
+buildTreeLoop:
+	leftArea := make([]models.Area, 0)
 	for _, one := range areas {
 		node := models.AreaNode{
 			Id:       one.Id,
@@ -93,21 +96,35 @@ func (s *Area) TransferListToTree(areas []models.Area, fieldMap map[int]string) 
 		if one.Parent == 0 {
 			tree.Children = append(tree.Children, node)
 		} else {
-			tree.Children = locationNode(tree.Children, node, one)
+			var targetFlag bool
+			tree.Children, targetFlag = locationNode(tree.Children, node, one)
+			if !targetFlag {
+				leftArea = append(leftArea, one)
+			}
 		}
 		areaTrees[one.FieldId] = tree
+	}
+
+	if len(leftArea) > 0 {
+		areas = leftArea
+		goto buildTreeLoop
 	}
 	return
 }
 
-func locationNode(level []models.AreaNode, node models.AreaNode, one models.Area) []models.AreaNode {
+func locationNode(level []models.AreaNode, node models.AreaNode, one models.Area) ([]models.AreaNode, bool) {
+	targetFlag := false
 	for key, leaf := range level {
 		if leaf.Id == one.Parent {
 			level[key].Children = append(leaf.Children, node)
+			targetFlag = true
 			break
 		} else if len(leaf.Children) > 0 {
-			level[key].Children = locationNode(leaf.Children, node, one)
+			level[key].Children, targetFlag = locationNode(leaf.Children, node, one)
+			if targetFlag {
+				break
+			}
 		}
 	}
-	return level
+	return level, targetFlag
 }

@@ -160,18 +160,6 @@ func (c *Area) Update(ctx *gin.Context) {
 		return
 	}
 
-	oldArea := ctx.MustGet("area").(models.Area)
-	if oldArea.Del != area.Del {
-		updateMaps := map[string]interface{}{
-			"del": area.Del,
-		}
-		err := c.AreaSvc.UpdateByMap(area.Id, updateMaps)
-		if err != nil {
-			resp.ErrorBusiness(ctx, resp.ErrorMysql, "area update error", err)
-			return
-		}
-	}
-
 	resp.Success(ctx, struct{}{})
 }
 
