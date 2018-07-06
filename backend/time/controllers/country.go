@@ -1,8 +1,9 @@
 package controllers
 
 import (
+	"evolution/backend/common/middles"
 	"evolution/backend/common/resp"
-	"evolution/backend/time/middles"
+	"evolution/backend/common/structs"
 	"evolution/backend/time/models"
 	"evolution/backend/time/services"
 
@@ -10,22 +11,22 @@ import (
 )
 
 type Country struct {
-	Base
-	Name       string
+	structs.Controller
 	CountrySvc *services.Country
 }
 
 func NewCountry() *Country {
-	Country := &Country{
-		Name: "country",
-	}
-	Country.Prepare()
-	Country.CountrySvc = services.NewCountry(Country.Engine, Country.Cache)
-	return Country
+	country := &Country{}
+	country.Init()
+	country.ProjectName = country.Config.Time.System.Name
+	country.Name = "country"
+	country.Prepare()
+	country.CountrySvc = services.NewCountry(country.Engine, country.Cache)
+	return country
 }
 
 func (c *Country) Router(router *gin.RouterGroup) {
-	country := router.Group("country").Use(middles.One(c.CountrySvc, c.Name))
+	country := router.Group(c.Name).Use(middles.One(c.CountrySvc, c.Name))
 	country.GET("/get/:id", c.One)
 	country.GET("/list", c.List)
 	country.POST("", c.Add)
@@ -34,7 +35,7 @@ func (c *Country) Router(router *gin.RouterGroup) {
 }
 
 func (c *Country) One(ctx *gin.Context) {
-	country := ctx.MustGet("country").(models.Country)
+	country := ctx.MustGet(c.Name).(models.Country)
 	resp.Success(ctx, country)
 }
 
@@ -78,7 +79,7 @@ func (c *Country) Update(ctx *gin.Context) {
 }
 
 func (c *Country) Delete(ctx *gin.Context) {
-	country := ctx.MustGet("country").(models.Country)
+	country := ctx.MustGet(c.Name).(models.Country)
 	err := c.CountrySvc.Delete(country.Id, country)
 	if err != nil {
 		resp.ErrorBusiness(ctx, resp.ErrorMysql, "country delete error", err)

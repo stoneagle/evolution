@@ -1,8 +1,9 @@
 package controllers
 
 import (
+	"evolution/backend/common/middles"
 	"evolution/backend/common/resp"
-	"evolution/backend/time/middles"
+	"evolution/backend/common/structs"
 	"evolution/backend/time/models"
 	"evolution/backend/time/services"
 
@@ -10,22 +11,22 @@ import (
 )
 
 type Phase struct {
-	Base
-	Name     string
+	structs.Controller
 	PhaseSvc *services.Phase
 }
 
 func NewPhase() *Phase {
-	Phase := &Phase{
-		Name: "phase",
-	}
+	Phase := &Phase{}
+	Phase.Init()
+	Phase.ProjectName = Phase.Config.Time.System.Name
+	Phase.Name = "phase"
 	Phase.Prepare()
 	Phase.PhaseSvc = services.NewPhase(Phase.Engine, Phase.Cache)
 	return Phase
 }
 
 func (c *Phase) Router(router *gin.RouterGroup) {
-	phase := router.Group("phase").Use(middles.One(c.PhaseSvc, c.Name))
+	phase := router.Group(c.Name).Use(middles.One(c.PhaseSvc, c.Name))
 	phase.GET("/get/:id", c.One)
 	phase.GET("/list", c.List)
 	phase.POST("", c.Add)
@@ -35,7 +36,7 @@ func (c *Phase) Router(router *gin.RouterGroup) {
 }
 
 func (c *Phase) One(ctx *gin.Context) {
-	phase := ctx.MustGet("phase").(models.Phase)
+	phase := ctx.MustGet(c.Name).(models.Phase)
 	resp.Success(ctx, phase)
 }
 
@@ -93,7 +94,7 @@ func (c *Phase) Update(ctx *gin.Context) {
 }
 
 func (c *Phase) Delete(ctx *gin.Context) {
-	phase := ctx.MustGet("phase").(models.Phase)
+	phase := ctx.MustGet(c.Name).(models.Phase)
 	err := c.PhaseSvc.Delete(phase.Id, phase)
 	if err != nil {
 		resp.ErrorBusiness(ctx, resp.ErrorMysql, "phase delete error", err)

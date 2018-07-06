@@ -1,4 +1,4 @@
-package models
+package structs
 
 import (
 	"reflect"
@@ -7,22 +7,22 @@ import (
 	"github.com/go-xorm/builder"
 )
 
-type General struct {
+type Model struct {
 	CreatedAt time.Time `xorm:"created comment('创建时间')" structs:"created_at,omitempty"`
 	UpdatedAt time.Time `xorm:"updated comment('修改时间')" structs:"updated_at,omitempty"`
 }
 
-type GeneralWithId struct {
-	Id      int `xorm:"pk autoincr" structs:"id,omitempty"`
-	General `xorm:"extends"`
+type ModelWithId struct {
+	Id    int `xorm:"pk autoincr" structs:"id,omitempty"`
+	Model `xorm:"extends"`
 }
 
-type GeneralWithDeleted struct {
-	GeneralWithId `xorm:"extends"`
-	DeletedAt     time.Time `xorm:"deleted comment('软删除时间')" structs:"deleted_at,omitempty"`
+type ModelWithDeleted struct {
+	ModelWithId `xorm:"extends"`
+	DeletedAt   time.Time `xorm:"deleted comment('软删除时间')" structs:"deleted_at,omitempty"`
 }
 
-func (m *General) BuildCondition(params map[string]interface{}, keyPrefix string) (condition builder.Eq) {
+func (m *Model) BuildCondition(params map[string]interface{}, keyPrefix string) (condition builder.Eq) {
 	condition = builder.Eq{}
 	for key, value := range params {
 		keyType := reflect.ValueOf(value).Kind()

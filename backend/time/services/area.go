@@ -2,6 +2,7 @@ package services
 
 import (
 	"errors"
+	"evolution/backend/common/structs"
 	"evolution/backend/time/models"
 
 	"github.com/go-redis/redis"
@@ -9,7 +10,7 @@ import (
 )
 
 type Area struct {
-	Basic
+	structs.Service
 }
 
 func NewArea(engine *xorm.Engine, cache *redis.Client) *Area {

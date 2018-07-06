@@ -1,8 +1,9 @@
 package controllers
 
 import (
+	"evolution/backend/common/middles"
 	"evolution/backend/common/resp"
-	"evolution/backend/time/middles"
+	"evolution/backend/common/structs"
 	"evolution/backend/time/models"
 	"evolution/backend/time/services"
 
@@ -10,22 +11,22 @@ import (
 )
 
 type Entity struct {
-	Base
-	Name      string
+	structs.Controller
 	EntitySvc *services.Entity
 }
 
 func NewEntity() *Entity {
-	Entity := &Entity{
-		Name: "entity",
-	}
+	Entity := &Entity{}
+	Entity.Init()
+	Entity.ProjectName = Entity.Config.Time.System.Name
+	Entity.Name = "entity"
 	Entity.Prepare()
 	Entity.EntitySvc = services.NewEntity(Entity.Engine, Entity.Cache)
 	return Entity
 }
 
 func (c *Entity) Router(router *gin.RouterGroup) {
-	entity := router.Group("entity").Use(middles.One(c.EntitySvc, c.Name))
+	entity := router.Group(c.Name).Use(middles.One(c.EntitySvc, c.Name))
 	entity.GET("/get/:id", c.One)
 	entity.GET("/list", c.List)
 	entity.POST("", c.Add)
@@ -35,7 +36,7 @@ func (c *Entity) Router(router *gin.RouterGroup) {
 }
 
 func (c *Entity) One(ctx *gin.Context) {
-	entity := ctx.MustGet("entity").(models.Entity)
+	entity := ctx.MustGet(c.Name).(models.Entity)
 	resp.Success(ctx, entity)
 }
 
@@ -94,7 +95,7 @@ func (c *Entity) Update(ctx *gin.Context) {
 }
 
 func (c *Entity) Delete(ctx *gin.Context) {
-	entity := ctx.MustGet("entity").(models.Entity)
+	entity := ctx.MustGet(c.Name).(models.Entity)
 	err := c.EntitySvc.Delete(entity.Id, entity)
 	if err != nil {
 		resp.ErrorBusiness(ctx, resp.ErrorMysql, "entity delete error", err)

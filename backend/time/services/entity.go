@@ -1,6 +1,7 @@
 package services
 
 import (
+	"evolution/backend/common/structs"
 	"evolution/backend/time/models"
 
 	"github.com/go-redis/redis"
@@ -8,7 +9,7 @@ import (
 )
 
 type Entity struct {
-	Basic
+	structs.Service
 }
 
 func NewEntity(engine *xorm.Engine, cache *redis.Client) *Entity {

@@ -3,16 +3,15 @@ app:
   log: /go/src/evolution/backend/logs
 quant:
   system:
+    name: quant
     prefix: evolution/quant
     cors: ["http://192.168.0.119:8888"]
   redis:
-    name: quant 
     host: redis
     port: 6379
     password: 
     db: 0
   database:
-    name: quant 
     type: mysql
     host: mysql
     port: 3306
@@ -28,21 +27,41 @@ quant:
     port: 6666
 time:
   system:
+    name: time
     prefix: evolution/time
     cors: ["http://192.168.0.119:8888"]
   redis:
-    name: time
     host: redis
     port: 6379
     password: 
     db: 0
   database:
-    name: time 
     type: mysql
     host: mysql
     port: 3306
     user: root
     target: time
+    password: 123456
+    maxIdle: 10 
+    maxOpen: 5 
+    showsql: True
+    location: Asia/Shanghai
+user:
+  system:
+    name: user
+    prefix: evolution/user
+    cors: ["http://192.168.0.119:8888"]
+  redis:
+    host: redis
+    port: 6379
+    password: 
+    db: 0
+  database:
+    type: mysql
+    host: mysql
+    port: 3306
+    user: root
+    target: user 
     password: 123456
     maxIdle: 10 
     maxOpen: 5 

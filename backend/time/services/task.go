@@ -1,6 +1,7 @@
 package services
 
 import (
+	"evolution/backend/common/structs"
 	"evolution/backend/time/models"
 
 	"github.com/go-redis/redis"
@@ -8,7 +9,7 @@ import (
 )
 
 type Task struct {
-	Basic
+	structs.Service
 }
 
 func NewTask(engine *xorm.Engine, cache *redis.Client) *Task {

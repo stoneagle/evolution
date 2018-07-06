@@ -1,8 +1,9 @@
 package controllers
 
 import (
+	"evolution/backend/common/middles"
 	"evolution/backend/common/resp"
-	"evolution/backend/time/middles"
+	"evolution/backend/common/structs"
 	"evolution/backend/time/models"
 	"evolution/backend/time/services"
 
@@ -10,22 +11,22 @@ import (
 )
 
 type Field struct {
-	Base
-	Name     string
+	structs.Controller
 	FieldSvc *services.Field
 }
 
 func NewField() *Field {
-	Field := &Field{
-		Name: "field",
-	}
+	Field := &Field{}
+	Field.Init()
+	Field.ProjectName = Field.Config.Time.System.Name
+	Field.Name = "field"
 	Field.Prepare()
 	Field.FieldSvc = services.NewField(Field.Engine, Field.Cache)
 	return Field
 }
 
 func (c *Field) Router(router *gin.RouterGroup) {
-	field := router.Group("field").Use(middles.One(c.FieldSvc, c.Name))
+	field := router.Group(c.Name).Use(middles.One(c.FieldSvc, c.Name))
 	field.GET("/get/:id", c.One)
 	field.GET("/list", c.List)
 	field.POST("", c.Add)
@@ -34,7 +35,7 @@ func (c *Field) Router(router *gin.RouterGroup) {
 }
 
 func (c *Field) One(ctx *gin.Context) {
-	field := ctx.MustGet("field").(models.Field)
+	field := ctx.MustGet(c.Name).(models.Field)
 	resp.Success(ctx, field)
 }
 
@@ -78,7 +79,7 @@ func (c *Field) Update(ctx *gin.Context) {
 }
 
 func (c *Field) Delete(ctx *gin.Context) {
-	field := ctx.MustGet("field").(models.Field)
+	field := ctx.MustGet(c.Name).(models.Field)
 	err := c.FieldSvc.Delete(field.Id, field)
 	if err != nil {
 		resp.ErrorBusiness(ctx, resp.ErrorMysql, "field delete error", err)

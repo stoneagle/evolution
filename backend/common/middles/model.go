@@ -2,14 +2,14 @@ package middles
 
 import (
 	"evolution/backend/common/resp"
-	"evolution/backend/time/services"
+	"evolution/backend/common/structs"
 	"fmt"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
-func One(svc services.General, name string) gin.HandlerFunc {
+func One(svc structs.ServiceGeneral, name string) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		idStr := ctx.Param("id")
 		if idStr != "" {

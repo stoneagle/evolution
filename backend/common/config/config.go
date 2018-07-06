@@ -8,7 +8,6 @@ import (
 )
 
 type RedisConf struct {
-	Name     string
 	Host     string
 	Port     string
 	Password string
@@ -16,7 +15,6 @@ type RedisConf struct {
 }
 
 type DBConf struct {
-	Name     string
 	Type     string
 	Host     string
 	Port     string
@@ -29,16 +27,19 @@ type DBConf struct {
 	Location string
 }
 
+type System struct {
+	Name   string
+	Prefix string
+	Cors   []string
+}
+
 type Conf struct {
 	App struct {
 		Mode string
 		Log  string
 	}
 	Quant struct {
-		System struct {
-			Prefix string
-			Cors   []string
-		}
+		System   System
 		Redis    RedisConf
 		Database DBConf
 		Rpc      struct {
@@ -47,10 +48,12 @@ type Conf struct {
 		}
 	}
 	Time struct {
-		System struct {
-			Prefix string
-			Cors   []string
-		}
+		System   System
+		Redis    RedisConf
+		Database DBConf
+	}
+	User struct {
+		System   System
 		Redis    RedisConf
 		Database DBConf
 	}
@@ -60,7 +63,6 @@ var onceConfig *Conf = &Conf{}
 
 func Get() *Conf {
 	if "" == onceConfig.App.Mode {
-		// if (Conf{}) == *onceConfig {
 		configPath := os.Getenv("ConfigPath")
 		if configPath == "" {
 			configPath = "../config/.config.yaml"

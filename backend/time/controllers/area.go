@@ -1,8 +1,9 @@
 package controllers
 
 import (
+	"evolution/backend/common/middles"
 	"evolution/backend/common/resp"
-	"evolution/backend/time/middles"
+	"evolution/backend/common/structs"
 	"evolution/backend/time/models"
 	"evolution/backend/time/services"
 	"strconv"
@@ -11,16 +12,16 @@ import (
 )
 
 type Area struct {
-	Base
-	Name     string
+	structs.Controller
 	AreaSvc  *services.Area
 	FieldSvc *services.Field
 }
 
 func NewArea() *Area {
-	Area := &Area{
-		Name: "area",
-	}
+	Area := &Area{}
+	Area.Init()
+	Area.Name = "area"
+	Area.ProjectName = Area.Config.Time.System.Name
 	Area.Prepare()
 	Area.AreaSvc = services.NewArea(Area.Engine, Area.Cache)
 	Area.FieldSvc = services.NewField(Area.Engine, Area.Cache)
@@ -28,7 +29,7 @@ func NewArea() *Area {
 }
 
 func (c *Area) Router(router *gin.RouterGroup) {
-	area := router.Group("area").Use(middles.One(c.AreaSvc, c.Name))
+	area := router.Group(c.Name).Use(middles.One(c.AreaSvc, c.Name))
 	area.GET("/get/:id", c.One)
 	area.GET("/list/all", c.List)
 	area.POST("/list", c.ListWithCondition)
@@ -40,7 +41,7 @@ func (c *Area) Router(router *gin.RouterGroup) {
 }
 
 func (c *Area) One(ctx *gin.Context) {
-	area := ctx.MustGet("area").(models.Area)
+	area := ctx.MustGet(c.Name).(models.Area)
 	resp.Success(ctx, area)
 }
 
@@ -164,7 +165,7 @@ func (c *Area) Update(ctx *gin.Context) {
 }
 
 func (c *Area) Delete(ctx *gin.Context) {
-	area := ctx.MustGet("area").(models.Area)
+	area := ctx.MustGet(c.Name).(models.Area)
 	err := c.AreaSvc.Delete(area.Id, area)
 	if err != nil {
 		resp.ErrorBusiness(ctx, resp.ErrorMysql, "area delete error", err)
