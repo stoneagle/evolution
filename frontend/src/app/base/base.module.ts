@@ -12,8 +12,8 @@ import { SignInComponent }   from './sign-in/sign-in.component';
 import { ShellComponent }    from './shell/shell.component';
 import { ShellNavComponent } from './shell/nav/shell-nav.component';
 import { AppRouteModule }    from '../route/app-route.module';
-import { SignService  }      from '../service/base/sign.service';
 import { MessageService }    from '../service/base/message.service';
+import { SignService  }      from '../service/system/sign.service';
 
 @NgModule({
   declarations: [

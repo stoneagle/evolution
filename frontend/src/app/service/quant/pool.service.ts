@@ -79,8 +79,8 @@ export class PoolService extends BaseService {
   Add(pool: Pool): Observable<Pool> {
     this.operation = 'SYSTEM.PROCESS.CREATE';
     return this.http.post<Response>(AppConfig.settings.apiServer.endpoint + this.uri, JSON.stringify(pool)).pipe(
-    tap(res => this.log(res)),
-    catchError(this.handleError<Response>()),
+      tap(res => this.log(res)),
+      catchError(this.handleError<Response>()),
       map(res => {
         if (res && res.code == 0) {
           return new Pool(res.data);
@@ -94,8 +94,8 @@ export class PoolService extends BaseService {
   AddItems(pool: Pool): Observable<Boolean> {
     this.operation = 'SYSTEM.PROCESS.CREATE';
     return this.http.post<Response>(AppConfig.settings.apiServer.endpoint + this.uri + "/items/add", JSON.stringify(pool)).pipe(
-    tap(res => this.log(res)),
-    catchError(this.handleError<Response>()),
+      tap(res => this.log(res)),
+      catchError(this.handleError<Response>()),
       map(res => {
         if (res && res.code == 0) {
           return true;
@@ -109,8 +109,8 @@ export class PoolService extends BaseService {
   DeleteItems(pool: Pool): Observable<Boolean> {
     this.operation = 'SYSTEM.PROCESS.CREATE';
     return this.http.post<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/items/delete`, JSON.stringify(pool)).pipe(
-    tap(res => this.log(res)),
-    catchError(this.handleError<Response>()),
+      tap(res => this.log(res)),
+      catchError(this.handleError<Response>()),
       map(res => {
         if (res && res.code == 0) {
           return true;

@@ -32,7 +32,6 @@ type System struct {
 	Host    string
 	Version string
 	Prefix  string
-	Auth    string
 	Cors    []string
 }
 
@@ -56,6 +55,10 @@ type Conf struct {
 		Database DBConf
 	}
 	System struct {
+		Auth struct {
+			Type    string
+			Session string
+		}
 		System   System
 		Redis    RedisConf
 		Database DBConf

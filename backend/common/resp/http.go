@@ -39,8 +39,7 @@ func ErrorBusiness(ctx *gin.Context, code ErrorCode, desc string, err error) {
 	}
 	FormatResponseLog(res)
 	FormatErrorLog(err)
-	ctx.JSON(http.StatusOK, res)
-	ctx.Abort()
+	ctx.AbortWithStatusJSON(http.StatusOK, res)
 }
 
 func FormatResponseLog(response Response) {

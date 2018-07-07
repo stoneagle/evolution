@@ -20,7 +20,7 @@ export class MessageHandlerService {
     let msg = error.message;
     let code = error.statusCode | error.status;
     if (code === httpStatusCode.Unauthorized) {
-      this.router.navigate(['/login']);
+      this.router.navigate(['/sign/login']);
     } else {
       this.SendMessage(resource, operation, AlertType.DANGER, 500, msg);
     }

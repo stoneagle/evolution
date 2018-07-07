@@ -74,8 +74,8 @@ export class PhaseService extends BaseService {
   Add(phase: Phase): Observable<Phase> {
     this.operation = 'SYSTEM.PROCESS.CREATE';
     return this.http.post<Response>(AppConfig.settings.apiServer.endpoint + this.uri, JSON.stringify(phase)).pipe(
-    tap(res => this.log(res)),
-    catchError(this.handleError<Response>()),
+      tap(res => this.log(res)),
+      catchError(this.handleError<Response>()),
       map(res => {
         if (res && res.code == 0) {
           return new Phase(res.data);

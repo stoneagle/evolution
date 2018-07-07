@@ -18,12 +18,15 @@ import { DefaultComponent }                from '../base/default/default.compone
 import { SignInComponent }                 from '../base/sign-in/sign-in.component';
 
 const routes: Routes = [
-  { path: '', redirectTo: 'flow/stock', pathMatch: 'full' }, 
-  { path: 'login', component: SignInComponent  },
+  { path: '', redirectTo: 'sign/login', pathMatch: 'full' }, 
   { 
     path: 'flow', component: ShellComponent, 
     children:[
-      { path: '', redirectTo: 'stock/pool', pathMatch: 'full' }, 
+      { 
+        path: '', 
+        redirectTo: 'stock/pool', 
+        pathMatch: 'full' 
+      }, 
       { 
         path: 'stock',
         children:[
@@ -46,6 +49,11 @@ const routes: Routes = [
     path: 'time', component: ShellComponent, 
     children:[
       { 
+        path: '', 
+        redirectTo: 'schedule/project', 
+        pathMatch: 'full' 
+      }, 
+      { 
         path: 'schedule',
         children:[
           { path: '', component: DefaultComponent }, 
@@ -64,8 +72,21 @@ const routes: Routes = [
     ]
   }, 
   { 
+    path: 'sign',
+    children:[
+      { 
+        path: 'login', component: SignInComponent },
+    ]
+  }, 
+  { 
     path: 'system', component: ShellComponent, 
     children:[
+      { 
+        path: 'sign',
+        children:[
+          { path: 'login', component: SignInComponent },
+        ]
+      },
       { 
         path: 'user',
         children:[

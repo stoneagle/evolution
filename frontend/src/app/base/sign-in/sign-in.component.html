@@ -3,7 +3,6 @@
         <label class="title">
             <h3 class="welcome">Welcome to</h3>
             {{CompanyName}}
-            <h5 class="hint">Use your Company ID to sign in or create one now</h5>
         </label>
         <div class="login-group">
             <!-- <div class="auth-source select"> -->
@@ -12,8 +11,8 @@
             <!--         <option value="admin">Admin</option> -->
             <!--     </select> -->
             <!-- </div> -->
-            <input [(ngModel)]="username" name="username" class="username" type="text" id="login_username" placeholder="Username">
-            <input [(ngModel)]="password" name="password" class="password" type="password" id="login_password" placeholder="Password">
+            <input [(ngModel)]="username" name="username" class="username" type="text" id="login_username" placeholder="{{ 'SYSTEM.RESOURCE.USER.NAME' | translate }}">
+            <input [(ngModel)]="password" name="password" class="password" type="password" id="login_password" placeholder="{{ 'SYSTEM.RESOURCE.USER.PASSWORD' | translate }}">
             <!-- <div class="checkbox"> -->
             <!--     <input type="checkbox" id="rememberme"> -->
             <!--     <label for="rememberme"> -->

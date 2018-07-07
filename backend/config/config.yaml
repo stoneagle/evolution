@@ -7,7 +7,6 @@ quant:
     host: http://quant-backend:8080 
     version: v1 
     prefix: evolution/quant
-    auth: "BasicAuth" 
     cors: ["http://192.168.0.119:8888"]
   redis:
     host: redis
@@ -34,7 +33,6 @@ time:
     host: http://time-backend:8080 
     version: v1 
     prefix: evolution/time
-    auth: "BasicAuth" 
     cors: ["http://192.168.0.119:8888"]
   redis:
     host: redis
@@ -53,6 +51,9 @@ time:
     showsql: True
     location: Asia/Shanghai
 system:
+  auth:
+    type: "BasicAuth"
+    session: "auth-session"
   system:
     name: system 
     host: http://system-backend:8080 

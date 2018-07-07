@@ -4,6 +4,7 @@ import { HttpClient, HTTP_INTERCEPTORS   }   from '@angular/common/http';
 import { TranslateModule, TranslateLoader  } from '@ngx-translate/core';
 import { TranslateHttpLoader  }              from '@ngx-translate/http-loader';
 import { ClarityModule  }                    from "@clr/angular";
+import { CookieModule }                      from 'ngx-cookie';
 
 import { AppComponent }       from './app.component';
 import { AppRouteModule }     from './route/app-route.module';
@@ -30,6 +31,7 @@ export function createTranslateLoader(http: HttpClient) {
     ClarityModule,
     AppRouteModule,
     BaseModule,
+    CookieModule.forRoot(),
     TranslateModule.forRoot({
       loader: {
         provide: TranslateLoader,

@@ -74,8 +74,8 @@ export class EntityService extends BaseService {
   Add(entity: Entity): Observable<Entity> {
     this.operation = 'SYSTEM.PROCESS.CREATE';
     return this.http.post<Response>(AppConfig.settings.apiServer.endpoint + this.uri, JSON.stringify(entity)).pipe(
-    tap(res => this.log(res)),
-    catchError(this.handleError<Response>()),
+      tap(res => this.log(res)),
+      catchError(this.handleError<Response>()),
       map(res => {
         if (res && res.code == 0) {
           return new Entity(res.data);

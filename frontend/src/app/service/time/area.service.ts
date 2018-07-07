@@ -106,8 +106,8 @@ export class AreaService extends BaseService {
   Add(area: Area): Observable<Area> {
     this.operation = 'SYSTEM.PROCESS.CREATE';
     return this.http.post<Response>(AppConfig.settings.apiServer.endpoint + this.uri, JSON.stringify(area)).pipe(
-    tap(res => this.log(res)),
-    catchError(this.handleError<Response>()),
+      tap(res => this.log(res)),
+      catchError(this.handleError<Response>()),
       map(res => {
         if (res && res.code == 0) {
           return new Area(res.data);

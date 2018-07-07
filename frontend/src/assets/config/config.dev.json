@@ -1,10 +1,15 @@
 {
   "app": {     
+    "name": "evolution",
     "language": "zh-cn"
   },
   "apiServer": {
     "endpoint": "http://192.168.0.119:8000/evolution",
     "websocket": "ws://192.168.0.119:8000/evolution",
+    "auth": {
+      "type": "basic-auth",
+      "session": "auth-session"
+    },
     "prefix": {
       "quant": "/quant/v1",
       "time": "/time/v1",
