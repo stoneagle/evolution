@@ -21,7 +21,7 @@ func Configure(b *bootstrap.Bootstrapper) {
 	prefix := b.Config.System.System.Prefix + "/" + b.Config.System.System.Version
 	var v1 *gin.RouterGroup
 	switch b.Config.System.Auth.Type {
-	case "BasicAuth":
+	case middles.TypeBasicAuth:
 		UserSlice, err := services.NewUser(database.GetXorm(b.Config.System.System.Name), nil).List()
 		if err != nil {
 			panic(err)

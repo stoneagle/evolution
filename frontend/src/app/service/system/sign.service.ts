@@ -59,11 +59,8 @@ export class SignService extends BaseService {
         if (res.code != 0) {
           return false;
         } else {
-          let loginUser = new SessionUser();
-          loginUser.Name = res.data;
-          this.currentUser = loginUser;
+          this.currentUser = new SessionUser(res.data);
           return true;
-
           // 目前由服务端控制
           // let expires: number = 10 * 3600 * 24 * 1000;
           // let date = new Date(Date.now() + expires);
@@ -98,14 +95,14 @@ export class SignService extends BaseService {
     return this.http.get<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/current`).pipe(
       catchError(this.handleError<Response>()),
       map(res => {
-        let user = new SessionUser();
+        let ret:SessionUser
         if (res.code != 0) {
-          return user;
+          ret = new SessionUser();
         } else {
-          user.Name = res.data;
-          this.currentUser = user;
-          return user;
+          ret = new SessionUser(res.data);
         }
+        this.currentUser = ret;
+        return ret;
       }),
     );
   }

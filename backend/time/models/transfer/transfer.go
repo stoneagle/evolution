@@ -3,6 +3,7 @@ package main
 import (
 	"evolution/backend/common/config"
 	"evolution/backend/time/models"
+	"evolution/backend/time/models/php"
 	"fmt"
 	"io/ioutil"
 	"time"
@@ -10,6 +11,17 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/go-xorm/xorm"
 	yaml "gopkg.in/yaml.v2"
+)
+
+var (
+	FieldMap map[int]string = map[int]string{
+		1: "技能",
+		2: "资产",
+		3: "作品",
+		4: "圈子",
+		5: "经历",
+		6: "日常",
+	}
 )
 
 type SrcConf struct {
@@ -68,26 +80,19 @@ func main() {
 	// new(php.Area).Transfer(srcEng, destEng)
 	// new(php.Country).Transfer(srcEng, destEng)
 	// initField(destEng)
-	initPhase(destEng)
+	// initPhase(destEng)
 	// new(php.EntityAsset).Transfer(srcEng, destEng)
 	// new(php.EntityCircle).Transfer(srcEng, destEng)
-	// new(php.EntityLife).Transfer(srcEng, destEng)
 	// new(php.EntityQuest).Transfer(srcEng, destEng)
 	// new(php.EntityWork).Transfer(srcEng, destEng)
 	// new(php.EntitySkill).Transfer(srcEng, destEng)
+	// new(php.EntityLife).Transfer(srcEng, destEng)
+	new(php.TargetEntityLink).Transfer(srcEng, destEng)
 }
 
 func initField(des *xorm.Engine) {
-	initMap := map[int]string{
-		1: "技能",
-		2: "资产",
-		3: "作品",
-		4: "圈子",
-		5: "经历",
-		6: "日常",
-	}
 	news := make([]models.Field, 0)
-	for k, v := range initMap {
+	for k, v := range FieldMap {
 		tmp := models.Field{}
 		tmp.Name = v
 		tmp.Id = k
@@ -110,6 +115,12 @@ func initPhase(des *xorm.Engine) {
 		5: []string{"探索", "尝试", "挑战", "记录"},
 		6: []string{"杂务", "规划"},
 	}
+	thresholdMap := map[int]int{
+		1: 80,
+		2: 400,
+		3: 2000,
+		4: 10000,
+	}
 	news := make([]models.Phase, 0)
 	for k, slice := range initMap {
 		for l, v := range slice {
@@ -117,6 +128,7 @@ func initPhase(des *xorm.Engine) {
 			tmp.Name = v
 			tmp.Desc = ""
 			tmp.Level = l + 1
+			tmp.Threshold = thresholdMap[tmp.Level]
 			tmp.FieldId = k
 			news = append(news, tmp)
 		}

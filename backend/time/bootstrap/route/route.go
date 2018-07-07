@@ -20,7 +20,7 @@ func Configure(b *bootstrap.Bootstrapper) {
 	prefix := b.Config.Time.System.Prefix + "/" + b.Config.Time.System.Version
 	var v1 *gin.RouterGroup
 	switch b.Config.System.Auth.Type {
-	case "BasicAuth":
+	case middles.TypeBasicAuth:
 		v1 = b.App.Group(prefix, middles.BasicAuthCheck())
 	default:
 		v1 = b.App.Group(prefix)
@@ -32,5 +32,6 @@ func Configure(b *bootstrap.Bootstrapper) {
 		controllers.NewField().Router(v1)
 		controllers.NewPhase().Router(v1)
 		controllers.NewEntity().Router(v1)
+		controllers.NewTreasure().Router(v1)
 	}
 }

@@ -45,7 +45,15 @@
         "NAME": "名称",
         "DESC": "描述",
         "LEVEL": "级别",
+        "THRESHOLD": "时间门槛",
         "FIELD": "所属方向"
+      },
+      "TREASURE": {
+        "CONCEPT": "规划",
+        "USER": "所属用户",
+        "ENTITY": "所属实体",
+        "STATUS": "状态",
+        "LEVEL": "级别"
       },
       "GENERAL": {
         "CONCEPT": "通用",

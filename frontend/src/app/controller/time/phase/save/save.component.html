@@ -19,6 +19,10 @@
           <label for="level">{{ 'TIME.RESOURCE.PHASE.LEVEL' | translate }}</label>
           <input type="number" class="form-control" id="Level" required readonly [(ngModel)]="phase.Level" name="Level" >
         </div> 
+        <div class="form-group">
+          <label for="threshold">{{ 'TIME.RESOURCE.PHASE.THRESHOLD' | translate }}</label>
+          <input type="number" class="form-control" id="Threshold" required [(ngModel)]="phase.Threshold" name="Threshold" >
+        </div> 
         <button type="submit" class="btn btn-success">{{ 'SYSTEM.PROCESS.SUBMIT' | translate }}</button>
         <button type="button" class="btn btn-primary" (click)="modelOpened = false">{{ 'SYSTEM.PROCESS.CANCEL' | translate }}</button>
       </form>

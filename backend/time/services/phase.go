@@ -49,12 +49,12 @@ func (s *Phase) List() (phases []models.Phase, err error) {
 	return
 }
 
-func (s *Phase) ListWithCondition(area *models.Phase) (areas []models.Phase, err error) {
-	areas = make([]models.Phase, 0)
+func (s *Phase) ListWithCondition(phase *models.Phase) (phases []models.Phase, err error) {
+	phases = make([]models.Phase, 0)
 	sql := s.Engine.Asc("level")
-	condition := area.BuildCondition()
+	condition := phase.BuildCondition()
 	sql = sql.Where(condition)
-	err = sql.Find(&areas)
+	err = sql.Find(&phases)
 	if err != nil {
 		return
 	}

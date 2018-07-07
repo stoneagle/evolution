@@ -8,23 +8,26 @@ import { ClarityModule  }            from "@clr/angular";
 import { TranslateModule  }          from "@ngx-translate/core";
 import { TreeModule }                from 'ng2-tree';
 
-import { ProjectComponent }     from './project/project.component';
-import { ProjectService }       from '../../service/time/project.service';
-import { CountryComponent }     from './country/country.component';
-import { SaveCountryComponent } from './country/save/save.component';
-import { PhaseComponent }       from './phase/phase.component';
-import { SavePhaseComponent }   from './phase/save/save.component';
-import { EntityComponent }      from './entity/entity.component';
-import { SaveEntityComponent }  from './entity/save/save.component';
-import { FieldComponent }       from './field/field.component';
-import { SaveFieldComponent }   from './field/save/save.component';
-import { AreaComponent }        from './area/area.component';
+import { ProjectComponent }        from './project/project.component';
+import { ProjectService }          from '../../service/time/project.service';
+import { CountryComponent }        from './country/country.component';
+import { SaveCountryComponent }    from './country/save/save.component';
+import { PhaseComponent }          from './phase/phase.component';
+import { SavePhaseComponent }      from './phase/save/save.component';
+import { EntityComponent }         from './entity/entity.component';
+import { SaveEntityComponent }     from './entity/save/save.component';
+import { FieldComponent }          from './field/field.component';
+import { SaveFieldComponent }      from './field/save/save.component';
+import { AreaComponent }           from './area/area.component';
+import { TreasureComponent }       from './treasure/treasure.component';
+import { TreasureEntityComponent } from './treasure/entity-list/entity-list.component';
 
 import { CountryService }         from '../../service/time/country.service';
 import { PhaseService }           from '../../service/time/phase.service';
 import { FieldService }           from '../../service/time/field.service';
 import { EntityService }          from '../../service/time/entity.service';
 import { AreaService }            from '../../service/time/area.service';
+import { TreasureService }        from '../../service/time/treasure.service';
 import { MessageHandlerService  } from '../../service/base/message-handler.service';
 
 
@@ -40,6 +43,8 @@ import { MessageHandlerService  } from '../../service/base/message-handler.servi
     FieldComponent,
     SaveFieldComponent,
     AreaComponent,
+    TreasureComponent,
+    TreasureEntityComponent,
   ],
   imports: [   
     BrowserModule,
@@ -53,6 +58,7 @@ import { MessageHandlerService  } from '../../service/base/message-handler.servi
   ],
   providers: [ 
     AreaService,
+    TreasureService,
     ProjectService,
     CountryService,
     FieldService,

@@ -12,6 +12,7 @@ const (
 	ErrorEngine      ErrorCode = 6
 	ErrorDataService ErrorCode = 7
 	ErrorLogin       ErrorCode = 8
+	ErrorApi         ErrorCode = 9
 	ErrorServer      ErrorCode = 500
 )
 

@@ -21,7 +21,7 @@ export class SignInComponent implements OnInit {
   ngOnInit() {
     this.CompanyName = AppConfig.settings.app.name;
     this.signService.current().subscribe(res => {
-      if (res.Name != undefined) {
+      if (res.Id != undefined) {
         this.router.navigate(['/time']);
       }
     });

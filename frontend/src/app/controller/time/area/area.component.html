@@ -3,7 +3,7 @@
 		<button (click)="refresh(areaFirstField)" clrTabLink>{{ areaFirstName }}</button>
 		<clr-tab-content *clrIfActive="active">
 			<div class="row">
-				<div class="col-xs-4">
+				<div class="col-xs-3">
 					<tree 
 						[tree]="tree"
 						(nodeRemoved)="handleRemoved($event)"
@@ -13,7 +13,7 @@
 						(menuItemSelected)="handleCustom($event)"
 					></tree>
 				</div>
-				<div class="col-xs-8">
+				<div class="col-xs-9">
 					<time-entity [currentField]="areaFirstField"></time-entity>
 				</div>
 			</div>
@@ -23,7 +23,7 @@
 		<button (click)="refresh(key)" clrTabLink>{{ areaMap.get(key) }}</button>
 		<clr-tab-content *clrIfActive>
 			<div class="row">
-				<div class="col-xs-4">
+				<div class="col-xs-3">
 					<tree 
 						[tree]="tree"
 						(nodeRemoved)="handleRemoved($event)"
@@ -33,7 +33,7 @@
 						(menuItemSelected)="handleCustom($event)"
 					></tree>
 				</div>
-				<div class="col-xs-8">
+				<div class="col-xs-9">
 					<time-entity [currentField]="currentField"></time-entity>
 				</div>
 			</div>

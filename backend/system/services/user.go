@@ -25,6 +25,13 @@ func (s *User) One(id int) (interface{}, error) {
 	return model, err
 }
 
+func (s *User) OneByCondition(user *models.User) (models.User, error) {
+	model := models.User{}
+	condition := user.BuildCondition()
+	_, err := s.Engine.Where(condition).Get(&model)
+	return model, err
+}
+
 func (s *User) Add(model models.User) (err error) {
 	_, err = s.Engine.Insert(&model)
 	return
@@ -49,12 +56,12 @@ func (s *User) List() (users []models.User, err error) {
 	return
 }
 
-func (s *User) ListWithCondition(area *models.User) (areas []models.User, err error) {
-	areas = make([]models.User, 0)
+func (s *User) ListWithCondition(user *models.User) (users []models.User, err error) {
+	users = make([]models.User, 0)
 	sql := s.Engine.Asc("level")
-	condition := area.BuildCondition()
+	condition := user.BuildCondition()
 	sql = sql.Where(condition)
-	err = sql.Find(&areas)
+	err = sql.Find(&users)
 	if err != nil {
 		return
 	}

@@ -31,7 +31,7 @@ export class ShellComponent implements OnInit {
     }
     this.signService.current().subscribe(res => {
       this.currentUser = res;
-      if (this.currentUser.Name == undefined) {
+      if (this.currentUser.Id == undefined) {
         this.router.navigate(['/sign/login']);
       }
     });

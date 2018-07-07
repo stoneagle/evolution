@@ -17,6 +17,17 @@ type EntityLife struct {
 }
 
 func (c *EntityLife) Transfer(src, des *xorm.Engine) {
+	// 插入一条日常，作为life的归属节点
+	area := models.Area{}
+	area.FieldId = 6
+	area.Parent = 0
+	area.Name = "生活杂务"
+	_, err := des.Insert(&area)
+	if err != nil {
+		fmt.Printf("life area insert error:%v\r\n", err.Error())
+		return
+	}
+
 	olds := make([]EntityLife, 0)
 	src.Find(&olds)
 	news := make([]models.Entity, 0)
@@ -25,7 +36,7 @@ func (c *EntityLife) Transfer(src, des *xorm.Engine) {
 		tmp.Name = one.Name
 		tmp.Desc = one.Desc
 		tmp.Year = 0
-		tmp.AreaId = 0
+		tmp.AreaId = area.Id
 		tmp.CreatedAt = one.Ctime
 		tmp.UpdatedAt = one.Utime
 		news = append(news, tmp)

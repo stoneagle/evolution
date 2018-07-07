@@ -10,7 +10,6 @@ func newApp() *bootstrap.Bootstrapper {
 	app := bootstrap.New("system", "wuzhongyang@wzy.com")
 	app.Bootstrap()
 	app.Configure(database.Configure, route.Configure)
-
 	return app
 }
 
