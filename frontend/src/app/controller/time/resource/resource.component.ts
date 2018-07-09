@@ -3,16 +3,16 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { Area }                    from '../../../model/time/area';
 import { AreaService }             from '../../../service/time/area.service';
 import { FieldService }            from '../../../service/time/field.service';
-import { TreasureEntityComponent } from './entity-list/entity-list.component';
+import { ResourceEntityComponent } from './entity-list/entity-list.component';
 
 @Component({
-  selector: 'time-treasure',
-  templateUrl: './treasure.component.html',
-  styleUrls: ['./treasure.component.css']
+  selector: 'time-resource',
+  templateUrl: './resource.component.html',
+  styleUrls: ['./resource.component.css']
 })
-export class TreasureComponent implements OnInit {
-  @ViewChild(TreasureEntityComponent)
-  entityComponent: TreasureEntityComponent;
+export class ResourceComponent implements OnInit {
+  @ViewChild(ResourceEntityComponent)
+  entityComponent: ResourceEntityComponent;
 
   constructor(
     private areaService: AreaService,

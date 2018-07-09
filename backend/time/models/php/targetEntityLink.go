@@ -63,15 +63,15 @@ func (c *TargetEntityLink) Transfer(src, des *xorm.Engine) {
 			fmt.Printf("%v:%v:%v\r\n", field, name, newEntity.Entity.Name)
 		}
 
-		tmp := models.Treasure{}
+		tmp := models.Resource{}
 		tmp.UserId = 1
 		tmp.EntityId = newEntity.Entity.Id
-		tmp.Status = models.TreasureStatusCollect
+		tmp.Status = models.ResourceStatusCollect
 		tmp.PhaseId = fieldPhaseMap[field]
 		tmp.CreatedAt = one.TargetEntityLink.Ctime
 		tmp.UpdatedAt = one.TargetEntityLink.Utime
 
-		has, err := des.Where("user_id = ?", 1).And("entity_id = ?", newEntity.Entity.Id).Get(new(models.Treasure))
+		has, err := des.Where("user_id = ?", 1).And("entity_id = ?", newEntity.Entity.Id).Get(new(models.Resource))
 		if err != nil {
 			fmt.Printf("target transfer has check error:%v\r\n", err.Error())
 			continue

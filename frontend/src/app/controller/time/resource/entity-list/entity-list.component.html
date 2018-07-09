@@ -15,7 +15,7 @@
     </ng-container>
   </clr-dg-column>
   <clr-dg-column>{{ 'TIME.RESOURCE.ENTITY.AREA' | translate }}</clr-dg-column>
-  <clr-dg-column>{{ 'TIME.RESOURCE.TREASURE.STATUS' | translate }}</clr-dg-column>
+  <clr-dg-column>{{ 'TIME.RESOURCE.RESOURCE.STATUS' | translate }}</clr-dg-column>
 	<clr-dg-column>{{ 'TIME.RESOURCE.GENERAL.OPERATION' | translate }}</clr-dg-column>
 
   <clr-dg-row *ngFor="let entity of entities">
@@ -24,17 +24,17 @@
     <clr-dg-cell>{{entity.Desc}}</clr-dg-cell>
     <clr-dg-cell>{{entity.Area.Name}}</clr-dg-cell>
     <clr-dg-cell>
-      <div *ngIf="(treasureMaps.get(entity.Id) != null)" class="progress-block">
+      <div *ngIf="(resourceMaps.get(entity.Id) != null)" class="progress-block">
         <div class="progress-group">
-          <div [ngClass]="(treasureMaps.get(entity.Id).Status==1)?'progress danger':'progress success loop'" >
-            <progress value="{{ treasureMaps.get(entity.Id).SumTime }}" max="{{ phaseMaps.get(treasureMaps.get(entity.Id).PhaseId).Threshold }}" data-displayval="...%"></progress>
+          <div [ngClass]="(resourceMaps.get(entity.Id).Status==1)?'progress danger':'progress success loop'" >
+            <progress value="{{ resourceMaps.get(entity.Id).SumTime }}" max="{{ phaseMaps.get(resourceMaps.get(entity.Id).PhaseId).Threshold }}" data-displayval="...%"></progress>
           </div>
           <div class="row">
             <div class="col-xs-6">
-              lv{{ phaseMaps.get(treasureMaps.get(entity.Id).PhaseId).Level }}:{{ phaseMaps.get(treasureMaps.get(entity.Id).PhaseId).Name }}
+              lv{{ phaseMaps.get(resourceMaps.get(entity.Id).PhaseId).Level }}:{{ phaseMaps.get(resourceMaps.get(entity.Id).PhaseId).Name }}
             </div>
             <div class="col-xs-6 text-right">
-              {{ treasureMaps.get(entity.Id).SumTime }}/{{ phaseMaps.get(treasureMaps.get(entity.Id).PhaseId).Threshold }}
+              {{ resourceMaps.get(entity.Id).SumTime }}/{{ phaseMaps.get(resourceMaps.get(entity.Id).PhaseId).Threshold }}
             </div>
           </div>
         </div>
@@ -42,15 +42,15 @@
     </clr-dg-cell>
     <clr-dg-cell>
       <div class="btn-group btn-primary btn-icon">
-        <button *ngIf="(treasureMaps.get(entity.Id) == null)" (click)="createTreasure(entity)" class="btn">
-          <clr-icon shape="play"></clr-icon>
-          <span class="clr-icon-title"></span>
-        </button>
-        <button *ngIf="(treasureMaps.get(entity.Id) != null) && (treasureMaps.get(entity.Id).Status == 1)" (click)="execTreasure(entity)" class="btn btn-success">
+        <button *ngIf="(resourceMaps.get(entity.Id) == null)" (click)="createResource(entity)" class="btn btn-success">
           <clr-icon shape="plus-circle"></clr-icon>
           <span class="clr-icon-title"></span>
         </button>
-        <button *ngIf="(treasureMaps.get(entity.Id) != null) && (treasureMaps.get(entity.Id).SumTime == 0)" (click)="deleteTreasure(entity)" class="btn btn-danger">
+        <button *ngIf="(resourceMaps.get(entity.Id) != null) && (resourceMaps.get(entity.Id).Status == 1)" (click)="execResource(entity)" class="btn">
+          <clr-icon shape="play"></clr-icon>
+          <span class="clr-icon-title"></span>
+        </button>
+        <button *ngIf="(resourceMaps.get(entity.Id) != null) && (resourceMaps.get(entity.Id).SumTime == 0)" (click)="deleteResource(entity)" class="btn btn-danger">
           <clr-icon shape="trash"></clr-icon>
           <span class="clr-icon-title"></span>
         </button>

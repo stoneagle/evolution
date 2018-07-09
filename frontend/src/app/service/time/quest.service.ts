@@ -6,31 +6,31 @@ import { catchError, map, tap  }    from 'rxjs/operators';
 import { AppConfig }                from '../base/config.service';
 import { MessageHandlerService  }   from '../base/message-handler.service';
 import { BaseService  }             from '../base/base.service';
-import { Project }                 from '../../model/time/project';
+import { Quest }                    from '../../model/time/quest';
 import { Response }                 from '../../model/base/response.model';
 
 @Injectable()
-export class ProjectService extends BaseService {
-  private uri = AppConfig.settings.apiServer.prefix.time + '/project';
+export class QuestService extends BaseService {
+  private uri = AppConfig.settings.apiServer.prefix.time + '/quest';
 
   constructor(
     protected http: HttpClient,
     protected messageHandlerService: MessageHandlerService,
   ) {
     super(http, messageHandlerService);
-    this.resource = 'TIME.RESOURCE.PROJECT.CONCEPT';
+    this.resource = 'TIME.RESOURCE.QUEST.CONCEPT';
   }
 
-  List(): Observable<Project[]> {
+  List(): Observable<Quest[]> {
     this.operation = 'SYSTEM.PROCESS.LIST';
     return this.http.get<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`).pipe(
       catchError(this.handleError<Response>()),
       map(res => {
-        let ret:Project[] = []; 
+        let ret:Quest[] = []; 
         if (res && res.code == 0) {
           res.data.map(
             one => {
-              ret.push(new Project(one));
+              ret.push(new Quest(one));
             }
           )
         }
@@ -39,16 +39,16 @@ export class ProjectService extends BaseService {
     )
   }
 
-  ListWithCondition(project: Project): Observable<Project[]> {
+  ListWithCondition(quest: Quest): Observable<Quest[]> {
     this.operation = 'SYSTEM.PROCESS.LIST';
-    return this.http.post<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`, JSON.stringify(project)).pipe(
+    return this.http.post<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`, JSON.stringify(quest)).pipe(
       catchError(this.handleError<Response>()),
       map(res => {
-        let ret:Project[] = []; 
+        let ret:Quest[] = []; 
         if (res && res.code == 0) {
           res.data.map(
             one => {
-              ret.push(new Project(one));
+              ret.push(new Quest(one));
             }
           )
         }
@@ -57,38 +57,38 @@ export class ProjectService extends BaseService {
     )
   }
 
-  Get(id: number): Observable<Project> {
+  Get(id: number): Observable<Quest> {
     this.operation = 'SYSTEM.PROCESS.GET';
     return this.http.get<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/get/${id}`).pipe(
       catchError(this.handleError<Response>()),
       map(res => {
         if (res && res.code == 0) {
-          return new Project(res.data);
+          return new Quest(res.data);
         } else {
-          return new Project();
+          return new Quest();
         }
       }),
     )
   }
 
-  Add(project: Project): Observable<Project> {
+  Add(quest: Quest): Observable<Quest> {
     this.operation = 'SYSTEM.PROCESS.CREATE';
-    return this.http.post<Response>(AppConfig.settings.apiServer.endpoint + this.uri, JSON.stringify(project)).pipe(
+    return this.http.post<Response>(AppConfig.settings.apiServer.endpoint + this.uri, JSON.stringify(quest)).pipe(
       tap(res => this.log(res)),
       catchError(this.handleError<Response>()),
       map(res => {
         if (res && res.code == 0) {
-          return new Project(res.data);
+          return new Quest(res.data);
         } else {
-          return new Project();
+          return new Quest();
         }
       }),
     );
   }
 
-  Update(project: Project): Observable<Response> {
+  Update(quest: Quest): Observable<Response> {
     this.operation = 'SYSTEM.PROCESS.UPDATE';
-    return this.http.put<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/${project.Id}`, JSON.stringify(project)).pipe(
+    return this.http.put<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/${quest.Id}`, JSON.stringify(quest)).pipe(
       tap(res => this.log(res)),
       catchError(this.handleError<Response>()),
     );

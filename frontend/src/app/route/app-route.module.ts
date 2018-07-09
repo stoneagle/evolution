@@ -7,12 +7,12 @@ import { PoolListItemComponent as QuantPoolListItem } from '../controller/quant/
 import { ClassifyComponent as QuantClassify }         from '../controller/quant/classify/classify.component';
 import { ItemComponent as QuantItem }                 from '../controller/quant/item/item.component';
 
-import { ProjectComponent as TimeProject }   from '../controller/time/project/project.component';
+import { QuestComponent as TimeQuest }       from '../controller/time/quest/quest.component';
 import { CountryComponent as TimeCountry }   from '../controller/time/country/country.component';
 import { FieldComponent as TimeField }       from '../controller/time/field/field.component';
 import { EntityComponent as TimeEntity }     from '../controller/time/entity/entity.component';
 import { AreaComponent as TimeArea }         from '../controller/time/area/area.component';
-import { TreasureComponent as TimeTreasure } from '../controller/time/treasure/treasure.component';
+import { ResourceComponent as TimeResource } from '../controller/time/resource/resource.component';
 import { UserComponent as SystemUser }       from '../controller/system/user/user.component';
 import { ShellComponent }                    from '../base/shell/shell.component';
 import { DefaultComponent }                  from '../base/default/default.component';
@@ -57,14 +57,14 @@ const routes: Routes = [
         path: 'schedule',
         children:[
           { path: '', component: DefaultComponent }, 
-          { path: 'project', component: TimeProject },
+          { path: 'quest', component: TimeQuest },
         ]
       },
       { 
         path: 'target',
         children:[
           { path: '', component: DefaultComponent }, 
-          { path: 'treasure', component: TimeTreasure },
+          { path: 'resource', component: TimeResource },
         ]
       },
       { 

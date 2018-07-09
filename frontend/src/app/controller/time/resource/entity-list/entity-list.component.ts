@@ -3,24 +3,24 @@ import { Component, OnInit, ViewChild, Input } from '@angular/core';
 import { Entity }          from '../../../../model/time/entity';
 import { Area }            from '../../../../model/time/area';
 import { Phase }           from '../../../../model/time/phase';
-import { Treasure }        from '../../../../model/time/treasure';
+import { Resource }        from '../../../../model/time/resource';
 import { AreaService }     from '../../../../service/time/area.service';
 import { EntityService }   from '../../../../service/time/entity.service';
 import { PhaseService }    from '../../../../service/time/phase.service';
-import { TreasureService } from '../../../../service/time/treasure.service';
+import { ResourceService } from '../../../../service/time/resource.service';
 import { SignService }     from '../../../../service/system/sign.service';
 
 @Component({
-  selector: 'time-treasure-entity',
+  selector: 'time-resource-entity',
   templateUrl: './entity-list.component.html',
   styleUrls: ['./entity-list.component.css']
 })
-export class TreasureEntityComponent implements OnInit {
+export class ResourceEntityComponent implements OnInit {
   @Input() currentField: number;
   @Input() areaMaps: Map<number, string>;
 
   entities: Entity[];
-  treasureMaps: Map<number, Treasure> = new Map();
+  resourceMaps: Map<number, Resource> = new Map();
   phaseMaps: Map<number, Phase> = new Map();
   pageSize: number = 10;
   totalCount: number = 0;
@@ -30,7 +30,7 @@ export class TreasureEntityComponent implements OnInit {
     private areaService: AreaService,
     private entityService: EntityService,
     private phaseService: PhaseService,
-    private treasureService: TreasureService,
+    private resourceService: ResourceService,
     private signService: SignService,
   ) { }
 
@@ -71,41 +71,41 @@ export class TreasureEntityComponent implements OnInit {
       this.totalCount = res.length;
       this.entities = res.slice(from, to);
 
-      this.refreshTreasure();
+      this.refreshResource();
     })
   }
 
-  refreshTreasure(): void {
-    // 更新treasureMap
-    let treasure = new Treasure();
-    treasure.UserId = this.signService.getCurrentUser().Id;
-    this.treasureService.ListWithCondition(treasure).subscribe(res => {
-      this.treasureMaps = new Map();
+  refreshResource(): void {
+    // 更新resourceMap
+    let resource = new Resource();
+    resource.UserId = this.signService.getCurrentUser().Id;
+    this.resourceService.ListWithCondition(resource).subscribe(res => {
+      this.resourceMaps = new Map();
       res.forEach((one, k) => {
-        this.treasureMaps.set(one.EntityId, one);
+        this.resourceMaps.set(one.EntityId, one);
       })
     })
   }
 
-  createTreasure(entity: Entity): void {
-    let treasure = new Treasure();
-    treasure.EntityId = entity.Id;
-    treasure.Status = 1;
-    treasure.PhaseId = this.phaseMaps.keys().next().value;
-    treasure.SumTime = 0;
-    treasure.UserId = this.signService.getCurrentUser().Id;
-    this.treasureService.Add(treasure).subscribe(res => {
-      this.refreshTreasure();
+  createResource(entity: Entity): void {
+    let resource = new Resource();
+    resource.EntityId = entity.Id;
+    resource.Status = 1;
+    resource.PhaseId = this.phaseMaps.keys().next().value;
+    resource.SumTime = 0;
+    resource.UserId = this.signService.getCurrentUser().Id;
+    this.resourceService.Add(resource).subscribe(res => {
+      this.refreshResource();
     })
   }
 
-  execTreasure(entity: Entity): void {
+  execResource(entity: Entity): void {
   }
 
-  deleteTreasure(entity: Entity): void {
-    let treasure = this.treasureMaps.get(entity.Id);
-    this.treasureService.Delete(treasure.Id).subscribe(res => {
-      this.refreshTreasure();
+  deleteResource(entity: Entity): void {
+    let resource = this.resourceMaps.get(entity.Id);
+    this.resourceService.Delete(resource.Id).subscribe(res => {
+      this.refreshResource();
     })
   }
 

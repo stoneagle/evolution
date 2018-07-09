@@ -6,31 +6,31 @@ import { catchError, map, tap  }    from 'rxjs/operators';
 import { AppConfig }                from '../base/config.service';
 import { MessageHandlerService  }   from '../base/message-handler.service';
 import { BaseService  }             from '../base/base.service';
-import { Treasure }                 from '../../model/time/treasure';
+import { Resource }                 from '../../model/time/resource';
 import { Response }                 from '../../model/base/response.model';
 
 @Injectable()
-export class TreasureService extends BaseService {
-  private uri = AppConfig.settings.apiServer.prefix.time + '/treasure';
+export class ResourceService extends BaseService {
+  private uri = AppConfig.settings.apiServer.prefix.time + '/resource';
 
   constructor(
     protected http: HttpClient,
     protected messageHandlerService: MessageHandlerService,
   ) {
     super(http, messageHandlerService);
-    this.resource = 'TIME.RESOURCE.TREASURE.CONCEPT';
+    this.resource = 'TIME.RESOURCE.RESOURCE.CONCEPT';
   }
 
-  List(): Observable<Treasure[]> {
+  List(): Observable<Resource[]> {
     this.operation = 'SYSTEM.PROCESS.LIST';
     return this.http.get<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`).pipe(
       catchError(this.handleError<Response>()),
       map(res => {
-        let ret:Treasure[] = []; 
+        let ret:Resource[] = []; 
         if (res && res.code == 0) {
           res.data.map(
             one => {
-              ret.push(new Treasure(one));
+              ret.push(new Resource(one));
             }
           )
         }
@@ -39,16 +39,16 @@ export class TreasureService extends BaseService {
     )
   }
 
-  ListWithCondition(treasure: Treasure): Observable<Treasure[]> {
+  ListWithCondition(resource: Resource): Observable<Resource[]> {
     this.operation = 'SYSTEM.PROCESS.LIST';
-    return this.http.post<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`, JSON.stringify(treasure)).pipe(
+    return this.http.post<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`, JSON.stringify(resource)).pipe(
       catchError(this.handleError<Response>()),
       map(res => {
-        let ret:Treasure[] = []; 
+        let ret:Resource[] = []; 
         if (res && res.code == 0) {
           res.data.map(
             one => {
-              ret.push(new Treasure(one));
+              ret.push(new Resource(one));
             }
           )
         }
@@ -57,38 +57,38 @@ export class TreasureService extends BaseService {
     )
   }
 
-  Get(id: number): Observable<Treasure> {
+  Get(id: number): Observable<Resource> {
     this.operation = 'SYSTEM.PROCESS.GET';
     return this.http.get<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/get/${id}`).pipe(
       catchError(this.handleError<Response>()),
       map(res => {
         if (res && res.code == 0) {
-          return new Treasure(res.data);
+          return new Resource(res.data);
         } else {
-          return new Treasure();
+          return new Resource();
         }
       }),
     )
   }
 
-  Add(treasure: Treasure): Observable<Treasure> {
+  Add(resource: Resource): Observable<Resource> {
     this.operation = 'SYSTEM.PROCESS.CREATE';
-    return this.http.post<Response>(AppConfig.settings.apiServer.endpoint + this.uri, JSON.stringify(treasure)).pipe(
+    return this.http.post<Response>(AppConfig.settings.apiServer.endpoint + this.uri, JSON.stringify(resource)).pipe(
       tap(res => this.log(res)),
       catchError(this.handleError<Response>()),
       map(res => {
         if (res && res.code == 0) {
-          return new Treasure(res.data);
+          return new Resource(res.data);
         } else {
-          return new Treasure();
+          return new Resource();
         }
       }),
     );
   }
 
-  Update(treasure: Treasure): Observable<Response> {
+  Update(resource: Resource): Observable<Response> {
     this.operation = 'SYSTEM.PROCESS.UPDATE';
-    return this.http.put<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/${treasure.Id}`, JSON.stringify(treasure)).pipe(
+    return this.http.put<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/${resource.Id}`, JSON.stringify(resource)).pipe(
       tap(res => this.log(res)),
       catchError(this.handleError<Response>()),
     );

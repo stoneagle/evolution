@@ -120,6 +120,7 @@ export class AreaComponent implements OnInit {
   handleSelected(e: NodeEvent): void {
     this.entityComponent.setCurrentAreaId(+e["node"]["node"]["id"]);
     this.entityComponent.refreshClassify(0, this.entityComponent.pageSize);
+    return
   }
 
   handleRenamed(e: NodeEvent): void {

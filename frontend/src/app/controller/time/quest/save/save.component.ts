@@ -1,22 +1,22 @@
 import { Component, OnInit, Output, Input, EventEmitter } from '@angular/core'; 
 
-import { Project }           from '../../../../model/time/project';
-import { ProjectService  }   from '../../../../service/time/project.service';
+import { Quest }           from '../../../../model/time/quest';
+import { QuestService  }   from '../../../../service/time/quest.service';
 
 @Component({
-  selector: 'time-save-project',
+  selector: 'time-save-quest',
   templateUrl: './save.component.html',
   styleUrls: ['./save.component.css']
 })
 
-export class SaveProjectComponent implements OnInit {
-  project: Project = new Project;
+export class SaveQuestComponent implements OnInit {
+  quest: Quest = new Quest;
   modelOpened: boolean = false;
 
   @Output() save = new EventEmitter<boolean>();
 
   constructor(
-    private projectService: ProjectService,
+    private questService: QuestService,
   ) { }
 
   ngOnInit() {
@@ -24,24 +24,24 @@ export class SaveProjectComponent implements OnInit {
 
   New(id?: number): void {
     if (id) {
-      this.projectService.Get(id).subscribe(res => {
-        this.project = res;
+      this.questService.Get(id).subscribe(res => {
+        this.quest = res;
         this.modelOpened = true;
       })
     } else {
-      this.project = new Project();
+      this.quest = new Quest();
       this.modelOpened = true;
     }
   }            
 
   Submit(): void {
-    if (this.project.Id == null) {
-      this.projectService.Add(this.project).subscribe(res => {
+    if (this.quest.Id == null) {
+      this.questService.Add(this.quest).subscribe(res => {
         this.modelOpened = false;
         this.save.emit(true);
       })
     } else {
-      this.projectService.Update(this.project).subscribe(res => {
+      this.questService.Update(this.quest).subscribe(res => {
         this.modelOpened = false;
         this.save.emit(true);
       })

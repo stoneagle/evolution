@@ -7,7 +7,7 @@ import (
 	"github.com/go-xorm/builder"
 )
 
-type Treasure struct {
+type Resource struct {
 	es.ModelWithId `xorm:"extends"`
 	UserId         int `xorm:"unique not null default 0 comment('隶属用户') INT(11)" structs:"user_id,omitempty"`
 	EntityId       int `xorm:"unique(user_id) not null default 0 comment('隶属实体') INT(11)" structs:"entity_id,omitempty"`
@@ -17,15 +17,15 @@ type Treasure struct {
 }
 
 var (
-	TreasureStatusCollect = 1
-	TreasureStatusExec    = 2
+	ResourceStatusCollect = 1
+	ResourceStatusExec    = 2
 )
 
-func (m *Treasure) TableName() string {
+func (m *Resource) TableName() string {
 	return "treasure"
 }
 
-func (m *Treasure) BuildCondition() (condition builder.Eq) {
+func (m *Resource) BuildCondition() (condition builder.Eq) {
 	keyPrefix := m.TableName() + "."
 	params := structs.Map(m)
 	condition = m.Model.BuildCondition(params, keyPrefix)

@@ -1,17 +1,17 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { EJ_GANTT_COMPONENTS }                      from 'ej-angular2/src/ej/gantt.component';
 
-import { Project }              from '../../../../model/time/project';
-import { ProjectService }       from '../../../../service/time/project.service';
+import { Quest }              from '../../../../model/time/quest';
+import { QuestService }       from '../../../../service/time/quest.service';
 
 @Component({
-  selector: 'time-gantt-project',
+  selector: 'time-gantt-quest',
   templateUrl: './gantt.component.html',
   styleUrls: ['./gantt.component.css']
 })
-export class GanttProjectComponent implements OnInit {
+export class GanttQuestComponent implements OnInit {
   constructor(
-    private projectService: ProjectService,
+    private questService: QuestService,
   ) { }
 
   ganttData =  [{

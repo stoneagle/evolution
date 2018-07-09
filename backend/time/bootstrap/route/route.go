@@ -32,7 +32,7 @@ func Configure(b *bootstrap.Bootstrapper) {
 		controllers.NewField().Router(v1)
 		controllers.NewPhase().Router(v1)
 		controllers.NewEntity().Router(v1)
-		controllers.NewTreasure().Router(v1)
-		controllers.NewProject().Router(v1)
+		controllers.NewResource().Router(v1)
+		controllers.NewQuest().Router(v1)
 	}
 }

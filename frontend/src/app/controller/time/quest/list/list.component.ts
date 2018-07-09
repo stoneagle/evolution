@@ -1,26 +1,26 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 
-import { Project }              from '../../../../model/time/project';
-import { ProjectService }       from '../../../../service/time/project.service';
-import { SaveProjectComponent } from '../save/save.component';
+import { Quest }              from '../../../../model/time/quest';
+import { QuestService }       from '../../../../service/time/quest.service';
+import { SaveQuestComponent } from '../save/save.component';
 
 @Component({
-  selector: 'time-project-list',
+  selector: 'time-quest-list',
   templateUrl: './list.component.html',
   styleUrls: ['./list.component.css']
 })
-export class ListProjectComponent implements OnInit {
-  @ViewChild(SaveProjectComponent)
-  saveProject: SaveProjectComponent;
+export class ListQuestComponent implements OnInit {
+  @ViewChild(SaveQuestComponent)
+  saveQuest: SaveQuestComponent;
 
-  projects: Project[];
+  quests: Quest[];
 
   pageSize: number = 10;
   totalCount: number = 0;
   currentPage: number = 1;
 
   constructor(
-    private projectService: ProjectService,
+    private questService: QuestService,
   ) { }
 
   ngOnInit() {
@@ -35,11 +35,11 @@ export class ListProjectComponent implements OnInit {
   }
 
   openSaveModel(id?: number): void {
-    this.saveProject.New(id);
+    this.saveQuest.New(id);
   }
 
-  delete(project: Project): void {
-    this.projectService.Delete(project.Id).subscribe(res => {
+  delete(quest: Quest): void {
+    this.questService.Delete(quest.Id).subscribe(res => {
       this.refresh();
     })
   }
@@ -56,9 +56,9 @@ export class ListProjectComponent implements OnInit {
   }
 
   refreshClassify(from: number, to: number): void {
-    this.projectService.List().subscribe(res => {
+    this.questService.List().subscribe(res => {
       this.totalCount = res.length;
-      this.projects = res.slice(from, to);
+      this.quests = res.slice(from, to);
     })
   }
 }
