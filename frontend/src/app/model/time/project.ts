@@ -1,10 +1,8 @@
-import { Serializable } from '../base/serializable.model';
+import { Basic } from '../base/basic';
 
-export class Project extends Serializable {
-  id: number;
-  name: string;
-  status: string;
-  CreatedAt: string;
-  UpdatedAt: string;
-  DeletedAt: string;
+export class Project extends Basic {
+  Name: string;
+  StartData: string;
+  UserId: number;
+  TreasureId: number;
 }

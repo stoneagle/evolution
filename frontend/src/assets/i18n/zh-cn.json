@@ -13,10 +13,6 @@
       }
     },
     "RESOURCE": {
-      "PROJECT": {
-        "CONCEPT": "项目",
-        "NAME": "名称"
-      },
       "COUNTRY": {
         "CONCEPT": "国家",
         "NAME": "名称",
@@ -47,6 +43,13 @@
         "LEVEL": "级别",
         "THRESHOLD": "时间门槛",
         "FIELD": "所属方向"
+      },
+      "PROJECT": {
+        "CONCEPT": "项目",
+        "NAME": "名称",
+        "STARTDATE": "开始日期",
+        "USER": "所属用户",
+        "TREASURE": "所属财富"
       },
       "TREASURE": {
         "CONCEPT": "规划",

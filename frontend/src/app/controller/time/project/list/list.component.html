@@ -1,0 +1,41 @@
+<button class="btn btn-primary" (click)="openSaveModel()">
+  {{ "SYSTEM.PROCESS.CREATE" | translate }}
+</button>
+<span class="refresh-btn" (click)="refresh()">
+  <clr-icon shape="refresh"></clr-icon>
+</span>
+<clr-datagrid  (clrDgRefresh)="load($event)">
+  <!-- <clr-dg-column>{{ 'TIME.RESOURCE.GENERAL.ID' | translate }}</clr-dg-column> -->
+  <clr-dg-column>{{ 'TIME.RESOURCE.PROJECT.NAME' | translate }}</clr-dg-column>
+  <clr-dg-column>{{ 'TIME.RESOURCE.GENERAL.CREATED' | translate }}</clr-dg-column>
+  <clr-dg-column>{{ 'TIME.RESOURCE.GENERAL.UPDATED' | translate }}</clr-dg-column>
+	<clr-dg-column>{{ 'TIME.RESOURCE.GENERAL.OPERATION' | translate }}</clr-dg-column>
+
+  <clr-dg-row *ngFor="let project of projects">
+    <!-- <clr-dg-cell>{{project.Id}}</clr-dg-cell> -->
+    <clr-dg-cell>{{project.Name}}</clr-dg-cell>
+    <clr-dg-cell>{{project.CreatedAt | date: 'yy-MM-dd HH:mm:ss'}}</clr-dg-cell>
+    <clr-dg-cell>{{project.UpdatedAt | date: 'yy-MM-dd HH:mm:ss'}}</clr-dg-cell>
+    <clr-dg-cell>
+      <div class="btn-group btn-primary btn-icon">
+        <button (click)="openSaveModel(project.Id)" class="btn">
+          <clr-icon shape="wrench"></clr-icon>
+          <span class="clr-icon-title"></span>
+        </button>
+        <button (click)="delete(project)" class="btn btn-danger">
+          <clr-icon shape="trash"></clr-icon>
+          <span class="clr-icon-title"></span>
+        </button>
+      </div>
+    </clr-dg-cell>  
+  </clr-dg-row>
+
+  <clr-dg-footer>
+    <clr-dg-pagination #pagination [clrDgPageSize]="pageSize" [(clrDgPage)]="currentPage" [clrDgTotalItems]="totalCount">
+      {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
+      / {{pagination.totalItems}} {{ 'TIME.RESOURCE.PROJECT.CONCEPT' | translate }}
+    </clr-dg-pagination>
+  </clr-dg-footer>
+</clr-datagrid>
+
+<time-save-project (save)="saved($event)"></time-save-project>

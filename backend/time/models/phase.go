@@ -9,8 +9,8 @@ import (
 
 type Phase struct {
 	es.ModelWithDeleted `xorm:"extends"`
-	Name                string `xorm:"not null unique default '' comment('名称') VARCHAR(255)"`
-	Desc                string `xorm:"not null default '' comment('描述') VARCHAR(255)"`
+	Name                string `xorm:"not null unique default '' comment('名称') VARCHAR(255)" structs:"name,omitempty"`
+	Desc                string `xorm:"not null default '' comment('描述') VARCHAR(255)" structs:"desc,omitempty"`
 	Level               int    `xorm:"unique(name) not null default 0 comment('阶段级别') INT(11)" structs:"level,omitempty"`
 	Threshold           int    `xorm:"not null default 0 comment('时间门槛') INT(11)" structs:"threshold,omitempty"`
 	FieldId             int    `xorm:"unique(name) not null default 0 comment('隶属方向') INT(11)" structs:"field_id,omitempty"`

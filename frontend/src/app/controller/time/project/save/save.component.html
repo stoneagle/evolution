@@ -1,0 +1,18 @@
+<clr-modal [(clrModalOpen)]="modelOpened">
+    <h3 class="modal-title" *ngIf="(project.Id)">
+      {{ 'SYSTEM.PROCESS.UPDATE' | translate }}{{ 'TIME.RESOURCE.PROJECT.CONCEPT' | translate }}
+    </h3>
+    <h3 class="modal-title" *ngIf="!(project.Id)">
+      {{ 'SYSTEM.PROCESS.CREATE' | translate }}{{ 'TIME.RESOURCE.PROJECT.CONCEPT' | translate }}
+    </h3>
+    <div class="modal-body">
+      <form #addForm="ngForm" (ngSubmit)="Submit()">
+        <div class="form-group">
+          <label for="name">{{ 'TIME.RESOURCE.PROJECT.NAME' | translate }}</label>
+          <input type="text" class="form-control" id="Name" required [(ngModel)]="project.Name" name="Name" >
+        </div> 
+        <button type="submit" class="btn btn-success">{{ 'SYSTEM.PROCESS.SUBMIT' | translate }}</button>
+        <button type="button" class="btn btn-primary" (click)="modelOpened = false">{{ 'SYSTEM.PROCESS.CANCEL' | translate }}</button>
+      </form>
+    </div>     
+</clr-modal>   

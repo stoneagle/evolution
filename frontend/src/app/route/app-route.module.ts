@@ -51,8 +51,7 @@ const routes: Routes = [
     children:[
       { 
         path: '', 
-        redirectTo: 'schedule/project', 
-        pathMatch: 'full' 
+        component: DefaultComponent,
       }, 
       { 
         path: 'schedule',
