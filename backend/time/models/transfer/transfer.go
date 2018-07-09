@@ -77,16 +77,17 @@ func main() {
 	srcEng.Charset("utf8")
 	// srcEng.ShowSQL(true)
 
-	// new(php.Area).Transfer(srcEng, destEng)
-	// new(php.Country).Transfer(srcEng, destEng)
-	// initField(destEng)
-	// initPhase(destEng)
-	// new(php.EntityAsset).Transfer(srcEng, destEng)
-	// new(php.EntityCircle).Transfer(srcEng, destEng)
-	// new(php.EntityQuest).Transfer(srcEng, destEng)
-	// new(php.EntityWork).Transfer(srcEng, destEng)
-	// new(php.EntitySkill).Transfer(srcEng, destEng)
-	// new(php.EntityLife).Transfer(srcEng, destEng)
+	new(php.Area).Transfer(srcEng, destEng)
+	initAreaType(destEng)
+	new(php.Country).Transfer(srcEng, destEng)
+	initField(destEng)
+	initPhase(destEng)
+	new(php.EntityAsset).Transfer(srcEng, destEng)
+	new(php.EntityCircle).Transfer(srcEng, destEng)
+	new(php.EntityQuest).Transfer(srcEng, destEng)
+	new(php.EntityWork).Transfer(srcEng, destEng)
+	new(php.EntitySkill).Transfer(srcEng, destEng)
+	new(php.EntityLife).Transfer(srcEng, destEng)
 	new(php.TargetEntityLink).Transfer(srcEng, destEng)
 }
 
@@ -139,4 +140,32 @@ func initPhase(des *xorm.Engine) {
 	} else {
 		fmt.Printf("phase transfer success:%v\r\n", affected)
 	}
+}
+
+func initAreaType(des *xorm.Engine) {
+	var err error
+	news := make([]models.Area, 0)
+	des.Find(&news)
+	for _, one := range news {
+		tmp := new(models.Area)
+		if one.Parent == 0 {
+			tmp.Type = models.AreaTypeRoot
+			_, err = des.Id(one.Id).Update(tmp)
+		} else {
+			asParent := make([]models.Area, 0)
+			des.Where("parent = ?", one.Id).Find(&asParent)
+			if len(asParent) > 0 {
+				tmp.Type = models.AreaTypeNode
+				_, err = des.Id(one.Id).Update(tmp)
+			} else {
+				tmp.Type = models.AreaTypeLeaf
+				_, err = des.Id(one.Id).Update(tmp)
+			}
+		}
+		if err != nil {
+			fmt.Printf("%v area type update error:%v\r\n", one.Name, err.Error())
+			return
+		}
+	}
+	fmt.Printf("area type init success\r\n")
 }

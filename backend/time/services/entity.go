@@ -48,6 +48,15 @@ func (s *Entity) ListWithCondition(entity *models.Entity) (entities []models.Ent
 	sql := s.Engine.Unscoped().Table("entity").Join("INNER", "area", "area.id = entity.area_id")
 
 	condition := entity.BuildCondition()
+	if entity.WithSub {
+		areaIdSlice, err := NewArea(s.Engine, s.Cache).GetAllLeafId(entity.Area.Id)
+		if err != nil {
+			return entities, err
+		}
+		areaIdSlice = append(areaIdSlice, entity.Area.Id)
+		condition["area.id"] = areaIdSlice
+	}
+
 	sql = sql.Where(condition)
 	err = sql.Find(&entitiesJoin)
 	if err != nil {
@@ -61,8 +70,8 @@ func (s *Entity) ListWithCondition(entity *models.Entity) (entities []models.Ent
 	return
 }
 
-func (s *Entity) List() (entites []models.Entity, err error) {
-	entites = make([]models.Entity, 0)
-	err = s.Engine.Find(&entites)
+func (s *Entity) List() (entities []models.Entity, err error) {
+	entities = make([]models.Entity, 0)
+	err = s.Engine.Find(&entities)
 	return
 }

@@ -14,7 +14,8 @@ import { SaveEntityComponent }            from './save/save.component';
 export class EntityComponent implements OnInit {
   @ViewChild(SaveEntityComponent)
   saveEntity: SaveEntityComponent;
-  @Input() currentField: number;
+  @Input() currentFieldId: number;
+  currentAreaId: number;
 
   entities: Entity[];
   areaMaps: Map<number, string> = new Map();
@@ -30,16 +31,20 @@ export class EntityComponent implements OnInit {
   ngOnInit() {
     this.pageSize = 10;
     let area = new Area();
-		if (this.currentField != undefined) {
-      area.FieldId = this.currentField;
+		if (this.currentFieldId != undefined) {
+      area.FieldId = this.currentFieldId;
     }
     this.areaService.ListAreaMap(area).subscribe(res => {
       this.areaMaps = res;
     })
   }
 
+  setCurrentAreaId(areaId: number) {
+    this.currentAreaId = areaId;
+  }
+
   initCurrentField(fieldId: number) {
-    this.currentField = fieldId;
+    this.currentFieldId = fieldId;
     this.refresh();
   }
 
@@ -70,7 +75,7 @@ export class EntityComponent implements OnInit {
   }
 
   load(state: any): void {
-    if (state && state.page && this.currentField != undefined) {
+    if (state && state.page && this.currentFieldId != undefined) {
       this.refreshClassify(state.page.from, state.page.to + 1);
     }
   }
@@ -81,7 +86,7 @@ export class EntityComponent implements OnInit {
   }
 
   refreshClassify(from: number, to: number): void {
-    if (this.currentField == undefined) {
+    if (this.currentFieldId == undefined) {
       this.entityService.List().subscribe(res => {
         this.totalCount = res.length;
         this.entities = res.slice(from, to);
@@ -89,7 +94,11 @@ export class EntityComponent implements OnInit {
     } else {
       let entity = new Entity();
       entity.Area = new Area(); 
-      entity.Area.FieldId = this.currentField;
+      if (this.currentAreaId != undefined) {
+        entity.Area.Id = this.currentAreaId;
+        entity.WithSub = true;
+      }
+      entity.Area.FieldId = this.currentFieldId;
       this.entityService.ListWithCondition(entity).subscribe(res => {
         this.totalCount = res.length;
         this.entities = res.slice(from, to);

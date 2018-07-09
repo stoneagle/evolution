@@ -71,6 +71,42 @@ export class AreaService extends BaseService {
     )
   }
 
+  ListParent(fieldId: number): Observable<Area[]> {
+    this.operation = 'SYSTEM.PROCESS.LIST';
+    return this.http.get<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/list/parent/${fieldId}`).pipe(
+      catchError(this.handleError<Response>()),
+      map(res => {
+        let ret:Area[] = []; 
+        if (res && res.code == 0) {
+          res.data.map(
+            one => {
+              ret.push(new Area(one));
+            }
+          )
+        }
+        return ret; 
+      }),
+    )
+  }
+
+  ListChildren(parentId: number): Observable<Area[]> {
+    this.operation = 'SYSTEM.PROCESS.LIST';
+    return this.http.get<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/list/children/${parentId}`).pipe(
+      catchError(this.handleError<Response>()),
+      map(res => {
+        let ret:Area[] = []; 
+        if (res && res.code == 0) {
+          res.data.map(
+            one => {
+              ret.push(new Area(one));
+            }
+          )
+        }
+        return ret; 
+      }),
+    )
+  }
+
   List(): Observable<Area[]> {
     this.operation = 'SYSTEM.PROCESS.LIST';
     return this.http.get<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`).pipe(

@@ -14,6 +14,7 @@ type Entity struct {
 	Year                int    `xorm:"not null default 0 comment('年份') INT(11)" structs:"year,omitempty"`
 	AreaId              int    `xorm:"unique(name) not null default 0 comment('隶属领域') INT(11)" structs:"area_id,omitempty"`
 	Area                Area   `xorm:"-"`
+	WithSub             bool   `xorm:"-"`
 }
 
 type EntityJoin struct {
@@ -36,5 +37,7 @@ func (m *Entity) BuildCondition() (condition builder.Eq) {
 			condition[k] = v
 		}
 	}
+
+	delete(condition, "entity.WithSub")
 	return condition
 }

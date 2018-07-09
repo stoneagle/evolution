@@ -32,9 +32,11 @@ func (c *Area) Router(router *gin.RouterGroup) {
 	area := router.Group(c.Name).Use(middles.One(c.AreaSvc, c.Name))
 	area.GET("/get/:id", c.One)
 	area.GET("/list/all", c.List)
-	area.POST("/list", c.ListWithCondition)
+	area.GET("/list/parent/:fieldId", c.ListParent)
+	area.GET("/list/children/:id", c.ListChildren)
 	area.GET("/list/tree/one/:fieldId", c.ListOneTree)
 	area.GET("/list/tree/all", c.ListAllTree)
+	area.POST("/list", c.ListWithCondition)
 	area.POST("", c.Add)
 	area.PUT("/:id", c.Update)
 	area.DELETE("/:id", c.Delete)
@@ -88,6 +90,45 @@ func (c *Area) ListAllTree(ctx *gin.Context) {
 		return
 	}
 	resp.Success(ctx, areaTrees)
+}
+
+func (c *Area) ListParent(ctx *gin.Context) {
+	fieldIdStr := ctx.Param("fieldId")
+	fieldId, err := strconv.Atoi(fieldIdStr)
+	if err != nil {
+		resp.ErrorBusiness(ctx, resp.ErrorParams, "fieldId params error", err)
+		return
+	}
+
+	area := models.Area{
+		FieldId: fieldId,
+		Type:    models.AreaTypeRoot,
+	}
+	areas, err := c.AreaSvc.ListWithCondition(&area)
+	if err != nil {
+		resp.ErrorBusiness(ctx, resp.ErrorMysql, "area get error", err)
+		return
+	}
+	resp.Success(ctx, areas)
+}
+
+func (c *Area) ListChildren(ctx *gin.Context) {
+	idStr := ctx.Param("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		resp.ErrorBusiness(ctx, resp.ErrorParams, "id params error", err)
+		return
+	}
+
+	area := models.Area{
+		Parent: id,
+	}
+	areas, err := c.AreaSvc.ListWithCondition(&area)
+	if err != nil {
+		resp.ErrorBusiness(ctx, resp.ErrorMysql, "area get error", err)
+		return
+	}
+	resp.Success(ctx, areas)
 }
 
 func (c *Area) ListOneTree(ctx *gin.Context) {

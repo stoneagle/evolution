@@ -1,40 +1,46 @@
 <clr-tabs>
 	<clr-tab>
-		<button (click)="refresh(areaFirstField)" clrTabLink>{{ areaFirstName }}</button>
+		<button (click)="refreshParent(areaFirstFieldId)" clrTabLink>{{ areaFirstName }}</button>
 		<clr-tab-content *clrIfActive="active">
 			<div class="row">
 				<div class="col-xs-3">
 					<tree 
-						[tree]="tree"
+            *ngFor="let parentTree of parents"
+						[tree]="parentTree"
 						(nodeRemoved)="handleRemoved($event)"
 						(nodeRenamed)="handleRenamed($event)"
 						(nodeMoved)="handleMoved($event)"
 						(nodeCreated)="handleCreated($event)"
+            (nodeSelected)="handleSelected($event)"
+            (nodeExpanded)="handleSelected($event)"
+            (nodeCollapsed)="handleSelected($event)"
 						(menuItemSelected)="handleCustom($event)"
 					></tree>
 				</div>
 				<div class="col-xs-9">
-					<time-entity [currentField]="areaFirstField"></time-entity>
+					<time-entity [currentFieldId]="areaFirstFieldId"></time-entity>
 				</div>
 			</div>
 		</clr-tab-content>
 	</clr-tab>
 	<clr-tab *ngFor="let key of getKeys(areaMap)">
-		<button (click)="refresh(key)" clrTabLink>{{ areaMap.get(key) }}</button>
+		<button (click)="refreshParent(key)" clrTabLink>{{ areaMap.get(key) }}</button>
 		<clr-tab-content *clrIfActive>
 			<div class="row">
 				<div class="col-xs-3">
 					<tree 
-						[tree]="tree"
+            *ngFor="let parentTree of parents"
+						[tree]="parentTree"
 						(nodeRemoved)="handleRemoved($event)"
 						(nodeRenamed)="handleRenamed($event)"
 						(nodeMoved)="handleMoved($event)"
 						(nodeCreated)="handleCreated($event)"
+            (nodeSelected)="handleSelected($event)"
 						(menuItemSelected)="handleCustom($event)"
 					></tree>
 				</div>
 				<div class="col-xs-9">
-					<time-entity [currentField]="currentField"></time-entity>
+					<time-entity [currentFieldId]="currentFieldId"></time-entity>
 				</div>
 			</div>
 		</clr-tab-content>

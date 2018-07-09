@@ -4,6 +4,8 @@ import (
 	"errors"
 	"evolution/backend/common/structs"
 	"evolution/backend/time/models"
+	"fmt"
+	"strconv"
 
 	"github.com/go-redis/redis"
 	"github.com/go-xorm/xorm"
@@ -109,6 +111,52 @@ buildTreeLoop:
 	if len(leftArea) > 0 {
 		areas = leftArea
 		goto buildTreeLoop
+	}
+	return
+}
+
+func (s *Area) GetAllLeafId(areaId int) (leafIds []int, err error) {
+	// this version can not solve parentId > id situation
+	// subSql := fmt.Sprintf("SELECT id FROM ( "+
+	// 	"	SELECT  id,"+
+	// 	"					NAME,"+
+	// 	"					parent,"+
+	// 	"					TYPE"+
+	// 	"	FROM    (SELECT * FROM `area`"+
+	// 	"					 ORDER BY parent, id) products_sorted,"+
+	// 	"					(SELECT @pv := %v) initialisation"+
+	// 	"	WHERE   FIND_IN_SET(parent, @pv)"+
+	// 	"	AND     LENGTH(@pv := CONCAT(@pv, ',', id))"+
+	// 	") result WHERE TYPE = %v ORDER BY parent;", areaId, models.AreaTypeLeaf)
+	subSql := fmt.Sprintf("WITH recursive cte (id, NAME, parent, TYPE) AS"+
+		"("+
+		" SELECT     id,"+
+		"            NAME,"+
+		"            parent,"+
+		"            TYPE"+
+		" FROM       `area`"+
+		" WHERE      parent = %v"+
+		" UNION ALL"+
+		" SELECT     p.id,"+
+		"            p.name,"+
+		"            p.parent,"+
+		"            p.type"+
+		" FROM       `area` p"+
+		" INNER JOIN cte"+
+		"         ON p.parent = cte.id"+
+		")"+
+		"SELECT * FROM cte WHERE TYPE = %v ORDER BY parent;", areaId, models.AreaTypeLeaf)
+	results, err := s.Engine.Query(subSql)
+	if err != nil {
+		return leafIds, err
+	}
+	leafIds = make([]int, 0)
+	for _, one := range results {
+		areaId, err := strconv.Atoi(string(one["id"]))
+		if err != nil {
+			return leafIds, err
+		}
+		leafIds = append(leafIds, areaId)
 	}
 	return
 }

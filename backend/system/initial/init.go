@@ -22,7 +22,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	exec(conf.User.Database, conf.App.Mode)
+	exec(conf.System.Database, conf.App.Mode)
 }
 
 func exec(dbConfig config.DBConf, mode string) {

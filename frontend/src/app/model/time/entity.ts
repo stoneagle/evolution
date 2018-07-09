@@ -7,4 +7,5 @@ export class Entity extends Basic {
   AreaId: number;
   Year: number;
   Area: Area;
+  WithSub: boolean;
 }
