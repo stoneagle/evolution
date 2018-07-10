@@ -22,7 +22,7 @@ var (
 )
 
 func (m *Resource) TableName() string {
-	return "treasure"
+	return "resource"
 }
 
 func (m *Resource) BuildCondition() (condition builder.Eq) {
