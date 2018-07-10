@@ -1,9 +1,3 @@
-<button class="btn btn-primary" (click)="openSaveModel()">
-  {{ "SYSTEM.PROCESS.CREATE" | translate }}
-</button>
-<span class="refresh-btn" (click)="refresh()">
-  <clr-icon shape="refresh"></clr-icon>
-</span>
 <clr-datagrid  (clrDgRefresh)="load($event)">
   <!-- <clr-dg-column>{{ 'TIME.RESOURCE.GENERAL.ID' | translate }}</clr-dg-column> -->
   <clr-dg-column>{{ 'TIME.RESOURCE.ENTITY.NAME' | translate }}</clr-dg-column>
@@ -44,4 +38,4 @@
   </clr-dg-footer>
 </clr-datagrid>
 
-<time-save-entity (save)="saved($event)" [areaMaps]="areaMaps"></time-save-entity>
+<time-save-entity (save)="saved($event)"></time-save-entity>

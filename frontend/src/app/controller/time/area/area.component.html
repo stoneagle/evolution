@@ -1,46 +1,5 @@
-<clr-tabs>
-	<clr-tab>
-		<button (click)="refreshParent(areaFirstFieldId)" clrTabLink>{{ areaFirstName }}</button>
-		<clr-tab-content *clrIfActive="active">
-			<div class="row">
-				<div class="col-xs-3">
-					<tree 
-            *ngFor="let parentTree of parents"
-						[tree]="parentTree"
-						(nodeRemoved)="handleRemoved($event)"
-						(nodeRenamed)="handleRenamed($event)"
-						(nodeMoved)="handleMoved($event)"
-						(nodeCreated)="handleCreated($event)"
-            (nodeSelected)="handleSelected($event)"
-						(menuItemSelected)="handleCustom($event)"
-					></tree>
-				</div>
-				<div class="col-xs-9">
-					<time-entity [currentFieldId]="areaFirstFieldId"></time-entity>
-				</div>
-			</div>
-		</clr-tab-content>
-	</clr-tab>
-	<clr-tab *ngFor="let key of getKeys(areaMap)">
-		<button (click)="refreshParent(key)" clrTabLink>{{ areaMap.get(key) }}</button>
-		<clr-tab-content *clrIfActive>
-			<div class="row">
-				<div class="col-xs-3">
-					<tree 
-            *ngFor="let parentTree of parents"
-						[tree]="parentTree"
-						(nodeRemoved)="handleRemoved($event)"
-						(nodeRenamed)="handleRenamed($event)"
-						(nodeMoved)="handleMoved($event)"
-						(nodeCreated)="handleCreated($event)"
-            (nodeSelected)="handleSelected($event)"
-						(menuItemSelected)="handleCustom($event)"
-					></tree>
-				</div>
-				<div class="col-xs-9">
-					<time-entity [currentFieldId]="currentFieldId"></time-entity>
-				</div>
-			</div>
-		</clr-tab-content>
-	</clr-tab>
-</clr-tabs>
+<time-area-ng2-tree
+  (selectAreaId)="selectAreaNode($event)" 
+>
+  <time-entity-list></time-entity-list>
+</time-area-ng2-tree>

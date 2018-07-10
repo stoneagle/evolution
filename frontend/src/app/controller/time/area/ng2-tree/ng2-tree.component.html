@@ -1,0 +1,25 @@
+<clr-tabs>
+	<clr-tab *ngFor="let key of getKeys(fieldMap)">
+		<button (click)="refreshParent(key)" clrTabLink>{{ fieldMap.get(key) }}</button>
+    <clr-tab-content *clrIfActive="key == this.areaFirstFieldId">
+      <div class="row">
+        <div class="col-xs-3">
+          <tree 
+            *ngFor="let parentTree of parents"
+            [tree]="parentTree"
+            (nodeRemoved)="handleRemoved($event)"
+            (nodeRenamed)="handleRenamed($event)"
+            (nodeMoved)="handleMoved($event)"
+            (nodeCreated)="handleCreated($event)"
+            (nodeSelected)="handleSelected($event)"
+            (menuItemSelected)="handleCustom($event)"
+          ></tree>
+        </div>
+        <div class="col-xs-9">
+          <ng-content></ng-content>
+        </div>
+      </div>
+    </clr-tab-content>
+  </clr-tab>
+</clr-tabs>
+<time-save-entity (save)="saved($event)"></time-save-entity>

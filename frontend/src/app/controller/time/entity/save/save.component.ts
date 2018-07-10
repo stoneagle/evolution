@@ -1,5 +1,7 @@
 import { Component, OnInit, Output, Input, EventEmitter } from '@angular/core'; 
 
+import { Area }            from '../../../../model/time/area';
+import { AreaService }     from '../../../../service/time/area.service';
 import { Entity }           from '../../../../model/time/entity';
 import { EntityService  }   from '../../../../service/time/entity.service';
 
@@ -13,14 +15,19 @@ export class SaveEntityComponent implements OnInit {
   entity: Entity = new Entity;
   modelOpened: boolean = false;
 
-  @Input() areaMaps: Map<number, string> = new Map();
+  areaMaps: Map<number, string> = new Map();
   @Output() save = new EventEmitter<boolean>();
 
   constructor(
     private entityService: EntityService,
+    private areaService: AreaService,
   ) { }
 
   ngOnInit() {
+    let area = new Area();
+    this.areaService.ListAreaMap(area).subscribe(res => {
+      this.areaMaps = res;
+    })
   }
 
   New(entity: Entity): void {

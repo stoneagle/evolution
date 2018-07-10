@@ -1,24 +1,23 @@
 import { Component, OnInit, ViewChild, Input } from '@angular/core';
 
-import { Entity }             from '../../../model/time/entity';
-import { Area }             from '../../../model/time/area';
-import { AreaService }      from '../../../service/time/area.service';
-import { EntityService }      from '../../../service/time/entity.service';
-import { SaveEntityComponent }            from './save/save.component';
+import { Entity }              from '../../../../model/time/entity';
+import { Area }                from '../../../../model/time/area';
+import { AreaService }         from '../../../../service/time/area.service';
+import { EntityService }       from '../../../../service/time/entity.service';
+import { SaveEntityComponent } from './../save/save.component';
 
 @Component({
-  selector: 'time-entity',
-  templateUrl: './entity.component.html',
-  styleUrls: ['./entity.component.css']
+  selector: 'time-entity-list',
+  templateUrl: './list.component.html',
+  styleUrls: ['./list.component.css']
 })
-export class EntityComponent implements OnInit {
+export class ListEntityComponent implements OnInit {
   @ViewChild(SaveEntityComponent)
   saveEntity: SaveEntityComponent;
-  @Input() currentFieldId: number;
-  currentAreaId: number;
+
+  filterAreaId: number;
 
   entities: Entity[];
-  areaMaps: Map<number, string> = new Map();
   pageSize: number = 10;
   totalCount: number = 0;
   currentPage: number = 1;
@@ -30,22 +29,10 @@ export class EntityComponent implements OnInit {
 
   ngOnInit() {
     this.pageSize = 10;
-    let area = new Area();
-		if (this.currentFieldId != undefined) {
-      area.FieldId = this.currentFieldId;
-    }
-    this.areaService.ListAreaMap(area).subscribe(res => {
-      this.areaMaps = res;
-    })
   }
 
-  setCurrentAreaId(areaId: number) {
-    this.currentAreaId = areaId;
-  }
-
-  initCurrentField(fieldId: number) {
-    this.currentFieldId = fieldId;
-    this.refresh();
+  setFilterAreaId(areaId: number) {
+    this.filterAreaId = areaId;
   }
 
   saved(saved: boolean): void {
@@ -62,12 +49,6 @@ export class EntityComponent implements OnInit {
     this.saveEntity.New(entity);
   }
 
-  openSaveModelWithArea(areaId: number): void {
-    let entity = new Entity();
-    entity.AreaId = areaId;
-    this.saveEntity.New(entity);
-  }
-
   delete(entity: Entity): void {
     this.entityService.Delete(entity.Id).subscribe(res => {
       this.refresh();
@@ -75,7 +56,7 @@ export class EntityComponent implements OnInit {
   }
 
   load(state: any): void {
-    if (state && state.page && this.currentFieldId != undefined) {
+    if (state && state.page) {
       this.refreshClassify(state.page.from, state.page.to + 1);
     }
   }
@@ -86,7 +67,7 @@ export class EntityComponent implements OnInit {
   }
 
   refreshClassify(from: number, to: number): void {
-    if (this.currentFieldId == undefined) {
+    if (this.filterAreaId == undefined) {
       this.entityService.List().subscribe(res => {
         this.totalCount = res.length;
         this.entities = res.slice(from, to);
@@ -94,11 +75,10 @@ export class EntityComponent implements OnInit {
     } else {
       let entity = new Entity();
       entity.Area = new Area(); 
-      if (this.currentAreaId != undefined) {
-        entity.Area.Id = this.currentAreaId;
+      if (this.filterAreaId != undefined) {
+        entity.Area.Id = this.filterAreaId;
         entity.WithSub = true;
       }
-      entity.Area.FieldId = this.currentFieldId;
       this.entityService.ListWithCondition(entity).subscribe(res => {
         this.totalCount = res.length;
         this.entities = res.slice(from, to);
