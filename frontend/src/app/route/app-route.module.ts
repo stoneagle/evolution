@@ -10,7 +10,6 @@ import { ItemComponent as QuantItem }                 from '../controller/quant/
 import { QuestComponent as TimeQuest }       from '../controller/time/quest/quest.component';
 import { CountryComponent as TimeCountry }   from '../controller/time/country/country.component';
 import { FieldComponent as TimeField }       from '../controller/time/field/field.component';
-import { EntityComponent as TimeEntity }     from '../controller/time/entity/entity.component';
 import { AreaComponent as TimeArea }         from '../controller/time/area/area.component';
 import { ResourceComponent as TimeResource } from '../controller/time/resource/resource.component';
 import { UserComponent as SystemUser }       from '../controller/system/user/user.component';

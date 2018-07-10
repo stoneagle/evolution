@@ -1,7 +1,13 @@
-import { Component, OnInit, Output, Input, EventEmitter } from '@angular/core'; 
+import { Component, OnInit, ViewChild, Output, Input, EventEmitter }  from '@angular/core';
+import { ClrWizard }                                                  from "@clr/angular";
+import * as _                                                         from 'lodash';
+import { NgForm  }                                                    from '@angular/forms';
+import { Quest, QuestTarget, QuestTeam, QuestEntity, QuestTimeTable } from '../../../../model/time/quest';
 
-import { Quest }           from '../../../../model/time/quest';
-import { QuestService  }   from '../../../../service/time/quest.service';
+import { SessionUser }         from '../../../../model/base/sign';
+import { QuestService  }       from '../../../../service/time/quest.service';
+import { SignService  }        from '../../../../service/system/sign.service';
+import { Quest as QuestConst } from '../../../../shared/shared.const';
 
 @Component({
   selector: 'time-save-quest',
@@ -10,14 +16,34 @@ import { QuestService  }   from '../../../../service/time/quest.service';
 })
 
 export class SaveQuestComponent implements OnInit {
-  quest: Quest = new Quest;
+  @ViewChild("wizard") 
+  wizard: ClrWizard;
+  @ViewChild("questForm") 
+  questForm: NgForm;
+
+  currentUser: SessionUser = new SessionUser();
+  quest: Quest                 = new Quest;
+  targets: QuestTarget[]       = [];
+  teams: QuestTeam[]           = [];
+  entities: QuestEntity[]      = [];
+  timeTables: QuestTimeTable[] = [];
+
+  _: any = _;
+  membersMap = QuestConst.Members;
+  constraintMap = QuestConst.Constraint;
+
   modelOpened: boolean = false;
 
   @Output() save = new EventEmitter<boolean>();
 
   constructor(
     private questService: QuestService,
-  ) { }
+    private signService: SignService,
+  ) { 
+    this.signService.current().subscribe( res=> {
+      this.currentUser = res;
+    });
+  }
 
   ngOnInit() {
   }
@@ -34,7 +60,18 @@ export class SaveQuestComponent implements OnInit {
     }
   }            
 
-  Submit(): void {
+  finish(): void {
+    console.log("finish");
+  }
+
+  onCancel(): void {
+    this.wizard.reset();
+    this.wizard.close();
+  }
+
+  onQuestCommit(): void {
+    // this.wizard.forceNext();
+    
     if (this.quest.Id == null) {
       this.questService.Add(this.quest).subscribe(res => {
         this.modelOpened = false;

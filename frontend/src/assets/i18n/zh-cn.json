@@ -48,8 +48,73 @@
         "CONCEPT": "远征",
         "NAME": "名称",
         "STARTDATE": "开始日期",
-        "USER": "所属用户",
-        "RESOURCE": "所属资源"
+        "ENDDATE": "结束日期",
+        "FOUNDER": "创始人",
+        "MEMBERS": "成员数量",
+        "CONSTRAINT": "优先级",
+        "STATUS": "状态",
+        "STATUS-NAME": {
+          "RECRUIT": "招募中",
+          "EXEC": "执行中",
+          "FINISH": "已完成",
+          "FAIL": "已放弃"
+        },
+        "MEMBERS-NAME": {
+          "ONE": "单人",
+          "SMALL": "小型5人",
+          "MIDDLE": "中型25人",
+          "LARGE": "大型100人"
+        },
+        "CONSTRAINT-NAME": {
+          "IMPORTANT-BUSY": "重要且紧急",
+          "IMPORTANT": "重要",
+          "BUSY": "紧急",
+          "NORMAL": "日常"
+        }
+      },
+      "QUEST-TEAM": {
+        "CONCEPT": "远征团队",
+        "QUEST": "所属团队",
+        "STARTDATE": "参与开始日期",
+        "ENDDATE": "参与结束日期",
+        "USER": "成员",
+        "TIMETABLE-PERCENT": "出席时间比例"
+      },
+      "QUEST-TIMETABLE": {
+        "CONCEPT": "远征出席时间",
+        "QUEST": "所属团队",
+        "STARTTIME": "开始时间",
+        "ENDDATE": "结束时间",
+        "TYPE": "类别",
+        "TYPE-NAME": {
+          "WORKDAY": "工作日",
+          "HOLIDAY": "节假日"
+        } 
+      },
+      "QUEST-TARGET": {
+        "CONCEPT": "远征目标",
+        "QUEST": "所属团队",
+        "ENTITY": "目标实体",
+        "TIME-PERCENT": "投入时间比例",
+        "DESC": "描述",
+        "STATUS": "状态",
+        "STATUS-NAME": {
+          "WAIT": "未完成",
+          "FINISH": "已完成"
+        } 
+      },
+      "QUEST-ENTITY": {
+        "CONCEPT": "远征依赖实体",
+        "QUEST": "所属团队",
+        "ENTITY": "要求实体",
+        "PHASE": "所处阶段",
+        "DESC": "描述",
+        "NUMBER": "数量",
+        "STATUS": "状态",
+        "STATUS-NAME": {
+          "WAIT": "未匹配",
+          "FINISH": "已匹配"
+        } 
       },
       "RESOURCE": {
         "CONCEPT": "资源",
@@ -120,6 +185,9 @@
         "USER": "用户"
       }
     },
+    "TOOLTIP": {
+      "EMPTY": "不能为空"
+    },
     "RESOURCE": {
       "USER": {
         "CONCEPT": "用户",
@@ -145,6 +213,8 @@
       "CREATE": "添加", 
       "UPDATE": "更新",
       "DELETE": "删除",
+      "BACK": "上一步",
+      "NEXT": "下一步",
       "SUBMIT": "提交",
       "CANCEL": "取消",
       "ROLLBACK": "回滚"

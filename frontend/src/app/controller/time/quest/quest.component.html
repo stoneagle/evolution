@@ -1,1 +1,41 @@
-<time-gantt-quest></time-gantt-quest>
+<button class="btn btn-primary" (click)="openSaveModel()">
+  {{ "SYSTEM.PROCESS.CREATE" | translate }}
+</button>
+<span class="refresh-btn" (click)="refresh()">
+  <clr-icon shape="refresh"></clr-icon>
+</span>
+<clr-datagrid  (clrDgRefresh)="load($event)">
+  <!-- <clr-dg-column>{{ 'TIME.RESOURCE.GENERAL.ID' | translate }}</clr-dg-column> -->
+  <clr-dg-column>{{ 'TIME.RESOURCE.QUEST.NAME' | translate }}</clr-dg-column>
+  <clr-dg-column>{{ 'TIME.RESOURCE.GENERAL.CREATED' | translate }}</clr-dg-column>
+  <clr-dg-column>{{ 'TIME.RESOURCE.GENERAL.UPDATED' | translate }}</clr-dg-column>
+	<clr-dg-column>{{ 'TIME.RESOURCE.GENERAL.OPERATION' | translate }}</clr-dg-column>
+
+  <clr-dg-row *ngFor="let quest of quests">
+    <!-- <clr-dg-cell>{{quest.Id}}</clr-dg-cell> -->
+    <clr-dg-cell>{{quest.Name}}</clr-dg-cell>
+    <clr-dg-cell>{{quest.CreatedAt | date: 'yy-MM-dd HH:mm:ss'}}</clr-dg-cell>
+    <clr-dg-cell>{{quest.UpdatedAt | date: 'yy-MM-dd HH:mm:ss'}}</clr-dg-cell>
+    <clr-dg-cell>
+      <div class="btn-group btn-primary btn-icon">
+        <button (click)="openSaveModel(quest.Id)" class="btn">
+          <clr-icon shape="wrench"></clr-icon>
+          <span class="clr-icon-title"></span>
+        </button>
+        <button (click)="delete(quest)" class="btn btn-danger">
+          <clr-icon shape="trash"></clr-icon>
+          <span class="clr-icon-title"></span>
+        </button>
+      </div>
+    </clr-dg-cell>  
+  </clr-dg-row>
+
+  <clr-dg-footer>
+    <clr-dg-pagination #pagination [clrDgPageSize]="pageSize" [(clrDgPage)]="currentPage" [clrDgTotalItems]="totalCount">
+      {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
+      / {{pagination.totalItems}} {{ 'TIME.RESOURCE.QUEST.CONCEPT' | translate }}
+    </clr-dg-pagination>
+  </clr-dg-footer>
+</clr-datagrid>
+
+<time-save-quest (save)="saved($event)"></time-save-quest>

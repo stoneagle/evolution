@@ -7,26 +7,30 @@ import { FormsModule }               from '@angular/forms';
 import { ClarityModule  }            from "@clr/angular";
 import { TranslateModule  }          from "@ngx-translate/core";
 import { TreeModule }                from 'ng2-tree';
-import { EJ_GANTT_COMPONENTS }                     from 'ej-angular2/src/ej/gantt.component';
+import { EJ_GANTT_COMPONENTS }       from 'ej-angular2/src/ej/gantt.component';
 
 import { QuestComponent }          from './quest/quest.component';
-import { ListQuestComponent }      from './quest/list/list.component';
 import { SaveQuestComponent }      from './quest/save/save.component';
 import { GanttQuestComponent }     from './quest/gantt/gantt.component';
 import { CountryComponent }        from './country/country.component';
 import { SaveCountryComponent }    from './country/save/save.component';
 import { PhaseComponent }          from './phase/phase.component';
 import { SavePhaseComponent }      from './phase/save/save.component';
-import { EntityComponent }         from './entity/entity.component';
+import { ListEntityComponent }     from './entity/list/list.component';
 import { SaveEntityComponent }     from './entity/save/save.component';
 import { FieldComponent }          from './field/field.component';
 import { SaveFieldComponent }      from './field/save/save.component';
 import { AreaComponent }           from './area/area.component';
+import { AreaNg2TreeComponent }    from './area/ng2-tree/ng2-tree.component';
 import { ResourceComponent }       from './resource/resource.component';
 import { ResourceEntityComponent } from './resource/entity-list/entity-list.component';
 
 import { CountryService }         from '../../service/time/country.service';
 import { QuestService }           from '../../service/time/quest.service';
+import { QuestTargetService }     from '../../service/time/quest-target.service';
+import { QuestEntityService }     from '../../service/time/quest-entity.service';
+import { QuestTimeTableService }  from '../../service/time/quest-time-table.service';
+import { QuestTeamService }       from '../../service/time/quest-team.service';
 import { PhaseService }           from '../../service/time/phase.service';
 import { FieldService }           from '../../service/time/field.service';
 import { EntityService }          from '../../service/time/entity.service';
@@ -37,18 +41,18 @@ import { MessageHandlerService  } from '../../service/base/message-handler.servi
 @NgModule({
   declarations: [
     QuestComponent,
-    ListQuestComponent,
     SaveQuestComponent,
     GanttQuestComponent,
     CountryComponent,
     SaveCountryComponent,
-    EntityComponent,
+    ListEntityComponent,
     SaveEntityComponent,
     PhaseComponent,
     SavePhaseComponent,
     FieldComponent,
     SaveFieldComponent,
     AreaComponent,
+    AreaNg2TreeComponent,
     ResourceComponent,
     ResourceEntityComponent,
     EJ_GANTT_COMPONENTS,
@@ -67,6 +71,10 @@ import { MessageHandlerService  } from '../../service/base/message-handler.servi
     AreaService,
     ResourceService,
     QuestService,
+    QuestTeamService,
+    QuestTargetService,
+    QuestEntityService,
+    QuestTimeTableService,
     CountryService,
     FieldService,
     PhaseService,

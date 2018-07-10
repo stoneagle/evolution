@@ -1,18 +1,112 @@
-<clr-modal [(clrModalOpen)]="modelOpened">
-    <h3 class="modal-title" *ngIf="(quest.Id)">
+<clr-wizard #wizard [(clrWizardOpen)]="modelOpened">
+    <clr-wizard-title *ngIf="(quest.Id)">
       {{ 'SYSTEM.PROCESS.UPDATE' | translate }}{{ 'TIME.RESOURCE.QUEST.CONCEPT' | translate }}
-    </h3>
-    <h3 class="modal-title" *ngIf="!(quest.Id)">
+    </clr-wizard-title>
+    <clr-wizard-title *ngIf="!(quest.Id)">
       {{ 'SYSTEM.PROCESS.CREATE' | translate }}{{ 'TIME.RESOURCE.QUEST.CONCEPT' | translate }}
-    </h3>
-    <div class="modal-body">
-      <form #addForm="ngForm" (ngSubmit)="Submit()">
-        <div class="form-group">
-          <label for="name">{{ 'TIME.RESOURCE.QUEST.NAME' | translate }}</label>
-          <input type="text" class="form-control" id="Name" required [(ngModel)]="quest.Name" name="Name" >
-        </div> 
-        <button type="submit" class="btn btn-success">{{ 'SYSTEM.PROCESS.SUBMIT' | translate }}</button>
-        <button type="button" class="btn btn-primary" (click)="modelOpened = false">{{ 'SYSTEM.PROCESS.CANCEL' | translate }}</button>
-      </form>
-    </div>     
-</clr-modal>   
+    </clr-wizard-title>
+
+    <clr-wizard-button [type]="'cancel'">{{ 'SYSTEM.PROCESS.CANCEL' | translate }}</clr-wizard-button>
+    <clr-wizard-button [type]="'previous'">{{ 'SYSTEM.PROCESS.BACK' | translate }}</clr-wizard-button>
+    <clr-wizard-button [type]="'next'">{{ 'SYSTEM.PROCESS.NEXT' | translate }}</clr-wizard-button>
+    <clr-wizard-button (click)="finish()" [type]="'finish'">{{ 'SYSTEM.PROCESS.SUBMIT' | translate }}</clr-wizard-button>
+
+    <!-- <clr-wizard-page -->
+    <!--   [clrWizardPageNextDisabled]="!questForm.valid" -->
+    <!-- > -->
+    <!--   <ng-template clrPageTitle>远征信息</ng-template> -->
+    <!--   <form #questForm="ngForm"> -->
+    <!--     <div class="form-group"> -->
+    <!--       <label> -->
+    <!--         {{ 'TIME.RESOURCE.QUEST.NAME' | translate }} -->
+    <!--       </label> -->
+    <!--       <label --> 
+    <!--         for="Name" aria-haspopup="true" role="tooltip" --> 
+    <!--         [class.invalid]="Name.invalid && (Name.dirty || Name.touched)" -->
+    <!--         class="tooltip tooltip-validation tooltip-md tooltip-bottom-right" -->
+    <!--       > -->
+    <!--         <input type="text" class="form-control" id="Name" required [(ngModel)]="quest.Name" name="Name" #Name="ngModel"> -->
+    <!--         <span class="tooltip-content">{{ 'TIME.RESOURCE.QUEST.NAME' | translate }}{{ 'SYSTEM.TOOLTIP.EMPTY' | translate }}</span> -->
+    <!--       </label> -->
+    <!--     </div> --> 
+    <!--     <div class="form-block"> -->
+    <!--       <div class="form-group"> -->
+    <!--         <label>{{ 'TIME.RESOURCE.QUEST.STARTDATE' | translate }}</label> -->
+    <!--         <label --> 
+    <!--           for="StartDate" aria-haspopup="true" role="tooltip" --> 
+    <!--           [class.invalid]="StartDate.invalid && (StartDate.dirty || StartDate.touched)" -->
+    <!--           class="tooltip tooltip-validation tooltip-md tooltip-bottom-right" -->
+    <!--         > -->
+    <!--           <input type="date" #StartDate="ngModel" id="StartDate" name="StartDate" [(ngModel)]="quest.StartDate" clrDate> -->
+    <!--           <span class="tooltip-content">{{ 'TIME.RESOURCE.QUEST.STARTDATE' | translate }}{{ 'SYSTEM.TOOLTIP.EMPTY' | translate }}</span> -->
+    <!--         </label> -->
+    <!--       </div> -->
+    <!--       <div class="form-group"> -->
+    <!--         <label>{{ 'TIME.RESOURCE.QUEST.ENDDATE' | translate }}</label> -->
+    <!--         <label --> 
+    <!--           for="EndDate" aria-haspopup="true" role="tooltip" --> 
+    <!--           [class.invalid]="EndDate.invalid && (EndDate.dirty || EndDate.touched)" -->
+    <!--           class="tooltip tooltip-validation tooltip-md tooltip-bottom-right" -->
+    <!--         > -->
+    <!--           <input type="date" #EndDate="ngModel" id="EndDate" name="EndDate" [(ngModel)]="quest.EndDate" clrDate> -->
+    <!--           <span class="tooltip-content">{{ 'TIME.RESOURCE.QUEST.ENDDATE' | translate }}{{ 'SYSTEM.TOOLTIP.EMPTY' | translate }}</span> -->
+    <!--         </label> -->
+    <!--       </div> -->
+    <!--     </div> -->
+    <!--     <div class="form-group"> -->
+    <!--       <label for="Founder">{{ 'TIME.RESOURCE.QUEST.NAME' | translate }}</label> -->
+    <!--       <input type="text" class="form-control" id="Founder" readonly name="Founder" value="{{ currentUser.Name }}" > -->
+    <!--     </div> --> 
+    <!--     <div class="form-group"> -->
+    <!--       <label>{{ 'TIME.RESOURCE.QUEST.MEMBERS' | translate }}</label> -->
+    <!--       <div class="select"> -->
+    <!--         <label --> 
+    <!--           for="Members" aria-haspopup="true" role="tooltip" --> 
+    <!--           [class.invalid]="Members.invalid && (Members.dirty || Members.touched)" -->
+    <!--           class="tooltip tooltip-validation tooltip-md tooltip-bottom-right" -->
+    <!--         > -->
+    <!--           <select id="Members" #Members="ngModel" [(ngModel)]="quest.Members" name="Members" required > -->
+    <!--             <option *ngFor="let key of _.keys(membersMap)" [ngValue]=key> -->
+    <!--               {{ membersMap[key] | translate }} -->
+    <!--             </option> -->
+    <!--           </select> -->
+    <!--           <span class="tooltip-content">{{ 'TIME.RESOURCE.QUEST.MEMBERS' | translate }}{{ 'SYSTEM.TOOLTIP.EMPTY' | translate }}</span> -->
+    <!--         </label> -->
+    <!--       </div> -->
+    <!--     </div> -->
+    <!--     <div class="form-group"> -->
+    <!--       <label>{{ 'TIME.RESOURCE.QUEST.CONSTRAINT' | translate }}</label> -->
+    <!--       <div class="select"> -->
+    <!--         <label --> 
+    <!--           for="Constraint" aria-haspopup="true" role="tooltip" --> 
+    <!--           [class.invalid]="Constraint.invalid && (Constraint.dirty || Constraint.touched)" -->
+    <!--           class="tooltip tooltip-validation tooltip-md tooltip-bottom-right" -->
+    <!--         > -->
+    <!--           <select id="Constraint" #Constraint="ngModel" [(ngModel)]="quest.Constraint" name="Constraint" required > -->
+    <!--             <option *ngFor="let key of _.keys(constraintMap)" [ngValue]=key> -->
+    <!--               {{ constraintMap[key] | translate }} -->
+    <!--             </option> -->
+    <!--           </select> -->
+    <!--           <span class="tooltip-content">{{ 'TIME.RESOURCE.QUEST.CONSTRAINT' | translate }}{{ 'SYSTEM.TOOLTIP.EMPTY' | translate }}</span> -->
+    <!--         </label> -->
+    <!--       </div> -->
+    <!--     </div> -->
+    <!--   </form> -->
+    <!-- </clr-wizard-page> -->
+    <clr-wizard-page
+      clrWizardPagePreventDefault="true"
+      (clrWizardPageOnCancel)="onCancel()"
+      (clrWizardPageOnCommit)="onQuestCommit()"
+    >
+      <ng-template clrPageTitle>目标</ng-template>
+      ...
+    </clr-wizard-page>
+    <clr-wizard-page>
+      <ng-template clrPageTitle>时间与资源</ng-template>
+      ...
+    </clr-wizard-page>
+    <clr-wizard-page>
+      <ng-template clrPageTitle>团队成员</ng-template>
+      ...
+    </clr-wizard-page>
+</clr-wizard>
