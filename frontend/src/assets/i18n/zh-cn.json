@@ -7,8 +7,7 @@
     "ASSETS": {
       "TYPE": {
         "SCHEDULE": "日程",
-        "TARGET": "目标",
-        "ENTITY": "实体",
+        "USER": "个人",
         "CONFIG": "配置"
       }
     },
@@ -35,6 +34,14 @@
         "CONCEPT": "方向",
         "NAME": "名称",
         "DESC": "描述"
+      },
+      "PROJECT": {
+        "CONCEPT": "项目",
+        "NAME": "名称",
+        "QUEST": "所属探索",
+        "ENTITY": "所属实体",
+        "STARTDATE": "开始时间",
+        "DURATION": "持续时间"
       },
       "PHASE": {
         "CONCEPT": "阶段",

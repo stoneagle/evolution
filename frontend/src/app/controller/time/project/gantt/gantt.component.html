@@ -1,0 +1,25 @@
+<ej-gantt 
+	id="GanttControl" 
+	[dataSource]="ganttData" 
+    taskIdMapping="taskID" 
+    taskNameMapping="taskName"
+    startDateMapping="startDate" 
+    endDateMapping="endDate" 
+    progressMapping="progress" 
+    durationMapping="duration"
+    predecessorMapping="predecessor"
+    childMapping="subtasks" 
+    [treeColumnIndex]=treeColumnIndex  
+    scheduleStartDate="02/01/2014" 
+    scheduleEndDate="04/09/2014"
+    sizeSettings.height="450px" 
+    sizeSettings.width="100%"
+    [toolbarSettings]="toolbarsettings" 
+    [allowGanttChartEditing]="true"
+    [enableContextMenu]="true"
+    predecessorMapping="predecessor"
+    [editSettings]="editsettings"
+    [allowMultiSorting]="true"
+    [showColumnChooser]="true"
+>
+</ej-gantt>

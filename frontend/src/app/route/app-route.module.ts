@@ -3,11 +3,12 @@ import { CommonModule }          from '@angular/common';
 import { RouterModule, Routes  } from '@angular/router';
 
 import { PoolComponent as QuantPool }                 from '../controller/quant/pool/pool.component';
-import { PoolListItemComponent as QuantPoolListItem } from '../controller/quant/pool/list-item/pool-list-item.component';
+import { PoolListItemComponent as QuantPoolListItem } from '../controller/quant/pool/list-item/list-item.component';
 import { ClassifyComponent as QuantClassify }         from '../controller/quant/classify/classify.component';
 import { ItemComponent as QuantItem }                 from '../controller/quant/item/item.component';
 
 import { QuestComponent as TimeQuest }       from '../controller/time/quest/quest.component';
+import { ProjectComponent as TimeProject }   from '../controller/time/project/project.component';
 import { CountryComponent as TimeCountry }   from '../controller/time/country/country.component';
 import { FieldComponent as TimeField }       from '../controller/time/field/field.component';
 import { AreaComponent as TimeArea }         from '../controller/time/area/area.component';
@@ -57,10 +58,11 @@ const routes: Routes = [
         children:[
           { path: '', component: DefaultComponent }, 
           { path: 'quest', component: TimeQuest },
+          { path: 'project', component: TimeProject },
         ]
       },
       { 
-        path: 'target',
+        path: 'user',
         children:[
           { path: '', component: DefaultComponent }, 
           { path: 'resource', component: TimeResource },
