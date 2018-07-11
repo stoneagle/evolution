@@ -28,8 +28,7 @@ export class AreaNg2TreeComponent implements OnInit {
   ) { }
 
   // 必须设置一个active，才能避免错误
-  areaFirstFieldId: number;
-  
+  firstFieldId: number;
   fieldMap: Map<number, string> = new Map(); 
   currentFieldId: number;
   parents: TreeModel[];
@@ -40,8 +39,8 @@ export class AreaNg2TreeComponent implements OnInit {
   ngOnInit() {
     this.fieldService.Map().subscribe(res => {
       this.fieldMap = res;
-      this.areaFirstFieldId = this.fieldMap.keys().next().value;
-      this.refreshParent(this.areaFirstFieldId);
+      this.firstFieldId = this.fieldMap.keys().next().value;
+      this.refreshParent(this.firstFieldId);
     })
   }
 

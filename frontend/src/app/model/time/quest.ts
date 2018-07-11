@@ -13,7 +13,6 @@ export class Quest extends Basic {
 export class QuestTarget extends Basic {
   QuestId: number;
   EntityId: number;
-  TimePercent: number;
   Desc: string;
   Status: number;
 }

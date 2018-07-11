@@ -1,9 +1,10 @@
 import { Component, OnInit, Output, Input, EventEmitter } from '@angular/core'; 
 
-import { Area }            from '../../../../model/time/area';
-import { AreaService }     from '../../../../service/time/area.service';
-import { Entity }           from '../../../../model/time/entity';
-import { EntityService  }   from '../../../../service/time/entity.service';
+import { Area }           from '../../../../model/time/area';
+import { AreaService }    from '../../../../service/time/area.service';
+import { Entity }         from '../../../../model/time/entity';
+import { EntityService  } from '../../../../service/time/entity.service';
+import { AreaType  } from '../../../../shared/shared.const';
 
 @Component({
   selector: 'time-save-entity',
@@ -25,6 +26,7 @@ export class SaveEntityComponent implements OnInit {
 
   ngOnInit() {
     let area = new Area();
+    area.Type = AreaType.Leaf; 
     this.areaService.ListAreaMap(area).subscribe(res => {
       this.areaMaps = res;
     })

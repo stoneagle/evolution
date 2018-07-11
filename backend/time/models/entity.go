@@ -22,6 +22,14 @@ type EntityJoin struct {
 	Area   `xorm:"extends" json:"-"`
 }
 
+type EntitySyncfusion struct {
+	Id       int    `json:"Id"`
+	ParentId int    `json:"ParentId"`
+	IsParent bool   `json:"IsParent"`
+	Name     string `json:"Name"`
+	Parent   string `json:"Parent"`
+}
+
 func (m *Entity) TableName() string {
 	return "entity"
 }

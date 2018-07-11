@@ -75,3 +75,22 @@ func (s *Entity) List() (entities []models.Entity, err error) {
 	err = s.Engine.Find(&entities)
 	return
 }
+
+func (s *Entity) GroupByArea(entities []models.Entity) (areas []models.Area) {
+	areasMap := map[int]models.Area{}
+	for _, one := range entities {
+		if _, ok := areasMap[one.Area.Id]; !ok {
+			one.Area.Entities = make([]models.Entity, 0)
+			areasMap[one.Area.Id] = one.Area
+		}
+		tmp, _ := areasMap[one.Area.Id]
+		tmp.Entities = append(tmp.Entities, one)
+		areasMap[one.Area.Id] = tmp
+	}
+
+	areas = make([]models.Area, 0)
+	for _, one := range areasMap {
+		areas = append(areas, one)
+	}
+	return areas
+}

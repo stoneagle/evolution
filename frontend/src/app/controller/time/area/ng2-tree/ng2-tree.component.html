@@ -1,7 +1,7 @@
 <clr-tabs>
 	<clr-tab *ngFor="let key of getKeys(fieldMap)">
 		<button (click)="refreshParent(key)" clrTabLink>{{ fieldMap.get(key) }}</button>
-    <clr-tab-content *clrIfActive="key == this.areaFirstFieldId">
+    <clr-tab-content *clrIfActive="key == this.firstFieldId">
       <div class="row">
         <div class="col-xs-3">
           <tree 

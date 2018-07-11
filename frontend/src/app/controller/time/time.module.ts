@@ -8,6 +8,7 @@ import { ClarityModule  }            from "@clr/angular";
 import { TranslateModule  }          from "@ngx-translate/core";
 import { TreeModule }                from 'ng2-tree';
 import { EJ_GANTT_COMPONENTS }       from 'ej-angular2/src/ej/gantt.component';
+import { EJ_TREEGRID_COMPONENTS }    from 'ej-angular2/src/ej/treegrid.component';
 
 import { QuestComponent }          from './quest/quest.component';
 import { SaveQuestComponent }      from './quest/save/save.component';
@@ -18,6 +19,7 @@ import { PhaseComponent }          from './phase/phase.component';
 import { SavePhaseComponent }      from './phase/save/save.component';
 import { ListEntityComponent }     from './entity/list/list.component';
 import { SaveEntityComponent }     from './entity/save/save.component';
+import { TreeGridEntityComponent } from './entity/tree-grid/tree-grid.component';
 import { FieldComponent }          from './field/field.component';
 import { SaveFieldComponent }      from './field/save/save.component';
 import { AreaComponent }           from './area/area.component';
@@ -47,6 +49,7 @@ import { MessageHandlerService  } from '../../service/base/message-handler.servi
     SaveCountryComponent,
     ListEntityComponent,
     SaveEntityComponent,
+    TreeGridEntityComponent,
     PhaseComponent,
     SavePhaseComponent,
     FieldComponent,
@@ -56,6 +59,7 @@ import { MessageHandlerService  } from '../../service/base/message-handler.servi
     ResourceComponent,
     ResourceEntityComponent,
     EJ_GANTT_COMPONENTS,
+    EJ_TREEGRID_COMPONENTS,
   ],
   imports: [   
     BrowserModule,

@@ -5,9 +5,12 @@ import { NgForm  }                                                    from '@ang
 import { Quest, QuestTarget, QuestTeam, QuestEntity, QuestTimeTable } from '../../../../model/time/quest';
 
 import { SessionUser }         from '../../../../model/base/sign';
+import { Entity }         from '../../../../model/time/entity';
 import { QuestService  }       from '../../../../service/time/quest.service';
 import { SignService  }        from '../../../../service/system/sign.service';
 import { Quest as QuestConst } from '../../../../shared/shared.const';
+
+import { TreeGridEntityComponent } from '../../entity/tree-grid/tree-grid.component';
 
 @Component({
   selector: 'time-save-quest',
@@ -20,6 +23,8 @@ export class SaveQuestComponent implements OnInit {
   wizard: ClrWizard;
   @ViewChild("questForm") 
   questForm: NgForm;
+  @ViewChild(TreeGridEntityComponent) 
+  treeGridEntity: TreeGridEntityComponent;
 
   currentUser: SessionUser = new SessionUser();
   quest: Quest                 = new Quest;
@@ -28,9 +33,11 @@ export class SaveQuestComponent implements OnInit {
   entities: QuestEntity[]      = [];
   timeTables: QuestTimeTable[] = [];
 
+  targetEntities: Entity[] = [];
+
   _: any = _;
-  membersMap = QuestConst.Members;
-  constraintMap = QuestConst.Constraint;
+  membersMap = QuestConst.MembersMap;
+  constraintMap = QuestConst.ConstraintMap;
 
   modelOpened: boolean = false;
 
@@ -60,8 +67,41 @@ export class SaveQuestComponent implements OnInit {
     }
   }            
 
+  addTargetEntity($event: Entity) {
+    if ($event.Id != undefined) {
+      let addFlag = true;
+      this.targetEntities.forEach((one, k) => {
+        if (one.Id == $event.Id) {
+          addFlag = false;
+          return;
+        }
+      });
+      if (addFlag) {
+        this.targetEntities.push($event);
+      }
+    }
+  }
+
+  deleteTargetEntity(entity: Entity) {
+    this.targetEntities.forEach( (one, k) => {
+      if (one.Id === entity.Id) {
+        this.targetEntities.splice(k, 1); 
+        return;
+      }
+    });
+  }
+
+  onTargetCommit(): void {
+    if (this.targetEntities.length <= 0) {
+      return;
+    }
+    if (this.targetEntities.length >= 5) {
+      return;
+    }
+    this.wizard.forceNext();
+  }
+
   finish(): void {
-    console.log("finish");
   }
 
   onCancel(): void {

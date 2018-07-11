@@ -6,7 +6,8 @@ import { catchError, map, tap  }    from 'rxjs/operators';
 import { AppConfig }                from '../base/config.service';
 import { MessageHandlerService  }   from '../base/message-handler.service';
 import { BaseService  }             from '../base/base.service';
-import { Entity }                 from '../../model/time/entity';
+import { Area }                     from '../../model/time/area';
+import { Entity }                   from '../../model/time/entity';
 import { Response }                 from '../../model/base/response.model';
 
 @Injectable()
@@ -49,6 +50,24 @@ export class EntityService extends BaseService {
           res.data.map(
             one => {
               ret.push(new Entity(one));
+            }
+          )
+        }
+        return ret; 
+      }),
+    )
+  }
+
+  ListGroupByLeaf(entity: Entity): Observable<Area[]> {
+    this.operation = 'SYSTEM.PROCESS.LIST';
+    return this.http.post<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/list/leaf`, JSON.stringify(entity)).pipe(
+      catchError(this.handleError<Response>()),
+      map(res => {
+        let ret:Area[] = []; 
+        if (res && res.code == 0) {
+          res.data.map(
+            one => {
+              ret.push(new Area(one));
             }
           )
         }

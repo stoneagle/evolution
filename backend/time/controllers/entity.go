@@ -31,6 +31,7 @@ func (c *Entity) Router(router *gin.RouterGroup) {
 	entity.GET("/list", c.List)
 	entity.POST("", c.Add)
 	entity.POST("/list", c.ListByCondition)
+	entity.POST("/list/leaf", c.ListGroupByLeaf)
 	entity.PUT("/:id", c.Update)
 	entity.DELETE("/:id", c.Delete)
 }
@@ -62,6 +63,22 @@ func (c *Entity) ListByCondition(ctx *gin.Context) {
 		return
 	}
 	resp.Success(ctx, entities)
+}
+
+func (c *Entity) ListGroupByLeaf(ctx *gin.Context) {
+	var entity models.Entity
+	if err := ctx.ShouldBindJSON(&entity); err != nil {
+		resp.ErrorBusiness(ctx, resp.ErrorParams, "params error: ", err)
+		return
+	}
+
+	entities, err := c.EntitySvc.ListWithCondition(&entity)
+	if err != nil {
+		resp.ErrorBusiness(ctx, resp.ErrorMysql, "entity get error", err)
+		return
+	}
+	areas := c.EntitySvc.GroupByArea(entities)
+	resp.Success(ctx, areas)
 }
 
 func (c *Entity) Add(ctx *gin.Context) {

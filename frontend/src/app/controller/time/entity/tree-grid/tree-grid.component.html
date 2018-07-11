@@ -1,0 +1,34 @@
+<clr-tabs>
+	<clr-tab *ngFor="let key of getKeys(fieldMap)">
+		<button (click)="changeField(key)" clrTabLink>{{ fieldMap.get(key) }}</button>
+    <clr-tab-content *clrIfActive="key == this.firstFieldId">
+      <div class="row">
+        <div class="col-xs-6">
+          <ej-treegrid 
+            id="TreeGridEntity" 
+            sizeSettings.height="330px" 
+            sizeSettings.width="400px" 
+            idMapping="Id" 
+            childMapping="Children" 
+            parentIdMapping= "ParentId"
+            hasChildMapping= "IsParent"
+            [enableVirtualization]= "true"
+            [dataSource]="treeGridData" 
+            [columns]="treeColumns" 
+            [treeColumnIndex]="treeColumnIndex"
+            [enableCollapseAll]="true"
+            [contextMenuSettings]="contextMenuSettings" 
+            (contextMenuOpen)="contextMenuOpen($event)"
+            (recordDoubleClick)="selectEntityInfo($event)"
+          >
+          </ej-treegrid>
+        </div>
+        <div class="col-xs-6">
+          <ng-content></ng-content>
+        </div>
+      </div>
+    </clr-tab-content>
+  </clr-tab>
+</clr-tabs>
+<!-- [allowPaging]="true" -->
+<!-- [pageSettings]="treePageSettings" --> 

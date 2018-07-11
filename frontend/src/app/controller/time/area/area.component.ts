@@ -3,7 +3,6 @@ import { TreeModel, TreeModelSettings, NodeEvent } from 'ng2-tree';
 
 import { Area }                from '../../../model/time/area';
 import { AreaService }         from '../../../service/time/area.service';
-import { FieldService }        from '../../../service/time/field.service';
 import { ListEntityComponent } from '../entity//list/list.component';
 import { AreaType }            from '../../../shared/shared.const';
 
@@ -29,7 +28,6 @@ export class AreaComponent implements OnInit {
   }
 
   selectAreaNode($event): void {
-    console.log($event);
     this.entityListComponent.setFilterAreaId($event);
     this.entityListComponent.refreshClassify(0, this.entityListComponent.pageSize);
   }
