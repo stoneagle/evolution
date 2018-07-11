@@ -29,6 +29,7 @@ func (c *Project) Router(router *gin.RouterGroup) {
 	project := router.Group(c.Name).Use(middles.One(c.ProjectSvc, c.Name))
 	project.GET("/get/:id", c.One)
 	project.GET("/list", c.List)
+	project.GET("/list/", c.List)
 	project.POST("", c.Add)
 	project.POST("/list", c.ListByCondition)
 	project.PUT("/:id", c.Update)

@@ -16,6 +16,7 @@ import (
 var (
 	SessionBasicAuth = "basicAuth"
 	TypeBasicAuth    = "BasicAuth"
+	TypeBAJwt        = "BAJwt"
 )
 
 func BasicAuthLogin() gin.HandlerFunc {

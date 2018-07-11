@@ -2,6 +2,7 @@ package bootstrap
 
 import (
 	"evolution/backend/common/config"
+	"evolution/backend/common/middles"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -36,12 +37,20 @@ func (b *Bootstrapper) Bootstrap() *Bootstrapper {
 
 	// cors must set in bootstrap
 	if b.Config.App.Mode == "debug" {
+		exposeHeaders := []string{
+			"Content-Length",
+		}
+		switch b.Config.System.Auth.Type {
+		case middles.TypeBAJwt:
+			exposeHeaders = append(exposeHeaders, middles.JwtTokenHeader)
+		}
+
 		b.App.Use(cors.New(cors.Config{
 			AllowHeaders:     []string{"Content-Type", "Access-Control-Allow-Origin", "Authorization"},
 			AllowMethods:     []string{"GET", "POST", "DELETE", "PUT", "PATCH"},
 			AllowCredentials: true,
 			AllowOrigins:     b.Config.Time.System.Cors,
-			ExposeHeaders:    []string{"Content-Length"},
+			ExposeHeaders:    exposeHeaders,
 			AllowOriginFunc: func(origin string) bool {
 				return origin == "http://localhost:8080"
 			},

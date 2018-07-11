@@ -1,5 +1,5 @@
-hash: e930e3f3071dc1a223c076779d3fbe88bab48036b357943a90dc02c48279fb06
-updated: 2018-07-06T20:57:51.38158473+08:00
+hash: 398656a8d1fe502443c4f78876d1d26d236cedd3f5a49c5b734c7fbfb0880fda
+updated: 2018-07-11T17:48:11.995513885+08:00
 imports:
 - name: git.apache.org/thrift.git
   version: 327ebb6c2b6df8bf075da02ef45a2a034e9b79ba
@@ -8,6 +8,8 @@ imports:
   - lib/go/thrift/...
 - name: github.com/boj/redistore
   version: 0cd55584b172cefd31c4cb84e2904585d898c7b2
+- name: github.com/dgrijalva/jwt-go
+  version: 06ea1031745cb8b3dab3f6a236daf2b0aa468b7e
 - name: github.com/fatih/structs
   version: a720dfa8df582c51dee1b36feabb906bde1588bd
 - name: github.com/garyburd/redigo
@@ -42,13 +44,13 @@ imports:
 - name: github.com/go-sql-driver/mysql
   version: d523deb1b23d913de5bdada721a6071e71283618
 - name: github.com/go-xorm/builder
-  version: bad0a612f0d6277b953910822ab5dfb30dd18237
+  version: dc8bf48f58fab2b4da338ffd25191905fd741b8f
 - name: github.com/go-xorm/core
   version: c10e21e7e1cec20e09398f2dfae385e58c8df555
 - name: github.com/go-xorm/xorm
   version: d85bb4911c725a53b135fc12862748a41b6c07da
 - name: github.com/golang/protobuf
-  version: 9eb2c01ac278a5d89ce4b2be68fe4500955d8179
+  version: 0cb4f732569330e7b40d8fcee91c41aafaaddc4f
   subpackages:
   - proto
 - name: github.com/gorilla/context
@@ -60,7 +62,7 @@ imports:
 - name: github.com/gorilla/websocket
   version: ea4d1f681babbce9545c9c5f3d5194a789c89f5b
 - name: github.com/influxdata/influxdb
-  version: 70441a240389c03a80d847539689dad80f603700
+  version: 62ab18a0f43ee342b84debaaae5486b8b2d8682c
   subpackages:
   - client/v2
 - name: github.com/json-iterator/go
@@ -91,11 +93,11 @@ imports:
   - internal/exit
   - zapcore
 - name: golang.org/x/net
-  version: 32a936f46389aa10549d60bd7833e54b01685d09
+  version: 039a4258aec0ad3c79b905677cceeab13b296a77
   subpackages:
   - context
 - name: golang.org/x/sys
-  version: ce36f3865eeb42541ce3f87f32f8462c5687befa
+  version: 1b2967e3c290b7c545b3db0deeda16e9be4f98a2
   subpackages:
   - unix
 - name: google.golang.org/appengine

@@ -3,7 +3,7 @@ import { HttpClient, HttpHeaders  } from '@angular/common/http';
 import { Observable }               from 'rxjs';
 import { of }                       from 'rxjs/observable/of';
 import { catchError, map, tap  }    from 'rxjs/operators';
-import { Response }                 from '../../model/base/response.model';
+import { Resp }                 from '../../model/base/resp';
 import { AppConfig }                from '../base/config.service';
 import { MessageHandlerService  }   from '../base/message-handler.service';
 import { BaseService  }             from '../base/base.service';
@@ -22,8 +22,8 @@ export class ConfigService extends BaseService {
 
   AssetList(): Observable<Map<string, string>> {
     this.operation = 'SYSTEM.PROCESS.LIST';
-    return this.http.get<Response>(AppConfig.settings.apiServer.endpoint + this.uri + "/asset").pipe(
-      catchError(this.handleError<Response>()),
+    return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + "/asset").pipe(
+      catchError(this.handleError<Resp>()),
       map(res => {
         let ret:Map<string, string> = new Map();
         if (res && res.code == 0) {
@@ -38,8 +38,8 @@ export class ConfigService extends BaseService {
 
   TypeList(resource: string): Observable<Map<string, Map<string, string[]>>> {
     this.operation = 'SYSTEM.PROCESS.LIST';
-    return this.http.get<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/type/${resource}`).pipe(
-      catchError(this.handleError<Response>()),
+    return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/type/${resource}`).pipe(
+      catchError(this.handleError<Resp>()),
       map(res => {
         let ret:Map<string, Map<string, string[]>> = new Map();
         if (res && res.code == 0) {
@@ -58,8 +58,8 @@ export class ConfigService extends BaseService {
 
   StrategyList(ctype: string): Observable<Map<string, string>> {
     this.operation = 'SYSTEM.PROCESS.LIST';
-    return this.http.get<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/strategy/${ctype}`).pipe(
-      catchError(this.handleError<Response>()),
+    return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/strategy/${ctype}`).pipe(
+      catchError(this.handleError<Resp>()),
       map(res => {
         let ret:Map<string, string> = new Map();
         if (res && res.code == 0) {

@@ -40,12 +40,12 @@ func exec(dbConfig config.DBConf, mode string) {
 	engine.StoreEngine("InnoDB")
 	engine.Charset("utf8")
 	// if mode == "debug" {
-	// 	err = engine.DropTables(new(models.Area), new(models.Country), new(models.Field), new(models.Entity), new(models.Phase), new(models.Resource), new(models.Quest), new(models.QuestTeam), new(models.QuestTimeTable), new(models.QuestTarget), new(models.QuestEntity))
+	// 	err = engine.DropTables(new(models.Area), new(models.Country), new(models.Field), new(models.Entity), new(models.Phase), new(models.Resource), new(models.Quest), new(models.QuestTeam), new(models.QuestTimeTable), new(models.QuestTarget), new(models.QuestEntity), new(models.Project))
 	// 	if err != nil {
 	// 		panic(err)
 	// 	}
 	// }
-	err = engine.Sync2(new(models.Area), new(models.Country), new(models.Field), new(models.Entity), new(models.Phase), new(models.Resource), new(models.Quest), new(models.QuestTeam), new(models.QuestTimeTable), new(models.QuestTarget), new(models.QuestEntity))
+	err = engine.Sync2(new(models.Area), new(models.Country), new(models.Field), new(models.Entity), new(models.Phase), new(models.Resource), new(models.Quest), new(models.QuestTeam), new(models.QuestTimeTable), new(models.QuestTarget), new(models.QuestEntity), new(models.Project))
 	if err != nil {
 		panic(err)
 	}

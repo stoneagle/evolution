@@ -7,6 +7,11 @@ export const httpStatusCode = {
   "Unauthorized": 401,
 }
 
+export const AuthType = {
+  BasicAuth: "basic-auth",
+  BasicAuthJwt: "basic-auth-jwt",
+}
+
 export const AreaType = {
   Root: 1,
   Node: 2,

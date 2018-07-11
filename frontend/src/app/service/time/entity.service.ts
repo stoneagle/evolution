@@ -8,7 +8,7 @@ import { MessageHandlerService  }   from '../base/message-handler.service';
 import { BaseService  }             from '../base/base.service';
 import { Area }                     from '../../model/time/area';
 import { Entity }                   from '../../model/time/entity';
-import { Response }                 from '../../model/base/response.model';
+import { Resp }                 from '../../model/base/resp';
 
 @Injectable()
 export class EntityService extends BaseService {
@@ -24,8 +24,8 @@ export class EntityService extends BaseService {
 
   List(): Observable<Entity[]> {
     this.operation = 'SYSTEM.PROCESS.LIST';
-    return this.http.get<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`).pipe(
-      catchError(this.handleError<Response>()),
+    return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`).pipe(
+      catchError(this.handleError<Resp>()),
       map(res => {
         let ret:Entity[] = []; 
         if (res && res.code == 0) {
@@ -42,8 +42,8 @@ export class EntityService extends BaseService {
 
   ListWithCondition(entity: Entity): Observable<Entity[]> {
     this.operation = 'SYSTEM.PROCESS.LIST';
-    return this.http.post<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`, JSON.stringify(entity)).pipe(
-      catchError(this.handleError<Response>()),
+    return this.http.post<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`, JSON.stringify(entity)).pipe(
+      catchError(this.handleError<Resp>()),
       map(res => {
         let ret:Entity[] = []; 
         if (res && res.code == 0) {
@@ -60,8 +60,8 @@ export class EntityService extends BaseService {
 
   ListGroupByLeaf(entity: Entity): Observable<Area[]> {
     this.operation = 'SYSTEM.PROCESS.LIST';
-    return this.http.post<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/list/leaf`, JSON.stringify(entity)).pipe(
-      catchError(this.handleError<Response>()),
+    return this.http.post<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/list/leaf`, JSON.stringify(entity)).pipe(
+      catchError(this.handleError<Resp>()),
       map(res => {
         let ret:Area[] = []; 
         if (res && res.code == 0) {
@@ -78,8 +78,8 @@ export class EntityService extends BaseService {
 
   Get(id: number): Observable<Entity> {
     this.operation = 'SYSTEM.PROCESS.GET';
-    return this.http.get<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/get/${id}`).pipe(
-      catchError(this.handleError<Response>()),
+    return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/get/${id}`).pipe(
+      catchError(this.handleError<Resp>()),
       map(res => {
         if (res && res.code == 0) {
           return new Entity(res.data);
@@ -92,9 +92,9 @@ export class EntityService extends BaseService {
 
   Add(entity: Entity): Observable<Entity> {
     this.operation = 'SYSTEM.PROCESS.CREATE';
-    return this.http.post<Response>(AppConfig.settings.apiServer.endpoint + this.uri, JSON.stringify(entity)).pipe(
+    return this.http.post<Resp>(AppConfig.settings.apiServer.endpoint + this.uri, JSON.stringify(entity)).pipe(
       tap(res => this.log(res)),
-      catchError(this.handleError<Response>()),
+      catchError(this.handleError<Resp>()),
       map(res => {
         if (res && res.code == 0) {
           return new Entity(res.data);
@@ -105,19 +105,19 @@ export class EntityService extends BaseService {
     );
   }
 
-  Update(entity: Entity): Observable<Response> {
+  Update(entity: Entity): Observable<Resp> {
     this.operation = 'SYSTEM.PROCESS.UPDATE';
-    return this.http.put<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/${entity.Id}`, JSON.stringify(entity)).pipe(
+    return this.http.put<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/${entity.Id}`, JSON.stringify(entity)).pipe(
       tap(res => this.log(res)),
-      catchError(this.handleError<Response>()),
+      catchError(this.handleError<Resp>()),
     );
   }
 
-  Delete(id: number): Observable<Response> {
+  Delete(id: number): Observable<Resp> {
     this.operation = 'SYSTEM.PROCESS.DELETE';
-    return this.http.delete<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/${id}`).pipe(
+    return this.http.delete<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/${id}`).pipe(
       tap(res => this.log(res)),
-      catchError(this.handleError<Response>())
+      catchError(this.handleError<Resp>())
     );
   }
 }

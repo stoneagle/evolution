@@ -11,17 +11,19 @@ import (
 )
 
 func Configure(b *bootstrap.Bootstrapper) {
-	store, err := database.SessionByRedis(b.Config.System.Redis)
-	if err != nil {
-		panic(err)
-	}
-	b.App.Use(sessions.Sessions(b.Config.System.Auth.Session, store))
 
 	prefix := b.Config.Time.System.Prefix + "/" + b.Config.Time.System.Version
 	var v1 *gin.RouterGroup
 	switch b.Config.System.Auth.Type {
 	case middles.TypeBasicAuth:
+		store, err := database.SessionByRedis(b.Config.System.Redis)
+		if err != nil {
+			panic(err)
+		}
+		b.App.Use(sessions.Sessions(b.Config.System.Auth.Session, store))
 		v1 = b.App.Group(prefix, middles.BasicAuthCheck())
+	case middles.TypeBAJwt:
+		v1 = b.App.Group(prefix, middles.JWTAuthCheck())
 	default:
 		v1 = b.App.Group(prefix)
 	}

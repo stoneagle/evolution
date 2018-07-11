@@ -5,7 +5,7 @@ import { of }                       from 'rxjs/observable/of';
 import { catchError, map, tap  }    from 'rxjs/operators';
 import { AppConfig }                from './config.service';
 import { MessageHandlerService  }   from '../base/message-handler.service';
-import { Response }                 from '../../model/base/response.model';
+import { Resp }                 from '../../model/base/resp';
 import { WsStatus }                 from '../../shared/shared.const';
 
 @Injectable()
@@ -26,7 +26,7 @@ export class BaseService {
     }
   }
 
-  protected log(res: Response, message?: string) {
+  protected log(res: Resp, message?: string) {
     if (res.code != 0) {
       this.messageHandlerService.showWarning(this.resource, this.operation, res.desc);
     } else {   
@@ -34,7 +34,7 @@ export class BaseService {
     }   
   }
 
-  protected logWs(res: Response): boolean {
+  protected logWs(res: Resp): boolean {
     if (!res || res.code != 0) {
       this.messageHandlerService.showWarning(this.resource, this.operation, res.desc);
       return false;

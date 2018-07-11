@@ -8,7 +8,7 @@ import { MessageHandlerService  }   from '../base/message-handler.service';
 import { WebsocketService  }        from '../base/websocket.service';
 import { BaseService  }             from '../base/base.service';
 import { Item }                     from '../../model/quant/item';
-import { Response }                 from '../../model/base/response.model';
+import { Resp }                 from '../../model/base/resp';
 import { Classify }                 from '../../model/quant/classify';
 import { AssetSource }              from '../../model/quant/config';
 import { Event }                    from '../../model/base/socket';
@@ -29,8 +29,8 @@ export class ItemService extends BaseService {
 
   List(item?: Item): Observable<Item[]> {
     this.operation = 'SYSTEM.PROCESS.LIST';
-    return this.http.post<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`, JSON.stringify(item)).pipe(
-      catchError(this.handleError<Response>()),
+    return this.http.post<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`, JSON.stringify(item)).pipe(
+      catchError(this.handleError<Resp>()),
       map(res => {
         let ret:Item[] = []; 
         if (res && res.code == 0) {
@@ -47,8 +47,8 @@ export class ItemService extends BaseService {
 
   Get(id: number): Observable<Item> {
     this.operation = 'SYSTEM.PROCESS.GET';
-    return this.http.get<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/get/${id}`).pipe(
-      catchError(this.handleError<Response>()),
+    return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/get/${id}`).pipe(
+      catchError(this.handleError<Resp>()),
       map(res => {
         if (res && res.code == 0) {
           let item = new Item(res.data);
@@ -65,9 +65,9 @@ export class ItemService extends BaseService {
 
   SyncClassify(classify: Classify): Observable<Boolean> {
     this.operation = 'SYSTEM.PROCESS.SYNC';
-    return this.http.post<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/sync/classify`, JSON.stringify(classify)).pipe(
+    return this.http.post<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/sync/classify`, JSON.stringify(classify)).pipe(
       tap(res => this.log(res)),
-      catchError(this.handleError<Response>()),
+      catchError(this.handleError<Resp>()),
       map(res => {
         if (res && res.code == 0) {
           return true;
@@ -80,9 +80,9 @@ export class ItemService extends BaseService {
 
   SyncPoint(id: number): Observable<Boolean> {
     this.operation = 'SYSTEM.PROCESS.SYNC';
-    return this.http.get<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/point/${id}`).pipe(
+    return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/point/${id}`).pipe(
       tap(res => this.log(res)),
-      catchError(this.handleError<Response>()),
+      catchError(this.handleError<Resp>()),
       map(res => {
         if (res && res.code == 0) {
           return true;
@@ -122,11 +122,11 @@ export class ItemService extends BaseService {
     return sub;
   }
 
-  Delete(id: number): Observable<Response> {
+  Delete(id: number): Observable<Resp> {
     this.operation = 'SYSTEM.PROCESS.DELETE';
-    return this.http.delete<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/${id}`).pipe(
+    return this.http.delete<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/${id}`).pipe(
       tap(res => this.log(res)),
-      catchError(this.handleError<Response>())
+      catchError(this.handleError<Resp>())
     );
   }
 }

@@ -7,7 +7,7 @@ import { AppConfig }                from '../base/config.service';
 import { MessageHandlerService  }   from '../base/message-handler.service';
 import { BaseService  }             from '../base/base.service';
 import { QuestTimeTable }           from '../../model/time/quest';
-import { Response }                 from '../../model/base/response.model';
+import { Resp }                 from '../../model/base/resp';
 
 @Injectable()
 export class QuestTimeTableService extends BaseService {
@@ -23,8 +23,8 @@ export class QuestTimeTableService extends BaseService {
 
   List(): Observable<QuestTimeTable[]> {
     this.operation = 'SYSTEM.PROCESS.LIST';
-    return this.http.get<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`).pipe(
-      catchError(this.handleError<Response>()),
+    return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`).pipe(
+      catchError(this.handleError<Resp>()),
       map(res => {
         let ret:QuestTimeTable[] = []; 
         if (res && res.code == 0) {
@@ -41,8 +41,8 @@ export class QuestTimeTableService extends BaseService {
 
   ListWithCondition(questTimeTable: QuestTimeTable): Observable<QuestTimeTable[]> {
     this.operation = 'SYSTEM.PROCESS.LIST';
-    return this.http.post<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`, JSON.stringify(questTimeTable)).pipe(
-      catchError(this.handleError<Response>()),
+    return this.http.post<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`, JSON.stringify(questTimeTable)).pipe(
+      catchError(this.handleError<Resp>()),
       map(res => {
         let ret:QuestTimeTable[] = []; 
         if (res && res.code == 0) {
@@ -59,8 +59,8 @@ export class QuestTimeTableService extends BaseService {
 
   Get(id: number): Observable<QuestTimeTable> {
     this.operation = 'SYSTEM.PROCESS.GET';
-    return this.http.get<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/get/${id}`).pipe(
-      catchError(this.handleError<Response>()),
+    return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/get/${id}`).pipe(
+      catchError(this.handleError<Resp>()),
       map(res => {
         if (res && res.code == 0) {
           return new QuestTimeTable(res.data);
@@ -73,9 +73,9 @@ export class QuestTimeTableService extends BaseService {
 
   Add(questTimeTable: QuestTimeTable): Observable<QuestTimeTable> {
     this.operation = 'SYSTEM.PROCESS.CREATE';
-    return this.http.post<Response>(AppConfig.settings.apiServer.endpoint + this.uri, JSON.stringify(questTimeTable)).pipe(
+    return this.http.post<Resp>(AppConfig.settings.apiServer.endpoint + this.uri, JSON.stringify(questTimeTable)).pipe(
       tap(res => this.log(res)),
-      catchError(this.handleError<Response>()),
+      catchError(this.handleError<Resp>()),
       map(res => {
         if (res && res.code == 0) {
           return new QuestTimeTable(res.data);
@@ -86,19 +86,19 @@ export class QuestTimeTableService extends BaseService {
     );
   }
 
-  Update(questTimeTable: QuestTimeTable): Observable<Response> {
+  Update(questTimeTable: QuestTimeTable): Observable<Resp> {
     this.operation = 'SYSTEM.PROCESS.UPDATE';
-    return this.http.put<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/${questTimeTable.Id}`, JSON.stringify(questTimeTable)).pipe(
+    return this.http.put<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/${questTimeTable.Id}`, JSON.stringify(questTimeTable)).pipe(
       tap(res => this.log(res)),
-      catchError(this.handleError<Response>()),
+      catchError(this.handleError<Resp>()),
     );
   }
 
-  Delete(id: number): Observable<Response> {
+  Delete(id: number): Observable<Resp> {
     this.operation = 'SYSTEM.PROCESS.DELETE';
-    return this.http.delete<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/${id}`).pipe(
+    return this.http.delete<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/${id}`).pipe(
       tap(res => this.log(res)),
-      catchError(this.handleError<Response>())
+      catchError(this.handleError<Resp>())
     );
   }
 }

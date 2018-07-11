@@ -9,6 +9,8 @@ export interface IConfig {
     auth: {
       type: string;
       session: string;
+      token: string;
+      jwt: string;
     }
     prefix: {
       quant: string;

@@ -8,7 +8,7 @@ import { AppConfig }                from '../base/config.service';
 import { MessageHandlerService  }   from '../base/message-handler.service';
 import { BaseService  }             from '../base/base.service';
 import { Area }                     from '../../model/time/area';
-import { Response }                 from '../../model/base/response.model';
+import { Resp }                 from '../../model/base/resp';
 
 @Injectable()
 export class AreaService extends BaseService {
@@ -24,8 +24,8 @@ export class AreaService extends BaseService {
 
   ListAreaMap(area: Area): Observable<Map<number, string>> {
     this.operation = 'SYSTEM.PROCESS.LIST';
-    return this.http.post<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`, JSON.stringify(area)).pipe(
-      catchError(this.handleError<Response>()),
+    return this.http.post<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`, JSON.stringify(area)).pipe(
+      catchError(this.handleError<Resp>()),
       map(res => {
         let ret:Map<number, string> = new Map(); 
         if (res && res.code == 0) {
@@ -43,8 +43,8 @@ export class AreaService extends BaseService {
 
   ListAllTree(): Observable<Map<number, TreeModel>> {
     this.operation = 'SYSTEM.PROCESS.LIST';
-    return this.http.get<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/list/tree/all`).pipe(
-      catchError(this.handleError<Response>()),
+    return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/list/tree/all`).pipe(
+      catchError(this.handleError<Resp>()),
       map(res => {
         let ret:Map<number, TreeModel> = new Map(); 
         if (res && res.code == 0) {
@@ -59,8 +59,8 @@ export class AreaService extends BaseService {
 
   ListOneTree(fieldId: number): Observable<TreeModel> {
     this.operation = 'SYSTEM.PROCESS.LIST';
-    return this.http.get<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/list/tree/one/${fieldId}`).pipe(
-      catchError(this.handleError<Response>()),
+    return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/list/tree/one/${fieldId}`).pipe(
+      catchError(this.handleError<Resp>()),
       map(res => {
         let ret:TreeModel; 
         if (res && res.code == 0) {
@@ -73,8 +73,8 @@ export class AreaService extends BaseService {
 
   ListParent(fieldId: number): Observable<Area[]> {
     this.operation = 'SYSTEM.PROCESS.LIST';
-    return this.http.get<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/list/parent/${fieldId}`).pipe(
-      catchError(this.handleError<Response>()),
+    return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/list/parent/${fieldId}`).pipe(
+      catchError(this.handleError<Resp>()),
       map(res => {
         let ret:Area[] = []; 
         if (res && res.code == 0) {
@@ -91,8 +91,8 @@ export class AreaService extends BaseService {
 
   ListChildren(parentId: number): Observable<Area[]> {
     this.operation = 'SYSTEM.PROCESS.LIST';
-    return this.http.get<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/list/children/${parentId}`).pipe(
-      catchError(this.handleError<Response>()),
+    return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/list/children/${parentId}`).pipe(
+      catchError(this.handleError<Resp>()),
       map(res => {
         let ret:Area[] = []; 
         if (res && res.code == 0) {
@@ -109,8 +109,8 @@ export class AreaService extends BaseService {
 
   List(): Observable<Area[]> {
     this.operation = 'SYSTEM.PROCESS.LIST';
-    return this.http.get<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`).pipe(
-      catchError(this.handleError<Response>()),
+    return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`).pipe(
+      catchError(this.handleError<Resp>()),
       map(res => {
         let ret:Area[] = []; 
         if (res && res.code == 0) {
@@ -127,8 +127,8 @@ export class AreaService extends BaseService {
 
   Get(id: number): Observable<Area> {
     this.operation = 'SYSTEM.PROCESS.GET';
-    return this.http.get<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/get/${id}`).pipe(
-      catchError(this.handleError<Response>()),
+    return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/get/${id}`).pipe(
+      catchError(this.handleError<Resp>()),
       map(res => {
         if (res && res.code == 0) {
           return new Area(res.data);
@@ -141,9 +141,9 @@ export class AreaService extends BaseService {
 
   Add(area: Area): Observable<Area> {
     this.operation = 'SYSTEM.PROCESS.CREATE';
-    return this.http.post<Response>(AppConfig.settings.apiServer.endpoint + this.uri, JSON.stringify(area)).pipe(
+    return this.http.post<Resp>(AppConfig.settings.apiServer.endpoint + this.uri, JSON.stringify(area)).pipe(
       tap(res => this.log(res)),
-      catchError(this.handleError<Response>()),
+      catchError(this.handleError<Resp>()),
       map(res => {
         if (res && res.code == 0) {
           return new Area(res.data);
@@ -154,19 +154,19 @@ export class AreaService extends BaseService {
     );
   }
 
-  Update(area: Area): Observable<Response> {
+  Update(area: Area): Observable<Resp> {
     this.operation = 'SYSTEM.PROCESS.UPDATE';
-    return this.http.put<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/${area.Id}`, JSON.stringify(area)).pipe(
+    return this.http.put<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/${area.Id}`, JSON.stringify(area)).pipe(
       tap(res => this.log(res)),
-      catchError(this.handleError<Response>()),
+      catchError(this.handleError<Resp>()),
     );
   }
 
-  Delete(id: number): Observable<Response> {
+  Delete(id: number): Observable<Resp> {
     this.operation = 'SYSTEM.PROCESS.DELETE';
-    return this.http.delete<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/${id}`).pipe(
+    return this.http.delete<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/${id}`).pipe(
       tap(res => this.log(res)),
-      catchError(this.handleError<Response>())
+      catchError(this.handleError<Resp>())
     );
   }
 }

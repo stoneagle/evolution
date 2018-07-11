@@ -7,8 +7,10 @@
     "endpoint": "http://192.168.0.119:8000/evolution/quant/v1",
     "websocket": "ws://192.168.0.119:8000/evolution/quant/v1",
     "auth": {
-      "type": "basic-auth",
-      "session": "auth-session"
+      "type": "basic-auth-jwt",
+      "session": "auth-session",
+      "token": "auth-token",
+      "jwt": "JwtToken"
     },
     "prefix": {
       "quant": "/quant/v1",

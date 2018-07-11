@@ -52,7 +52,7 @@ time:
     location: Asia/Shanghai
 system:
   auth:
-    type: "BasicAuth"
+    type: "BAJwt"
     session: "auth-session"
   system:
     name: system 
