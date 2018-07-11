@@ -13,24 +13,26 @@ import { EJ_SCHEDULE_COMPONENTS }    from 'ej-angular2/src/ej/schedule.component
 import { EJ_DATEPICKER_COMPONENTS }  from 'ej-angular2/src/ej/datepicker.component';
 
 import { QuestComponent }          from './quest/quest.component';
-import { SaveQuestComponent }      from './quest/save/save.component';
-import { GanttQuestComponent }     from './quest/gantt/gantt.component';
-import { ListQuestTeamComponent }  from './quest/team-list/team-list.component';
+import { QuestSaveComponent }      from './quest/save/save.component';
+import { QuestTeamListComponent }  from './quest/team-list/team-list.component';
+import { ProjectComponent }        from './project/project.component';
+import { ProjectGanttComponent }   from './project/gantt/gantt.component';
 import { CountryComponent }        from './country/country.component';
-import { SaveCountryComponent }    from './country/save/save.component';
+import { CountrySaveComponent }    from './country/save/save.component';
 import { PhaseComponent }          from './phase/phase.component';
-import { SavePhaseComponent }      from './phase/save/save.component';
-import { ListEntityComponent }     from './entity/list/list.component';
-import { SaveEntityComponent }     from './entity/save/save.component';
-import { TreeGridEntityComponent } from './entity/tree-grid/tree-grid.component';
+import { PhaseSaveComponent }      from './phase/save/save.component';
+import { EntityListComponent }     from './entity/list/list.component';
+import { EntitySaveComponent }     from './entity/save/save.component';
+import { EntityTreeGridComponent } from './entity/tree-grid/tree-grid.component';
 import { FieldComponent }          from './field/field.component';
-import { SaveFieldComponent }      from './field/save/save.component';
+import { FieldSaveComponent }      from './field/save/save.component';
 import { AreaComponent }           from './area/area.component';
 import { AreaNg2TreeComponent }    from './area/ng2-tree/ng2-tree.component';
 import { ResourceComponent }       from './resource/resource.component';
 import { ResourceEntityComponent } from './resource/entity-list/entity-list.component';
 
 import { CountryService }         from '../../service/time/country.service';
+import { ProjectService }         from '../../service/time/project.service';
 import { QuestService }           from '../../service/time/quest.service';
 import { QuestTargetService }     from '../../service/time/quest-target.service';
 import { QuestEntityService }     from '../../service/time/quest-entity.service';
@@ -46,18 +48,19 @@ import { MessageHandlerService  } from '../../service/base/message-handler.servi
 @NgModule({
   declarations: [
     QuestComponent,
-    SaveQuestComponent,
-    GanttQuestComponent,
-    ListQuestTeamComponent,
+    QuestSaveComponent,
+    QuestTeamListComponent,
+    ProjectComponent,
+    ProjectGanttComponent,
     CountryComponent,
-    SaveCountryComponent,
-    ListEntityComponent,
-    SaveEntityComponent,
-    TreeGridEntityComponent,
+    CountrySaveComponent,
+    EntityListComponent,
+    EntitySaveComponent,
+    EntityTreeGridComponent,
     PhaseComponent,
-    SavePhaseComponent,
+    PhaseSaveComponent,
     FieldComponent,
-    SaveFieldComponent,
+    FieldSaveComponent,
     AreaComponent,
     AreaNg2TreeComponent,
     ResourceComponent,
@@ -80,6 +83,7 @@ import { MessageHandlerService  } from '../../service/base/message-handler.servi
   providers: [ 
     AreaService,
     ResourceService,
+    ProjectService,
     QuestService,
     QuestTeamService,
     QuestTargetService,

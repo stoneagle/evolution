@@ -4,12 +4,12 @@ import { User }           from '../../../../model/system/user';
 import { UserService  }   from '../../../../service/system/user.service';
 
 @Component({
-  selector: 'system-save-user',
+  selector: 'system-user-save',
   templateUrl: './save.component.html',
   styleUrls: ['./save.component.css']
 })
 
-export class SaveUserComponent implements OnInit {
+export class UserSaveComponent implements OnInit {
   user: User = new User;
   modelOpened: boolean = false;
 

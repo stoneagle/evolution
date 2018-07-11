@@ -4,16 +4,16 @@ import { Entity }              from '../../../../model/time/entity';
 import { Area }                from '../../../../model/time/area';
 import { AreaService }         from '../../../../service/time/area.service';
 import { EntityService }       from '../../../../service/time/entity.service';
-import { SaveEntityComponent } from './../save/save.component';
+import { EntitySaveComponent } from './../save/save.component';
 
 @Component({
   selector: 'time-entity-list',
   templateUrl: './list.component.html',
   styleUrls: ['./list.component.css']
 })
-export class ListEntityComponent implements OnInit {
-  @ViewChild(SaveEntityComponent)
-  saveEntity: SaveEntityComponent;
+export class EntityListComponent implements OnInit {
+  @ViewChild(EntitySaveComponent)
+  saveEntity: EntitySaveComponent;
 
   filterAreaId: number;
 

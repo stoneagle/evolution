@@ -7,21 +7,22 @@ import { EJ_SCHEDULE_COMPONENTS }       from 'ej-angular2/src/ej/schedule.compon
 import { SessionUser }                                                from '../../../../model/base/sign';
 import { Quest, QuestTarget, QuestTeam, QuestEntity, QuestTimeTable } from '../../../../model/time/quest';
 import { Entity }                                                     from '../../../../model/time/entity';
-import { QuestService  }                                              from '../../../../service/time/quest.service';
-import { QuestTargetService  }                                        from '../../../../service/time/quest-target.service';
-import { QuestTeamService  }                                          from '../../../../service/time/quest-team.service';
-import { SignService  }                                               from '../../../../service/system/sign.service';
-import { Quest as QuestConst }                                        from '../../../../shared/shared.const';
 
-import { TreeGridEntityComponent } from '../../entity/tree-grid/tree-grid.component';
+import { QuestService  }           from '../../../../service/time/quest.service';
+import { QuestTargetService  }     from '../../../../service/time/quest-target.service';
+import { QuestTeamService  }       from '../../../../service/time/quest-team.service';
+import { SignService  }            from '../../../../service/system/sign.service';
+import { Quest as QuestConst }     from '../../../../shared/shared.const';
+import { EntityTreeGridComponent } from '../../entity/tree-grid/tree-grid.component';
+
 
 @Component({
-  selector: 'time-save-quest',
+  selector: 'time-quest-save',
   templateUrl: './save.component.html',
   styleUrls: ['./save.component.css']
 })
 
-export class SaveQuestComponent implements OnInit {
+export class QuestSaveComponent implements OnInit {
   constructor(
     private questService: QuestService,
     private questTargetService: QuestTargetService,
@@ -34,8 +35,8 @@ export class SaveQuestComponent implements OnInit {
   wizard: ClrWizard;
   @ViewChild("questForm") 
   questForm: NgForm;
-  @ViewChild(TreeGridEntityComponent) 
-  treeGridEntity: TreeGridEntityComponent;
+  @ViewChild(EntityTreeGridComponent) 
+  entityTreeGrid: EntityTreeGridComponent;
 
   currentUser: SessionUser = new SessionUser();
   quest: Quest                 = new Quest;

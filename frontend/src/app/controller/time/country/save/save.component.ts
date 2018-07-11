@@ -4,12 +4,12 @@ import { Country }           from '../../../../model/time/country';
 import { CountryService  }   from '../../../../service/time/country.service';
 
 @Component({
-  selector: 'time-save-country',
+  selector: 'time-country-save',
   templateUrl: './save.component.html',
   styleUrls: ['./save.component.css']
 })
 
-export class SaveCountryComponent implements OnInit {
+export class CountrySaveComponent implements OnInit {
   country: Country = new Country;
   modelOpened: boolean = false;
 

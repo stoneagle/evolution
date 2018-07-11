@@ -7,7 +7,7 @@ import { Entity }          from '../../../../model/time/entity';
 import { FieldService }    from '../../../../service/time/field.service';
 import { AreaType }        from '../../../../shared/shared.const';
 
-import { SaveEntityComponent }            from '../../entity/save/save.component';
+import { EntitySaveComponent }            from '../../entity/save/save.component';
 
 @Component({
   selector: 'time-area-ng2-tree',
@@ -15,8 +15,8 @@ import { SaveEntityComponent }            from '../../entity/save/save.component
   styleUrls: ['./ng2-tree.component.css']
 })
 export class AreaNg2TreeComponent implements OnInit {
-  @ViewChild(SaveEntityComponent)
-  saveEntity: SaveEntityComponent;
+  @ViewChild(EntitySaveComponent)
+  saveEntity: EntitySaveComponent;
 
   // TODO
   // 1. 递归删除/实体判断是否允许删除

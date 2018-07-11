@@ -4,12 +4,12 @@ import { Field }           from '../../../../model/time/field';
 import { FieldService  }   from '../../../../service/time/field.service';
 
 @Component({
-  selector: 'time-save-field',
+  selector: 'time-field-save',
   templateUrl: './save.component.html',
   styleUrls: ['./save.component.css']
 })
 
-export class SaveFieldComponent implements OnInit {
+export class FieldSaveComponent implements OnInit {
   field: Field = new Field;
   modelOpened: boolean = false;
 

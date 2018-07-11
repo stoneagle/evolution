@@ -4,12 +4,12 @@ import { Phase }           from '../../../../model/time/phase';
 import { PhaseService  }   from '../../../../service/time/phase.service';
 
 @Component({
-  selector: 'time-save-phase',
+  selector: 'time-phase-save',
   templateUrl: './save.component.html',
   styleUrls: ['./save.component.css']
 })
 
-export class SavePhaseComponent implements OnInit {
+export class PhaseSaveComponent implements OnInit {
   phase: Phase = new Phase;
   modelOpened: boolean = false;
 

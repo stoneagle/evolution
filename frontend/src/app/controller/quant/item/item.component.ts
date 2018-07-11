@@ -4,16 +4,16 @@ import { Item }                 from '../../../model/quant/item';
 import { ItemService }          from '../../../service/quant/item.service';
 import { ClassifyService }      from '../../../service/quant/classify.service';
 import { AssetSource }          from '../../../model/quant/config';
-import { AssetSourceComponent } from '../config/asset-source/asset-source.component';
+import { ConfigAssetSourceComponent } from '../config/asset-source/asset-source.component';
 
 @Component({
-  selector: 'app-item',
+  selector: 'quant-item',
   templateUrl: './item.component.html',
   styleUrls: ['./item.component.css']
 })
 export class ItemComponent implements OnInit {
-  @ViewChild(AssetSourceComponent)
-  assetSource: AssetSourceComponent;
+  @ViewChild(ConfigAssetSourceComponent)
+  assetSourceComponent: ConfigAssetSourceComponent;
 
   items: Item[];
   allItems: Item[] = [];
@@ -53,7 +53,7 @@ export class ItemComponent implements OnInit {
 
   openSyncModel(id?: number): void {
     this.syncModelOpened = true;
-    this.assetSource.New()
+    this.assetSourceComponent.New()
   }
 
   delete(item: Item): void {

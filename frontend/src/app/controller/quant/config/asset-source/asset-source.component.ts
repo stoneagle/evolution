@@ -5,12 +5,12 @@ import { AssetSource }    from '../../../../model/quant/config';
 import { ConfigService  } from '../../../../service/quant/config.service';
 
 @Component({
-  selector: 'asset-source',
+  selector: 'quant-config-asset-source',
   templateUrl: './asset-source.component.html',
   styleUrls: ['./asset-source.component.css']
 })
 
-export class AssetSourceComponent implements OnInit {
+export class ConfigAssetSourceComponent implements OnInit {
   assetSource: AssetSource = new AssetSource;
 
   selectMap: Map<string, Map<string, Map<string, string[]>>> = new Map();

@@ -1,8 +1,8 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 
-import { Country }             from '../../../model/time/country';
-import { CountryService }      from '../../../service/time/country.service';
-import { SaveCountryComponent }            from './save/save.component';
+import { Country }              from '../../../model/time/country';
+import { CountryService }       from '../../../service/time/country.service';
+import { CountrySaveComponent } from './save/save.component';
 
 @Component({
   selector: 'time-country',
@@ -10,8 +10,8 @@ import { SaveCountryComponent }            from './save/save.component';
   styleUrls: ['./country.component.css']
 })
 export class CountryComponent implements OnInit {
-  @ViewChild(SaveCountryComponent)
-  saveCountry: SaveCountryComponent;
+  @ViewChild(CountrySaveComponent)
+  saveCountry: CountrySaveComponent;
 
   countries: Country[];
 

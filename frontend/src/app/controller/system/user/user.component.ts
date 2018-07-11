@@ -1,8 +1,8 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 
-import { User }             from '../../../model/system/user';
-import { UserService }      from '../../../service/system/user.service';
-import { SaveUserComponent }            from './save/save.component';
+import { User }              from '../../../model/system/user';
+import { UserService }       from '../../../service/system/user.service';
+import { UserSaveComponent } from './save/save.component';
 
 @Component({
   selector: 'system-user',
@@ -10,8 +10,8 @@ import { SaveUserComponent }            from './save/save.component';
   styleUrls: ['./user.component.css']
 })
 export class UserComponent implements OnInit {
-  @ViewChild(SaveUserComponent)
-  saveUser: SaveUserComponent;
+  @ViewChild(UserSaveComponent)
+  saveUser: UserSaveComponent;
 
   users: User[];
   pageSize: number = 10;

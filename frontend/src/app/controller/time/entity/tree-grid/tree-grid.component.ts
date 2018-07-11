@@ -12,7 +12,7 @@ import { EntityService } from '../../../../service/time/entity.service';
   templateUrl: './tree-grid.component.html',
   styleUrls: ['./tree-grid.component.css']
 })
-export class TreeGridEntityComponent implements OnInit {
+export class EntityTreeGridComponent implements OnInit {
   constructor(
     private areaService: AreaService,
     private entityService: EntityService,

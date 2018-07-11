@@ -5,12 +5,12 @@ import { PoolService  }   from '../../../../service/quant/pool.service';
 import { ConfigService  } from '../../../../service/quant/config.service';
 
 @Component({
-  selector: 'save-pool',
+  selector: 'quant-pool-save',
   templateUrl: './save.component.html',
   styleUrls: ['./save.component.css']
 })
 
-export class SavePoolComponent implements OnInit {
+export class PoolSaveComponent implements OnInit {
   typeMap: Map<string, string> = new Map();
   strategyMap: Map<string, string> = new Map();
   pool: Pool = new Pool;

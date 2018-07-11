@@ -8,9 +8,9 @@ import { ItemService } from '../../../../service/quant/item.service';
 import { doFiltering } from '../../../../shared/utils';
 
 @Component({
-  selector: 'pool-add-item',
-  templateUrl: './pool-add-item.component.html',
-  styleUrls: ['./pool-add-item.component.css']
+  selector: 'quant-pool-add-item',
+  templateUrl: './add-item.component.html',
+  styleUrls: ['./add-item.component.css']
 })
 
 export class PoolAddItemComponent implements OnInit {

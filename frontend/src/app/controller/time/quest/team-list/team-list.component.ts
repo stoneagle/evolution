@@ -11,7 +11,7 @@ import { UserService }      from '../../../../service/system/user.service';
   templateUrl: './team-list.component.html',
   styleUrls: ['./team-list.component.css']
 })
-export class ListQuestTeamComponent implements OnInit {
+export class QuestTeamListComponent implements OnInit {
   questTeams: QuestTeam[];
 
   pageSize: number = 10;

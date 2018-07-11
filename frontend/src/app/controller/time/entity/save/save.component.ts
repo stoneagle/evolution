@@ -7,12 +7,12 @@ import { EntityService  } from '../../../../service/time/entity.service';
 import { AreaType  } from '../../../../shared/shared.const';
 
 @Component({
-  selector: 'time-save-entity',
+  selector: 'time-entity-save',
   templateUrl: './save.component.html',
   styleUrls: ['./save.component.css']
 })
 
-export class SaveEntityComponent implements OnInit {
+export class EntitySaveComponent implements OnInit {
   entity: Entity = new Entity;
   modelOpened: boolean = false;
 

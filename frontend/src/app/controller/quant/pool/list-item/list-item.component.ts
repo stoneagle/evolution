@@ -6,12 +6,12 @@ import { Pool }                 from '../../../../model/quant/pool';
 import { Classify }             from '../../../../model/quant/classify';
 import { PoolService }          from '../../../../service/quant/pool.service';
 import { ItemService }          from '../../../../service/quant/item.service';
-import { PoolAddItemComponent } from '../add-item/pool-add-item.component';
+import { PoolAddItemComponent } from '../add-item/add-item.component';
 
 @Component({
-  selector: 'pool-list-item',
-  templateUrl: './pool-list-item.component.html',
-  styleUrls: ['./pool-list-item.component.css']
+  selector: 'quant-pool-list-item',
+  templateUrl: './list-item.component.html',
+  styleUrls: ['./list-item.component.css']
 })
 export class PoolListItemComponent implements OnInit {
   @ViewChild(PoolAddItemComponent)

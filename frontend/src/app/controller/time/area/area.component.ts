@@ -3,7 +3,7 @@ import { TreeModel, TreeModelSettings, NodeEvent } from 'ng2-tree';
 
 import { Area }                from '../../../model/time/area';
 import { AreaService }         from '../../../service/time/area.service';
-import { ListEntityComponent } from '../entity//list/list.component';
+import { EntityListComponent } from '../entity//list/list.component';
 import { AreaType }            from '../../../shared/shared.const';
 
 import { AreaNg2TreeComponent } from './ng2-tree/ng2-tree.component';
@@ -17,8 +17,8 @@ export class AreaComponent implements OnInit {
   @ViewChild(AreaNg2TreeComponent)
   ng2TreeComponent: AreaNg2TreeComponent;
 
-  @ViewChild(ListEntityComponent)
-  entityListComponent: ListEntityComponent;
+  @ViewChild(EntityListComponent)
+  entityListComponent: EntityListComponent;
 
   constructor(
     private areaService: AreaService,

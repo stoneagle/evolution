@@ -2,8 +2,8 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { Quest }                        from '../../../model/time/quest';
 import { QuestService }                 from '../../../service/time/quest.service';
 import { Quest as QuestConst }          from '../../../shared/shared.const';
-import { SaveQuestComponent }           from './save/save.component';
-import { ListQuestTeamComponent }       from './team-list/team-list.component';
+import { QuestSaveComponent }           from './save/save.component';
+import { QuestTeamListComponent }       from './team-list/team-list.component';
 
 @Component({
   selector: 'time-quest',
@@ -11,10 +11,10 @@ import { ListQuestTeamComponent }       from './team-list/team-list.component';
   styleUrls: ['./quest.component.css']
 })
 export class QuestComponent implements OnInit {
-  @ViewChild(SaveQuestComponent)
-  saveQuest: SaveQuestComponent;
-  @ViewChild(ListQuestTeamComponent)
-  listQuestTeam: ListQuestTeamComponent;
+  @ViewChild(QuestSaveComponent)
+  saveComponent: QuestSaveComponent;
+  @ViewChild(QuestTeamListComponent)
+  questTeamListComponent: QuestTeamListComponent;
 
   quests: Quest[];
   pageSize: number = 10;
@@ -43,11 +43,11 @@ export class QuestComponent implements OnInit {
   }
 
   openSaveModel(id?: number): void {
-    this.saveQuest.New(id);
+    this.saveComponent.New(id);
   }
 
   openTeamList(id: number): void {
-    this.listQuestTeam.New(id);
+    this.questTeamListComponent.New(id);
   }
 
   delete(quest: Quest): void {

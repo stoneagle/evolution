@@ -8,7 +8,7 @@ import { ClarityModule  }            from "@clr/angular";
 import { TranslateModule  }          from "@ngx-translate/core";
 
 import { UserComponent }     from './user/user.component';
-import { SaveUserComponent } from './user/save/save.component';
+import { UserSaveComponent } from './user/save/save.component';
 
 import { UserService }         from '../../service/system/user.service';
 
@@ -16,7 +16,7 @@ import { UserService }         from '../../service/system/user.service';
 @NgModule({
   declarations: [
     UserComponent,
-    SaveUserComponent,
+    UserSaveComponent,
   ],
   imports: [   
     BrowserModule,

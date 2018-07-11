@@ -4,16 +4,16 @@ import { Classify }             from '../../../model/quant/classify';
 import { ClassifyService }      from '../../../service/quant/classify.service';
 import { ItemService }          from '../../../service/quant/item.service';
 import { AssetSource }          from '../../../model/quant/config';
-import { AssetSourceComponent } from '../config/asset-source/asset-source.component';
+import { ConfigAssetSourceComponent } from '../config/asset-source/asset-source.component';
 
 @Component({
-  selector: 'app-classify',
+  selector: 'quant-classify',
   templateUrl: './classify.component.html',
   styleUrls: ['./classify.component.css']
 })
 export class ClassifyComponent implements OnInit {
-  @ViewChild(AssetSourceComponent)
-  assetSource: AssetSourceComponent;
+  @ViewChild(ConfigAssetSourceComponent)
+  assetSourceComponent: ConfigAssetSourceComponent;
 
   classifys: Classify[];
 
@@ -51,7 +51,7 @@ export class ClassifyComponent implements OnInit {
 
   openSyncModel(): void {
     this.syncModelOpened = true;
-    this.assetSource.New()
+    this.assetSourceComponent.New()
   }
 
   delete(classify: Classify): void {
