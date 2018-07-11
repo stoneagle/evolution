@@ -11,7 +11,7 @@ import { Response }                 from '../../model/base/response.model';
 
 @Injectable()
 export class QuestTeamService extends BaseService {
-  private uri = AppConfig.settings.apiServer.prefix.time + '/quest/team';
+  private uri = AppConfig.settings.apiServer.prefix.time + '/quest-team';
 
   constructor(
     protected http: HttpClient,

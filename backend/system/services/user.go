@@ -58,9 +58,8 @@ func (s *User) List() (users []models.User, err error) {
 
 func (s *User) ListWithCondition(user *models.User) (users []models.User, err error) {
 	users = make([]models.User, 0)
-	sql := s.Engine.Asc("level")
 	condition := user.BuildCondition()
-	sql = sql.Where(condition)
+	sql := s.Engine.Where(condition)
 	err = sql.Find(&users)
 	if err != nil {
 		return

@@ -2,13 +2,16 @@ import { Component, OnInit, ViewChild, Output, Input, EventEmitter }  from '@ang
 import { ClrWizard }                                                  from "@clr/angular";
 import * as _                                                         from 'lodash';
 import { NgForm  }                                                    from '@angular/forms';
-import { Quest, QuestTarget, QuestTeam, QuestEntity, QuestTimeTable } from '../../../../model/time/quest';
+import { EJ_SCHEDULE_COMPONENTS }       from 'ej-angular2/src/ej/schedule.component';
 
-import { SessionUser }         from '../../../../model/base/sign';
-import { Entity }         from '../../../../model/time/entity';
-import { QuestService  }       from '../../../../service/time/quest.service';
-import { SignService  }        from '../../../../service/system/sign.service';
-import { Quest as QuestConst } from '../../../../shared/shared.const';
+import { SessionUser }                                                from '../../../../model/base/sign';
+import { Quest, QuestTarget, QuestTeam, QuestEntity, QuestTimeTable } from '../../../../model/time/quest';
+import { Entity }                                                     from '../../../../model/time/entity';
+import { QuestService  }                                              from '../../../../service/time/quest.service';
+import { QuestTargetService  }                                        from '../../../../service/time/quest-target.service';
+import { QuestTeamService  }                                          from '../../../../service/time/quest-team.service';
+import { SignService  }                                               from '../../../../service/system/sign.service';
+import { Quest as QuestConst }                                        from '../../../../shared/shared.const';
 
 import { TreeGridEntityComponent } from '../../entity/tree-grid/tree-grid.component';
 
@@ -19,6 +22,14 @@ import { TreeGridEntityComponent } from '../../entity/tree-grid/tree-grid.compon
 })
 
 export class SaveQuestComponent implements OnInit {
+  constructor(
+    private questService: QuestService,
+    private questTargetService: QuestTargetService,
+    private questTeamService: QuestTeamService,
+    private signService: SignService,
+  ) { 
+  }
+
   @ViewChild("wizard") 
   wizard: ClrWizard;
   @ViewChild("questForm") 
@@ -34,35 +45,44 @@ export class SaveQuestComponent implements OnInit {
   timeTables: QuestTimeTable[] = [];
 
   targetEntities: Entity[] = [];
-
   _: any = _;
-  membersMap = QuestConst.MembersMap;
-  constraintMap = QuestConst.ConstraintMap;
+
+  membersMap         = QuestConst.Members;
+  membersInfoMap     = QuestConst.MembersInfo;
+  constraintMap      = QuestConst.Constraint;
+  constraintInfoMap  = QuestConst.ConstraintInfo;
+  questRecruitStatus = QuestConst.Status.Recruit;
 
   modelOpened: boolean = false;
 
   @Output() save = new EventEmitter<boolean>();
 
-  constructor(
-    private questService: QuestService,
-    private signService: SignService,
-  ) { 
-    this.signService.current().subscribe( res=> {
-      this.currentUser = res;
-    });
-  }
-
   ngOnInit() {
   }
 
   New(id?: number): void {
+    this.wizard.reset();
+    this.signService.current().subscribe( res=> {
+      this.currentUser = res;
+    });
     if (id) {
       this.questService.Get(id).subscribe(res => {
         this.quest = res;
+
+        let questTarget = new QuestTarget();
+        questTarget.QuestId = this.quest.Id;
+        this.targetEntities = []; 
+        this.questTargetService.ListWithCondition(questTarget).subscribe(res => {
+          res.forEach((target, k) => {
+            this.targetEntities.push(target.Entity);
+          });
+        });
+
         this.modelOpened = true;
       })
     } else {
       this.quest = new Quest();
+      this.targetEntities = [];
       this.modelOpened = true;
     }
   }            
@@ -102,6 +122,50 @@ export class SaveQuestComponent implements OnInit {
   }
 
   finish(): void {
+    this.quest.EndDate = new Date(this.quest.EndDate);
+    if (this.quest.Id == null) {
+      this.quest.Status = QuestConst.Status.Recruit; 
+      this.questService.Add(this.quest).subscribe(res => {
+        if (res.Id != undefined) {
+          this.saveQuestTarget(res.Id);
+          this.saveQuestTeamFounder(res.Id, res.EndDate);
+        }
+        this.modelOpened = false;
+        this.save.emit(true);
+      })
+    } else {
+      if (this.quest.Status != QuestConst.Status.Recruit) {
+        this.quest.StartDate = new Date(this.quest.StartDate);
+      }
+      this.questService.Update(this.quest).subscribe(res => {
+        this.saveQuestTarget(this.quest.Id);
+        this.modelOpened = false;
+        this.save.emit(true);
+      })
+    }
+  }
+
+  saveQuestTarget(questId: number): void {
+    let questTargets: QuestTarget[] = [];
+    this.targetEntities.forEach((one, k) => {
+      let questTarget = new QuestTarget();
+      questTarget.QuestId = questId;
+      questTarget.EntityId = one.Id;
+      questTarget.Status = QuestConst.TargetStatus.Wait;
+      questTargets.push(questTarget);
+    })
+    this.questTargetService.BatchAdd(questTargets).subscribe(res => {
+    })
+  }
+
+  saveQuestTeamFounder(questId: number, endDate: Date): void {
+    let questTeam: QuestTeam = new QuestTeam();
+    questTeam.QuestId = questId;
+    questTeam.StartDate = new Date();
+    questTeam.EndDate = endDate; 
+    questTeam.UserId = this.currentUser.Id; 
+    this.questTeamService.Add(questTeam).subscribe(res => {
+    });
   }
 
   onCancel(): void {
@@ -109,19 +173,7 @@ export class SaveQuestComponent implements OnInit {
     this.wizard.close();
   }
 
-  onQuestCommit(): void {
-    // this.wizard.forceNext();
-    
-    if (this.quest.Id == null) {
-      this.questService.Add(this.quest).subscribe(res => {
-        this.modelOpened = false;
-        this.save.emit(true);
-      })
-    } else {
-      this.questService.Update(this.quest).subscribe(res => {
-        this.modelOpened = false;
-        this.save.emit(true);
-      })
-    }
+  onPrevious(): void {
+    this.wizard.previous();
   }
 }

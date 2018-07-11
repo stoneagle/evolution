@@ -1,7 +1,9 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { Quest }              from '../../../model/time/quest';
-import { QuestService }       from '../../../service/time/quest.service';
-import { SaveQuestComponent } from './save/save.component';
+import { Quest }                        from '../../../model/time/quest';
+import { QuestService }                 from '../../../service/time/quest.service';
+import { Quest as QuestConst }          from '../../../shared/shared.const';
+import { SaveQuestComponent }           from './save/save.component';
+import { ListQuestTeamComponent }       from './team-list/team-list.component';
 
 @Component({
   selector: 'time-quest',
@@ -11,11 +13,19 @@ import { SaveQuestComponent } from './save/save.component';
 export class QuestComponent implements OnInit {
   @ViewChild(SaveQuestComponent)
   saveQuest: SaveQuestComponent;
+  @ViewChild(ListQuestTeamComponent)
+  listQuestTeam: ListQuestTeamComponent;
 
   quests: Quest[];
   pageSize: number = 10;
   totalCount: number = 0;
   currentPage: number = 1;
+
+  membersInfoMap    = QuestConst.MembersInfo;
+  constraintInfoMap = QuestConst.ConstraintInfo;
+  statusInfoMap     = QuestConst.StatusInfo;
+  recruitStatus     = QuestConst.Status.Recruit
+  execStatus        = QuestConst.Status.Exec
 
   constructor(
     private questService: QuestService,
@@ -34,6 +44,10 @@ export class QuestComponent implements OnInit {
 
   openSaveModel(id?: number): void {
     this.saveQuest.New(id);
+  }
+
+  openTeamList(id: number): void {
+    this.listQuestTeam.New(id);
   }
 
   delete(quest: Quest): void {
@@ -57,6 +71,28 @@ export class QuestComponent implements OnInit {
     this.questService.List().subscribe(res => {
       this.totalCount = res.length;
       this.quests = res.slice(from, to);
+    })
+  }
+
+  exec(quest: Quest): void {
+    quest.StartDate = new Date();
+    quest.Status = QuestConst.Status.Exec;
+    this.questService.Update(quest).subscribe(res => {
+      this.refresh();
+    })
+  }
+
+  finish(quest: Quest): void {
+    quest.Status = QuestConst.Status.Finish;
+    this.questService.Update(quest).subscribe(res => {
+      this.refresh();
+    })
+  }
+
+  fail(quest: Quest): void {
+    quest.Status = QuestConst.Status.Fail;
+    this.questService.Update(quest).subscribe(res => {
+      this.refresh();
     })
   }
 }

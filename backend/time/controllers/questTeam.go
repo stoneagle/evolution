@@ -19,21 +19,13 @@ func NewQuestTeam() *QuestTeam {
 	QuestTeam := &QuestTeam{}
 	QuestTeam.Init()
 	QuestTeam.ProjectName = QuestTeam.Config.Time.System.Name
-	QuestTeam.Name = "quest/team"
+	QuestTeam.Name = "quest-team"
 	QuestTeam.Prepare()
 	QuestTeam.QuestTeamSvc = services.NewQuestTeam(QuestTeam.Engine, QuestTeam.Cache)
 	return QuestTeam
 }
 
 func (c *QuestTeam) Router(router *gin.RouterGroup) {
-	// TODO 暂时由前端控制
-	// var questTeam gin.IRoutes
-	// switch c.Config.System.Auth.Type {
-	// case middles.TypeBasicAuth:
-	// 	questTeam = router.Group(c.Name).Use(middles.One(c.QuestTeamSvc, c.Name)).Use(middles.UserFromSession(c.Config.System.Auth.Session))
-	// default:
-	// 	questTeam = router.Group(c.Name).Use(middles.One(c.QuestTeamSvc, c.Name))
-	// }
 	questTeam := router.Group(c.Name).Use(middles.One(c.QuestTeamSvc, c.Name))
 	questTeam.GET("/get/:id", c.One)
 	questTeam.GET("/list", c.List)

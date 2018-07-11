@@ -19,25 +19,18 @@ func NewQuestTarget() *QuestTarget {
 	QuestTarget := &QuestTarget{}
 	QuestTarget.Init()
 	QuestTarget.ProjectName = QuestTarget.Config.Time.System.Name
-	QuestTarget.Name = "quest/target"
+	QuestTarget.Name = "quest-target"
 	QuestTarget.Prepare()
 	QuestTarget.QuestTargetSvc = services.NewQuestTarget(QuestTarget.Engine, QuestTarget.Cache)
 	return QuestTarget
 }
 
 func (c *QuestTarget) Router(router *gin.RouterGroup) {
-	// TODO 暂时由前端控制
-	// var questTarget gin.IRoutes
-	// switch c.Config.System.Auth.Type {
-	// case middles.TypeBasicAuth:
-	// 	questTarget = router.Group(c.Name).Use(middles.One(c.QuestTargetSvc, c.Name)).Use(middles.UserFromSession(c.Config.System.Auth.Session))
-	// default:
-	// 	questTarget = router.Group(c.Name).Use(middles.One(c.QuestTargetSvc, c.Name))
-	// }
 	questTarget := router.Group(c.Name).Use(middles.One(c.QuestTargetSvc, c.Name))
 	questTarget.GET("/get/:id", c.One)
 	questTarget.GET("/list", c.List)
 	questTarget.POST("", c.Add)
+	questTarget.POST("/batch", c.BatchAdd)
 	questTarget.POST("/list", c.ListByCondition)
 	questTarget.PUT("/:id", c.Update)
 	questTarget.DELETE("/:id", c.Delete)
@@ -78,9 +71,24 @@ func (c *QuestTarget) Add(ctx *gin.Context) {
 		return
 	}
 
-	err := c.QuestTargetSvc.Add(questTarget)
+	err := c.QuestTargetSvc.Add(&questTarget)
 	if err != nil {
 		resp.ErrorBusiness(ctx, resp.ErrorMysql, "questTarget insert error", err)
+		return
+	}
+	resp.Success(ctx, questTarget)
+}
+
+func (c *QuestTarget) BatchAdd(ctx *gin.Context) {
+	batchQuestTarget := make([]models.QuestTarget, 0)
+	if err := ctx.ShouldBindJSON(&batchQuestTarget); err != nil {
+		resp.ErrorBusiness(ctx, resp.ErrorParams, "params error: ", err)
+		return
+	}
+
+	err := c.QuestTargetSvc.BatchAdd(batchQuestTarget)
+	if err != nil {
+		resp.ErrorBusiness(ctx, resp.ErrorMysql, "questTarget batch insert error", err)
 		return
 	}
 	resp.Success(ctx, struct{}{})

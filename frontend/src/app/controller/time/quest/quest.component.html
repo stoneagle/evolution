@@ -7,22 +7,46 @@
 <clr-datagrid  (clrDgRefresh)="load($event)">
   <!-- <clr-dg-column>{{ 'TIME.RESOURCE.GENERAL.ID' | translate }}</clr-dg-column> -->
   <clr-dg-column>{{ 'TIME.RESOURCE.QUEST.NAME' | translate }}</clr-dg-column>
+  <clr-dg-column>{{ 'TIME.RESOURCE.QUEST.MEMBERS' | translate }}</clr-dg-column>
+  <clr-dg-column>{{ 'TIME.RESOURCE.QUEST.CONSTRAINT' | translate }}</clr-dg-column>
+  <clr-dg-column>{{ 'TIME.RESOURCE.QUEST.STATUS' | translate }}</clr-dg-column>
+  <clr-dg-column>{{ 'TIME.RESOURCE.QUEST.STARTDATE' | translate }}</clr-dg-column>
+  <clr-dg-column>{{ 'TIME.RESOURCE.QUEST.ENDDATE' | translate }}</clr-dg-column>
   <clr-dg-column>{{ 'TIME.RESOURCE.GENERAL.CREATED' | translate }}</clr-dg-column>
-  <clr-dg-column>{{ 'TIME.RESOURCE.GENERAL.UPDATED' | translate }}</clr-dg-column>
 	<clr-dg-column>{{ 'TIME.RESOURCE.GENERAL.OPERATION' | translate }}</clr-dg-column>
 
   <clr-dg-row *ngFor="let quest of quests">
     <!-- <clr-dg-cell>{{quest.Id}}</clr-dg-cell> -->
     <clr-dg-cell>{{quest.Name}}</clr-dg-cell>
+    <clr-dg-cell>{{quest.Members}}</clr-dg-cell>
+    <clr-dg-cell>{{constraintInfoMap[quest.Constraint] | translate}}</clr-dg-cell>
+    <clr-dg-cell>{{statusInfoMap[quest.Status] | translate}}</clr-dg-cell>
+    <clr-dg-cell>{{(quest.Status == recruitStatus) ? ('-') : (quest.StartDate | date: 'yyyy-MM-dd') }}</clr-dg-cell>
+    <clr-dg-cell>{{quest.EndDate | date: 'yyyy-MM-dd' }}</clr-dg-cell>
     <clr-dg-cell>{{quest.CreatedAt | date: 'yy-MM-dd HH:mm:ss'}}</clr-dg-cell>
-    <clr-dg-cell>{{quest.UpdatedAt | date: 'yy-MM-dd HH:mm:ss'}}</clr-dg-cell>
     <clr-dg-cell>
       <div class="btn-group btn-primary btn-icon">
+        <button *ngIf="(quest.Status == recruitStatus)" (click)="exec(quest)" class="btn">
+          <clr-icon shape="play"></clr-icon>
+          <span class="clr-icon-title"></span>
+        </button>
+        <button *ngIf="(quest.Status == execStatus)" (click)="finish(quest)" class="btn btn-success">
+          <clr-icon shape="check"></clr-icon>
+          <span class="clr-icon-title"></span>
+        </button>
         <button (click)="openSaveModel(quest.Id)" class="btn">
           <clr-icon shape="wrench"></clr-icon>
           <span class="clr-icon-title"></span>
         </button>
-        <button (click)="delete(quest)" class="btn btn-danger">
+        <button (click)="openTeamList(quest.Id)" class="btn btn-success">
+          <clr-icon shape="users"></clr-icon>
+          <span class="clr-icon-title"></span>
+        </button>
+        <button *ngIf="(quest.Status == execStatus)" (click)="fail(quest)" class="btn btn-danger">
+          <clr-icon shape="ban"></clr-icon>
+          <span class="clr-icon-title"></span>
+        </button>
+        <button *ngIf="(quest.Status == recruitStatus)" (click)="delete(quest)" class="btn btn-danger">
           <clr-icon shape="trash"></clr-icon>
           <span class="clr-icon-title"></span>
         </button>
@@ -39,3 +63,4 @@
 </clr-datagrid>
 
 <time-save-quest (save)="saved($event)"></time-save-quest>
+<time-quest-team-list></time-quest-team-list>

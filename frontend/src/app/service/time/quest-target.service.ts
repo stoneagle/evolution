@@ -11,7 +11,7 @@ import { Response }                 from '../../model/base/response.model';
 
 @Injectable()
 export class QuestTargetService extends BaseService {
-  private uri = AppConfig.settings.apiServer.prefix.time + '/quest/target';
+  private uri = AppConfig.settings.apiServer.prefix.time + '/quest-target';
 
   constructor(
     protected http: HttpClient,
@@ -81,6 +81,21 @@ export class QuestTargetService extends BaseService {
           return new QuestTarget(res.data);
         } else {
           return new QuestTarget();
+        }
+      }),
+    );
+  }
+
+  BatchAdd(questTargets: QuestTarget[]): Observable<Boolean> {
+    this.operation = 'SYSTEM.PROCESS.CREATE';
+    return this.http.post<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/batch`, JSON.stringify(questTargets)).pipe(
+      tap(res => this.log(res)),
+      catchError(this.handleError<Response>()),
+      map(res => {
+        if (res && res.code == 0) {
+          return true;
+        } else {
+          return false;
         }
       }),
     );

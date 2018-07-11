@@ -77,8 +77,7 @@
         "QUEST": "所属团队",
         "STARTDATE": "参与开始日期",
         "ENDDATE": "参与结束日期",
-        "USER": "成员",
-        "TIMETABLE-PERCENT": "出席时间比例"
+        "USER": "成员"
       },
       "QUEST-TIMETABLE": {
         "CONCEPT": "远征出席时间",
@@ -95,7 +94,6 @@
         "CONCEPT": "远征目标",
         "QUEST": "所属团队",
         "ENTITY": "目标实体",
-        "TIME-PERCENT": "投入时间比例",
         "DESC": "描述",
         "STATUS": "状态",
         "STATUS-NAME": {

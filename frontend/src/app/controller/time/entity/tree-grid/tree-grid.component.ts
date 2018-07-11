@@ -44,9 +44,9 @@ export class TreeGridEntityComponent implements OnInit {
 
   ngOnInit() {
     // TODO init field load failed
-    // this.treeGridData.push(new LeafWithEntities({"Id":0,"Name":"init","Parent":"init", "Children":[
-    //   {"Id":1,"Name":"test","Parent":"test"}
-    // ]}));
+    this.treeGridData.push(new LeafWithEntities({"Id":0,"Name":"init","Parent":"init", "Children":[
+      {"Id":1,"Name":"test","Parent":"test"}
+    ]}));
     
     this.treeColumns = [
       { field: "Id", headerText: "ID", width: "45", visible: false },

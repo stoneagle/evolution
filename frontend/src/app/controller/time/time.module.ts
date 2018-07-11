@@ -9,10 +9,13 @@ import { TranslateModule  }          from "@ngx-translate/core";
 import { TreeModule }                from 'ng2-tree';
 import { EJ_GANTT_COMPONENTS }       from 'ej-angular2/src/ej/gantt.component';
 import { EJ_TREEGRID_COMPONENTS }    from 'ej-angular2/src/ej/treegrid.component';
+import { EJ_SCHEDULE_COMPONENTS }    from 'ej-angular2/src/ej/schedule.component';
+import { EJ_DATEPICKER_COMPONENTS }  from 'ej-angular2/src/ej/datepicker.component';
 
 import { QuestComponent }          from './quest/quest.component';
 import { SaveQuestComponent }      from './quest/save/save.component';
 import { GanttQuestComponent }     from './quest/gantt/gantt.component';
+import { ListQuestTeamComponent }  from './quest/team-list/team-list.component';
 import { CountryComponent }        from './country/country.component';
 import { SaveCountryComponent }    from './country/save/save.component';
 import { PhaseComponent }          from './phase/phase.component';
@@ -45,6 +48,7 @@ import { MessageHandlerService  } from '../../service/base/message-handler.servi
     QuestComponent,
     SaveQuestComponent,
     GanttQuestComponent,
+    ListQuestTeamComponent,
     CountryComponent,
     SaveCountryComponent,
     ListEntityComponent,
@@ -60,6 +64,8 @@ import { MessageHandlerService  } from '../../service/base/message-handler.servi
     ResourceEntityComponent,
     EJ_GANTT_COMPONENTS,
     EJ_TREEGRID_COMPONENTS,
+    EJ_SCHEDULE_COMPONENTS,
+    EJ_DATEPICKER_COMPONENTS
   ],
   imports: [   
     BrowserModule,

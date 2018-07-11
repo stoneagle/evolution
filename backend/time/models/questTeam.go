@@ -9,12 +9,11 @@ import (
 )
 
 type QuestTeam struct {
-	es.ModelWithId   `xorm:"extends"`
-	QuestId          int       `xorm:"not null default 0 comment('所属quest') INT(11)" structs:"quest_id,omitempty"`
-	StartDate        time.Time `xorm:"not null comment('开始日期') DATETIME" structs:"start_date,omitempty"`
-	EndDate          time.Time `xorm:"not null comment('开始日期') DATETIME" structs:"start_date,omitempty"`
-	UserId           int       `xorm:"not null default 0 comment('成员id') INT(11)" structs:"founder_id,omitempty"`
-	TimeTablePercent int       `xorm:"not null default 0 comment('投入时间比例') INT(11)" structs:"time_table_percent,omitempty"`
+	es.ModelWithId `xorm:"extends"`
+	QuestId        int       `xorm:"unique not null default 0 comment('所属quest') INT(11)" structs:"quest_id,omitempty"`
+	StartDate      time.Time `xorm:"not null comment('开始日期') DATETIME" structs:"start_date,omitempty"`
+	EndDate        time.Time `xorm:"not null comment('开始日期') DATETIME" structs:"start_date,omitempty"`
+	UserId         int       `xorm:"unique(quest_id) not null default 0 comment('成员id') INT(11)" structs:"founder_id,omitempty"`
 }
 
 func (m *QuestTeam) TableName() string {

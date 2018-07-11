@@ -11,7 +11,7 @@ import (
 type Quest struct {
 	es.ModelWithDeleted `xorm:"extends"`
 	Name                string    `xorm:"not null default '' comment('内容') VARCHAR(255)" structs:"name,omitempty"`
-	StartDate           time.Time `xorm:"not null comment('开始日期') DATETIME" structs:"start_date,omitempty"`
+	StartDate           time.Time `xorm:"comment('开始日期') DATETIME" structs:"start_date,omitempty"`
 	EndDate             time.Time `xorm:"not null comment('结束日期') DATETIME" structs:"start_date,omitempty"`
 	FounderId           int       `xorm:"not null default 0 comment('创建人id') INT(11)" structs:"founder_id,omitempty"`
 	Members             int       `xorm:"not null default 0 comment('团队人数') INT(11)" structs:"members,omitempty"`

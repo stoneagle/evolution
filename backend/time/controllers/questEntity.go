@@ -19,21 +19,13 @@ func NewQuestEntity() *QuestEntity {
 	QuestEntity := &QuestEntity{}
 	QuestEntity.Init()
 	QuestEntity.ProjectName = QuestEntity.Config.Time.System.Name
-	QuestEntity.Name = "quest/entity"
+	QuestEntity.Name = "quest-entity"
 	QuestEntity.Prepare()
 	QuestEntity.QuestEntitySvc = services.NewQuestEntity(QuestEntity.Engine, QuestEntity.Cache)
 	return QuestEntity
 }
 
 func (c *QuestEntity) Router(router *gin.RouterGroup) {
-	// TODO 暂时由前端控制
-	// var questEntity gin.IRoutes
-	// switch c.Config.System.Auth.Type {
-	// case middles.TypeBasicAuth:
-	// 	questEntity = router.Group(c.Name).Use(middles.One(c.QuestEntitySvc, c.Name)).Use(middles.UserFromSession(c.Config.System.Auth.Session))
-	// default:
-	// 	questEntity = router.Group(c.Name).Use(middles.One(c.QuestEntitySvc, c.Name))
-	// }
 	questEntity := router.Group(c.Name).Use(middles.One(c.QuestEntitySvc, c.Name))
 	questEntity.GET("/get/:id", c.One)
 	questEntity.GET("/list", c.List)

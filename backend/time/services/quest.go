@@ -25,8 +25,8 @@ func (s *Quest) One(id int) (interface{}, error) {
 	return model, err
 }
 
-func (s *Quest) Add(model models.Quest) (err error) {
-	_, err = s.Engine.Insert(&model)
+func (s *Quest) Add(model *models.Quest) (err error) {
+	_, err = s.Engine.Insert(model)
 	return
 }
 

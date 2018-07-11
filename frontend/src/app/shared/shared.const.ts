@@ -14,33 +14,63 @@ export const AreaType = {
 }
 
 export const Quest = {
-  StatusMap: {
+  Status: {
+    Recruit: 1,
+    Exec: 2,
+    Finish: 3,
+    Fail: 4,
+  },
+  StatusInfo: {
     1: "TIME.RESOURCE.QUEST.STATUS-NAME.RECRUIT",
     2: "TIME.RESOURCE.QUEST.STATUS-NAME.EXEC",
     3: "TIME.RESOURCE.QUEST.STATUS-NAME.FINISH",
     4: "TIME.RESOURCE.QUEST.STATUS-NAME.FAIL",
   },
-  MembersMap: {
+  Members: {
+    One: 1,
+    Small: 5,
+    Middle: 25,
+    Large: 100,
+  },
+  MembersInfo: {
     1: "TIME.RESOURCE.QUEST.MEMBERS-NAME.ONE",
     5: "TIME.RESOURCE.QUEST.MEMBERS-NAME.SMALL",
     25: "TIME.RESOURCE.QUEST.MEMBERS-NAME.MIDDLE",
     100: "TIME.RESOURCE.QUEST.MEMBERS-NAME.LARGE",
   },
-  ConstraintMap: {
+  Constraint: {
+    ImportantAndBusy: 1,
+    Important: 2,
+    Busy: 3,
+    Normal: 4,
+  },
+  ConstraintInfo: {
     1:"TIME.RESOURCE.QUEST.CONSTRAINT-NAME.IMPORTANT-BUSY",
     2:"TIME.RESOURCE.QUEST.CONSTRAINT-NAME.IMPORTANT",
     3:"TIME.RESOURCE.QUEST.CONSTRAINT-NAME.BUSY",
     4:"TIME.RESOURCE.QUEST.CONSTRAINT-NAME.NORMAL",
   },
-  TimeTableTypeMap : {
+  TimeTableType: {
+    Workday: 1,
+    holiday: 2,
+  },
+  TimeTableTypeInfo : {
     1: "TIME.RESOURCE.QUEST-TIMETABLE.TYPE-NAME.WORKDAY",
     2: "TIME.RESOURCE.QUEST-TIMETABLE.TYPE-NAME.HOLIDAY",
   },
-  TargetStatusMap : {
+  TargetStatus: {
+    Wait: 1,
+    Finish: 2,
+  },
+  TargetStatusInfo : {
     1: "TIME.RESOURCE.QUEST-TARGET.STATUS-NAME.WAIT",
     2: "TIME.RESOURCE.QUEST-TARGET.STATUS-NAME.FINISH",
   },
-  EntityStatusMap : {
+  EntityStatus: {
+    Unmatch: 1,
+    Matched: 2,
+  },
+  EntityStatusInfo : {
     1: "TIME.RESOURCE.QUEST-ENTITY.STATUS-NAME.UNMATCH",
     2: "TIME.RESOURCE.QUEST-ENTITY.STATUS-NAME.MATCHED",
   }

@@ -86,7 +86,7 @@ func (c *TargetEntityLink) Transfer(src, des *xorm.Engine) {
 		}
 	}
 
-	fmt.Printf("target transfer success:%v\r\n", insertNum)
+	fmt.Printf("target and entity transfer success:%v\r\n", insertNum)
 }
 
 func getEntityName(src *xorm.Engine, entityId int, field int) (name string, err error) {

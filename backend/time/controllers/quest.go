@@ -70,12 +70,12 @@ func (c *Quest) Add(ctx *gin.Context) {
 		return
 	}
 
-	err := c.QuestSvc.Add(quest)
+	err := c.QuestSvc.Add(&quest)
 	if err != nil {
 		resp.ErrorBusiness(ctx, resp.ErrorMysql, "quest insert error", err)
 		return
 	}
-	resp.Success(ctx, struct{}{})
+	resp.Success(ctx, quest)
 }
 
 func (c *Quest) Update(ctx *gin.Context) {

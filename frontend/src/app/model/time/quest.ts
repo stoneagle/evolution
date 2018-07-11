@@ -1,9 +1,11 @@
-import { Basic } from '../base/basic';
+import { Basic }  from '../base/basic';
+import { Entity } from './entity';
+import { Area }   from './area';
 
 export class Quest extends Basic {
   Name: string;
-  StartDate: string;
-  EndDate: string;
+  StartDate: Date;
+  EndDate: Date;
   FounderId: number;
   Members: number;
   Constraint: number;
@@ -15,6 +17,8 @@ export class QuestTarget extends Basic {
   EntityId: number;
   Desc: string;
   Status: number;
+  Entity: Entity;
+  Area: Area;
 }
 
 export class QuestTimeTable extends Basic {
@@ -35,9 +39,8 @@ export class QuestEntity extends Basic {
 
 export class QuestTeam extends Basic {
   QuestId: number;
-  StartDate: string;
-  EndDate: string;
+  StartDate: Date;
+  EndDate: Date;
   UserId: number;
-  TimeTablePercent: number;
 }
 

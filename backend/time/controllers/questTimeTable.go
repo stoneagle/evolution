@@ -19,21 +19,13 @@ func NewQuestTimeTable() *QuestTimeTable {
 	QuestTimeTable := &QuestTimeTable{}
 	QuestTimeTable.Init()
 	QuestTimeTable.ProjectName = QuestTimeTable.Config.Time.System.Name
-	QuestTimeTable.Name = "quest/timetable"
+	QuestTimeTable.Name = "quest-timetable"
 	QuestTimeTable.Prepare()
 	QuestTimeTable.QuestTimeTableSvc = services.NewQuestTimeTable(QuestTimeTable.Engine, QuestTimeTable.Cache)
 	return QuestTimeTable
 }
 
 func (c *QuestTimeTable) Router(router *gin.RouterGroup) {
-	// TODO 暂时由前端控制
-	// var questTimeTable gin.IRoutes
-	// switch c.Config.System.Auth.Type {
-	// case middles.TypeBasicAuth:
-	// 	questTimeTable = router.Group(c.Name).Use(middles.One(c.QuestTimeTableSvc, c.Name)).Use(middles.UserFromSession(c.Config.System.Auth.Session))
-	// default:
-	// 	questTimeTable = router.Group(c.Name).Use(middles.One(c.QuestTimeTableSvc, c.Name))
-	// }
 	questTimeTable := router.Group(c.Name).Use(middles.One(c.QuestTimeTableSvc, c.Name))
 	questTimeTable.GET("/get/:id", c.One)
 	questTimeTable.GET("/list", c.List)

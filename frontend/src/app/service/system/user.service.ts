@@ -39,6 +39,24 @@ export class UserService extends BaseService {
     )
   }
 
+  ListWithCondition(user: User): Observable<User[]> {
+    this.operation = 'SYSTEM.PROCESS.LIST';
+    return this.http.post<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`, JSON.stringify(user)).pipe(
+      catchError(this.handleError<Response>()),
+      map(res => {
+        let ret:User[] = []; 
+        if (res && res.code == 0) {
+          res.data.map(
+            one => {
+              ret.push(new User(one));
+            }
+          )
+        }
+        return ret; 
+      }),
+    )
+  }
+
   Get(id: number): Observable<User> {
     this.operation = 'SYSTEM.PROCESS.GET';
     return this.http.get<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/get/${id}`).pipe(
