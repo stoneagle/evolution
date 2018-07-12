@@ -25,16 +25,6 @@ func (s *Task) One(id int) (interface{}, error) {
 	return model, err
 }
 
-func (s *Task) UpdateByMap(id int, task map[string]interface{}) (err error) {
-	_, err = s.Engine.Table(new(models.Task)).Id(id).Update(&task)
-	return
-}
-
-func (s *Task) List(tasks []models.Task) (err error) {
-	err = s.Engine.Find(&tasks)
-	return
-}
-
 func (s *Task) Add(model models.Task) (err error) {
 	_, err = s.Engine.Insert(&model)
 	return
@@ -53,27 +43,27 @@ func (s *Task) Delete(id int, model models.Task) (err error) {
 	return
 }
 
-// func (s *Task) formatJoin(itemsJoin []models.MapTaskItemJoin) (tasks []models.Task) {
-// 	tasksMap := make(map[int]models.Task)
-// 	for _, one := range itemsJoin {
-// 		if target, ok := tasksMap[one.Task.Id]; !ok {
-// 			task := one.Task
-// 			task.Item = make([]models.Item, 0)
-// 			item := one.Item
-// 			if item.Id != 0 {
-// 				task.Item = append(task.Item, item)
-// 			}
-// 			tasksMap[one.Task.Id] = task
-// 		} else if one.Task.Id != 0 {
-// 			item := one.Item
-// 			target.Item = append(target.Item, item)
-// 			tasksMap[one.Task.Id] = target
-// 		}
-// 	}
+func (s *Task) List() (tasks []models.Task, err error) {
+	tasks = make([]models.Task, 0)
+	err = s.Engine.Find(&tasks)
+	return
+}
 
-// 	tasks = make([]models.Task, 0)
-// 	for _, one := range tasksMap {
-// 		tasks = append(tasks, one)
-// 	}
-// 	return
-// }
+func (s *Task) ListWithCondition(task *models.Task) (tasks []models.Task, err error) {
+	tasksJoin := make([]models.TaskJoin, 0)
+	sql := s.Engine.Unscoped().Table("task").Join("INNER", "resource", "resource.id = task.resource_id")
+
+	condition := task.BuildCondition()
+	sql = sql.Where(condition)
+	err = sql.Find(&tasksJoin)
+	if err != nil {
+		return
+	}
+
+	tasks = make([]models.Task, 0)
+	for _, one := range tasksJoin {
+		one.Task.Resource = one.Resource
+		tasks = append(tasks, one.Task)
+	}
+	return
+}

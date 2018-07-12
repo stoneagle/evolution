@@ -18,6 +18,21 @@ export const AreaType = {
   Leaf: 3,
 }
 
+export const Task = {
+  Status: {
+    Backlog: 1,
+    Todo: 2,
+    Progress: 3,
+    Finish: 4
+  },
+  StatusInfo: {
+    1: "TIME.RESOURCE.TASK.STATUS-NAME.BACKLOG",
+    2: "TIME.RESOURCE.TASK.STATUS-NAME.TODO",
+    3: "TIME.RESOURCE.TASK.STATUS-NAME.PROGRESS",
+    4: "TIME.RESOURCE.TASK.STATUS-NAME.FINISH",
+  }
+}
+
 export const Quest = {
   Status: {
     Recruit: 1,

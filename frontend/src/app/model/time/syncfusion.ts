@@ -12,6 +12,7 @@ export class TreeGrid extends Basic {
 export class Gantt extends Basic {
   Id: number;
   Name: string;
+  Relate: string;
   StartDate: Date;
   EndDate: Date;
   Progress: number;

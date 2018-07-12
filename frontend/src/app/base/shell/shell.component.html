@@ -63,7 +63,7 @@
     </clr-vertical-nav>
     <clr-vertical-nav *ngIf="(nav == 'time')"  [clrVerticalNavCollapsible]="true" [(clrVerticalNavCollapsed)]="collapsed">
       <clr-vertical-nav-group routerLinkActive="active">
-        <clr-icon shape="bullseye" clrVerticalNavIcon></clr-icon>
+        <clr-icon shape="dashboard" clrVerticalNavIcon></clr-icon>
         {{ 'TIME.ASSETS.TYPE.SCHEDULE' | translate }}
         <clr-vertical-nav-group-children>
           <a href="#" routerLink="/time/schedule/quest" class="nav-link">
@@ -71,6 +71,9 @@
           </a>
           <a href="#" routerLink="/time/schedule/project" class="nav-link">
             {{ 'TIME.RESOURCE.PROJECT.CONCEPT' | translate }} 
+          </a>
+          <a href="#" routerLink="/time/schedule/task" class="nav-link">
+            {{ 'TIME.RESOURCE.TASK.CONCEPT' | translate }} 
           </a>
         </clr-vertical-nav-group-children>
       </clr-vertical-nav-group>

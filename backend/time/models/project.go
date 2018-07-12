@@ -15,11 +15,18 @@ type Project struct {
 	Name                string    `xorm:"not null unique default '' comment('名称') VARCHAR(255)" structs:"name,omitempty"`
 	StartDate           time.Time `xorm:"not null comment('开始日期') DATETIME"`
 	Duration            int       `xorm:"not null default 0 comment('持续时间') INT(11)" structs:"duration,omitempty"`
-	QuestIds            []int     `xorm:"-" structs:"quest_id,omitempty"`
+
+	QuestIds []int `xorm:"-" structs:"quest_id,omitempty"`
+	Area     Area  `xorm:"-" structs:"-"`
 }
 
 func (m *Project) TableName() string {
 	return "project"
+}
+
+type ProjectJoin struct {
+	Project `xorm:"extends" json:"-"`
+	Area    `xorm:"extends" json:"-"`
 }
 
 func (m *Project) BuildCondition() (condition builder.Eq) {

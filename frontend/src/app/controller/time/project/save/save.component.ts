@@ -3,7 +3,9 @@ import { Component, OnInit, Output, Input, EventEmitter } from '@angular/core';
 import { Project }             from '../../../../model/time/project';
 import { Quest, QuestTarget }  from '../../../../model/time/quest';
 import { Area }                from '../../../../model/time/area';
+import { Task }                from '../../../../model/time/task';
 import { Resource }            from '../../../../model/time/resource';
+import { TaskService  }        from '../../../../service/time/task.service';
 import { ProjectService  }     from '../../../../service/time/project.service';
 import { QuestService  }       from '../../../../service/time/quest.service';
 import { QuestTargetService  } from '../../../../service/time/quest-target.service';
@@ -17,11 +19,13 @@ import { QuestTargetService  } from '../../../../service/time/quest-target.servi
 export class ProjectSaveComponent implements OnInit {
   project: Project = new Project();
   modelOpened: boolean = false;
-  questTargetAreasMaps: Map<number, Area> = new Map();
+  areaMaps: Map<number, Area> = new Map();
+  tasks: Task[] = [];
 
   @Output() save = new EventEmitter<Project>();
 
   constructor(
+    private taskService: TaskService,
     private projectService: ProjectService,
     private questService: QuestService,
     private questTargetService: QuestTargetService,
@@ -31,25 +35,32 @@ export class ProjectSaveComponent implements OnInit {
     this.project.Quest = new Quest();
   }
 
-  New(questId:number, id?: number): void {
+  New(questId: number, id?: number): void {
     this.questService.Get(questId).subscribe(quest => {
       let questTarget = new QuestTarget();
       questTarget.QuestId = questId;
       this.questTargetService.ListWithCondition(questTarget).subscribe(targets => {
         targets.forEach((one, k) => {
-          this.questTargetAreasMaps.set(one.Area.Id, one.Area);
+          this.areaMaps.set(one.Area.Id, one.Area);
         })
       })
 
       if (id) {
+        let task = new Task();
+        task.ProjectId = id;
+        this.taskService.ListWithCondition(task).subscribe(tasks => {
+          this.tasks = tasks;
+        });
         this.projectService.Get(id).subscribe(res => {
           this.project = res;
           this.project.Quest = quest;
+          this.project.QuestId = this.project.Quest.Id;
           this.modelOpened = true;
         })
       } else {
         this.project = new Project();
         this.project.Quest = quest;
+        this.project.QuestId = this.project.Quest.Id;
         this.modelOpened = true;
       }
     })
@@ -58,7 +69,6 @@ export class ProjectSaveComponent implements OnInit {
   Submit(): void {
     this.project.StartDate = new Date(this.project.StartDate);
     if (this.project.Id == null) {
-      this.project.QuestId = this.project.Quest.Id;
       this.projectService.Add(this.project).subscribe(res => {
         this.save.emit(this.project);
         this.modelOpened = false;

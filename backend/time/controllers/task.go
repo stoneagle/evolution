@@ -30,6 +30,7 @@ func (c *Task) Router(router *gin.RouterGroup) {
 	task.GET("/get/:id", c.One)
 	task.GET("/list", c.List)
 	task.POST("", c.Add)
+	task.POST("/list", c.ListByCondition)
 	task.PUT("/:id", c.Update)
 	task.DELETE("/:id", c.Delete)
 }
@@ -40,8 +41,21 @@ func (c *Task) One(ctx *gin.Context) {
 }
 
 func (c *Task) List(ctx *gin.Context) {
-	tasks := make([]models.Task, 0)
-	err := c.TaskSvc.List(tasks)
+	tasks, err := c.TaskSvc.List()
+	if err != nil {
+		resp.ErrorBusiness(ctx, resp.ErrorMysql, "task get error", err)
+		return
+	}
+	resp.Success(ctx, tasks)
+}
+
+func (c *Task) ListByCondition(ctx *gin.Context) {
+	var task models.Task
+	if err := ctx.ShouldBindJSON(&task); err != nil {
+		resp.ErrorBusiness(ctx, resp.ErrorParams, "params error: ", err)
+		return
+	}
+	tasks, err := c.TaskSvc.ListWithCondition(&task)
 	if err != nil {
 		resp.ErrorBusiness(ctx, resp.ErrorMysql, "task get error", err)
 		return

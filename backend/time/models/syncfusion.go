@@ -7,6 +7,7 @@ import (
 type SyncfusionGantt struct {
 	Id        int
 	Name      string
+	Relate    string
 	Parent    int
 	Progress  int
 	Duration  int
@@ -25,7 +26,30 @@ type SyncfusionTreeGrid struct {
 	Children   []SyncfusionTreeGrid `json:"Children,omitempty"`
 }
 
-func (m *SyncfusionGantt) BuildProjectMap(projects []Project) map[int][]SyncfusionGantt {
+func (m *SyncfusionGantt) BuildTaskMap(tasks []Task) map[int][]SyncfusionGantt {
+	result := make(map[int][]SyncfusionGantt)
+	for _, one := range tasks {
+		if _, ok := result[one.ProjectId]; !ok {
+			result[one.ProjectId] = make([]SyncfusionGantt, 0)
+		}
+		gantt := SyncfusionGantt{}
+		gantt.Id = one.Id
+		gantt.Parent = one.ProjectId
+		gantt.Relate = one.Resource.Name
+		gantt.Name = one.Name
+		gantt.StartDate = one.StartDate
+		gantt.EndDate = one.EndDate
+		gantt.Progress = 0
+		gantt.Duration = 0
+		gantt.Expanded = false
+		child := make([]SyncfusionGantt, 0)
+		gantt.Children = child
+		result[one.ProjectId] = append(result[one.ProjectId], gantt)
+	}
+	return result
+}
+
+func (m *SyncfusionGantt) BuildProjectMap(projects []Project, tasksMap map[int][]SyncfusionGantt) map[int][]SyncfusionGantt {
 	result := make(map[int][]SyncfusionGantt)
 	for _, one := range projects {
 		if _, ok := result[one.QuestId]; !ok {
@@ -34,14 +58,19 @@ func (m *SyncfusionGantt) BuildProjectMap(projects []Project) map[int][]Syncfusi
 		gantt := SyncfusionGantt{}
 		gantt.Id = one.Id
 		gantt.Parent = one.QuestId
+		gantt.Relate = one.Area.Name
 		gantt.Name = one.Name
 		gantt.StartDate = one.StartDate
 		gantt.EndDate = one.StartDate
 		gantt.Progress = 0
 		gantt.Duration = 0
 		gantt.Expanded = false
-		child := make([]SyncfusionGantt, 0)
-		gantt.Children = child
+		if children, ok := tasksMap[one.Id]; ok {
+			gantt.Children = children
+		} else {
+			child := make([]SyncfusionGantt, 0)
+			gantt.Children = child
+		}
 		result[one.QuestId] = append(result[one.QuestId], gantt)
 	}
 	return result

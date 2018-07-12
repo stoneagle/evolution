@@ -13,7 +13,7 @@ type Area struct {
 	Parent              int        `xorm:"unique(name) not null default 0 comment('父id') INT(11)" structs:"parent,omitempty"`
 	FieldId             int        `xorm:"not null default 0 comment('所属范畴id') SMALLINT(6)" structs:"field_id,omitempty"`
 	Type                int        `xorm:"not null default 0 comment('类别1根2节点3叶') SMALLINT(6)" structs:"type,omitempty"`
-	Resources           []Resource `xorm:"-"`
+	Resources           []Resource `xorm:"-" structs:"-"`
 }
 
 var (

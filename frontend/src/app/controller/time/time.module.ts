@@ -18,6 +18,8 @@ import { QuestTeamListComponent }    from './quest/team-list/team-list.component
 import { ProjectComponent }          from './project/project.component';
 import { ProjectGanttComponent }     from './project/gantt/gantt.component';
 import { ProjectSaveComponent }      from './project/save/save.component';
+import { TaskComponent }             from './task/task.component';
+import { TaskSaveComponent }         from './task/save/save.component';
 import { CountryComponent }          from './country/country.component';
 import { CountrySaveComponent }      from './country/save/save.component';
 import { PhaseComponent }            from './phase/phase.component';
@@ -35,6 +37,7 @@ import { UserResourceListComponent } from './user-resource/list/list.component';
 
 import { CountryService }         from '../../service/time/country.service';
 import { ProjectService }         from '../../service/time/project.service';
+import { TaskService }            from '../../service/time/task.service';
 import { QuestService }           from '../../service/time/quest.service';
 import { QuestTargetService }     from '../../service/time/quest-target.service';
 import { QuestResourceService }   from '../../service/time/quest-resource.service';
@@ -55,6 +58,8 @@ import { MessageHandlerService  } from '../../service/base/message-handler.servi
     ProjectComponent,
     ProjectGanttComponent,
     ProjectSaveComponent,
+    TaskComponent,
+    TaskSaveComponent,
     CountryComponent,
     CountrySaveComponent,
     ResourceListComponent,
@@ -87,6 +92,7 @@ import { MessageHandlerService  } from '../../service/base/message-handler.servi
   providers: [ 
     AreaService,
     ProjectService,
+    TaskService,
     QuestService,
     QuestTeamService,
     QuestTargetService,

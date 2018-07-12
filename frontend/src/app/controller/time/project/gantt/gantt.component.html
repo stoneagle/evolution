@@ -1,15 +1,18 @@
 <ej-gantt 
   id="GanttPanel" 
   [dataSource]="data"
+  [allowColumnResize]="true"
   taskIdMapping= "Id"
   taskNameMapping= "Name"
   childMapping="Children" 
   progressMapping="Progress" 
   durationMapping="Duration"
+  resourceNameMappin="ResourceName"
   expandStateMapping="Expanded"
   parentTaskIdMapping="Parent"
   startDateMapping= "StartDate"
-  endDateMapping= "EndDate"
+  endDateMapping="EndDate"
+  rightTaskLabelMapping="Relate"
   [enableVirtualization]="true"
   [treeColumnIndex]=treeColumnIndex  
   sizeSettings.height="450px" 
@@ -27,4 +30,5 @@
   <!-- [allowMultiSorting]="true" -->
 
 <time-project-save (save)="projectSaved($event)"></time-project-save>
+<time-task-save (save)="taskSaved($event)"></time-task-save>
 <time-quest-save (save)="questSaved($event)"></time-quest-save>

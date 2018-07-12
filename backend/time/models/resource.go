@@ -13,8 +13,8 @@ type Resource struct {
 	Desc                string `xorm:"not null default '' comment('描述') VARCHAR(255)" structs:"desc,omitempty"`
 	Year                int    `xorm:"not null default 0 comment('年份') INT(11)" structs:"year,omitempty"`
 	AreaId              int    `xorm:"unique(name) not null default 0 comment('隶属领域') INT(11)" structs:"area_id,omitempty"`
-	Area                Area   `xorm:"-"`
-	WithSub             bool   `xorm:"-"`
+	Area                Area   `xorm:"-" structs:"-"`
+	WithSub             bool   `xorm:"-" structs:"-"`
 }
 
 type ResourceJoin struct {
@@ -46,6 +46,5 @@ func (m *Resource) BuildCondition() (condition builder.Eq) {
 		}
 	}
 
-	delete(condition, m.TableName()+".WithSub")
 	return condition
 }

@@ -1,15 +1,19 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { EJ_GANTT_COMPONENTS }                      from 'ej-angular2/src/ej/gantt.component';
+import { EJ_GANTT_COMPONENTS }          from 'ej-angular2/src/ej/gantt.component';
+import { TranslateService }             from '@ngx-translate/core';
 
-import { Quest }                from '../../../../model/time/quest';
-import { Project }              from '../../../../model/time/project';
-import { Gantt }                from '../../../../model/time/syncfusion';
-import { QuestService }         from '../../../../service/time/quest.service';
-import { ProjectService }       from '../../../../service/time/project.service';
-import { SignService }          from '../../../../service/system/sign.service';
-import { TranslateService }     from '@ngx-translate/core';
+import { Quest }           from '../../../../model/time/quest';
+import { Project }         from '../../../../model/time/project';
+import { Gantt }           from '../../../../model/time/syncfusion';
+import { QuestService }    from '../../../../service/time/quest.service';
+import { ProjectService }  from '../../../../service/time/project.service';
+import { SignService }     from '../../../../service/system/sign.service';
+import { AreaService }     from '../../../../service/time/area.service';
+import { ResourceService } from '../../../../service/time/resource.service';
+
 import { ProjectSaveComponent } from '../save/save.component';
 import { QuestSaveComponent }   from '../../quest/save/save.component';
+import { TaskSaveComponent }    from '../../task/save/save.component';
 
 @Component({
   selector: 'time-project-gantt',
@@ -21,10 +25,14 @@ export class ProjectGanttComponent implements OnInit {
   projectSaveComponent: ProjectSaveComponent;
   @ViewChild(QuestSaveComponent)
   questSaveComponent: QuestSaveComponent;
+  @ViewChild(TaskSaveComponent)
+  taskSaveComponent: TaskSaveComponent;
 
   constructor(
     private questService: QuestService,
     private projectService: ProjectService,
+    private areaService: AreaService,
+    private resourceService: ResourceService,
     private signService: SignService,
     private translateService: TranslateService
   ) { }
@@ -33,6 +41,7 @@ export class ProjectGanttComponent implements OnInit {
 	editSettings
   toolbarSettings: any;
   treeColumnIndex: number;
+  selectGanttData: any;
 
   ngOnInit() {
     let dataManager = new ej.DataManager({
@@ -81,7 +90,16 @@ export class ProjectGanttComponent implements OnInit {
           break;
       }
     });
-
+    var customColumn = {
+      field: "Relate",
+      mappingName: "Relate",
+      allowEditing: true,
+      visible: false,
+      headerText: "Relate",
+      // isTemplateColumn: true,
+      // template: "{{if eResourceTaskType=='resourceTask'}} <span style='padding:10px;'> {{if eOverlapped}} Yes {{else}} No {{/if}} </span> {{/if}}"
+    };
+    columns.push(customColumn);
   }
 
   onGanttContextMenuOpen($event): void {
@@ -93,7 +111,7 @@ export class ProjectGanttComponent implements OnInit {
     let processDelete = this.translateService.instant('SYSTEM.PROCESS.DELETE');
     let self = this;
     $event.contextMenuItems = [];
-    let taskUpdateItem = {
+    let questUpdateItem = {
       headerText: processUpdate + questName,
       menuId: "quest-update",
       eventHandler: function(args) {
@@ -111,6 +129,7 @@ export class ProjectGanttComponent implements OnInit {
       headerText: processUpdate + projectName,
       menuId: "project-update",
       eventHandler: function(args) {
+        self.selectGanttData = args.data;
         self.projectSaveComponent.New(args.data.parentItem.taskId, args.data.taskId);
       },
     }
@@ -121,14 +140,41 @@ export class ProjectGanttComponent implements OnInit {
         this.deleteItem();
       }
     }
+    let taskAddItem = {
+      headerText: processCreate + taskName,
+      menuId: "task-add",
+      eventHandler: function(args) {
+        self.taskSaveComponent.New(args.data.taskId);
+      },
+    }
+    let taskUpdateItem = {
+      headerText: processUpdate + taskName,
+      menuId: "task-update",
+      eventHandler: function(args) {
+        self.selectGanttData = args.data;
+        self.taskSaveComponent.New(args.data.parentItem.taskId, args.data.taskId);
+      },
+    }
+    let taskDeleteItem = {
+      headerText: processDelete + taskName,
+      menuId: "task-close",
+      eventHandler: function(args) {
+        this.deleteItem();
+      }
+    }
     switch($event.item.level) {
       case 0:
-        $event.contextMenuItems.push(taskUpdateItem);
+        $event.contextMenuItems.push(questUpdateItem);
         $event.contextMenuItems.push(projectAddItem);
         break;
       case 1:
         $event.contextMenuItems.push(projectUpdateItem);
         $event.contextMenuItems.push(projectDeleteItem);
+        $event.contextMenuItems.push(taskAddItem);
+        break;
+      case 2:
+        $event.contextMenuItems.push(taskUpdateItem);
+        $event.contextMenuItems.push(taskDeleteItem);
         break;
     }
   }
@@ -151,9 +197,44 @@ export class ProjectGanttComponent implements OnInit {
       let rowPosition: any;
       rowPosition = ej.TreeGrid.RowPosition.Child;
       gantt.addRecord(newRecord, rowPosition);
+    } else {
+      this.areaService.Get($event.AreaId).subscribe(area => {
+        let newRecord = new Gantt;
+        newRecord.Name = $event.Name;
+        this.selectGanttData.Relate = area.Name;
+        this.selectGanttData.item.Relate = area.Name;
+        gantt.updateRecordByIndex(this.selectGanttData.index, newRecord);
+      })
     }
-    // let data = {Id: args.data.item.Id, Name: "updated value" };
-    // this.updateRecordByTaskId(data);
+  }
+
+  taskSaved($event): void {
+    if ($event == undefined) {
+      return
+    }
+
+    let gantt = $("#GanttPanel").ejGantt("instance");
+    if ($event.Id == null) {
+      let newRecord = new Gantt;
+      newRecord.Id = $event.Id;
+      newRecord.Name = $event.Name;
+      newRecord.StartDate = $event.StartDate;
+      newRecord.EndDate = null;
+      newRecord.Parent = $event.Project.Id
+      newRecord.Progress = 0;
+      newRecord.Duration = 0;
+      let rowPosition: any;
+      rowPosition = ej.TreeGrid.RowPosition.Child;
+      gantt.addRecord(newRecord, rowPosition);
+    } else {
+      this.resourceService.Get($event.ResourceId).subscribe(resource => {
+        let newRecord = new Gantt;
+        newRecord.Name = $event.Name;
+        this.selectGanttData.Relate = resource.Name;
+        this.selectGanttData.item.Relate = resource.Name;
+        gantt.updateRecordByIndex(this.selectGanttData.index, newRecord);
+      })
+    }
   }
 
   questSaved($event): void {

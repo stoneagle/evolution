@@ -3,15 +3,45 @@ package models
 import (
 	es "evolution/backend/common/structs"
 	"time"
+
+	"github.com/fatih/structs"
+	"github.com/go-xorm/builder"
 )
 
 type Task struct {
 	es.ModelWithDeleted `xorm:"extends"`
-	Text                string    `xorm:"not null default '' comment('内容') VARCHAR(255)"`
+	ProjectId           int       `xorm:"not null default 0 comment('所属项目') INT(11)" structs:"project_id,omitempty"`
+	ResourceId          int       `xorm:"not null default 0 comment('所属资源') INT(11)" structs:"resource_id,omitempty"`
+	UserId              int       `xorm:"not null default 0 comment('负责人') INT(11)" structs:"user_id,omitempty"`
+	Name                string    `xorm:"not null default '' comment('名称') VARCHAR(255)" structs:"name,omitempty"`
 	StartDate           time.Time `xorm:"not null comment('开始日期') DATETIME"`
-	Progress            float32   `xorm:"not null default 0 comment('进度') FLOAT"`
-	Parent              int       `xorm:"not null default 0 comment('父id') INT(11)"`
-	Duration            int       `xorm:"not null comment('持续时间') INT(11)"`
-	UserId              int       `xorm:"not null default 0 comment('所属用户') INT(11)"`
-	EntityId            int       `xorm:"not null default 0 comment('相关实体') INT(11)"`
+	EndDate             time.Time `xorm:"comment('结束日期') DATETIME"`
+	Duration            int       `xorm:"not null comment('持续时间') INT(11)" structs:"duration,omitempty"`
+	Status              int       `xorm:"not null default 0 comment('当前状态:1未分配2准备做3执行中4已完成') INT(11)" structs:"status,omitempty"`
+
+	ProjectIds []int    `xorm:"-" structs:"project_id,omitempty"`
+	Resource   Resource `xorm:"-" structs:"-"`
+}
+
+var (
+	TaskStatusBacklog  int = 1
+	TaskStatusTodo     int = 2
+	TaskStatusProgress int = 3
+	TaskStatusDone     int = 4
+)
+
+type TaskJoin struct {
+	Task     `xorm:"extends" json:"-"`
+	Resource `xorm:"extends" json:"-"`
+}
+
+func (m *Task) TableName() string {
+	return "task"
+}
+
+func (m *Task) BuildCondition() (condition builder.Eq) {
+	keyPrefix := m.TableName() + "."
+	params := structs.Map(m)
+	condition = m.Model.BuildCondition(params, keyPrefix)
+	return
 }

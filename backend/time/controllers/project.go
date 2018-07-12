@@ -12,6 +12,7 @@ import (
 
 type Project struct {
 	structs.Controller
+	TaskSvc      *services.Task
 	ProjectSvc   *services.Project
 	QuestSvc     *services.Quest
 	QuestTeamSvc *services.QuestTeam
@@ -23,6 +24,7 @@ func NewProject() *Project {
 	Project.ProjectName = Project.Config.Time.System.Name
 	Project.Name = "project"
 	Project.Prepare()
+	Project.TaskSvc = services.NewTask(Project.Engine, Project.Cache)
 	Project.ProjectSvc = services.NewProject(Project.Engine, Project.Cache)
 	Project.QuestSvc = services.NewQuest(Project.Engine, Project.Cache)
 	Project.QuestTeamSvc = services.NewQuestTeam(Project.Engine, Project.Cache)
@@ -85,8 +87,21 @@ func (c *Project) ListSyncfusionGanttFormat(ctx *gin.Context) {
 		return
 	}
 
+	projectIds := make([]int, 0)
+	for _, one := range projects {
+		projectIds = append(projectIds, one.Id)
+	}
+	task := models.Task{}
+	task.ProjectIds = projectIds
+	tasks, err := c.TaskSvc.ListWithCondition(&task)
+	if err != nil {
+		resp.ErrorBusiness(ctx, resp.ErrorMysql, "task get error", err)
+		return
+	}
+
 	sync := models.SyncfusionGantt{}
-	projectsMap := sync.BuildProjectMap(projects)
+	tasksMap := sync.BuildTaskMap(tasks)
+	projectsMap := sync.BuildProjectMap(projects, tasksMap)
 	questsSlice := sync.BuildQuestSlice(quests, projectsMap)
 	resp.CustomSuccess(ctx, questsSlice)
 }

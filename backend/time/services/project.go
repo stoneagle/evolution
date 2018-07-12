@@ -50,12 +50,20 @@ func (s *Project) List() (projects []models.Project, err error) {
 }
 
 func (s *Project) ListWithCondition(project *models.Project) (projects []models.Project, err error) {
-	projects = make([]models.Project, 0)
+	projectsJoin := make([]models.ProjectJoin, 0)
+	sql := s.Engine.Unscoped().Table("project").Join("INNER", "area", "area.id = project.area_id")
+
 	condition := project.BuildCondition()
-	sql := s.Engine.Where(condition)
-	err = sql.Find(&projects)
+	sql = sql.Where(condition)
+	err = sql.Find(&projectsJoin)
 	if err != nil {
 		return
+	}
+
+	projects = make([]models.Project, 0)
+	for _, one := range projectsJoin {
+		one.Project.Area = one.Area
+		projects = append(projects, one.Project)
 	}
 	return
 }

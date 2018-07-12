@@ -15,7 +15,7 @@
           <label for="Name">{{ 'TIME.RESOURCE.PROJECT.NAME' | translate }}</label>
           <input type="text" class="form-control" id="Name" required [(ngModel)]="project.Name" name="Name" >
         </div> 
-        <div class="form-group">
+        <div class="form-group" *ngIf="(tasks.length == 0)">
           <label>{{ 'TIME.RESOURCE.PROJECT.AREA' | translate }}</label>
           <div class="select">
             <label 
@@ -23,14 +23,18 @@
               [class.invalid]="AreaId.invalid && (AreaId.dirty || AreaId.touched)"
               class="tooltip tooltip-validation tooltip-md tooltip-bottom-right"
             >
-              <select id="AreaId" #AreaId="ngModel" [(ngModel)]="project.AreaId" name="AreaId" required >
-                <option *ngFor="let key of getKeys(questTargetAreasMaps)" [ngValue]="questTargetAreasMaps.get(key).Id">
-                  {{ questTargetAreasMaps.get(key).Name  }}
+              <select id="AreaId" #AreaId="ngModel" [(ngModel)]="project.AreaId" name="AreaId" required>
+                <option *ngFor="let key of getKeys(areaMaps)" [ngValue]="areaMaps.get(key).Id">
+                  {{ areaMaps.get(key).Name  }}
                 </option>
               </select>
               <span class="tooltip-content">{{ 'TIME.RESOURCE.PROJECT.AREA' | translate }}{{ 'SYSTEM.TOOLTIP.EMPTY' | translate }}</span>
             </label>
           </div>
+        </div>
+        <div class="form-group" *ngIf="(tasks.length != 0)">
+          <label for="AreaName">{{ 'TIME.RESOURCE.PROJECT.AREA' | translate }}</label>
+          <input type="text" class="form-control" id="AreaName" readonly name="AreaName" value="{{areaMaps.get(project.AreaId).Name}}" />
         </div>
         <div class="form-group">
           <label for="StartDate">{{ 'TIME.RESOURCE.PROJECT.STARTDATE' | translate }}</label>

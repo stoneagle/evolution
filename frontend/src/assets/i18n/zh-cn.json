@@ -43,6 +43,23 @@
         "STARTDATE": "开始时间",
         "DURATION": "持续时间"
       },
+      "TASK": {
+        "CONCEPT": "任务",
+        "NAME": "名称",
+        "PROJECT": "所属项目",
+        "RESOURCE": "相关资源",
+        "USER": "负责人",
+        "STARTDATE": "开始时间",
+        "ENDDATE": "结束时间",
+        "DURATION": "持续时间",
+        "STATUS": "状态",
+        "STATUS-NAME": {
+          "BACKLOG": "未分配",
+          "TODO": "等待中",
+          "PROGRESS": "进行中",
+          "FINISH": "已完成"
+        }
+      },
       "PHASE": {
         "CONCEPT": "阶段",
         "NAME": "名称",

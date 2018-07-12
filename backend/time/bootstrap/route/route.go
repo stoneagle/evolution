@@ -28,7 +28,6 @@ func Configure(b *bootstrap.Bootstrapper) {
 		v1 = b.App.Group(prefix)
 	}
 	{
-		controllers.NewTask().Router(v1)
 		controllers.NewCountry().Router(v1)
 		controllers.NewArea().Router(v1)
 		controllers.NewField().Router(v1)
@@ -39,5 +38,6 @@ func Configure(b *bootstrap.Bootstrapper) {
 		controllers.NewQuestTarget().Router(v1)
 		controllers.NewQuestTeam().Router(v1)
 		controllers.NewProject().Router(v1)
+		controllers.NewTask().Router(v1)
 	}
 }
