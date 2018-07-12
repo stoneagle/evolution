@@ -4,16 +4,16 @@ import * as _                                                         from 'loda
 import { NgForm  }                                                    from '@angular/forms';
 import { EJ_SCHEDULE_COMPONENTS }       from 'ej-angular2/src/ej/schedule.component';
 
-import { SessionUser }                                                  from '../../../../model/base/sign';
-import { Quest, QuestTarget, QuestTeam, QuestResource, QuestTimeTable } from '../../../../model/time/quest';
-import { Resource }                                                     from '../../../../model/time/resource';
+import { SessionUser }                    from '../../../../model/base/sign';
+import { Quest, QuestTarget, QuestTeam, } from '../../../../model/time/quest';
+import { Area }                           from '../../../../model/time/area';
 
-import { QuestService  }             from '../../../../service/time/quest.service';
-import { QuestTargetService  }       from '../../../../service/time/quest-target.service';
-import { QuestTeamService  }         from '../../../../service/time/quest-team.service';
-import { SignService  }              from '../../../../service/system/sign.service';
-import { Quest as QuestConst }       from '../../../../shared/shared.const';
-import { ResourceTreeGridComponent } from '../../resource/tree-grid/tree-grid.component';
+import { QuestService  }         from '../../../../service/time/quest.service';
+import { QuestTargetService  }   from '../../../../service/time/quest-target.service';
+import { QuestTeamService  }     from '../../../../service/time/quest-team.service';
+import { SignService  }          from '../../../../service/system/sign.service';
+import { Quest as QuestConst }   from '../../../../shared/const';
+import { AreaTreeGridComponent } from '../../area/tree-grid/tree-grid.component';
 
 
 @Component({
@@ -35,17 +35,15 @@ export class QuestSaveComponent implements OnInit {
   wizard: ClrWizard;
   @ViewChild("questForm") 
   questForm: NgForm;
-  @ViewChild(ResourceTreeGridComponent) 
-  resourceTreeGrid: ResourceTreeGridComponent;
+  @ViewChild(AreaTreeGridComponent) 
+  areaTreeGrid: AreaTreeGridComponent;
 
   currentUser: SessionUser = new SessionUser();
-  quest: Quest                 = new Quest;
-  targets: QuestTarget[]       = [];
-  teams: QuestTeam[]           = [];
-  resources: QuestResource[]      = [];
-  timeTables: QuestTimeTable[] = [];
+  quest: Quest             = new Quest;
+  targets: QuestTarget[]   = [];
+  targetAreas: Area[]      = [];
+  teams: QuestTeam[]       = [];
 
-  targetResources: Resource[] = [];
   _: any = _;
 
   membersMap         = QuestConst.Members;
@@ -72,10 +70,10 @@ export class QuestSaveComponent implements OnInit {
 
         let questTarget = new QuestTarget();
         questTarget.QuestId = this.quest.Id;
-        this.targetResources = []; 
+        this.targetAreas = []; 
         this.questTargetService.ListWithCondition(questTarget).subscribe(res => {
           res.forEach((target, k) => {
-            this.targetResources.push(target.Resource);
+            this.targetAreas.push(target.Area);
           });
         });
 
@@ -83,40 +81,40 @@ export class QuestSaveComponent implements OnInit {
       })
     } else {
       this.quest = new Quest();
-      this.targetResources = [];
+      this.targetAreas = [];
       this.modelOpened = true;
     }
   }            
 
-  addTargetResource($event: Resource) {
+  addTargetArea($event: Area) {
     if ($event.Id != undefined) {
       let addFlag = true;
-      this.targetResources.forEach((one, k) => {
+      this.targetAreas.forEach((one, k) => {
         if (one.Id == $event.Id) {
           addFlag = false;
           return;
         }
       });
       if (addFlag) {
-        this.targetResources.push($event);
+        this.targetAreas.push($event);
       }
     }
   }
 
-  deleteTargetResource(resource: Resource) {
-    this.targetResources.forEach( (one, k) => {
-      if (one.Id === resource.Id) {
-        this.targetResources.splice(k, 1); 
+  deleteTargetArea(area: Area) {
+    this.targetAreas.forEach( (one, k) => {
+      if (one.Id === area.Id) {
+        this.targetAreas.splice(k, 1); 
         return;
       }
     });
   }
 
   onTargetCommit(): void {
-    if (this.targetResources.length <= 0) {
+    if (this.targetAreas.length <= 0) {
       return;
     }
-    if (this.targetResources.length >= 5) {
+    if (this.targetAreas.length >= 5) {
       return;
     }
     this.wizard.forceNext();
@@ -124,6 +122,7 @@ export class QuestSaveComponent implements OnInit {
 
   finish(): void {
     this.quest.EndDate = new Date(this.quest.EndDate);
+    this.quest.FounderId = this.currentUser.Id;
     if (this.quest.Id == null) {
       this.quest.Status = QuestConst.Status.Recruit; 
       this.questService.Add(this.quest).subscribe(res => {
@@ -148,10 +147,10 @@ export class QuestSaveComponent implements OnInit {
 
   saveQuestTarget(questId: number): void {
     let questTargets: QuestTarget[] = [];
-    this.targetResources.forEach((one, k) => {
+    this.targetAreas.forEach((one, k) => {
       let questTarget = new QuestTarget();
       questTarget.QuestId = questId;
-      questTarget.ResourceId = one.Id;
+      questTarget.AreaId = one.Id;
       questTarget.Status = QuestConst.TargetStatus.Wait;
       questTargets.push(questTarget);
     })

@@ -89,22 +89,20 @@
       <ng-template clrPageTitle>目标</ng-template>
       <div class="row">
         <div class="col-xs-12">
-          <time-resource-tree-grid
-            (selectResource)="addTargetResource($event)"
+          <time-area-tree-grid
+            (selectArea)="addTargetArea($event)"
           >
             <clr-datagrid class="datagrid-compact">
               <!-- <clr-dg-column>{{ 'TIME.RESOURCE.GENERAL.ID' | translate }}</clr-dg-column> -->
-              <clr-dg-column>{{ 'TIME.RESOURCE.RESOURCE.NAME' | translate }}</clr-dg-column>
-              <clr-dg-column>{{ 'TIME.RESOURCE.RESOURCE.AREA' | translate }}</clr-dg-column>
+              <clr-dg-column>{{ 'TIME.RESOURCE.AREA.NAME' | translate }}</clr-dg-column>
               <clr-dg-column>{{ 'TIME.RESOURCE.GENERAL.OPERATION' | translate }}</clr-dg-column>
 
-              <clr-dg-row *ngFor="let resource of targetResources">
-                <!-- <clr-dg-cell>{{resource.Id}}</clr-dg-cell> -->
-                <clr-dg-cell>{{resource.Name}}</clr-dg-cell>
-                <clr-dg-cell>{{resource.Area.Name}}</clr-dg-cell>
+              <clr-dg-row *ngFor="let area of targetAreas">
+                <!-- <clr-dg-cell>{{area.Id}}</clr-dg-cell> -->
+                <clr-dg-cell>{{area.Name}}</clr-dg-cell>
                 <clr-dg-cell>
                   <div class="btn-group btn-primary btn-icon">
-                    <button (click)="deleteTargetResource(resource)" class="btn btn-danger">
+                    <button (click)="deleteTargetArea(area)" class="btn btn-danger">
                       <clr-icon shape="trash"></clr-icon>
                       <span class="clr-icon-title"></span>
                     </button>
@@ -112,7 +110,7 @@
                 </clr-dg-cell>  
               </clr-dg-row>
             </clr-datagrid>
-          </time-resource-tree-grid>
+          </time-area-tree-grid>
         </div>
       </div>
     </clr-wizard-page>
@@ -137,6 +135,3 @@
     <!--   <ng-template clrPageTitle>团队</ng-template> -->
     <!-- </clr-wizard-page> -->
 </clr-wizard>
-
-<time-resource-save (save)="saved($event)"></time-resource-save>
-

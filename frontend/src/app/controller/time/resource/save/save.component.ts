@@ -4,7 +4,7 @@ import { Area }             from '../../../../model/time/area';
 import { AreaService }      from '../../../../service/time/area.service';
 import { Resource }         from '../../../../model/time/resource';
 import { ResourceService  } from '../../../../service/time/resource.service';
-import { AreaType  }        from '../../../../shared/shared.const';
+import { AreaType  }        from '../../../../shared/const';
 
 @Component({
   selector: 'time-resource-save',

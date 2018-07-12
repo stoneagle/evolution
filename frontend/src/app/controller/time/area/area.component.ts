@@ -4,7 +4,7 @@ import { TreeModel, TreeModelSettings, NodeEvent } from 'ng2-tree';
 import { Area }                  from '../../../model/time/area';
 import { AreaService }           from '../../../service/time/area.service';
 import { ResourceListComponent } from '../resource//list/list.component';
-import { AreaType }              from '../../../shared/shared.const';
+import { AreaType }              from '../../../shared/const';
 
 import { AreaNg2TreeComponent } from './ng2-tree/ng2-tree.component';
 

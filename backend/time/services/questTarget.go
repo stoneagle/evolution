@@ -33,7 +33,7 @@ func (s *QuestTarget) Add(model *models.QuestTarget) (err error) {
 func (s *QuestTarget) BatchAdd(targets []models.QuestTarget) (err error) {
 	saveModels := make([]models.QuestTarget, 0)
 	for _, one := range targets {
-		has, err := s.Engine.Where("quest_id = ?", one.QuestId).And("resource_id = ?", one.ResourceId).Get(new(models.QuestTarget))
+		has, err := s.Engine.Where("quest_id = ?", one.QuestId).And("area_id = ?", one.AreaId).Get(new(models.QuestTarget))
 		if err != nil {
 			return err
 		}
@@ -66,7 +66,7 @@ func (s *QuestTarget) List() (questTargets []models.QuestTarget, err error) {
 
 func (s *QuestTarget) ListWithCondition(questTarget *models.QuestTarget) (questTargets []models.QuestTarget, err error) {
 	questTargetsJoin := make([]models.QuestTargetJoin, 0)
-	sql := s.Engine.Unscoped().Table("quest_target").Join("INNER", "resource", "resource.id = quest_target.resource_id").Join("INNER", "area", "area.id = resource.area_id")
+	sql := s.Engine.Unscoped().Table("quest_target").Join("INNER", "area", "area.id = quest_target.area_id")
 
 	condition := questTarget.BuildCondition()
 	sql = sql.Where(condition)
@@ -77,8 +77,7 @@ func (s *QuestTarget) ListWithCondition(questTarget *models.QuestTarget) (questT
 
 	questTargets = make([]models.QuestTarget, 0)
 	for _, one := range questTargetsJoin {
-		one.QuestTarget.Resource = one.Resource
-		one.QuestTarget.Resource.Area = one.Area
+		one.QuestTarget.Area = one.Area
 		questTargets = append(questTargets, one.QuestTarget)
 	}
 	return

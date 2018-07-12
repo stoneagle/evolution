@@ -5,21 +5,19 @@
       <div class="row">
         <div class="col-xs-6">
           <ej-treegrid 
-            id="TreeGridEntity" 
+            id="TreeGridArea" 
             sizeSettings.height="330px" 
             sizeSettings.width="400px" 
-            idMapping="Id" 
-            childMapping="Children" 
-            parentIdMapping= "ParentId"
-            hasChildMapping= "IsParent"
-            [enableVirtualization]= "true"
-            [dataSource]="treeGridData" 
             [columns]="treeColumns" 
+            [dataSource]="treeGridData" 
             [treeColumnIndex]="treeColumnIndex"
-            [enableCollapseAll]="true"
-            [contextMenuSettings]="contextMenuSettings" 
-            (contextMenuOpen)="contextMenuOpen($event)"
-            (recordDoubleClick)="selectEntityInfo($event)"
+            idMapping="Id" 
+            parentIdMapping="Parent"
+						childMapping="Children" 
+            expandStateMapping="IsExpanded"
+						[enableLoadOnDemand]="true" 
+						[enableVirtualization]="true"
+            (recordDoubleClick)="selectAreaInfo($event)"
           >
           </ej-treegrid>
         </div>
@@ -30,5 +28,3 @@
     </clr-tab-content>
   </clr-tab>
 </clr-tabs>
-<!-- [allowPaging]="true" -->
-<!-- [pageSettings]="treePageSettings" --> 

@@ -1,9 +1,10 @@
 import { Component, OnInit, Output, ViewChild, EventEmitter } from '@angular/core';
 import { EJ_TREEGRID_COMPONENTS }       from 'ej-angular2/src/ej/treegrid.component';
 
-import { Area, LeafWithResources }          from '../../../../model/time/area';
-import { AreaService }   from '../../../../service/time/area.service';
-import { FieldService }  from '../../../../service/time/field.service';
+import { Area }            from '../../../../model/time/area';
+import { TreeGrid }        from '../../../../model/time/syncfusion';
+import { AreaService }     from '../../../../service/time/area.service';
+import { FieldService }    from '../../../../service/time/field.service';
 import { Resource }        from '../../../../model/time/resource';
 import { ResourceService } from '../../../../service/time/resource.service';
 
@@ -24,7 +25,7 @@ export class ResourceTreeGridComponent implements OnInit {
   fieldMap: Map<number, string> = new Map(); 
   currentFieldId: number;
 
-  treeGridData: LeafWithResources[] = [];
+  treeGridData: TreeGrid[] = [];
   treePageSettings: any;
   treeColumns: any[] = [];
   contextMenuSettings: any
@@ -44,7 +45,7 @@ export class ResourceTreeGridComponent implements OnInit {
 
   ngOnInit() {
     // TODO init field load failed
-    this.treeGridData.push(new LeafWithResources({"Id":0,"Name":"init","Parent":"init", "Children":[
+    this.treeGridData.push(new TreeGrid({"Id":0,"Name":"init","Parent":"init", "Children":[
       {"Id":1,"Name":"test","Parent":"test"}
     ]}));
     
@@ -97,7 +98,7 @@ export class ResourceTreeGridComponent implements OnInit {
     this.resourceService.ListGroupByLeaf(resource).subscribe(res => {
       this.treeGridData = [];
       res.forEach((area, k) => {
-        let Leaf: LeafWithResources = new LeafWithResources();
+        let Leaf: TreeGrid = new TreeGrid();
         Leaf.Id = area.Id;
         Leaf.Name = area.Name;
         Leaf.ParentId = 0;
@@ -106,7 +107,7 @@ export class ResourceTreeGridComponent implements OnInit {
         if (area.Resources.length > 0) {
           Leaf.Children = [];
           area.Resources.forEach((one, ek) => {
-            let resource: LeafWithResources = new LeafWithResources();
+            let resource: TreeGrid = new TreeGrid();
             resource.Id = one.Id;
             resource.Name = one.Name;
             resource.Parent = area.Name;

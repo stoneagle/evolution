@@ -3,7 +3,7 @@ import { Subject }                   from 'rxjs/Subject';
 import { Router }                    from "@angular/router";
 import { TranslateService }          from '@ngx-translate/core';
 import { MessageService }            from './message.service';
-import { AlertType, httpStatusCode } from '../../shared/shared.const';
+import { AlertType, httpStatusCode } from '../../shared/const';
 
 @Injectable()
 export class MessageHandlerService {

@@ -9,7 +9,7 @@ import { MessageHandlerService  }                from '../base/message-handler.s
 import { BaseService  }                          from '../base/base.service';
 import { SessionUser }                           from '../../model/base/sign';
 import { Resp, RespObject }                      from '../../model/base/resp';
-import { AuthType }                              from '../../shared/shared.const';
+import { AuthType }                              from '../../shared/const';
 
 @Injectable()
 export class SignService extends BaseService {

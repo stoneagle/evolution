@@ -33,8 +33,7 @@ func Success(ctx *gin.Context, data interface{}) {
 
 func CustomSuccess(ctx *gin.Context, res interface{}) {
 	ctx.JSON(http.StatusOK, res)
-	// TODO custom return log
-	// FormatResponseLog(res)
+	FormatResponseLog(res)
 }
 
 func ErrorBusiness(ctx *gin.Context, code ErrorCode, desc string, err error) {
@@ -48,7 +47,7 @@ func ErrorBusiness(ctx *gin.Context, code ErrorCode, desc string, err error) {
 	ctx.AbortWithStatusJSON(http.StatusOK, res)
 }
 
-func FormatResponseLog(response Response) {
+func FormatResponseLog(response interface{}) {
 	logResponse, _ := json.Marshal(response)
 	if string(logResponse) != "" {
 		logger.Get().Infow("response:【" + string(logResponse) + "】")

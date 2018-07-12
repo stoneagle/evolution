@@ -31,7 +31,7 @@ export class ProjectGanttComponent implements OnInit {
 
   ngOnInit() {
     let dataManager = new ej.DataManager({
-      url: this.projectService.getUrl(),
+      url: this.projectService.getGanttUrl(),
       crossDomain: true,
       adaptor: new ej.WebApiAdaptor(),
       headers: [{

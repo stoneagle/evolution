@@ -5,7 +5,7 @@ import { TranslateService }                                from '@ngx-translate/
 
 import { Message }                                                  from '../../model/base/message';
 import { MessageService }                                           from '../../service/base/message.service';
-import { AlertType, dismissInterval, httpStatusCode, CommonRoutes } from '../../shared/shared.const';
+import { AlertType, dismissInterval, httpStatusCode, CommonRoutes } from '../../shared/const';
 
 @Component({
   selector: 'global-message',

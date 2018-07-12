@@ -33,7 +33,7 @@ func (c *Project) Router(router *gin.RouterGroup) {
 	project := router.Group(c.Name).Use(middles.One(c.ProjectSvc, c.Name))
 	project.GET("/get/:id", c.One)
 	project.GET("/list", c.List)
-	project.GET("/list/syncfusion/", c.ListSyncfusionFormat)
+	project.GET("/list/syncfusion/gantt/", c.ListSyncfusionGanttFormat)
 	project.POST("", c.Add)
 	project.POST("/list", c.ListByCondition)
 	project.PUT("/:id", c.Update)
@@ -54,7 +54,7 @@ func (c *Project) List(ctx *gin.Context) {
 	resp.Success(ctx, projects)
 }
 
-func (c *Project) ListSyncfusionFormat(ctx *gin.Context) {
+func (c *Project) ListSyncfusionGanttFormat(ctx *gin.Context) {
 	user := ctx.MustGet(middles.UserKey).(middles.UserInfo)
 	questTeam := models.QuestTeam{}
 	questTeam.UserId = user.Id
@@ -88,7 +88,6 @@ func (c *Project) ListSyncfusionFormat(ctx *gin.Context) {
 		gantt.Duration = 0
 		gantt.Expanded = false
 		child := make([]models.SyncfusionGantt, 0)
-		// child = append(child, gantt)
 		gantt.Children = child
 		res = append(res, gantt)
 	}

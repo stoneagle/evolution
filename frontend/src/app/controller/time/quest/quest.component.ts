@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Quest }                        from '../../../model/time/quest';
 import { QuestService }                 from '../../../service/time/quest.service';
-import { Quest as QuestConst }          from '../../../shared/shared.const';
+import { Quest as QuestConst }          from '../../../shared/const';
 import { QuestSaveComponent }           from './save/save.component';
 import { QuestTeamListComponent }       from './team-list/team-list.component';
 

@@ -5,7 +5,7 @@ import { Area }         from '../../../../model/time/area';
 import { AreaService }  from '../../../../service/time/area.service';
 import { Resource }     from '../../../../model/time/resource';
 import { FieldService } from '../../../../service/time/field.service';
-import { AreaType }     from '../../../../shared/shared.const';
+import { AreaType }     from '../../../../shared/const';
 
 import { ResourceSaveComponent }            from '../../resource/save/save.component';
 

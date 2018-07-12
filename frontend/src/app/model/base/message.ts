@@ -1,4 +1,4 @@
-import { AlertType } from '../../shared/shared.const';
+import { AlertType } from '../../shared/const';
 
 export class Message {
   statusCode: number;

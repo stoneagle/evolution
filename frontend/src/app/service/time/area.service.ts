@@ -22,6 +22,10 @@ export class AreaService extends BaseService {
     this.resource = 'TIME.RESOURCE.AREA.CONCEPT';
   }
 
+  getTreeGridUrl(fieldId: number): string {
+    return AppConfig.settings.apiServer.endpoint + this.uri + `/list/syncfusion/treegrid/${fieldId}`;
+  }
+
   ListAreaMap(area: Area): Observable<Map<number, string>> {
     this.operation = 'SYSTEM.PROCESS.LIST';
     return this.http.post<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`, JSON.stringify(area)).pipe(

@@ -17,7 +17,7 @@ export class ResourceListComponent implements OnInit {
 
   filterAreaId: number;
 
-  resource: Resource[];
+  resources: Resource[];
   pageSize: number = 10;
   totalCount: number = 0;
   currentPage: number = 1;
@@ -70,7 +70,7 @@ export class ResourceListComponent implements OnInit {
     if (this.filterAreaId == undefined) {
       this.resourceService.List().subscribe(res => {
         this.totalCount = res.length;
-        this.resource = res.slice(from, to);
+        this.resources = res.slice(from, to);
       })
     } else {
       let resource = new Resource();
@@ -81,7 +81,7 @@ export class ResourceListComponent implements OnInit {
       }
       this.resourceService.ListWithCondition(resource).subscribe(res => {
         this.totalCount = res.length;
-        this.resource = res.slice(from, to);
+        this.resources = res.slice(from, to);
       })
     }
   }

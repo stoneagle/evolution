@@ -1,4 +1,4 @@
-import { Serializable } from '../base/serializable.model';
+import { Serializable } from '../base/serializable';
 
 export class SessionUser extends Serializable {
   Id: number;

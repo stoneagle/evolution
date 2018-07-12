@@ -1,4 +1,4 @@
-import { Serializable } from '../base/serializable.model';
+import { Serializable } from '../base/serializable';
 import { Classify } from './classify'
 
 export class Item extends Serializable {

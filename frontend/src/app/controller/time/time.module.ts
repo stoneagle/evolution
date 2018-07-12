@@ -28,6 +28,7 @@ import { ResourceTreeGridComponent } from './resource/tree-grid/tree-grid.compon
 import { FieldComponent }            from './field/field.component';
 import { FieldSaveComponent }        from './field/save/save.component';
 import { AreaComponent }             from './area/area.component';
+import { AreaTreeGridComponent }     from './area/tree-grid/tree-grid.component';
 import { AreaNg2TreeComponent }      from './area/ng2-tree/ng2-tree.component';
 import { UserResourceComponent }     from './user-resource/user-resource.component';
 import { UserResourceListComponent } from './user-resource/list/list.component';
@@ -65,6 +66,7 @@ import { MessageHandlerService  } from '../../service/base/message-handler.servi
     FieldSaveComponent,
     AreaComponent,
     AreaNg2TreeComponent,
+    AreaTreeGridComponent,
     UserResourceComponent,
     UserResourceListComponent,
     EJ_GANTT_COMPONENTS,

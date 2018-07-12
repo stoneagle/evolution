@@ -14,10 +14,9 @@ export class Quest extends Basic {
 
 export class QuestTarget extends Basic {
   QuestId: number;
-  ResourceId: number;
+  AreaId: number;
   Desc: string;
   Status: number;
-  Resource: Resource;
   Area: Area;
 }
 
