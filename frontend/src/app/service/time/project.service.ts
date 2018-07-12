@@ -22,7 +22,7 @@ export class ProjectService extends BaseService {
   }
 
   getUrl(): string {
-    return AppConfig.settings.apiServer.endpoint + this.uri + `/list`;
+    return AppConfig.settings.apiServer.endpoint + this.uri + `/list/syncfusion`;
   }
 
   List(): Observable<Project[]> {

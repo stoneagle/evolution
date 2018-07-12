@@ -29,7 +29,7 @@ var (
 	ExpireHours      time.Duration = 24
 )
 
-type CustomClaims struct {
+type UserInfo struct {
 	Id    int    `json:"Id"`
 	Name  string `json:"Name"`
 	Email string `json:"Email"`
@@ -48,17 +48,17 @@ func JWTAuthLogin() gin.HandlerFunc {
 			return
 		}
 		j := NewJWT()
-		claim := CustomClaims{}
-		claim.Id = user.Id
-		claim.Name = user.Name
-		claim.Email = user.Email
-		token, err := j.CreateToken(claim)
+		userInfo := UserInfo{}
+		userInfo.Id = user.Id
+		userInfo.Name = user.Name
+		userInfo.Email = user.Email
+		token, err := j.CreateToken(userInfo)
 		if err != nil {
 			resp.ErrorBusiness(c, resp.ErrorLogin, fmt.Sprintf("create token %s error", username), err)
 			return
 		}
 		c.Header(JwtTokenHeader, "Bear "+token)
-		resp.Success(c, claim)
+		resp.Success(c, userInfo)
 	}
 }
 
@@ -72,19 +72,19 @@ func JWTAuthCheck() gin.HandlerFunc {
 			}
 		}
 		j := NewJWT()
-		claims, err := j.ParseToken(token)
+		userInfo, err := j.ParseToken(token)
 		if err != nil {
 			if err == TokenExpired {
 				if token, err = j.RefreshToken(token); err == nil {
 					c.Header(JwtTokenHeader, "Bear "+token)
-					resp.Success(c, claims)
+					resp.Success(c, userInfo)
 					return
 				}
 			}
 			resp.ErrorBusiness(c, resp.ErrorLogin, "token check error", err)
 			return
 		}
-		c.Set(UserKey, claims)
+		c.Set(UserKey, *userInfo)
 	}
 }
 
@@ -98,12 +98,12 @@ func JWTAuthCurrent() gin.HandlerFunc {
 			}
 		}
 		j := NewJWT()
-		claims, err := j.ParseToken(token)
+		userInfo, err := j.ParseToken(token)
 		if err != nil {
 			resp.ErrorBusiness(c, resp.ErrorLogin, "token check error", err)
 			return
 		}
-		resp.Success(c, claims)
+		resp.Success(c, userInfo)
 	}
 }
 
@@ -122,13 +122,13 @@ func SetSignKey(key string) string {
 	return SignKey
 }
 
-func (j *JWT) CreateToken(claims CustomClaims) (string, error) {
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+func (j *JWT) CreateToken(userInfo UserInfo) (string, error) {
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, userInfo)
 	return token.SignedString(j.SigningKey)
 }
 
-func (j *JWT) ParseToken(tokenString string) (*CustomClaims, error) {
-	token, err := jwt.ParseWithClaims(tokenString, &CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
+func (j *JWT) ParseToken(tokenString string) (*UserInfo, error) {
+	token, err := jwt.ParseWithClaims(tokenString, &UserInfo{}, func(token *jwt.Token) (interface{}, error) {
 		return j.SigningKey, nil
 	})
 	if err != nil {
@@ -144,8 +144,8 @@ func (j *JWT) ParseToken(tokenString string) (*CustomClaims, error) {
 			}
 		}
 	}
-	if claims, ok := token.Claims.(*CustomClaims); ok && token.Valid {
-		return claims, nil
+	if userInfo, ok := token.Claims.(*UserInfo); ok && token.Valid {
+		return userInfo, nil
 	}
 	return nil, TokenInvalid
 }
@@ -154,16 +154,16 @@ func (j *JWT) RefreshToken(tokenString string) (string, error) {
 	jwt.TimeFunc = func() time.Time {
 		return time.Unix(0, 0)
 	}
-	token, err := jwt.ParseWithClaims(tokenString, &CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(tokenString, &UserInfo{}, func(token *jwt.Token) (interface{}, error) {
 		return j.SigningKey, nil
 	})
 	if err != nil {
 		return "", err
 	}
-	if claims, ok := token.Claims.(*CustomClaims); ok && token.Valid {
+	if userInfo, ok := token.Claims.(*UserInfo); ok && token.Valid {
 		jwt.TimeFunc = time.Now
-		claims.StandardClaims.ExpiresAt = time.Now().Add(ExpireHours * time.Hour).Unix()
-		return j.CreateToken(*claims)
+		userInfo.StandardClaims.ExpiresAt = time.Now().Add(ExpireHours * time.Hour).Unix()
+		return j.CreateToken(*userInfo)
 	}
 	return "", TokenInvalid
 }

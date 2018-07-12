@@ -89,7 +89,7 @@ export class SignService extends BaseService {
               return false
             }
             let token = res.headers.get(AppConfig.settings.apiServer.auth.jwt);
-            let expires: number = 3600 * 24;
+            let expires: number = 3600 * 24 * 1000;
             let date = new Date(Date.now() + expires);
             let cookieOptions: CookieOptions = {
                 path: "/",

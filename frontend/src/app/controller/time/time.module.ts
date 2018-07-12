@@ -17,6 +17,7 @@ import { QuestSaveComponent }      from './quest/save/save.component';
 import { QuestTeamListComponent }  from './quest/team-list/team-list.component';
 import { ProjectComponent }        from './project/project.component';
 import { ProjectGanttComponent }   from './project/gantt/gantt.component';
+import { ProjectSaveComponent }    from './project/save/save.component';
 import { CountryComponent }        from './country/country.component';
 import { CountrySaveComponent }    from './country/save/save.component';
 import { PhaseComponent }          from './phase/phase.component';
@@ -52,6 +53,7 @@ import { MessageHandlerService  } from '../../service/base/message-handler.servi
     QuestTeamListComponent,
     ProjectComponent,
     ProjectGanttComponent,
+    ProjectSaveComponent,
     CountryComponent,
     CountrySaveComponent,
     EntityListComponent,

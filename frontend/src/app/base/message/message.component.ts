@@ -28,7 +28,8 @@ export class MessageComponent implements OnInit, OnDestroy {
     private elementRef: ElementRef,
     private messageService: MessageService,
     private router: Router,
-    private translate: TranslateService) { }
+    private translate: TranslateService
+  ) { }
 
   ngOnInit(): void {
     if (this.isAppLevel) {

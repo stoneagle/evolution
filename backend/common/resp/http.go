@@ -31,6 +31,12 @@ func Success(ctx *gin.Context, data interface{}) {
 	FormatResponseLog(res)
 }
 
+func CustomSuccess(ctx *gin.Context, res interface{}) {
+	ctx.JSON(http.StatusOK, res)
+	// TODO custom return log
+	// FormatResponseLog(res)
+}
+
 func ErrorBusiness(ctx *gin.Context, code ErrorCode, desc string, err error) {
 	res := Response{
 		Code: code,

@@ -17,6 +17,18 @@ type Project struct {
 	Duration            int       `xorm:"not null default 0 comment('持续时间') INT(11)" structs:"duration,omitempty"`
 }
 
+type SyncfusionGantt struct {
+	Id        int
+	Name      string
+	Parent    int
+	Progress  int
+	Duration  int
+	Expanded  bool
+	StartDate time.Time
+	EndDate   time.Time
+	Children  []SyncfusionGantt
+}
+
 func (m *Project) TableName() string {
 	return "project"
 }
