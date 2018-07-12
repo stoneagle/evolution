@@ -1,10 +1,10 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { TreeModel, TreeModelSettings, NodeEvent } from 'ng2-tree';
 
-import { Area }                from '../../../model/time/area';
-import { AreaService }         from '../../../service/time/area.service';
-import { EntityListComponent } from '../entity//list/list.component';
-import { AreaType }            from '../../../shared/shared.const';
+import { Area }                  from '../../../model/time/area';
+import { AreaService }           from '../../../service/time/area.service';
+import { ResourceListComponent } from '../resource//list/list.component';
+import { AreaType }              from '../../../shared/shared.const';
 
 import { AreaNg2TreeComponent } from './ng2-tree/ng2-tree.component';
 
@@ -17,8 +17,8 @@ export class AreaComponent implements OnInit {
   @ViewChild(AreaNg2TreeComponent)
   ng2TreeComponent: AreaNg2TreeComponent;
 
-  @ViewChild(EntityListComponent)
-  entityListComponent: EntityListComponent;
+  @ViewChild(ResourceListComponent)
+  resourceListComponent: ResourceListComponent;
 
   constructor(
     private areaService: AreaService,
@@ -28,7 +28,7 @@ export class AreaComponent implements OnInit {
   }
 
   selectAreaNode($event): void {
-    this.entityListComponent.setFilterAreaId($event);
-    this.entityListComponent.refreshClassify(0, this.entityListComponent.pageSize);
+    this.resourceListComponent.setFilterAreaId($event);
+    this.resourceListComponent.refreshClassify(0, this.resourceListComponent.pageSize);
   }
 }

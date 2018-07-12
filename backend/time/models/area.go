@@ -9,11 +9,11 @@ import (
 
 type Area struct {
 	es.ModelWithDeleted `xorm:"extends"`
-	Name                string   `xorm:"unique not null default '' comment('名称') VARCHAR(255)" structs:"name,omitempty"`
-	Parent              int      `xorm:"unique(name) not null default 0 comment('父id') INT(11)" structs:"parent,omitempty"`
-	FieldId             int      `xorm:"not null default 0 comment('所属范畴id') SMALLINT(6)" structs:"field_id,omitempty"`
-	Type                int      `xorm:"not null default 0 comment('类别1根2节点3叶') SMALLINT(6)" structs:"type,omitempty"`
-	Entities            []Entity `xorm:"-"`
+	Name                string     `xorm:"unique not null default '' comment('名称') VARCHAR(255)" structs:"name,omitempty"`
+	Parent              int        `xorm:"unique(name) not null default 0 comment('父id') INT(11)" structs:"parent,omitempty"`
+	FieldId             int        `xorm:"not null default 0 comment('所属范畴id') SMALLINT(6)" structs:"field_id,omitempty"`
+	Type                int        `xorm:"not null default 0 comment('类别1根2节点3叶') SMALLINT(6)" structs:"type,omitempty"`
+	Resources           []Resource `xorm:"-"`
 }
 
 var (

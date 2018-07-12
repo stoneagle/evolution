@@ -1,6 +1,6 @@
-import { Basic }  from '../base/basic';
-import { Entity } from './entity';
-import { Area }   from './area';
+import { Basic }    from '../base/basic';
+import { Resource } from './resource';
+import { Area }     from './area';
 
 export class Quest extends Basic {
   Name: string;
@@ -14,10 +14,10 @@ export class Quest extends Basic {
 
 export class QuestTarget extends Basic {
   QuestId: number;
-  EntityId: number;
+  ResourceId: number;
   Desc: string;
   Status: number;
-  Entity: Entity;
+  Resource: Resource;
   Area: Area;
 }
 
@@ -28,9 +28,9 @@ export class QuestTimeTable extends Basic {
   Type: number;
 }
 
-export class QuestEntity extends Basic {
+export class QuestResource extends Basic {
   QuestId: number;
-  EntityId: number;
+  ResourceId: number;
   PhaseId: number;
   Desc: string;
   Number: number;

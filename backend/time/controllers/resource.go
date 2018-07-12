@@ -26,19 +26,12 @@ func NewResource() *Resource {
 }
 
 func (c *Resource) Router(router *gin.RouterGroup) {
-	// TODO 暂时由前端控制
-	// var resource gin.IRoutes
-	// switch c.Config.System.Auth.Type {
-	// case middles.TypeBasicAuth:
-	// 	resource = router.Group(c.Name).Use(middles.One(c.ResourceSvc, c.Name)).Use(middles.UserFromSession(c.Config.System.Auth.Session))
-	// default:
-	// 	resource = router.Group(c.Name).Use(middles.One(c.ResourceSvc, c.Name))
-	// }
 	resource := router.Group(c.Name).Use(middles.One(c.ResourceSvc, c.Name))
 	resource.GET("/get/:id", c.One)
 	resource.GET("/list", c.List)
 	resource.POST("", c.Add)
 	resource.POST("/list", c.ListByCondition)
+	resource.POST("/list/leaf", c.ListGroupByLeaf)
 	resource.PUT("/:id", c.Update)
 	resource.DELETE("/:id", c.Delete)
 }
@@ -63,12 +56,29 @@ func (c *Resource) ListByCondition(ctx *gin.Context) {
 		resp.ErrorBusiness(ctx, resp.ErrorParams, "params error: ", err)
 		return
 	}
+
 	resources, err := c.ResourceSvc.ListWithCondition(&resource)
 	if err != nil {
 		resp.ErrorBusiness(ctx, resp.ErrorMysql, "resource get error", err)
 		return
 	}
 	resp.Success(ctx, resources)
+}
+
+func (c *Resource) ListGroupByLeaf(ctx *gin.Context) {
+	var resource models.Resource
+	if err := ctx.ShouldBindJSON(&resource); err != nil {
+		resp.ErrorBusiness(ctx, resp.ErrorParams, "params error: ", err)
+		return
+	}
+
+	resources, err := c.ResourceSvc.ListWithCondition(&resource)
+	if err != nil {
+		resp.ErrorBusiness(ctx, resp.ErrorMysql, "resource get error", err)
+		return
+	}
+	areas := c.ResourceSvc.GroupByArea(resources)
+	resp.Success(ctx, areas)
 }
 
 func (c *Resource) Add(ctx *gin.Context) {

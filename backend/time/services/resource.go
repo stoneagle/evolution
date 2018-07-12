@@ -43,19 +43,54 @@ func (s *Resource) Delete(id int, model models.Resource) (err error) {
 	return
 }
 
+func (s *Resource) ListWithCondition(resource *models.Resource) (resources []models.Resource, err error) {
+	resourcesJoin := make([]models.ResourceJoin, 0)
+	sql := s.Engine.Unscoped().Table("resource").Join("INNER", "area", "area.id = resource.area_id")
+
+	condition := resource.BuildCondition()
+	if resource.WithSub {
+		areaIdSlice, err := NewArea(s.Engine, s.Cache).GetAllLeafId(resource.Area.Id)
+		if err != nil {
+			return resources, err
+		}
+		areaIdSlice = append(areaIdSlice, resource.Area.Id)
+		condition["area.id"] = areaIdSlice
+	}
+
+	sql = sql.Where(condition)
+	err = sql.Find(&resourcesJoin)
+	if err != nil {
+		return
+	}
+	resources = make([]models.Resource, 0)
+	for _, one := range resourcesJoin {
+		one.Resource.Area = one.Area
+		resources = append(resources, one.Resource)
+	}
+	return
+}
+
 func (s *Resource) List() (resources []models.Resource, err error) {
 	resources = make([]models.Resource, 0)
 	err = s.Engine.Find(&resources)
 	return
 }
 
-func (s *Resource) ListWithCondition(resource *models.Resource) (resources []models.Resource, err error) {
-	resources = make([]models.Resource, 0)
-	condition := resource.BuildCondition()
-	sql := s.Engine.Where(condition)
-	err = sql.Find(&resources)
-	if err != nil {
-		return
+func (s *Resource) GroupByArea(resources []models.Resource) (areas []models.Area) {
+	areasMap := map[int]models.Area{}
+	for _, one := range resources {
+		if _, ok := areasMap[one.Area.Id]; !ok {
+			one.Area.Resources = make([]models.Resource, 0)
+			areasMap[one.Area.Id] = one.Area
+		}
+		tmp, _ := areasMap[one.Area.Id]
+		tmp.Resources = append(tmp.Resources, one)
+		areasMap[one.Area.Id] = tmp
 	}
-	return
+
+	areas = make([]models.Area, 0)
+	for _, one := range areasMap {
+		areas = append(areas, one)
+	}
+	return areas
 }

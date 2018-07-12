@@ -1,13 +1,13 @@
 import { Component, OnInit, Input, Output, ViewChild, EventEmitter  } from '@angular/core';
 import { TreeModel, TreeModelSettings, NodeEvent }                    from 'ng2-tree';
 
-import { Area }            from '../../../../model/time/area';
-import { AreaService }     from '../../../../service/time/area.service';
-import { Entity }          from '../../../../model/time/entity';
-import { FieldService }    from '../../../../service/time/field.service';
-import { AreaType }        from '../../../../shared/shared.const';
+import { Area }         from '../../../../model/time/area';
+import { AreaService }  from '../../../../service/time/area.service';
+import { Resource }     from '../../../../model/time/resource';
+import { FieldService } from '../../../../service/time/field.service';
+import { AreaType }     from '../../../../shared/shared.const';
 
-import { EntitySaveComponent }            from '../../entity/save/save.component';
+import { ResourceSaveComponent }            from '../../resource/save/save.component';
 
 @Component({
   selector: 'time-area-ng2-tree',
@@ -15,8 +15,8 @@ import { EntitySaveComponent }            from '../../entity/save/save.component
   styleUrls: ['./ng2-tree.component.css']
 })
 export class AreaNg2TreeComponent implements OnInit {
-  @ViewChild(EntitySaveComponent)
-  saveEntity: EntitySaveComponent;
+  @ViewChild(ResourceSaveComponent)
+  saveResource: ResourceSaveComponent;
 
   // TODO
   // 1. 递归删除/实体判断是否允许删除
@@ -145,9 +145,9 @@ export class AreaNg2TreeComponent implements OnInit {
   }
 
   handleCustom(e: NodeEvent): void {
-    let entity = new Entity();
-    entity.AreaId = +e.node.id;
-    this.saveEntity.New(entity);
+    let resource = new Resource();
+    resource.AreaId = +e.node.id;
+    this.saveResource.New(resource);
   }
 
   saved(saved: boolean): void {

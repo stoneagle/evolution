@@ -11,7 +11,7 @@ import (
 type Project struct {
 	es.ModelWithDeleted `xorm:"extends"`
 	QuestId             int       `xorm:"unique not null default 0 comment('所属quest') INT(11)" structs:"quest_id,omitempty"`
-	EntityId            int       `xorm:"unique(quest_id) not null default 0 comment('所属entity') INT(11)" structs:"entity_id,omitempty"`
+	AreaId            int       `xorm:"unique(quest_id) not null default 0 comment('所属area') INT(11)" structs:"area_id,omitempty"`
 	Name                string    `unique(name) xorm:"not null unique default '' comment('名称') VARCHAR(255)" structs:"name,omitempty"`
 	StartDate           time.Time `xorm:"not null comment('开始日期') DATETIME"`
 	Duration            int       `xorm:"not null default 0 comment('持续时间') INT(11)" structs:"duration,omitempty"`

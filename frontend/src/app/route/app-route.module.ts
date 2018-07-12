@@ -12,7 +12,7 @@ import { ProjectComponent as TimeProject }   from '../controller/time/project/pr
 import { CountryComponent as TimeCountry }   from '../controller/time/country/country.component';
 import { FieldComponent as TimeField }       from '../controller/time/field/field.component';
 import { AreaComponent as TimeArea }         from '../controller/time/area/area.component';
-import { ResourceComponent as TimeResource } from '../controller/time/resource/resource.component';
+import { UserResourceComponent as TimeUserResource } from '../controller/time/user-resource/user-resource.component';
 import { UserComponent as SystemUser }       from '../controller/system/user/user.component';
 import { ShellComponent }                    from '../base/shell/shell.component';
 import { DefaultComponent }                  from '../base/default/default.component';
@@ -65,7 +65,7 @@ const routes: Routes = [
         path: 'user',
         children:[
           { path: '', component: DefaultComponent }, 
-          { path: 'resource', component: TimeResource },
+          { path: 'resource', component: TimeUserResource },
         ]
       },
       { 

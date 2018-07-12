@@ -89,22 +89,22 @@
       <ng-template clrPageTitle>目标</ng-template>
       <div class="row">
         <div class="col-xs-12">
-          <time-entity-tree-grid
-            (selectEntity)="addTargetEntity($event)"
+          <time-resource-tree-grid
+            (selectResource)="addTargetResource($event)"
           >
             <clr-datagrid class="datagrid-compact">
               <!-- <clr-dg-column>{{ 'TIME.RESOURCE.GENERAL.ID' | translate }}</clr-dg-column> -->
-              <clr-dg-column>{{ 'TIME.RESOURCE.ENTITY.NAME' | translate }}</clr-dg-column>
-              <clr-dg-column>{{ 'TIME.RESOURCE.ENTITY.AREA' | translate }}</clr-dg-column>
+              <clr-dg-column>{{ 'TIME.RESOURCE.RESOURCE.NAME' | translate }}</clr-dg-column>
+              <clr-dg-column>{{ 'TIME.RESOURCE.RESOURCE.AREA' | translate }}</clr-dg-column>
               <clr-dg-column>{{ 'TIME.RESOURCE.GENERAL.OPERATION' | translate }}</clr-dg-column>
 
-              <clr-dg-row *ngFor="let entity of targetEntities">
-                <!-- <clr-dg-cell>{{entity.Id}}</clr-dg-cell> -->
-                <clr-dg-cell>{{entity.Name}}</clr-dg-cell>
-                <clr-dg-cell>{{entity.Area.Name}}</clr-dg-cell>
+              <clr-dg-row *ngFor="let resource of targetResources">
+                <!-- <clr-dg-cell>{{resource.Id}}</clr-dg-cell> -->
+                <clr-dg-cell>{{resource.Name}}</clr-dg-cell>
+                <clr-dg-cell>{{resource.Area.Name}}</clr-dg-cell>
                 <clr-dg-cell>
                   <div class="btn-group btn-primary btn-icon">
-                    <button (click)="deleteTargetEntity(entity)" class="btn btn-danger">
+                    <button (click)="deleteTargetResource(resource)" class="btn btn-danger">
                       <clr-icon shape="trash"></clr-icon>
                       <span class="clr-icon-title"></span>
                     </button>
@@ -112,7 +112,7 @@
                 </clr-dg-cell>  
               </clr-dg-row>
             </clr-datagrid>
-          </time-entity-tree-grid>
+          </time-resource-tree-grid>
         </div>
       </div>
     </clr-wizard-page>
@@ -138,4 +138,5 @@
     <!-- </clr-wizard-page> -->
 </clr-wizard>
 
-<time-entity-save (save)="saved($event)"></time-entity-save>
+<time-resource-save (save)="saved($event)"></time-resource-save>
+

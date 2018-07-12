@@ -7,7 +7,7 @@ import { AppConfig }                from '../base/config.service';
 import { MessageHandlerService  }   from '../base/message-handler.service';
 import { BaseService  }             from '../base/base.service';
 import { QuestTarget }              from '../../model/time/quest';
-import { Resp }                 from '../../model/base/resp';
+import { Resp }                     from '../../model/base/resp';
 
 @Injectable()
 export class QuestTargetService extends BaseService {

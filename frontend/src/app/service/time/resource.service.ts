@@ -6,8 +6,9 @@ import { catchError, map, tap  }    from 'rxjs/operators';
 import { AppConfig }                from '../base/config.service';
 import { MessageHandlerService  }   from '../base/message-handler.service';
 import { BaseService  }             from '../base/base.service';
+import { Area }                     from '../../model/time/area';
 import { Resource }                 from '../../model/time/resource';
-import { Resp }                 from '../../model/base/resp';
+import { Resp }                     from '../../model/base/resp';
 
 @Injectable()
 export class ResourceService extends BaseService {
@@ -49,6 +50,24 @@ export class ResourceService extends BaseService {
           res.data.map(
             one => {
               ret.push(new Resource(one));
+            }
+          )
+        }
+        return ret; 
+      }),
+    )
+  }
+
+  ListGroupByLeaf(resource: Resource): Observable<Area[]> {
+    this.operation = 'SYSTEM.PROCESS.LIST';
+    return this.http.post<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/list/leaf`, JSON.stringify(resource)).pipe(
+      catchError(this.handleError<Resp>()),
+      map(res => {
+        let ret:Area[] = []; 
+        if (res && res.code == 0) {
+          res.data.map(
+            one => {
+              ret.push(new Area(one));
             }
           )
         }

@@ -23,8 +23,8 @@
         "PARENT": "父节点",
         "FIELDID": "方向"
       },
-      "ENTITY": {
-        "CONCEPT": "实体",
+      "RESOURCE": {
+        "CONCEPT": "资源",
         "NAME": "名称",
         "DESC": "描述",
         "YEAR": "年份",
@@ -39,7 +39,7 @@
         "CONCEPT": "项目",
         "NAME": "名称",
         "QUEST": "所属探索",
-        "ENTITY": "所属实体",
+        "AREA": "所属领域",
         "STARTDATE": "开始时间",
         "DURATION": "持续时间"
       },
@@ -100,7 +100,7 @@
       "QUEST-TARGET": {
         "CONCEPT": "远征目标",
         "QUEST": "所属团队",
-        "ENTITY": "目标实体",
+        "RESOURCE": "目标资源",
         "DESC": "描述",
         "STATUS": "状态",
         "STATUS-NAME": {
@@ -108,11 +108,10 @@
           "FINISH": "已完成"
         } 
       },
-      "QUEST-ENTITY": {
-        "CONCEPT": "远征依赖实体",
+      "QUEST-RESOURCEY": {
+        "CONCEPT": "远征依赖资源",
         "QUEST": "所属团队",
-        "ENTITY": "要求实体",
-        "PHASE": "所处阶段",
+        "RESOURCE": "要求资源",
         "DESC": "描述",
         "NUMBER": "数量",
         "STATUS": "状态",
@@ -121,12 +120,11 @@
           "FINISH": "已匹配"
         } 
       },
-      "RESOURCE": {
+      "USER-RESOURCE": {
         "CONCEPT": "资源",
         "USER": "所属用户",
-        "ENTITY": "所属实体",
-        "STATUS": "状态",
-        "LEVEL": "级别"
+        "RESOURCE": "所属资源",
+        "TIME": "投入时间"
       },
       "GENERAL": {
         "CONCEPT": "通用",

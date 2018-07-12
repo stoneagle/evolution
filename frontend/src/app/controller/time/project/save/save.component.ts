@@ -1,11 +1,11 @@
 import { Component, OnInit, Output, Input, EventEmitter } from '@angular/core'; 
 
-import { Project }         from '../../../../model/time/project';
-import { Quest }           from '../../../../model/time/quest';
-import { Area }            from '../../../../model/time/area';
-import { Entity }          from '../../../../model/time/entity';
-import { ProjectService  } from '../../../../service/time/project.service';
-import { EntityService  }  from '../../../../service/time/entity.service';
+import { Project }          from '../../../../model/time/project';
+import { Quest }            from '../../../../model/time/quest';
+import { Area }             from '../../../../model/time/area';
+import { Resource }         from '../../../../model/time/resource';
+import { ProjectService  }  from '../../../../service/time/project.service';
+import { ResourceService  } from '../../../../service/time/resource.service';
 
 @Component({
   selector: 'time-project-save',
