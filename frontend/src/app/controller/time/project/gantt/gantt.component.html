@@ -26,4 +26,5 @@
   <!-- [allowGanttChartEditing]="true" -->
   <!-- [allowMultiSorting]="true" -->
 
-<time-project-save></time-project-save>
+<time-project-save (save)="projectSaved($event)"></time-project-save>
+<time-quest-save (save)="questSaved($event)"></time-quest-save>

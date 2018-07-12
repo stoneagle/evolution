@@ -2,11 +2,14 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { EJ_GANTT_COMPONENTS }                      from 'ej-angular2/src/ej/gantt.component';
 
 import { Quest }                from '../../../../model/time/quest';
+import { Project }              from '../../../../model/time/project';
+import { Gantt }                from '../../../../model/time/syncfusion';
 import { QuestService }         from '../../../../service/time/quest.service';
 import { ProjectService }       from '../../../../service/time/project.service';
 import { SignService }          from '../../../../service/system/sign.service';
 import { TranslateService }     from '@ngx-translate/core';
 import { ProjectSaveComponent } from '../save/save.component';
+import { QuestSaveComponent }   from '../../quest/save/save.component';
 
 @Component({
   selector: 'time-project-gantt',
@@ -15,7 +18,9 @@ import { ProjectSaveComponent } from '../save/save.component';
 })
 export class ProjectGanttComponent implements OnInit {
   @ViewChild(ProjectSaveComponent)
-  saveComponent: ProjectSaveComponent;
+  projectSaveComponent: ProjectSaveComponent;
+  @ViewChild(QuestSaveComponent)
+  questSaveComponent: QuestSaveComponent;
 
   constructor(
     private questService: QuestService,
@@ -69,7 +74,10 @@ export class ProjectGanttComponent implements OnInit {
           columns[k].visible = false;
           break;
         case "Name":
-          columns[k].headerText = this.translateService.instant('TIME.RESOURCE.PROJECT.NAME');
+          this.translateService.get('TIME.RESOURCE.PROJECT.NAME').subscribe(result => {
+            columns[k].headerText = result;
+          });
+          columns[k].width = "300";
           break;
       }
     });
@@ -77,18 +85,33 @@ export class ProjectGanttComponent implements OnInit {
   }
 
   onGanttContextMenuOpen($event): void {
-    let questName = this.translateService.instant('TIME.RESOURCE.QUEST.NAME');
-    let projectName = this.translateService.instant('TIME.RESOURCE.PROJECT.NAME');
-    let taskName = this.translateService.instant('TIME.RESOURCE.TASK.NAME');
-    let processAdd = this.translateService.instant('SYSTEM.PROCESS.CREATE');
-    let processDelete = this.translateService.instant('SYSTEM.PROCESS.CREATE');
+    let questName = this.translateService.instant('TIME.RESOURCE.QUEST.CONCEPT');
+    let projectName = this.translateService.instant('TIME.RESOURCE.PROJECT.CONCEPT');
+    let taskName = this.translateService.instant('TIME.RESOURCE.TASK.CONCEPT');
+    let processCreate = this.translateService.instant('SYSTEM.PROCESS.CREATE');
+    let processUpdate = this.translateService.instant('SYSTEM.PROCESS.UPDATE');
+    let processDelete = this.translateService.instant('SYSTEM.PROCESS.DELETE');
     let self = this;
     $event.contextMenuItems = [];
+    let taskUpdateItem = {
+      headerText: processUpdate + questName,
+      menuId: "quest-update",
+      eventHandler: function(args) {
+        self.questSaveComponent.New(args.data.item.Id);
+      },
+    }
     let projectAddItem = {
-      headerText: processAdd + projectName,
+      headerText: processCreate + projectName,
       menuId: "project-add",
       eventHandler: function(args) {
-        self.saveComponent.New();
+        self.projectSaveComponent.New(args.data.item.Id);
+      },
+    }
+    let projectUpdateItem = {
+      headerText: processUpdate + projectName,
+      menuId: "project-update",
+      eventHandler: function(args) {
+        self.projectSaveComponent.New(args.data.parentItem.taskId, args.data.taskId);
       },
     }
     let projectDeleteItem = {
@@ -100,22 +123,39 @@ export class ProjectGanttComponent implements OnInit {
     }
     switch($event.item.level) {
       case 0:
+        $event.contextMenuItems.push(taskUpdateItem);
         $event.contextMenuItems.push(projectAddItem);
+        break;
+      case 1:
+        $event.contextMenuItems.push(projectUpdateItem);
         $event.contextMenuItems.push(projectDeleteItem);
+        break;
     }
   }
 
-  saved($event): void {
+  projectSaved($event): void {
+    if ($event == undefined) {
+      return
+    }
+
+    let gantt = $("#GanttPanel").ejGantt("instance");
+    if ($event.Id == null) {
+      let newRecord = new Gantt;
+      newRecord.Id = $event.Id;
+      newRecord.Name = $event.Name;
+      newRecord.StartDate = $event.StartDate;
+      newRecord.EndDate = null;
+      newRecord.Parent = $event.Quest.Id
+      newRecord.Progress = 0;
+      newRecord.Duration = 0;
+      let rowPosition: any;
+      rowPosition = ej.TreeGrid.RowPosition.Child;
+      gantt.addRecord(newRecord, rowPosition);
+    }
     // let data = {Id: args.data.item.Id, Name: "updated value" };
     // this.updateRecordByTaskId(data);
-    // let tempData = {
-    //   Id: 5,
-    //   Name: "test",
-    //   Parent: 2,
-    // };
-    // let obj = $("#GanttPanel").ejGantt("instance");
-    // let rowPosition: any;
-    // rowPosition = ej.TreeGrid.RowPosition.Child;
-    // obj.addRecord(tempData, rowPosition);
+  }
+
+  questSaved($event): void {
   }
 }

@@ -14,7 +14,7 @@ type Model struct {
 
 type ModelWithId struct {
 	Id    int   `xorm:"pk autoincr" structs:"id,omitempty"`
-	Ids   []int `xorm:"-" structs:"ids,omitempty"`
+	Ids   []int `xorm:"-" structs:"id,omitempty"`
 	Model `xorm:"extends"`
 }
 
@@ -27,11 +27,7 @@ func (m *Model) BuildCondition(params map[string]interface{}, keyPrefix string) 
 	condition = builder.Eq{}
 	for key, value := range params {
 		keyType := reflect.ValueOf(value).Kind()
-		if key == "ids" {
-			condition[keyPrefix+key] = value
-			continue
-		}
-		if keyType == reflect.Map || keyType == reflect.Slice || keyType == reflect.Struct {
+		if keyType == reflect.Map || keyType == reflect.Struct {
 			continue
 		}
 		if keyType == reflect.String && value == "" {

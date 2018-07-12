@@ -64,34 +64,31 @@ func (c *Project) ListSyncfusionGanttFormat(ctx *gin.Context) {
 		return
 	}
 
-	Ids := make([]int, 0)
+	questIds := make([]int, 0)
 	for _, one := range questTeams {
-		Ids = append(Ids, one.QuestId)
+		questIds = append(questIds, one.QuestId)
 	}
 	quest := models.Quest{}
-	quest.Ids = Ids
+	quest.Ids = questIds
+	quest.Status = models.QuestStatusExec
 	quests, err := c.QuestSvc.ListWithCondition(&quest)
 	if err != nil {
 		resp.ErrorBusiness(ctx, resp.ErrorMysql, "quest get error", err)
 		return
 	}
 
-	res := make([]models.SyncfusionGantt, 0)
-	for _, one := range quests {
-		gantt := models.SyncfusionGantt{}
-		gantt.Id = one.Id
-		gantt.Parent = 0
-		gantt.Name = one.Name
-		gantt.StartDate = one.EndDate
-		gantt.EndDate = one.EndDate
-		gantt.Progress = 0
-		gantt.Duration = 0
-		gantt.Expanded = false
-		child := make([]models.SyncfusionGantt, 0)
-		gantt.Children = child
-		res = append(res, gantt)
+	project := models.Project{}
+	project.QuestIds = questIds
+	projects, err := c.ProjectSvc.ListWithCondition(&project)
+	if err != nil {
+		resp.ErrorBusiness(ctx, resp.ErrorMysql, "project get error", err)
+		return
 	}
-	resp.CustomSuccess(ctx, res)
+
+	sync := models.SyncfusionGantt{}
+	projectsMap := sync.BuildProjectMap(projects)
+	questsSlice := sync.BuildQuestSlice(quests, projectsMap)
+	resp.CustomSuccess(ctx, questsSlice)
 }
 
 func (c *Project) ListByCondition(ctx *gin.Context) {

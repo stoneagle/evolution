@@ -1,4 +1,5 @@
 import { Basic } from '../base/basic';
+import { Quest } from './quest';
 
 export class Project extends Basic {
   Name: string;
@@ -6,4 +7,5 @@ export class Project extends Basic {
   AreaId: number;
   StartDate: Date;
   Duration: number;
+  Quest: Quest;
 }
