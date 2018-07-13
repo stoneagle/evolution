@@ -39,5 +39,6 @@ func Configure(b *bootstrap.Bootstrapper) {
 		controllers.NewQuestTeam().Router(v1)
 		controllers.NewProject().Router(v1)
 		controllers.NewTask().Router(v1)
+		controllers.NewAction().Router(v1)
 	}
 }

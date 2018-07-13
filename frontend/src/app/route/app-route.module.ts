@@ -10,6 +10,7 @@ import { ItemComponent as QuantItem }                 from '../controller/quant/
 import { QuestComponent as TimeQuest }               from '../controller/time/quest/quest.component';
 import { ProjectComponent as TimeProject }           from '../controller/time/project/project.component';
 import { TaskComponent as TimeTask }                 from '../controller/time/task/task.component';
+import { ActionComponent as TimeAction }             from '../controller/time/action/action.component';
 import { CountryComponent as TimeCountry }           from '../controller/time/country/country.component';
 import { FieldComponent as TimeField }               from '../controller/time/field/field.component';
 import { AreaComponent as TimeArea }                 from '../controller/time/area/area.component';
@@ -61,6 +62,7 @@ const routes: Routes = [
           { path: 'quest', component: TimeQuest },
           { path: 'project', component: TimeProject },
           { path: 'task', component: TimeTask },
+          { path: 'action', component: TimeAction },
         ]
       },
       { 

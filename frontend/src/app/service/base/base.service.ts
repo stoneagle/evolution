@@ -58,4 +58,16 @@ export class BaseService {
       }
     );
   }
+
+  protected DateJsonKeepFormat = function() {
+		let timezoneOffsetInHours = -(this.getTimezoneOffset() / 60); //UTC minus local time
+		let sign = timezoneOffsetInHours >= 0 ? '+' : '-';
+		let leadingZero = (timezoneOffsetInHours < 10) ? '0' : '';
+		let correctedDate = new Date(this.getFullYear(), this.getMonth(), 
+				this.getDate(), this.getHours(), this.getMinutes(), this.getSeconds(), 
+				this.getMilliseconds());
+		correctedDate.setHours(this.getHours() + timezoneOffsetInHours);
+		let iso = correctedDate.toISOString().replace('Z', '');
+		return iso + sign + leadingZero + Math.abs(timezoneOffsetInHours).toString() + ':00';
+	}
 }

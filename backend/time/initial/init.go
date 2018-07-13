@@ -40,12 +40,12 @@ func exec(dbConfig config.DBConf, mode string) {
 	engine.StoreEngine("InnoDB")
 	engine.Charset("utf8")
 	// if mode == "debug" {
-	// 	err = engine.DropTables(new(models.Area), new(models.Country), new(models.Field), new(models.Resource), new(models.Phase), new(models.UserResource), new(models.Quest), new(models.QuestTeam), new(models.QuestTimeTable), new(models.QuestTarget), new(models.QuestResource), new(models.Project), new(models.Task))
+	// 	err = engine.DropTables(new(models.Area), new(models.Country), new(models.Field), new(models.Resource), new(models.Phase), new(models.UserResource), new(models.Quest), new(models.QuestTeam), new(models.QuestTimeTable), new(models.QuestTarget), new(models.QuestResource), new(models.Project), new(models.Task), new(models.Action))
 	// 	if err != nil {
 	// 		panic(err)
 	// 	}
 	// }
-	err = engine.Sync2(new(models.Area), new(models.Country), new(models.Field), new(models.Resource), new(models.Phase), new(models.UserResource), new(models.Quest), new(models.QuestTeam), new(models.QuestTimeTable), new(models.QuestTarget), new(models.QuestResource), new(models.Project), new(models.Task))
+	err = engine.Sync2(new(models.Area), new(models.Country), new(models.Field), new(models.Resource), new(models.Phase), new(models.UserResource), new(models.Quest), new(models.QuestTeam), new(models.QuestTimeTable), new(models.QuestTarget), new(models.QuestResource), new(models.Project), new(models.Task), new(models.Action))
 	if err != nil {
 		panic(err)
 	}

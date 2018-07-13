@@ -28,11 +28,12 @@ type DBConf struct {
 }
 
 type System struct {
-	Name    string
-	Host    string
-	Version string
-	Prefix  string
-	Cors    []string
+	Name     string
+	Host     string
+	Version  string
+	Prefix   string
+	Cors     []string
+	Location string
 }
 
 type Conf struct {

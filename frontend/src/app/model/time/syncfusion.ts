@@ -21,3 +21,12 @@ export class Gantt extends Basic {
   Children: Gantt[];
   Parent: number;
 }
+
+export class Schedule extends Basic {
+  Id: number;
+  Name: string;
+  StartDate: Date;
+  EndDate: Date;
+  AllDay: boolean;
+  Recurrence: boolean;
+}

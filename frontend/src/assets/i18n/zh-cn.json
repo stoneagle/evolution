@@ -60,6 +60,15 @@
           "FINISH": "已完成"
         }
       },
+      "ACTION": {
+        "CONCEPT": "行动",
+        "NAME": "名称",
+        "STARTDATE": "开始时间",
+        "ENDDATE": "结束时间",
+        "TASK": "所属任务",
+        "USER": "执行人",
+        "TIME": "花费时间"
+      },
       "PHASE": {
         "CONCEPT": "阶段",
         "NAME": "名称",

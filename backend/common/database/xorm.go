@@ -23,7 +23,7 @@ func GetXorm(key string) *xorm.Engine {
 }
 
 func SetProjectXorm(dbConfig config.DBConf, name string) {
-	source := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True", dbConfig.User, dbConfig.Password, dbConfig.Host, dbConfig.Port, dbConfig.Target)
+	source := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&interpolateParams=true&parseTime=true&loc=Local", dbConfig.User, dbConfig.Password, dbConfig.Host, dbConfig.Port, dbConfig.Target)
 
 	engine, err := xorm.NewEngine(dbConfig.Type, source)
 	if err != nil {
@@ -36,6 +36,7 @@ func SetProjectXorm(dbConfig config.DBConf, name string) {
 	if err != nil {
 		panic(err)
 	}
+	engine.DatabaseTZ = location
 	engine.TZLocation = location
 	if dbConfig.Showsql {
 		engine.ShowSQL(true)

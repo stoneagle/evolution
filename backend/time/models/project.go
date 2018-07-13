@@ -18,6 +18,7 @@ type Project struct {
 
 	QuestIds []int `xorm:"-" structs:"quest_id,omitempty"`
 	Area     Area  `xorm:"-" structs:"-"`
+	Quest    Quest `xorm:"-" structs:"-"`
 }
 
 func (m *Project) TableName() string {

@@ -26,6 +26,23 @@ type SyncfusionTreeGrid struct {
 	Children   []SyncfusionTreeGrid `json:"Children,omitempty"`
 }
 
+type SyncfusionSchedule struct {
+	Id         int
+	Name       string
+	StartDate  time.Time
+	EndDate    time.Time
+	AllDay     bool
+	Recurrence bool
+}
+
+var (
+	SyncfusionScheduleViewWeek     string = "week"
+	SyncfusionScheduleViewDay      string = "day"
+	SyncfusionScheduleViewMonth    string = "month"
+	SyncfusionScheduleViewAgenda   string = "agenda"
+	SyncfusionScheduleViewWorkWeek string = "workweek"
+)
+
 func (m *SyncfusionGantt) BuildTaskMap(tasks []Task) map[int][]SyncfusionGantt {
 	result := make(map[int][]SyncfusionGantt)
 	for _, one := range tasks {
@@ -94,5 +111,21 @@ func (m *SyncfusionGantt) BuildQuestSlice(quests []Quest, projectsMap map[int][]
 		result = append(result, gantt)
 	}
 
+	return result
+}
+
+func (m *SyncfusionSchedule) BuildActionSlice(actions []Action) []SyncfusionSchedule {
+	result := make([]SyncfusionSchedule, 0)
+	hour, _ := time.ParseDuration("-4h")
+	for _, one := range actions {
+		schedule := SyncfusionSchedule{}
+		schedule.Id = one.Id
+		schedule.Name = one.Name
+		schedule.StartDate = one.StartDate.Add(hour)
+		schedule.EndDate = one.EndDate.Add(hour)
+		schedule.AllDay = false
+		schedule.Recurrence = false
+		result = append(result, schedule)
+	}
 	return result
 }

@@ -1,16 +1,17 @@
-import { NgModule }                  from '@angular/core';
-import { BrowserModule }             from '@angular/platform-browser';
-import { BrowserAnimationsModule   } from '@angular/platform-browser/animations';
-import { HttpClientModule  }         from '@angular/common/http';
-import { HttpModule   }              from '@angular/http';
-import { FormsModule }               from '@angular/forms';
-import { ClarityModule  }            from "@clr/angular";
-import { TranslateModule  }          from "@ngx-translate/core";
-import { TreeModule }                from 'ng2-tree';
-import { EJ_GANTT_COMPONENTS }       from 'ej-angular2/src/ej/gantt.component';
-import { EJ_TREEGRID_COMPONENTS }    from 'ej-angular2/src/ej/treegrid.component';
-import { EJ_SCHEDULE_COMPONENTS }    from 'ej-angular2/src/ej/schedule.component';
-import { EJ_DATEPICKER_COMPONENTS }  from 'ej-angular2/src/ej/datepicker.component';
+import { NgModule }                     from '@angular/core';
+import { BrowserModule }                from '@angular/platform-browser';
+import { BrowserAnimationsModule   }    from '@angular/platform-browser/animations';
+import { HttpClientModule  }            from '@angular/common/http';
+import { HttpModule   }                 from '@angular/http';
+import { FormsModule }                  from '@angular/forms';
+import { ClarityModule  }               from "@clr/angular";
+import { TranslateModule  }             from "@ngx-translate/core";
+import { TreeModule }                   from 'ng2-tree';
+import { EJ_GANTT_COMPONENTS }          from 'ej-angular2/src/ej/gantt.component';
+import { EJ_TREEGRID_COMPONENTS }       from 'ej-angular2/src/ej/treegrid.component';
+import { EJ_SCHEDULE_COMPONENTS }       from 'ej-angular2/src/ej/schedule.component';
+import { EJ_DATEPICKER_COMPONENTS }     from 'ej-angular2/src/ej/datepicker.component';
+import { EJ_DATETIMEPICKER_COMPONENTS } from 'ej-angular2/src/ej/datetimepicker.component';
 
 import { QuestComponent }            from './quest/quest.component';
 import { QuestSaveComponent }        from './quest/save/save.component';
@@ -20,6 +21,9 @@ import { ProjectGanttComponent }     from './project/gantt/gantt.component';
 import { ProjectSaveComponent }      from './project/save/save.component';
 import { TaskComponent }             from './task/task.component';
 import { TaskSaveComponent }         from './task/save/save.component';
+import { ActionComponent }           from './action/action.component';
+import { ActionSaveComponent }       from './action/save/save.component';
+import { ActionScheduleComponent }   from './action/schedule/schedule.component';
 import { CountryComponent }          from './country/country.component';
 import { CountrySaveComponent }      from './country/save/save.component';
 import { PhaseComponent }            from './phase/phase.component';
@@ -38,6 +42,7 @@ import { UserResourceListComponent } from './user-resource/list/list.component';
 import { CountryService }         from '../../service/time/country.service';
 import { ProjectService }         from '../../service/time/project.service';
 import { TaskService }            from '../../service/time/task.service';
+import { ActionService }          from '../../service/time/action.service';
 import { QuestService }           from '../../service/time/quest.service';
 import { QuestTargetService }     from '../../service/time/quest-target.service';
 import { QuestResourceService }   from '../../service/time/quest-resource.service';
@@ -60,6 +65,9 @@ import { MessageHandlerService  } from '../../service/base/message-handler.servi
     ProjectSaveComponent,
     TaskComponent,
     TaskSaveComponent,
+    ActionComponent,
+    ActionSaveComponent,
+    ActionScheduleComponent,
     CountryComponent,
     CountrySaveComponent,
     ResourceListComponent,
@@ -93,6 +101,7 @@ import { MessageHandlerService  } from '../../service/base/message-handler.servi
     AreaService,
     ProjectService,
     TaskService,
+    ActionService,
     QuestService,
     QuestTeamService,
     QuestTargetService,

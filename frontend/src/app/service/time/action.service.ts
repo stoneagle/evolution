@@ -6,31 +6,35 @@ import { catchError, map, tap  }    from 'rxjs/operators';
 import { AppConfig }                from '../base/config.service';
 import { MessageHandlerService  }   from '../base/message-handler.service';
 import { BaseService  }             from '../base/base.service';
-import { Task }                     from '../../model/time/task';
+import { Action }                   from '../../model/time/action';
 import { Resp }                     from '../../model/base/resp';
 
 @Injectable()
-export class TaskService extends BaseService {
-  private uri = AppConfig.settings.apiServer.prefix.time + '/task';
+export class ActionService extends BaseService {
+  private uri = AppConfig.settings.apiServer.prefix.time + '/action';
 
   constructor(
     protected http: HttpClient,
     protected messageHandlerService: MessageHandlerService,
   ) {
     super(http, messageHandlerService);
-    this.resource = 'TIME.RESOURCE.TASK.CONCEPT';
+    this.resource = 'TIME.RESOURCE.ACTION.CONCEPT';
   }
 
-  List(): Observable<Task[]> {
+  getScheduleUrl(): string {
+    return AppConfig.settings.apiServer.endpoint + this.uri + `/list/syncfusion/schedule`;
+  }
+
+  List(): Observable<Action[]> {
     this.operation = 'SYSTEM.PROCESS.LIST';
     return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`).pipe(
       catchError(this.handleError<Resp>()),
       map(res => {
-        let ret:Task[] = []; 
+        let ret:Action[] = []; 
         if (res && res.code == 0) {
           res.data.map(
             one => {
-              ret.push(new Task(one));
+              ret.push(new Action(one));
             }
           )
         }
@@ -39,16 +43,16 @@ export class TaskService extends BaseService {
     )
   }
 
-  ListByUser(userId: number): Observable<Task[]> {
+  ListWithCondition(action: Action): Observable<Action[]> {
     this.operation = 'SYSTEM.PROCESS.LIST';
-    return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/list/user/${userId}`).pipe(
+    return this.http.post<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`, JSON.stringify(action)).pipe(
       catchError(this.handleError<Resp>()),
       map(res => {
-        let ret:Task[] = []; 
+        let ret:Action[] = []; 
         if (res && res.code == 0) {
           res.data.map(
             one => {
-              ret.push(new Task(one));
+              ret.push(new Action(one));
             }
           )
         }
@@ -57,56 +61,40 @@ export class TaskService extends BaseService {
     )
   }
 
-  ListWithCondition(task: Task): Observable<Task[]> {
-    this.operation = 'SYSTEM.PROCESS.LIST';
-    return this.http.post<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`, JSON.stringify(task)).pipe(
-      catchError(this.handleError<Resp>()),
-      map(res => {
-        let ret:Task[] = []; 
-        if (res && res.code == 0) {
-          res.data.map(
-            one => {
-              ret.push(new Task(one));
-            }
-          )
-        }
-        return ret; 
-      }),
-    )
-  }
-
-  Get(id: number): Observable<Task> {
+  Get(id: number): Observable<Action> {
     this.operation = 'SYSTEM.PROCESS.GET';
     return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/get/${id}`).pipe(
       catchError(this.handleError<Resp>()),
       map(res => {
         if (res && res.code == 0) {
-          return new Task(res.data);
+          return new Action(res.data);
         } else {
-          return new Task();
+          return new Action();
         }
       }),
     )
   }
 
-  Add(task: Task): Observable<Task> {
+  Add(action: Action): Observable<Action> {
     this.operation = 'SYSTEM.PROCESS.CREATE';
-    return this.http.post<Resp>(AppConfig.settings.apiServer.endpoint + this.uri, JSON.stringify(task)).pipe(
+    // action.StartDate.toJSON = this.DateJsonKeepFormat;
+    // action.EndDate.toJSON = this.DateJsonKeepFormat;
+    return this.http.post<Resp>(AppConfig.settings.apiServer.endpoint + this.uri, JSON.stringify(action)).pipe(
       tap(res => this.log(res)),
       catchError(this.handleError<Resp>()),
       map(res => {
         if (res && res.code == 0) {
-          return new Task(res.data);
+          return new Action(res.data);
         } else {
-          return new Task();
+          return new Action();
         }
       }),
     );
   }
 
-  Update(task: Task): Observable<Resp> {
+  Update(action: Action): Observable<Resp> {
     this.operation = 'SYSTEM.PROCESS.UPDATE';
-    return this.http.put<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/${task.Id}`, JSON.stringify(task)).pipe(
+    return this.http.put<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/${action.Id}`, JSON.stringify(action)).pipe(
       tap(res => this.log(res)),
       catchError(this.handleError<Resp>()),
     );
