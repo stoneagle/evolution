@@ -3,7 +3,6 @@ package main
 import (
 	"evolution/backend/common/config"
 	"evolution/backend/time/models"
-	"evolution/backend/time/models/php"
 	"fmt"
 	"io/ioutil"
 	"time"
@@ -21,6 +20,14 @@ var (
 		4: "圈子",
 		5: "经历",
 		6: "日常",
+	}
+	FieldColorMap map[int]string = map[int]string{
+		1: "#57b94c",
+		2: "#5187c6",
+		3: "#edba3c",
+		4: "#FF9900",
+		5: "#ee4e75",
+		6: "#B0B0B0",
 	}
 )
 
@@ -80,7 +87,7 @@ func main() {
 	// new(php.Area).Transfer(srcEng, destEng)
 	// initAreaType(destEng)
 	// new(php.Country).Transfer(srcEng, destEng)
-	// initField(destEng)
+	initField(destEng)
 	// initPhase(destEng)
 	// new(php.EntityAsset).Transfer(srcEng, destEng)
 	// new(php.EntityCircle).Transfer(srcEng, destEng)
@@ -88,7 +95,7 @@ func main() {
 	// new(php.EntityWork).Transfer(srcEng, destEng)
 	// new(php.EntitySkill).Transfer(srcEng, destEng)
 	// new(php.EntityLife).Transfer(srcEng, destEng)
-	new(php.TargetEntityLink).Transfer(srcEng, destEng)
+	// new(php.TargetEntityLink).Transfer(srcEng, destEng)
 }
 
 func initField(des *xorm.Engine) {
@@ -97,6 +104,12 @@ func initField(des *xorm.Engine) {
 		tmp := models.Field{}
 		tmp.Name = v
 		tmp.Id = k
+		color, ok := FieldColorMap[k]
+		if !ok {
+			fmt.Printf("field color not exist")
+			return
+		}
+		tmp.Color = color
 		news = append(news, tmp)
 	}
 	affected, err := des.Insert(&news)

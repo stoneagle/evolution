@@ -81,14 +81,16 @@ export class TaskSaveComponent implements OnInit {
   }            
 
   Submit(): void {
-    this.task.StartDate = new Date(this.task.StartDate);
+    // this.task.StartDate = new Date(this.task.StartDate);
     if (this.task.Id == null) {
       this.taskService.Add(this.task).subscribe(res => {
+        this.task.Resource = this.resourceMaps.get(this.task.ResourceId);
         this.save.emit(this.task);
         this.modelOpened = false;
       })
     } else {
       this.taskService.Update(this.task).subscribe(res => {
+        this.task.Resource = this.resourceMaps.get(this.task.ResourceId);
         this.save.emit(this.task);
         this.modelOpened = false;
       })

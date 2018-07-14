@@ -35,6 +35,21 @@ type SyncfusionSchedule struct {
 	Recurrence bool
 }
 
+type SyncfusionKanban struct {
+	Id           int
+	Name         string
+	Desc         string
+	Tags         string
+	Status       int
+	StatusName   string
+	ResourceId   int
+	ResourceName string
+	ProjectId    int
+	ProjectName  string
+	FieldId      int
+	FieldName    string
+}
+
 var (
 	SyncfusionScheduleViewWeek     string = "week"
 	SyncfusionScheduleViewDay      string = "day"

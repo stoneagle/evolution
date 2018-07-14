@@ -30,3 +30,17 @@ export class Schedule extends Basic {
   AllDay: boolean;
   Recurrence: boolean;
 }
+
+export class Kanban extends Basic {
+	Id          :number
+	Name        :string
+	Desc        :string
+	Status      :number
+	StatusName  :string
+	ProjectName :number
+	Tags        :string
+	FieldName   :string
+	ResourceId  :number
+	ProjectId   :number
+	FieldId     :number
+}

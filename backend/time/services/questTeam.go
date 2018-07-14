@@ -50,12 +50,19 @@ func (s *QuestTeam) List() (questTeam []models.QuestTeam, err error) {
 }
 
 func (s *QuestTeam) ListWithCondition(questTeam *models.QuestTeam) (questTeams []models.QuestTeam, err error) {
-	questTeams = make([]models.QuestTeam, 0)
+	questTeamsJoin := make([]models.QuestTeamJoin, 0)
+	sql := s.Engine.Unscoped().Table("quest_team").Join("INNER", "quest", "quest.id = quest_team.quest_id")
+
 	condition := questTeam.BuildCondition()
-	sql := s.Engine.Where(condition)
-	err = sql.Find(&questTeams)
+	sql = sql.Where(condition)
+	err = sql.Find(&questTeamsJoin)
 	if err != nil {
 		return
+	}
+	questTeams = make([]models.QuestTeam, 0)
+	for _, one := range questTeamsJoin {
+		one.QuestTeam.Quest = one.Quest
+		questTeams = append(questTeams, one.QuestTeam)
 	}
 	return
 }

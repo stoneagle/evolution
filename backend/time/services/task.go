@@ -3,6 +3,8 @@ package services
 import (
 	"evolution/backend/common/structs"
 	"evolution/backend/time/models"
+	"math"
+	"time"
 
 	"github.com/go-redis/redis"
 	"github.com/go-xorm/xorm"
@@ -31,7 +33,38 @@ func (s *Task) Add(model models.Task) (err error) {
 }
 
 func (s *Task) Update(id int, model models.Task) (err error) {
+	emptyTime := time.Time{}
+	if model.EndDate != emptyTime {
+		task, err := s.One(id)
+		if err != nil {
+			return err
+		}
+		diffHours := model.EndDate.Sub(task.(models.Task).StartDate).Hours()
+		model.Duration = int(math.Ceil(diffHours / 24))
+	}
 	_, err = s.Engine.Id(id).Update(&model)
+	if model.StartDateReset {
+		err = s.UpdateByMap(id, map[string]interface{}{
+			"start_date": nil,
+		})
+		if err != nil {
+			return
+		}
+	}
+	if model.EndDateReset {
+		err = s.UpdateByMap(id, map[string]interface{}{
+			"end_date": nil,
+			"duration": 0,
+		})
+		if err != nil {
+			return
+		}
+	}
+	return
+}
+
+func (s *Task) UpdateByMap(id int, model map[string]interface{}) (err error) {
+	_, err = s.Engine.Table(new(models.Task)).Id(id).Update(&model)
 	return
 }
 

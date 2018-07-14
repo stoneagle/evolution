@@ -50,9 +50,13 @@
           </div>
         </div>
         <div class="form-group">
-          <label for="StartDate">{{ 'TIME.RESOURCE.TASK.STARTDATE' | translate }}</label>
-          <input type="text" ej-datepicker dateFormat="yyyy/MM/dd" id="StartDate" name="StartDate" [readonly]="task.Id" required [(ngModel)]="task.StartDate" />
+            <label for="Desc">{{ 'TIME.RESOURCE.TASK.DESC' | translate }}</label>
+            <textarea id="Desc" name="Desc" [(ngModel)]="task.Desc" rows="3"></textarea>
         </div>
+        <!-- <div class="form-group"> -->
+        <!--   <label for="StartDate">{{ 'TIME.RESOURCE.TASK.STARTDATE' | translate }}</label> -->
+        <!--   <input type="text" ej-datepicker dateFormat="yyyy/MM/dd" id="StartDate" name="StartDate" [readonly]="task.Id" required [(ngModel)]="task.StartDate" /> -->
+        <!-- </div> -->
         <button type="submit" class="btn btn-success">{{ 'SYSTEM.PROCESS.SUBMIT' | translate }}</button>
         <button type="button" class="btn btn-primary" (click)="modelOpened = false">{{ 'SYSTEM.PROCESS.CANCEL' | translate }}</button>
       </form>

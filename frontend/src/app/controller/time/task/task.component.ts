@@ -1,8 +1,8 @@
 import { Component, OnInit, Input, ViewChild } from '@angular/core';
 
-import { Task }              from '../../../model/time/task';
-import { TaskService }       from '../../../service/time/task.service';
-import { TaskSaveComponent } from './save/save.component';
+import { Task }                from '../../../model/time/task';
+import { TaskService }         from '../../../service/time/task.service';
+import { TaskKanbanComponent } from './kanban/kanban.component';
 
 @Component({
   selector: 'time-task',
@@ -10,8 +10,8 @@ import { TaskSaveComponent } from './save/save.component';
   styleUrls: ['./task.component.css']
 })
 export class TaskComponent implements OnInit {
-  @ViewChild(TaskSaveComponent)
-  taskSaveComponent: TaskSaveComponent;
+  @ViewChild(TaskKanbanComponent)
+  taskKanbanComponent: TaskKanbanComponent;
 
   tasks: Task[];
 
@@ -20,14 +20,5 @@ export class TaskComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-  }
-
-  saved(saved: boolean): void {
-    if (saved) {
-    }
-  }
-
-  openSaveModel(id?: number): void {
-    this.taskSaveComponent.New(id);
   }
 }

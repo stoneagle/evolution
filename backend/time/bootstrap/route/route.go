@@ -40,5 +40,6 @@ func Configure(b *bootstrap.Bootstrapper) {
 		controllers.NewProject().Router(v1)
 		controllers.NewTask().Router(v1)
 		controllers.NewAction().Router(v1)
+		controllers.NewSyncfusion().Router(v1)
 	}
 }

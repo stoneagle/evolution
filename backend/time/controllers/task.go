@@ -15,7 +15,6 @@ type Task struct {
 	structs.Controller
 	TaskSvc      *services.Task
 	ProjectSvc   *services.Project
-	QuestSvc     *services.Quest
 	QuestTeamSvc *services.QuestTeam
 }
 
@@ -27,7 +26,6 @@ func NewTask() *Task {
 	Task.Prepare()
 	Task.TaskSvc = services.NewTask(Task.Engine, Task.Cache)
 	Task.ProjectSvc = services.NewProject(Task.Engine, Task.Cache)
-	Task.QuestSvc = services.NewQuest(Task.Engine, Task.Cache)
 	Task.QuestTeamSvc = services.NewQuestTeam(Task.Engine, Task.Cache)
 	return Task
 }

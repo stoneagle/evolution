@@ -23,13 +23,19 @@ export const Task = {
     Backlog: 1,
     Todo: 2,
     Progress: 3,
-    Finish: 4
+    Done: 4
+  },
+  StatusName: {
+    1: "backlog",
+    2: "todo",
+    3: "progress",
+    4: "done",
   },
   StatusInfo: {
     1: "TIME.RESOURCE.TASK.STATUS-NAME.BACKLOG",
     2: "TIME.RESOURCE.TASK.STATUS-NAME.TODO",
     3: "TIME.RESOURCE.TASK.STATUS-NAME.PROGRESS",
-    4: "TIME.RESOURCE.TASK.STATUS-NAME.FINISH",
+    4: "TIME.RESOURCE.TASK.STATUS-NAME.DONE",
   }
 }
 

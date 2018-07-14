@@ -12,6 +12,7 @@ import { EJ_TREEGRID_COMPONENTS }       from 'ej-angular2/src/ej/treegrid.compon
 import { EJ_SCHEDULE_COMPONENTS }       from 'ej-angular2/src/ej/schedule.component';
 import { EJ_DATEPICKER_COMPONENTS }     from 'ej-angular2/src/ej/datepicker.component';
 import { EJ_DATETIMEPICKER_COMPONENTS } from 'ej-angular2/src/ej/datetimepicker.component';
+import { EJ_KANBAN_COMPONENTS }         from 'ej-angular2/src/ej/kanban.component';
 
 import { QuestComponent }            from './quest/quest.component';
 import { QuestSaveComponent }        from './quest/save/save.component';
@@ -21,6 +22,7 @@ import { ProjectGanttComponent }     from './project/gantt/gantt.component';
 import { ProjectSaveComponent }      from './project/save/save.component';
 import { TaskComponent }             from './task/task.component';
 import { TaskSaveComponent }         from './task/save/save.component';
+import { TaskKanbanComponent }       from './task/kanban/kanban.component';
 import { ActionComponent }           from './action/action.component';
 import { ActionSaveComponent }       from './action/save/save.component';
 import { ActionScheduleComponent }   from './action/schedule/schedule.component';
@@ -53,6 +55,7 @@ import { FieldService }           from '../../service/time/field.service';
 import { ResourceService }        from '../../service/time/resource.service';
 import { AreaService }            from '../../service/time/area.service';
 import { UserResourceService }    from '../../service/time/user-resource.service';
+import { SyncfusionService }      from '../../service/time/syncfusion.service';
 import { MessageHandlerService  } from '../../service/base/message-handler.service';
 
 @NgModule({
@@ -65,6 +68,7 @@ import { MessageHandlerService  } from '../../service/base/message-handler.servi
     ProjectSaveComponent,
     TaskComponent,
     TaskSaveComponent,
+    TaskKanbanComponent,
     ActionComponent,
     ActionSaveComponent,
     ActionScheduleComponent,
@@ -85,7 +89,8 @@ import { MessageHandlerService  } from '../../service/base/message-handler.servi
     EJ_GANTT_COMPONENTS,
     EJ_TREEGRID_COMPONENTS,
     EJ_SCHEDULE_COMPONENTS,
-    EJ_DATEPICKER_COMPONENTS
+    EJ_DATEPICKER_COMPONENTS,
+    EJ_KANBAN_COMPONENTS,
   ],
   imports: [   
     BrowserModule,
@@ -112,6 +117,7 @@ import { MessageHandlerService  } from '../../service/base/message-handler.servi
     PhaseService,
     ResourceService,
     UserResourceService,
+    SyncfusionService,
     MessageHandlerService,
   ],
   exports: [
