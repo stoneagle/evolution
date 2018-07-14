@@ -27,7 +27,6 @@ export class AreaNg2TreeComponent implements OnInit {
     private fieldService: FieldService,
   ) { }
 
-  // 必须设置一个active，才能避免错误
   firstFieldId: number;
   fieldMap: Map<number, string> = new Map(); 
   currentFieldId: number;
@@ -37,6 +36,13 @@ export class AreaNg2TreeComponent implements OnInit {
   @Output() selectAreaId = new EventEmitter<number>();
 
   ngOnInit() {
+    // must set an unempty initMap，avoid clrtabs render active get error
+    let initMap: Map<number, string> = new Map();
+    initMap.set(1, "init");
+    this.fieldMap = initMap;
+
+    this.firstFieldId = this.fieldMap.keys().next().value;
+    this.refreshParent(this.firstFieldId);
     this.fieldService.Map().subscribe(res => {
       this.fieldMap = res;
       this.firstFieldId = this.fieldMap.keys().next().value;
@@ -146,7 +152,7 @@ export class AreaNg2TreeComponent implements OnInit {
 
   handleCustom(e: NodeEvent): void {
     let resource = new Resource();
-    resource.AreaId = +e.node.id;
+    resource.Area.Id = +e.node.id;
     this.saveResource.New(resource);
   }
 

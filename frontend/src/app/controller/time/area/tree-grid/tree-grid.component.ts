@@ -35,6 +35,11 @@ export class AreaTreeGridComponent implements OnInit {
   treeColumnIndex: number;
 
   ngOnInit() {
+    // must set an unempty initMap，avoid clrtabs render active get error
+    let initMap: Map<number, string> = new Map();
+    initMap.set(1, "init");
+    this.fieldMap = initMap;
+
     this.treeColumns = [
       { field: "Id", headerText: "ID", width: "45", visible: false },
       { field: "Name", headerText: "Name" },
