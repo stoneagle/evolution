@@ -1,6 +1,7 @@
 package php
 
 import (
+	"errors"
 	"evolution/backend/time/models"
 	"fmt"
 	"time"
@@ -21,7 +22,7 @@ type TargetEntityLinkJoin struct {
 	Target           `xorm:"extends"`
 }
 
-func (c *TargetEntityLink) Transfer(src, des *xorm.Engine) {
+func (c *TargetEntityLink) Transfer(src, des *xorm.Engine, userId int) {
 	olds := make([]TargetEntityLinkJoin, 0)
 	err := src.Table("target_entity_link").Join("LEFT", "target", "target.id = target_entity_link.target_id").Find(&olds)
 	if err != nil {
@@ -48,28 +49,19 @@ func (c *TargetEntityLink) Transfer(src, des *xorm.Engine) {
 		}
 
 		// 找到新版本resource的Id
-		name, err := getResourceName(src, entityId, field)
+		newResourceJoin, err := getResourceJoin(src, des, entityId, field)
 		if err != nil {
+			fmt.Printf("get new resource error:%v\r\n", err)
 			return
-		}
-
-		newResource := models.ResourceJoin{}
-		_, err = des.Table("resource").Join("LEFT", "area", "area.id = resource.area_id").Where("area.field_id = ?", field).And("resource.name = ?", name).Get(&newResource)
-		if err != nil {
-			fmt.Printf("new resource join get error:%v\r\n", err.Error())
-			return
-		}
-		if newResource.Resource.Name == "" {
-			fmt.Printf("%v:%v:%v\r\n", field, name, newResource.Resource.Name)
 		}
 
 		tmp := models.UserResource{}
-		tmp.UserId = 1
-		tmp.ResourceId = newResource.Resource.Id
+		tmp.UserId = userId
+		tmp.ResourceId = newResourceJoin.Resource.Id
 		tmp.CreatedAt = one.TargetEntityLink.Ctime
 		tmp.UpdatedAt = one.TargetEntityLink.Utime
 
-		has, err := des.Where("user_id = ?", 1).And("resource_id = ?", newResource.Resource.Id).Get(new(models.UserResource))
+		has, err := des.Where("user_id = ?", userId).And("resource_id = ?", newResourceJoin.Resource.Id).Get(new(models.UserResource))
 		if err != nil {
 			fmt.Printf("target transfer has check error:%v\r\n", err.Error())
 			continue
@@ -80,14 +72,14 @@ func (c *TargetEntityLink) Transfer(src, des *xorm.Engine) {
 				fmt.Printf("target transfer insert error:%v\r\n", err.Error())
 				continue
 			}
-			insertNum++
 		}
+		insertNum++
 	}
-
 	fmt.Printf("target and entity transfer success:%v\r\n", insertNum)
 }
 
-func getResourceName(src *xorm.Engine, entityId int, field int) (name string, err error) {
+func getResourceJoin(src, des *xorm.Engine, entityId int, field int) (newResource models.ResourceJoin, err error) {
+	var name string
 	switch field {
 	case 1:
 		oldEntity := EntitySkill{}
@@ -137,6 +129,16 @@ func getResourceName(src *xorm.Engine, entityId int, field int) (name string, er
 			return
 		}
 		name = oldEntity.Name
+	}
+
+	_, err = des.Table("resource").Join("LEFT", "area", "area.id = resource.area_id").Where("area.field_id = ?", field).And("resource.name = ?", name).Get(&newResource)
+	if err != nil {
+		return
+	}
+	if newResource.Resource.Name == "" {
+		fmt.Printf("%v:%v:%v\r\n", field, name, newResource.Resource.Name)
+		errors.New(fmt.Sprintf("new resource name not exist:%v\r\n", newResource))
+		return
 	}
 	return
 }
