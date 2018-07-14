@@ -84,7 +84,7 @@ func (s *Syncfusion) ListKanban(userId int) (kanbans []models.SyncfusionKanban, 
 			err = errors.New(fmt.Sprintf("task %s not find its project", one.Name))
 			return
 		}
-		area, ok := areasMap[one.Resource.AreaId]
+		area, ok := areasMap[one.Resource.Area.Id]
 		if !ok {
 			err = errors.New(fmt.Sprintf("task %s not find its area", one.Name))
 			return

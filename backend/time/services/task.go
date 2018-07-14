@@ -84,7 +84,7 @@ func (s *Task) List() (tasks []models.Task, err error) {
 
 func (s *Task) ListWithCondition(task *models.Task) (tasks []models.Task, err error) {
 	tasksJoin := make([]models.TaskJoin, 0)
-	sql := s.Engine.Unscoped().Table("task").Join("INNER", "resource", "resource.id = task.resource_id")
+	sql := s.Engine.Unscoped().Table("task").Join("INNER", "resource", "resource.id = task.resource_id").Join("INNER", "map_area_resource", "map_area_resource.resource_id = resource.id")
 
 	condition := task.BuildCondition()
 	sql = sql.Where(condition)
@@ -96,6 +96,7 @@ func (s *Task) ListWithCondition(task *models.Task) (tasks []models.Task, err er
 	tasks = make([]models.Task, 0)
 	for _, one := range tasksJoin {
 		one.Task.Resource = one.Resource
+		one.Task.Resource.Area.Id = one.MapAreaResource.AreaId
 		tasks = append(tasks, one.Task)
 	}
 	return

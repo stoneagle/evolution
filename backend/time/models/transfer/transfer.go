@@ -85,7 +85,7 @@ func main() {
 	srcEng.Charset("utf8")
 	// srcEng.ShowSQL(true)
 
-	userId := 1
+	// userId := 1
 	// new(php.Area).Transfer(srcEng, destEng)
 	// initAreaType(destEng)
 	// new(php.Country).Transfer(srcEng, destEng)
@@ -94,12 +94,12 @@ func main() {
 	// new(php.EntityAsset).Transfer(srcEng, destEng)
 	// new(php.EntityCircle).Transfer(srcEng, destEng)
 	// new(php.EntityQuest).Transfer(srcEng, destEng)
-	// new(php.EntityWork).Transfer(srcEng, destEng)
-	// new(php.EntitySkill).Transfer(srcEng, destEng)
 	// new(php.EntityLife).Transfer(srcEng, destEng)
+	// new(php.EntityWork).Transfer(srcEng, destEng)
+	new(php.EntitySkill).Transfer(srcEng, destEng)
 	// new(php.TargetEntityLink).Transfer(srcEng, destEng, userId)
 	// new(php.Target).Transfer(srcEng, destEng, userId)
-	new(php.Project).Transfer(srcEng, destEng, userId)
+	// new(php.Project).Transfer(srcEng, destEng, userId)
 }
 
 func initField(des *xorm.Engine) {

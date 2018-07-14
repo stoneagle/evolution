@@ -13,7 +13,7 @@ import { AreaType  }        from '../../../../shared/const';
 })
 
 export class ResourceSaveComponent implements OnInit {
-  resource: Resource = new Resource;
+  resource: Resource;
   modelOpened: boolean = false;
 
   areaMaps: Map<number, string> = new Map();
@@ -25,6 +25,8 @@ export class ResourceSaveComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+    this.resource = new Resource();
+    this.resource.Area = new Area();
     let area = new Area();
     area.Type = AreaType.Leaf; 
     this.areaService.ListAreaMap(area).subscribe(res => {

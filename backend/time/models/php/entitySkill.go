@@ -21,28 +21,73 @@ type EntitySkill struct {
 }
 
 func (c *EntitySkill) Transfer(src, des *xorm.Engine) {
+	session := des.NewSession()
+	defer session.Close()
+	err := session.Begin()
+	if err != nil {
+		fmt.Printf("skill session error:%v\r\n", err.Error())
+		return
+	}
+
 	oldLinks := make([]AreaSkillLink, 0)
 	src.Find(&oldLinks)
-	news := make([]models.Resource, 0)
+	insertNum := 0
+	areaMap := map[string][]int{}
+	resourceMap := map[string]models.Resource{}
 	for _, one := range oldLinks {
-		tmp := models.Resource{}
+		resource := models.Resource{}
 		skill := new(EntitySkill)
 		_, err := src.Id(one.SkillId).Get(skill)
 		if err != nil {
 			fmt.Printf("skillId:%v, not exist\r\n", one.SkillId)
 		}
-		tmp.Name = skill.Name
-		tmp.Desc = skill.Description
-		tmp.Year = 0
-		tmp.AreaId = one.AreaId
-		tmp.CreatedAt = one.Ctime
-		tmp.UpdatedAt = one.Utime
-		news = append(news, tmp)
+		resource.Name = skill.Name
+		resource.Desc = skill.Description
+		resource.Year = 0
+		resource.CreatedAt = one.Ctime
+		resource.UpdatedAt = one.Utime
+
+		areaSlice, ok := areaMap[resource.Name]
+		if !ok {
+			areaMap[resource.Name] = make([]int, 0)
+		}
+		areaSlice = append(areaSlice, one.AreaId)
+		areaMap[resource.Name] = areaSlice
+
+		if _, ok := resourceMap[resource.Name]; !ok {
+			resourceMap[resource.Name] = resource
+		}
+
 	}
-	affected, err := des.Insert(&news)
+	for resourceName, areaSlice := range areaMap {
+		resource, ok := resourceMap[resourceName]
+		if !ok {
+			session.Rollback()
+			fmt.Printf("work resource can not find in map\r\n")
+			return
+		}
+		_, err = session.Insert(&resource)
+		if err != nil {
+			session.Rollback()
+			fmt.Printf("skill resource insert error:%v\r\n", err.Error())
+			return
+		}
+		for _, areaId := range areaSlice {
+			mapAreaResource := models.MapAreaResource{}
+			mapAreaResource.AreaId = areaId
+			mapAreaResource.ResourceId = resource.Id
+			_, err = session.Insert(&mapAreaResource)
+			if err != nil {
+				session.Rollback()
+				fmt.Printf("skill resource map insert error:%v\r\n", err.Error())
+				return
+			}
+		}
+		insertNum++
+	}
+	err = session.Commit()
 	if err != nil {
-		fmt.Printf("entity skill transfer error:%v\r\n", err.Error())
-	} else {
-		fmt.Printf("entity skill transfer success:%v\r\n", affected)
+		fmt.Printf("skill session commit error:%v\r\n", err)
 	}
+	fmt.Printf("skill transfer success:%v\r\n", insertNum)
 }

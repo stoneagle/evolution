@@ -27,11 +27,29 @@ func (s *Resource) One(id int) (interface{}, error) {
 
 func (s *Resource) Add(model models.Resource) (err error) {
 	_, err = s.Engine.Insert(&model)
+	if err != nil {
+		return
+	}
+	mapAreaResource := models.MapAreaResource{}
+	mapAreaResource.AreaId = model.Area.Id
+	mapAreaResource.ResourceId = model.Id
+	_, err = s.Engine.Insert(&mapAreaResource)
 	return
 }
 
 func (s *Resource) Update(id int, model models.Resource) (err error) {
 	_, err = s.Engine.Id(id).Update(&model)
+	if err != nil {
+		return
+	}
+	if model.Area.Id != 0 {
+		mapAreaResource := models.MapAreaResource{}
+		mapAreaResource.AreaId = model.Area.Id
+		_, err = s.Engine.Where("resource_id = ?", id).Update(&mapAreaResource)
+		if err != nil {
+			return
+		}
+	}
 	return
 }
 
@@ -45,7 +63,7 @@ func (s *Resource) Delete(id int, model models.Resource) (err error) {
 
 func (s *Resource) ListWithCondition(resource *models.Resource) (resources []models.Resource, err error) {
 	resourcesJoin := make([]models.ResourceJoin, 0)
-	sql := s.Engine.Unscoped().Table("resource").Join("INNER", "area", "area.id = resource.area_id")
+	sql := s.Engine.Unscoped().Table("resource").Join("INNER", "map_area_resource", "map_area_resource.resource_id = resource.id").Join("INNER", "area", "area.id = map_area_resource.area_id")
 
 	condition := resource.BuildCondition()
 	if resource.WithSub {

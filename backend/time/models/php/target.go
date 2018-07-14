@@ -93,9 +93,9 @@ func (c *Target) Transfer(src, des *xorm.Engine, userId int) {
 			}
 			// fmt.Printf("quest_id:%v, area_id:%v\r\n", quest.Id, newResourceJoin.Resource.AreaId)
 			// fmt.Printf("area_name:%v\r\n", newResourceJoin.Resource.Name)
-			_, ok := targetAreaSlice[newResourceJoin.Resource.AreaId]
+			_, ok := targetAreaSlice[newResourceJoin.Resource.Area.Id]
 			if !ok {
-				targetAreaSlice[newResourceJoin.Resource.AreaId] = true
+				targetAreaSlice[newResourceJoin.Resource.Area.Id] = true
 			}
 		}
 		for areaId, _ := range targetAreaSlice {

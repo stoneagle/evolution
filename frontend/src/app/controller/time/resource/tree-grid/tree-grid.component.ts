@@ -79,8 +79,8 @@ export class ResourceTreeGridComponent implements OnInit {
       let resource = new Resource();
       resource.Id = $event.data.Id
       resource.Name = $event.data.Name
-      resource.AreaId = $event.data.ParentId
       resource.Area = new Area();
+      resource.Area.Id = $event.data.ParentId
       resource.Area.Name = $event.data.Parent;
       this.selectResource.emit(resource);
     }
@@ -111,7 +111,7 @@ export class ResourceTreeGridComponent implements OnInit {
             resource.Id = one.Id;
             resource.Name = one.Name;
             resource.Parent = area.Name;
-            resource.ParentId = one.AreaId;
+            resource.ParentId = one.Area.Id;
             resource.IsParent = false;
             Leaf.Children.push(resource);
           })

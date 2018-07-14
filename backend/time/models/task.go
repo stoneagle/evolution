@@ -40,8 +40,9 @@ var (
 )
 
 type TaskJoin struct {
-	Task     `xorm:"extends" json:"-"`
-	Resource `xorm:"extends" json:"-"`
+	Task            `xorm:"extends" json:"-"`
+	Resource        `xorm:"extends" json:"-"`
+	MapAreaResource `xorm:"extends" json:"-"`
 }
 
 func (m *Task) TableName() string {

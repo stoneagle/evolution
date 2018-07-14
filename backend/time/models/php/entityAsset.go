@@ -20,23 +20,44 @@ type EntityAsset struct {
 }
 
 func (c *EntityAsset) Transfer(src, des *xorm.Engine) {
+	session := des.NewSession()
+	defer session.Close()
+	err := session.Begin()
+	if err != nil {
+		fmt.Printf("asset session error:%v\r\n", err.Error())
+		return
+	}
+
 	olds := make([]EntityAsset, 0)
 	src.Find(&olds)
-	news := make([]models.Resource, 0)
+	insertNum := 0
 	for _, one := range olds {
-		tmp := models.Resource{}
-		tmp.Name = one.Name
-		tmp.Desc = one.Desc
-		tmp.Year = one.Year
-		tmp.AreaId = one.AreaId
-		tmp.CreatedAt = one.Ctime
-		tmp.UpdatedAt = one.Utime
-		news = append(news, tmp)
+		resource := models.Resource{}
+		resource.Name = one.Name
+		resource.Desc = one.Desc
+		resource.Year = one.Year
+		resource.CreatedAt = one.Ctime
+		resource.UpdatedAt = one.Utime
+		_, err = session.Insert(&resource)
+		if err != nil {
+			session.Rollback()
+			fmt.Printf("asset resource insert error:%v\r\n", err.Error())
+			return
+		}
+		mapAreaResource := models.MapAreaResource{}
+		mapAreaResource.AreaId = one.AreaId
+		mapAreaResource.ResourceId = resource.Id
+		_, err = session.Insert(&mapAreaResource)
+		if err != nil {
+			session.Rollback()
+			fmt.Printf("asset resource map insert error:%v\r\n", err.Error())
+			return
+		}
+		insertNum++
 	}
-	affected, err := des.Insert(&news)
+	err = session.Commit()
 	if err != nil {
-		fmt.Printf("entity asset transfer error:%v\r\n", err.Error())
-	} else {
-		fmt.Printf("entity asset transfer success:%v\r\n", affected)
+		fmt.Printf("asset session commit error:%v\r\n", err)
 	}
+	fmt.Printf("asset transfer success:%v\r\n", insertNum)
 }

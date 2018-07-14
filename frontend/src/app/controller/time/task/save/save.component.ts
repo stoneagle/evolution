@@ -56,7 +56,7 @@ export class TaskSaveComponent implements OnInit {
       });
 
       let resource = new Resource();
-      resource.AreaId = project.AreaId;
+      resource.Area.Id = project.AreaId;
       this.resourceService.ListWithCondition(resource).subscribe(resources => {
         this.resourceMaps = new Map();
         resources.forEach((one, k) => {

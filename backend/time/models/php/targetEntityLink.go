@@ -55,11 +55,11 @@ func (c *TargetEntityLink) Transfer(src, des *xorm.Engine, userId int) {
 			return
 		}
 
-		tmp := models.UserResource{}
-		tmp.UserId = userId
-		tmp.ResourceId = newResourceJoin.Resource.Id
-		tmp.CreatedAt = one.TargetEntityLink.Ctime
-		tmp.UpdatedAt = one.TargetEntityLink.Utime
+		userResource := models.UserResource{}
+		userResource.UserId = userId
+		userResource.ResourceId = newResourceJoin.Resource.Id
+		userResource.CreatedAt = one.TargetEntityLink.Ctime
+		userResource.UpdatedAt = one.TargetEntityLink.Utime
 
 		has, err := des.Where("user_id = ?", userId).And("resource_id = ?", newResourceJoin.Resource.Id).Get(new(models.UserResource))
 		if err != nil {
@@ -67,7 +67,7 @@ func (c *TargetEntityLink) Transfer(src, des *xorm.Engine, userId int) {
 			continue
 		}
 		if !has {
-			_, err = des.Insert(&tmp)
+			_, err = des.Insert(&userResource)
 			if err != nil {
 				fmt.Printf("target transfer insert error:%v\r\n", err.Error())
 				continue
@@ -131,7 +131,7 @@ func getResourceJoin(src, des *xorm.Engine, entityId int, field int) (newResourc
 		name = oldEntity.Name
 	}
 
-	_, err = des.Table("resource").Join("LEFT", "area", "area.id = resource.area_id").Where("area.field_id = ?", field).And("resource.name = ?", name).Get(&newResource)
+	_, err = des.Table("resource").Join("LEFT", "map_area_resource", "map_area_resource.resource_id = resource.id").Join("LEFT", "area", "area.id = map_area_resource.area_id").Where("area.field_id = ?", field).And("resource.name = ?", name).Get(&newResource)
 	if err != nil {
 		return
 	}

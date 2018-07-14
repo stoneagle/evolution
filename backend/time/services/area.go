@@ -71,7 +71,6 @@ func (s *Area) List() (areas []models.Area, err error) {
 
 func (s *Area) TransferListToTree(areas []models.Area, fieldMap map[int]string) (areaTrees map[int]models.AreaTree, err error) {
 	areaTrees = make(map[int]models.AreaTree)
-
 buildTreeLoop:
 	leftArea := make([]models.Area, 0)
 	for _, one := range areas {

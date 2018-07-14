@@ -18,23 +18,44 @@ type EntityCircle struct {
 }
 
 func (c *EntityCircle) Transfer(src, des *xorm.Engine) {
+	session := des.NewSession()
+	defer session.Close()
+	err := session.Begin()
+	if err != nil {
+		fmt.Printf("circle session error:%v\r\n", err.Error())
+		return
+	}
+
 	olds := make([]EntityCircle, 0)
 	src.Find(&olds)
-	news := make([]models.Resource, 0)
+	insertNum := 0
 	for _, one := range olds {
-		tmp := models.Resource{}
-		tmp.Name = one.Name
-		tmp.Desc = one.Desc
-		tmp.Year = 0
-		tmp.AreaId = one.AreaId
-		tmp.CreatedAt = one.Ctime
-		tmp.UpdatedAt = one.Utime
-		news = append(news, tmp)
+		resource := models.Resource{}
+		resource.Name = one.Name
+		resource.Desc = one.Desc
+		resource.Year = 0
+		resource.CreatedAt = one.Ctime
+		resource.UpdatedAt = one.Utime
+		_, err = session.Insert(&resource)
+		if err != nil {
+			session.Rollback()
+			fmt.Printf("circle resource insert error:%v\r\n", err.Error())
+			return
+		}
+		mapAreaResource := models.MapAreaResource{}
+		mapAreaResource.AreaId = one.AreaId
+		mapAreaResource.ResourceId = resource.Id
+		_, err = session.Insert(&mapAreaResource)
+		if err != nil {
+			session.Rollback()
+			fmt.Printf("circle resource map insert error:%v\r\n", err.Error())
+			return
+		}
+		insertNum++
 	}
-	affected, err := des.Insert(&news)
+	err = session.Commit()
 	if err != nil {
-		fmt.Printf("entity circle transfer error:%v\r\n", err.Error())
-	} else {
-		fmt.Printf("entity circle transfer success:%v\r\n", affected)
+		fmt.Printf("circle session commit error:%v\r\n", err)
 	}
+	fmt.Printf("circle transfer success:%v\r\n", insertNum)
 }

@@ -29,23 +29,44 @@ func (c *EntityLife) Transfer(src, des *xorm.Engine) {
 		return
 	}
 
+	session := des.NewSession()
+	defer session.Close()
+	err = session.Begin()
+	if err != nil {
+		fmt.Printf("life session error:%v\r\n", err.Error())
+		return
+	}
+
 	olds := make([]EntityLife, 0)
 	src.Find(&olds)
-	news := make([]models.Resource, 0)
+	insertNum := 0
 	for _, one := range olds {
-		tmp := models.Resource{}
-		tmp.Name = one.Name
-		tmp.Desc = one.Desc
-		tmp.Year = 0
-		tmp.AreaId = area.Id
-		tmp.CreatedAt = one.Ctime
-		tmp.UpdatedAt = one.Utime
-		news = append(news, tmp)
+		resource := models.Resource{}
+		resource.Name = one.Name
+		resource.Desc = one.Desc
+		resource.Year = 0
+		resource.CreatedAt = one.Ctime
+		resource.UpdatedAt = one.Utime
+		_, err = session.Insert(&resource)
+		if err != nil {
+			session.Rollback()
+			fmt.Printf("life resource insert error:%v\r\n", err.Error())
+			return
+		}
+		mapAreaResource := models.MapAreaResource{}
+		mapAreaResource.AreaId = area.Id
+		mapAreaResource.ResourceId = resource.Id
+		_, err = session.Insert(&mapAreaResource)
+		if err != nil {
+			session.Rollback()
+			fmt.Printf("life resource map insert error:%v\r\n", err.Error())
+			return
+		}
+		insertNum++
 	}
-	affected, err := des.Insert(&news)
+	err = session.Commit()
 	if err != nil {
-		fmt.Printf("entity life transfer error:%v\r\n", err.Error())
-	} else {
-		fmt.Printf("entity life transfer success:%v\r\n", affected)
+		fmt.Printf("life session commit error:%v\r\n", err)
 	}
+	fmt.Printf("life transfer success:%v\r\n", insertNum)
 }

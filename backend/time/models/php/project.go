@@ -80,12 +80,12 @@ func (c *Project) Transfer(src, des *xorm.Engine, userId int) {
 			}
 			newTask.CreatedAt = oldTask.Ctime
 			newTask.UpdatedAt = oldTask.Utime
-			tasksSlice, ok := newAreaTasksMap[newResourceJoin.Resource.AreaId]
+			tasksSlice, ok := newAreaTasksMap[newResourceJoin.Resource.Area.Id]
 			if !ok {
-				newAreaTasksMap[newResourceJoin.Resource.AreaId] = make([]models.Task, 0)
+				newAreaTasksMap[newResourceJoin.Resource.Area.Id] = make([]models.Task, 0)
 			}
 			tasksSlice = append(tasksSlice, newTask)
-			newAreaTasksMap[newResourceJoin.Resource.AreaId] = tasksSlice
+			newAreaTasksMap[newResourceJoin.Resource.Area.Id] = tasksSlice
 		}
 		newProject.QuestId = quest.Id
 		newProject.StartDate = oldProject.Project.StartDate
