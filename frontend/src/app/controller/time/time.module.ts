@@ -6,6 +6,7 @@ import { HttpModule   }                 from '@angular/http';
 import { FormsModule }                  from '@angular/forms';
 import { ClarityModule  }               from "@clr/angular";
 import { TranslateModule  }             from "@ngx-translate/core";
+import { NgSelectModule  }              from '@ng-select/ng-select';
 import { TreeModule }                   from 'ng2-tree';
 import { EJ_GANTT_COMPONENTS }          from 'ej-angular2/src/ej/gantt.component';
 import { EJ_TREEGRID_COMPONENTS }       from 'ej-angular2/src/ej/treegrid.component';
@@ -101,6 +102,7 @@ import { MessageHandlerService  } from '../../service/base/message-handler.servi
     ClarityModule,
     TranslateModule,
     TreeModule,
+    NgSelectModule,
   ],
   providers: [ 
     AreaService,

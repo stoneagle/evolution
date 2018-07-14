@@ -29,6 +29,7 @@ func (c *Resource) Router(router *gin.RouterGroup) {
 	resource := router.Group(c.Name).Use(middles.One(c.ResourceSvc, c.Name))
 	resource.GET("/get/:id", c.One)
 	resource.GET("/list", c.List)
+	resource.GET("/list/areas/:id", c.ListAreas)
 	resource.POST("", c.Add)
 	resource.POST("/list", c.ListByCondition)
 	resource.POST("/list/leaf", c.ListGroupByLeaf)
@@ -48,6 +49,16 @@ func (c *Resource) List(ctx *gin.Context) {
 		return
 	}
 	resp.Success(ctx, resources)
+}
+
+func (c *Resource) ListAreas(ctx *gin.Context) {
+	resource := ctx.MustGet(c.Name).(models.Resource)
+	areas, err := c.ResourceSvc.ListAreas(resource.Id)
+	if err != nil {
+		resp.ErrorBusiness(ctx, resp.ErrorMysql, "area get error", err)
+		return
+	}
+	resp.Success(ctx, areas)
 }
 
 func (c *Resource) ListByCondition(ctx *gin.Context) {

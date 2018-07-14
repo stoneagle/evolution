@@ -16,7 +16,8 @@ export class ResourceSaveComponent implements OnInit {
   resource: Resource;
   modelOpened: boolean = false;
 
-  areaMaps: Map<number, string> = new Map();
+  areaIds: number[];
+  areas: Area[] = [];
   @Output() save = new EventEmitter<boolean>();
 
   constructor(
@@ -29,24 +30,36 @@ export class ResourceSaveComponent implements OnInit {
     this.resource.Area = new Area();
     let area = new Area();
     area.Type = AreaType.Leaf; 
-    this.areaService.ListAreaMap(area).subscribe(res => {
-      this.areaMaps = res;
+    this.areaService.ListWithCondition(area).subscribe(res => {
+      this.areas = res;
     })
   }
 
-  New(resource: Resource): void {
-    if (resource.Id) {
-      this.resourceService.Get(resource.Id).subscribe(res => {
-        this.resource = res;
-        this.modelOpened = true;
+  New(areaId:number, id?: number): void {
+    if (id) {
+      this.resourceService.Get(id).subscribe(res => {
+        this.resourceService.ListAreas(id).subscribe(areas => {
+          let tmpAreaIds = []; 
+          areas.forEach((one, k) => {
+            tmpAreaIds.push(one.Id)
+          })
+          this.areaIds = tmpAreaIds;
+          this.resource = res;
+          this.modelOpened = true;
+        })
       })
     } else {
-      this.resource = resource;
+      this.resource = new Resource();
+      this.areaIds = [areaId];
       this.modelOpened = true;
     }
   }            
 
   Submit(): void {
+    if (this.resource.Area == undefined) {
+      this.resource.Area = new Area();
+    }
+    this.resource.Area.Ids = this.areaIds;
     if (this.resource.Id == null) {
       this.resourceService.Add(this.resource).subscribe(res => {
         this.modelOpened = false;
@@ -58,5 +71,9 @@ export class ResourceSaveComponent implements OnInit {
         this.save.emit(true);
       })
     }
+  }
+
+  getKeys(map) {
+    return Array.from(map.keys());
   }
 }

@@ -2,9 +2,9 @@ package resp
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"runtime"
-	"strconv"
 
 	"evolution/backend/common/logger"
 
@@ -37,6 +37,9 @@ func CustomSuccess(ctx *gin.Context, res interface{}) {
 }
 
 func ErrorBusiness(ctx *gin.Context, code ErrorCode, desc string, err error) {
+	if err != nil {
+		desc += ":" + err.Error()
+	}
 	res := Response{
 		Code: code,
 		Data: struct{}{},
@@ -56,7 +59,7 @@ func FormatResponseLog(response interface{}) {
 
 func FormatErrorLog(err error) {
 	if err != nil {
-		_, fn, line, _ := runtime.Caller(2)
-		logger.Get().Infow("response-error:【" + fn + ":" + strconv.Itoa(line) + ":" + err.Error() + "】")
+		_, fn, line, _ := runtime.Caller(3)
+		logger.Get().Infow(fmt.Sprintf("response-error:【%s:%d:%v】", fn, line, err))
 	}
 }

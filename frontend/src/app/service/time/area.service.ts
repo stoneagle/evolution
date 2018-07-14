@@ -22,17 +22,16 @@ export class AreaService extends BaseService {
     this.resource = 'TIME.RESOURCE.AREA.CONCEPT';
   }
 
-  ListAreaMap(area: Area): Observable<Map<number, string>> {
+  ListWithCondition(area: Area): Observable<Area[]> {
     this.operation = 'SYSTEM.PROCESS.LIST';
     return this.http.post<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`, JSON.stringify(area)).pipe(
       catchError(this.handleError<Resp>()),
       map(res => {
-        let ret:Map<number, string> = new Map(); 
+        let ret:Area[] = []; 
         if (res && res.code == 0) {
           res.data.map(
             one => {
-              let tmp = new Area(one);
-              ret.set(tmp.Id, tmp.Name);
+              ret.push(new Area(one));
             }
           )
         }

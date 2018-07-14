@@ -1,26 +1,6 @@
-<clr-tabs>
-	<clr-tab>
-		<button (click)="refresh(areaFirstField)" clrTabLink>{{ areaFirstName }}</button>
-		<clr-tab-content *clrIfActive="active">
-			<div class="row">
-				<div class="col-xs-3">
-				</div>
-				<div class="col-xs-9">
-					<time-user-resource-list [currentField]="areaFirstField" [areaMaps]="areaMaps"></time-user-resource-list>
-				</div>
-			</div>
-		</clr-tab-content>
-	</clr-tab>
-	<clr-tab *ngFor="let key of getKeys(areaMaps)">
-		<button (click)="refresh(key)" clrTabLink>{{ areaMaps.get(key) }}</button>
-		<clr-tab-content *clrIfActive>
-			<div class="row">
-				<div class="col-xs-3">
-				</div>
-				<div class="col-xs-9">
-					<time-user-resource-list [currentField]="currentField" [areaMaps]="areaMaps"></time-user-resource-list>
-				</div>
-			</div>
-		</clr-tab-content>
-	</clr-tab>
-</clr-tabs>
+<time-area-ng2-tree
+  (selectAreaId)="selectAreaNode($event)" 
+>
+	<time-user-resource-list [currentField]="currentField" [areaMaps]="areaMaps">
+  </time-user-resource-list>
+</time-area-ng2-tree>

@@ -24,40 +24,39 @@
     <clr-dg-cell>{{resource.Desc}}</clr-dg-cell>
     <clr-dg-cell>{{resource.Area.Name}}</clr-dg-cell>
     <clr-dg-cell>
-      <div *ngIf="(resourceMaps.get(resource.Id) != null)" class="progress-block">
-        <div class="progress-group">
-          <div [ngClass]="(resourceMaps.get(resource.Id).Status==1)?'progress danger':'progress success loop'" >
-            <progress value="{{ resourceMaps.get(resource.Id).SumTime }}" max="{{ phaseMaps.get(resourceMaps.get(resource.Id).PhaseId).Threshold }}" data-displayval="...%"></progress>
-          </div>
-          <div class="row">
-            <div class="col-xs-6">
-              lv{{ phaseMaps.get(resourceMaps.get(resource.Id).PhaseId).Level }}:{{ phaseMaps.get(resourceMaps.get(resource.Id).PhaseId).Name }}
-            </div>
-            <div class="col-xs-6 text-right">
-              {{ resourceMaps.get(resource.Id).SumTime }}/{{ phaseMaps.get(resourceMaps.get(resource.Id).PhaseId).Threshold }}
-            </div>
-          </div>
-        </div>
-      </div>
+      <!-- <div *ngIf="(resourceMaps.get(resource.Id) != null)" class="progress-block"> -->
+      <!--   <div class="progress-group"> -->
+      <!--     <div [ngClass]="(resourceMaps.get(resource.Id).Status==1)?'progress danger':'progress success loop'" > -->
+      <!--       <progress value="{{ resourceMaps.get(resource.Id).SumTime }}" max="{{ phaseMaps.get(resourceMaps.get(resource.Id).PhaseId).Threshold }}" data-displayval="...%"></progress> -->
+      <!--     </div> -->
+      <!--     <div class="row"> -->
+      <!--       <div class="col-xs-6"> -->
+      <!--         lv{{ phaseMaps.get(resourceMaps.get(resource.Id).PhaseId).Level }}:{{ phaseMaps.get(resourceMaps.get(resource.Id).PhaseId).Name }} -->
+      <!--       </div> -->
+      <!--       <div class="col-xs-6 text-right"> -->
+      <!--         {{ resourceMaps.get(resource.Id).SumTime }}/{{ phaseMaps.get(resourceMaps.get(resource.Id).PhaseId).Threshold }} -->
+      <!--       </div> -->
+      <!--     </div> -->
+      <!--   </div> -->
+      <!-- </div> -->
     </clr-dg-cell>
     <clr-dg-cell>
-      <div class="btn-group btn-primary btn-icon">
-        <button *ngIf="(resourceMaps.get(resource.Id) == null)" (click)="createResource(resource)" class="btn btn-success">
-          <clr-icon shape="plus-circle"></clr-icon>
-          <span class="clr-icon-title"></span>
-        </button>
-        <button *ngIf="(resourceMaps.get(resource.Id) != null) && (resourceMaps.get(resource.Id).Status == 1)" (click)="execResource(resource)" class="btn">
-          <clr-icon shape="play"></clr-icon>
-          <span class="clr-icon-title"></span>
-        </button>
-        <button *ngIf="(resourceMaps.get(resource.Id) != null) && (resourceMaps.get(resource.Id).SumTime == 0)" (click)="deleteResource(resource)" class="btn btn-danger">
-          <clr-icon shape="trash"></clr-icon>
-          <span class="clr-icon-title"></span>
-        </button>
-      </div>
+      <!-- <div class="btn-group btn-primary btn-icon"> -->
+      <!--   <button *ngIf="(resourceMaps.get(resource.Id) == null)" (click)="createResource(resource)" class="btn btn-success"> -->
+      <!--     <clr-icon shape="plus-circle"></clr-icon> -->
+      <!--     <span class="clr-icon-title"></span> -->
+      <!--   </button> -->
+      <!--   <button *ngIf="(resourceMaps.get(resource.Id) != null) && (resourceMaps.get(resource.Id).Status == 1)" (click)="execResource(resource)" class="btn"> -->
+      <!--     <clr-icon shape="play"></clr-icon> -->
+      <!--     <span class="clr-icon-title"></span> -->
+      <!--   </button> -->
+      <!--   <button *ngIf="(resourceMaps.get(resource.Id) != null) && (resourceMaps.get(resource.Id).SumTime == 0)" (click)="deleteResource(resource)" class="btn btn-danger"> -->
+      <!--     <clr-icon shape="trash"></clr-icon> -->
+      <!--     <span class="clr-icon-title"></span> -->
+      <!--   </button> -->
+      <!-- </div> -->
     </clr-dg-cell>  
   </clr-dg-row>
-
   <clr-dg-footer>
     <clr-dg-pagination #pagination [clrDgPageSize]="pageSize" [(clrDgPage)]="currentPage" [clrDgTotalItems]="totalCount">
       {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}

@@ -13,7 +13,9 @@ import { ResourceSaveComponent } from './../save/save.component';
 })
 export class ResourceListComponent implements OnInit {
   @ViewChild(ResourceSaveComponent)
-  saveResource: ResourceSaveComponent;
+  saveResourceComponent: ResourceSaveComponent;
+
+  @Input() initAllFlag: boolean = false;
 
   filterAreaId: number;
 
@@ -42,11 +44,7 @@ export class ResourceListComponent implements OnInit {
   }
 
   openSaveModel(id?: number): void {
-    let resource = new Resource();
-    if (id) {
-      resource.Id = id;
-    }
-    this.saveResource.New(resource);
+    this.saveResourceComponent.New(this.filterAreaId, id);
   }
 
   delete(resource: Resource): void {
@@ -67,18 +65,16 @@ export class ResourceListComponent implements OnInit {
   }
 
   refreshClassify(from: number, to: number): void {
-    if (this.filterAreaId == undefined) {
+    if ((this.filterAreaId == undefined) && (this.initAllFlag)) {
       this.resourceService.List().subscribe(res => {
         this.totalCount = res.length;
         this.resources = res.slice(from, to);
       })
-    } else {
+    } else if (this.filterAreaId != undefined) {
       let resource = new Resource();
       resource.Area = new Area(); 
-      if (this.filterAreaId != undefined) {
-        resource.Area.Id = this.filterAreaId;
-        resource.WithSub = true;
-      }
+      resource.Area.Id = this.filterAreaId;
+      resource.WithSub = true;
       this.resourceService.ListWithCondition(resource).subscribe(res => {
         this.totalCount = res.length;
         this.resources = res.slice(from, to);

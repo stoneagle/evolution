@@ -40,6 +40,24 @@ export class ResourceService extends BaseService {
     )
   }
 
+  ListAreas(id: number): Observable<Area[]> {
+    this.operation = 'SYSTEM.PROCESS.LIST';
+    return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/list/areas/${id}`).pipe(
+      catchError(this.handleError<Resp>()),
+      map(res => {
+        let ret:Area[] = []; 
+        if (res && res.code == 0) {
+          res.data.map(
+            one => {
+              ret.push(new Area(one));
+            }
+          )
+        }
+        return ret; 
+      }),
+    )
+  }
+
   ListWithCondition(resource: Resource): Observable<Resource[]> {
     this.operation = 'SYSTEM.PROCESS.LIST';
     return this.http.post<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`, JSON.stringify(resource)).pipe(

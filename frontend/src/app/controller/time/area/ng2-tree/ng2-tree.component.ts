@@ -16,7 +16,7 @@ import { ResourceSaveComponent }            from '../../resource/save/save.compo
 })
 export class AreaNg2TreeComponent implements OnInit {
   @ViewChild(ResourceSaveComponent)
-  saveResource: ResourceSaveComponent;
+  saveResourceComponent: ResourceSaveComponent;
 
   // TODO
   // 1. 递归删除/实体判断是否允许删除
@@ -30,6 +30,7 @@ export class AreaNg2TreeComponent implements OnInit {
   firstFieldId: number;
   fieldMap: Map<number, string> = new Map(); 
   currentFieldId: number;
+  currentAreaId: number;
   parents: TreeModel[];
   tree: TreeModel;
 
@@ -114,7 +115,8 @@ export class AreaNg2TreeComponent implements OnInit {
   }
 
   handleSelected(e: NodeEvent): void {
-    this.selectAreaId.emit(+e["node"]["node"]["id"]);
+    this.currentAreaId = +e["node"]["node"]["id"];
+    this.selectAreaId.emit(this.currentAreaId);
     return
   }
 
@@ -151,13 +153,12 @@ export class AreaNg2TreeComponent implements OnInit {
   }
 
   handleCustom(e: NodeEvent): void {
-    let resource = new Resource();
-    resource.Area.Id = +e.node.id;
-    this.saveResource.New(resource);
+    this.saveResourceComponent.New(+e.node.id);
   }
 
   saved(saved: boolean): void {
     if (saved) {
+      this.selectAreaId.emit(this.currentAreaId);
     }
   }
 
