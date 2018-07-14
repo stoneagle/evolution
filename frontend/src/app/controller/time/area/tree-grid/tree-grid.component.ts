@@ -1,12 +1,13 @@
 import { Component, OnInit, Output, ViewChild, EventEmitter } from '@angular/core';
 import { EJ_TREEGRID_COMPONENTS }       from 'ej-angular2/src/ej/treegrid.component';
 
-import { Area }         from '../../../../model/time/area';
-import { TreeGrid }     from '../../../../model/time/syncfusion';
-import { AreaService }  from '../../../../service/time/area.service';
-import { FieldService } from '../../../../service/time/field.service';
-import { SignService }  from '../../../../service/system/sign.service';
-import { AreaType }  from '../../../../shared/const';
+import { Area }              from '../../../../model/time/area';
+import { TreeGrid }          from '../../../../model/time/syncfusion';
+import { AreaService }       from '../../../../service/time/area.service';
+import { FieldService }      from '../../../../service/time/field.service';
+import { SyncfusionService } from '../../../../service/time/syncfusion.service';
+import { SignService }       from '../../../../service/system/sign.service';
+import { AreaType }          from '../../../../shared/const';
 
 @Component({
   selector: 'time-area-tree-grid',
@@ -16,6 +17,7 @@ import { AreaType }  from '../../../../shared/const';
 export class AreaTreeGridComponent implements OnInit {
   constructor(
     private areaService: AreaService,
+    private syncfusionService: SyncfusionService,
     private signService: SignService,
     private fieldService: FieldService,
   ) { }
@@ -64,14 +66,7 @@ export class AreaTreeGridComponent implements OnInit {
   }
 
   refresh() {
-    let dataManager = new ej.DataManager({
-      url: this.areaService.getTreeGridUrl(this.currentFieldId),
-      crossDomain: true,
-      adaptor: new ej.WebApiAdaptor(),
-      headers: [{
-        "Authorization": this.signService.getAuthToken(),
-      }],
-    });
+    let dataManager = this.syncfusionService.GetTreeGridManager(this.currentFieldId);
     this.treeGridData = dataManager;
   }
 

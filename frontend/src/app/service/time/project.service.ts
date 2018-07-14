@@ -21,10 +21,6 @@ export class ProjectService extends BaseService {
     this.resource = 'TIME.RESOURCE.PROJECT.CONCEPT';
   }
 
-  getGanttUrl(): string {
-    return AppConfig.settings.apiServer.endpoint + this.uri + `/list/syncfusion/gantt`;
-  }
-
   List(): Observable<Project[]> {
     this.operation = 'SYSTEM.PROCESS.LIST';
     return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`).pipe(

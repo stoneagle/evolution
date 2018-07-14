@@ -5,6 +5,7 @@ import (
 	"evolution/backend/common/structs"
 	"evolution/backend/time/models"
 	"fmt"
+	"time"
 
 	"github.com/go-redis/redis"
 	"github.com/go-xorm/xorm"
@@ -113,4 +114,178 @@ func (s *Syncfusion) ListKanban(userId int) (kanbans []models.SyncfusionKanban, 
 		kanbans = append(kanbans, kanban)
 	}
 	return kanbans, err
+}
+
+func (s *Syncfusion) ListSchedule(userId int, startDate, endDate time.Time) (schedules []models.SyncfusionSchedule, err error) {
+	action := models.Action{}
+	action.UserId = userId
+	action.StartDate = startDate
+	action.EndDate = endDate
+	actions, err := NewAction(s.Engine, s.Cache).ListWithCondition(&action)
+	if err != nil {
+		return
+	}
+	schedules = make([]models.SyncfusionSchedule, 0)
+	hour, _ := time.ParseDuration("-4h")
+	for _, one := range actions {
+		schedule := models.SyncfusionSchedule{}
+		schedule.Id = one.Id
+		schedule.Name = one.Name
+		schedule.StartDate = one.StartDate.Add(hour)
+		schedule.EndDate = one.EndDate.Add(hour)
+		schedule.AllDay = false
+		schedule.Recurrence = false
+		schedules = append(schedules, schedule)
+	}
+	return
+}
+
+func (s *Syncfusion) ListTreeGrid(fieldId, parentId int) (treeGrids []models.SyncfusionTreeGrid, err error) {
+	area := models.Area{}
+	area.FieldId = fieldId
+	if parentId == 0 {
+		area.Type = models.AreaTypeRoot
+	} else {
+		area.Parent = parentId
+	}
+
+	areas, err := NewArea(s.Engine, s.Cache).ListWithCondition(&area)
+	if err != nil {
+		return
+	}
+
+	treeGrids = make([]models.SyncfusionTreeGrid, 0)
+	for _, one := range areas {
+		treeGrid := models.SyncfusionTreeGrid{}
+		treeGrid.Id = one.Id
+		treeGrid.Name = one.Name
+		if parentId == 0 {
+			treeGrid.Parent = nil
+		} else {
+			treeGrid.Parent = one.Parent
+		}
+
+		if one.Type == models.AreaTypeLeaf {
+			treeGrid.IsParent = false
+			treeGrid.IsExpanded = true
+		} else {
+			treeGrid.IsParent = true
+			treeGrid.IsExpanded = false
+			children := make([]models.SyncfusionTreeGrid, 0)
+			children = append(children, models.SyncfusionTreeGrid{})
+			treeGrid.Children = children
+		}
+		treeGrids = append(treeGrids, treeGrid)
+	}
+	return
+}
+
+func (s *Syncfusion) ListGantt(userId int) (gantts []models.SyncfusionGantt, err error) {
+	questTeam := models.QuestTeam{}
+	questTeam.UserId = userId
+	questTeam.Quest.Status = models.QuestStatusExec
+	questTeams, err := NewQuestTeam(s.Engine, s.Cache).ListWithCondition(&questTeam)
+	if err != nil {
+		return
+	}
+
+	questIds := make([]int, 0)
+	quests := make([]models.Quest, 0)
+	for _, one := range questTeams {
+		questIds = append(questIds, one.QuestId)
+		quests = append(quests, one.Quest)
+	}
+
+	project := models.Project{}
+	project.QuestIds = questIds
+	projects, err := NewProject(s.Engine, s.Cache).ListWithCondition(&project)
+	if err != nil {
+		return
+	}
+
+	projectIds := make([]int, 0)
+	for _, one := range projects {
+		projectIds = append(projectIds, one.Id)
+	}
+	task := models.Task{}
+	task.ProjectIds = projectIds
+	tasks, err := NewTask(s.Engine, s.Cache).ListWithCondition(&task)
+	if err != nil {
+		return
+	}
+
+	tasksMap := s.buildTaskMap(tasks)
+	projectsMap := s.buildProjectMap(projects, tasksMap)
+	gantts = s.buildQuestSlice(quests, projectsMap)
+	return
+}
+
+func (s *Syncfusion) buildTaskMap(tasks []models.Task) map[int][]models.SyncfusionGantt {
+	result := make(map[int][]models.SyncfusionGantt)
+	for _, one := range tasks {
+		if _, ok := result[one.ProjectId]; !ok {
+			result[one.ProjectId] = make([]models.SyncfusionGantt, 0)
+		}
+		gantt := models.SyncfusionGantt{}
+		gantt.Id = one.Id
+		gantt.Parent = one.ProjectId
+		gantt.Relate = one.Resource.Name
+		gantt.Name = one.Name
+		gantt.StartDate = one.StartDate
+		gantt.EndDate = one.EndDate
+		gantt.Progress = 0
+		gantt.Duration = 0
+		gantt.Expanded = false
+		child := make([]models.SyncfusionGantt, 0)
+		gantt.Children = child
+		result[one.ProjectId] = append(result[one.ProjectId], gantt)
+	}
+	return result
+}
+
+func (s *Syncfusion) buildProjectMap(projects []models.Project, tasksMap map[int][]models.SyncfusionGantt) map[int][]models.SyncfusionGantt {
+	result := make(map[int][]models.SyncfusionGantt)
+	for _, one := range projects {
+		if _, ok := result[one.QuestId]; !ok {
+			result[one.QuestId] = make([]models.SyncfusionGantt, 0)
+		}
+		gantt := models.SyncfusionGantt{}
+		gantt.Id = one.Id
+		gantt.Parent = one.QuestId
+		gantt.Relate = one.Area.Name
+		gantt.Name = one.Name
+		gantt.StartDate = one.StartDate
+		gantt.EndDate = one.StartDate
+		gantt.Progress = 0
+		gantt.Duration = 0
+		gantt.Expanded = false
+		if children, ok := tasksMap[one.Id]; ok {
+			gantt.Children = children
+		} else {
+			child := make([]models.SyncfusionGantt, 0)
+			gantt.Children = child
+		}
+		result[one.QuestId] = append(result[one.QuestId], gantt)
+	}
+	return result
+}
+
+func (s *Syncfusion) buildQuestSlice(quests []models.Quest, projectsMap map[int][]models.SyncfusionGantt) []models.SyncfusionGantt {
+	result := make([]models.SyncfusionGantt, 0)
+	for _, one := range quests {
+		gantt := models.SyncfusionGantt{}
+		gantt.Id = one.Id
+		gantt.Parent = 0
+		gantt.Name = one.Name
+		gantt.StartDate = one.StartDate
+		gantt.EndDate = one.EndDate
+		gantt.Progress = 0
+		gantt.Duration = 0
+		gantt.Expanded = false
+		if children, ok := projectsMap[one.Id]; ok {
+			gantt.Children = children
+		}
+		result = append(result, gantt)
+	}
+	return result
 }

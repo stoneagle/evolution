@@ -5,6 +5,7 @@ import { TranslateService }                            from '@ngx-translate/core
 import { Action }              from '../../../../model/time/action';
 import { Schedule }            from '../../../../model/time/syncfusion';
 import { ActionService }       from '../../../../service/time/action.service';
+import { SyncfusionService }   from '../../../../service/time/syncfusion.service';
 import { SignService }         from '../../../../service/system/sign.service';
 import { ActionSaveComponent } from '../save/save.component';
 
@@ -25,6 +26,7 @@ export class ActionScheduleComponent implements OnInit {
 
   constructor(
     private actionService: ActionService,
+    private syncfusionService: SyncfusionService,
     private signService: SignService,
     private translateService: TranslateService,
   ) { }
@@ -39,14 +41,7 @@ export class ActionScheduleComponent implements OnInit {
       recurrence:"Recurrence",
       recurrenceRule:"RecurrenceRule",
     }
-    let dataManager = new ej.DataManager({
-      url: this.actionService.getScheduleUrl(),
-      crossDomain: true,
-      adaptor: new ej.WebApiAdaptor(),
-      headers: [{
-        "Authorization": this.signService.getAuthToken(),
-      }],
-    });
+    let dataManager = this.syncfusionService.GetScheduleManager();
     this.scheduleData = dataManager;
     this.translateService.get('TIME.RESOURCE.ACTION.CONCEPT').subscribe(actionName => {
       let processCreate = this.translateService.instant('SYSTEM.PROCESS.CREATE');

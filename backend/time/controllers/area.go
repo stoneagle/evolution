@@ -7,7 +7,6 @@ import (
 	"evolution/backend/time/models"
 	"evolution/backend/time/services"
 	"strconv"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -37,7 +36,6 @@ func (c *Area) Router(router *gin.RouterGroup) {
 	area.GET("/list/children/:id", c.ListChildren)
 	area.GET("/list/tree/one/:fieldId", c.ListOneTree)
 	area.GET("/list/tree/all", c.ListAllTree)
-	area.GET("/list/syncfusion/treegrid/:fieldId/", c.ListSyncfusionTreeGridFormat)
 	area.POST("/list", c.ListWithCondition)
 	area.POST("", c.Add)
 	area.PUT("/:id", c.Update)
@@ -71,76 +69,6 @@ func (c *Area) ListWithCondition(ctx *gin.Context) {
 		return
 	}
 	resp.Success(ctx, areas)
-}
-
-func (c *Area) ListSyncfusionTreeGridFormat(ctx *gin.Context) {
-	area := models.Area{}
-	fieldIdStr := ctx.Param("fieldId")
-	if fieldIdStr != "" {
-		fieldId, err := strconv.Atoi(fieldIdStr)
-		if err != nil {
-			resp.ErrorBusiness(ctx, resp.ErrorParams, "field id params error", err)
-			return
-		}
-		area.FieldId = fieldId
-	}
-
-	nodeFlag := true
-	filter := ctx.Query("$filter")
-	if len(filter) == 0 {
-		area.Type = models.AreaTypeRoot
-	} else {
-		s := strings.Split(filter, " eq ")
-		if len(s) < 2 {
-			resp.ErrorBusiness(ctx, resp.ErrorParams, "parent id params error", nil)
-			return
-		}
-		parentIdStr := s[1]
-		if parentIdStr == "null" {
-			area.Type = models.AreaTypeRoot
-		} else {
-			parentId, err := strconv.Atoi(parentIdStr)
-			if err != nil {
-				resp.ErrorBusiness(ctx, resp.ErrorParams, "parent id params transfer error", err)
-				return
-			}
-			area.Parent = parentId
-			nodeFlag = false
-		}
-	}
-
-	areas, err := c.AreaSvc.ListWithCondition(&area)
-	if err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorMysql, "area get error", err)
-		return
-	}
-
-	treeGrids := make([]models.SyncfusionTreeGrid, 0)
-	for _, one := range areas {
-		treeGrid := models.SyncfusionTreeGrid{}
-		treeGrid.Id = one.Id
-		treeGrid.Name = one.Name
-		if nodeFlag {
-			treeGrid.Parent = nil
-		} else {
-			treeGrid.Parent = one.Parent
-		}
-		if one.Type == models.AreaTypeLeaf {
-			treeGrid.IsParent = false
-			treeGrid.IsExpanded = true
-		} else {
-			treeGrid.IsParent = true
-			treeGrid.IsExpanded = false
-			children := make([]models.SyncfusionTreeGrid, 0)
-			children = append(children, models.SyncfusionTreeGrid{})
-			treeGrid.Children = children
-		}
-		treeGrids = append(treeGrids, treeGrid)
-	}
-	res := map[string]interface{}{}
-	res["result"] = treeGrids
-	res["__count"] = len(treeGrids)
-	resp.CustomSuccess(ctx, res)
 }
 
 func (c *Area) ListAllTree(ctx *gin.Context) {

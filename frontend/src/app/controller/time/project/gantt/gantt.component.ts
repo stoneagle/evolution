@@ -2,14 +2,15 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { EJ_GANTT_COMPONENTS }          from 'ej-angular2/src/ej/gantt.component';
 import { TranslateService }             from '@ngx-translate/core';
 
-import { Quest }           from '../../../../model/time/quest';
-import { Project }         from '../../../../model/time/project';
-import { Gantt }           from '../../../../model/time/syncfusion';
-import { QuestService }    from '../../../../service/time/quest.service';
-import { ProjectService }  from '../../../../service/time/project.service';
-import { SignService }     from '../../../../service/system/sign.service';
-import { AreaService }     from '../../../../service/time/area.service';
-import { ResourceService } from '../../../../service/time/resource.service';
+import { Quest }             from '../../../../model/time/quest';
+import { Project }           from '../../../../model/time/project';
+import { Gantt }             from '../../../../model/time/syncfusion';
+import { QuestService }      from '../../../../service/time/quest.service';
+import { ProjectService }    from '../../../../service/time/project.service';
+import { AreaService }       from '../../../../service/time/area.service';
+import { ResourceService }   from '../../../../service/time/resource.service';
+import { SyncfusionService } from '../../../../service/time/syncfusion.service';
+import { SignService }       from '../../../../service/system/sign.service';
 
 import { ProjectSaveComponent } from '../save/save.component';
 import { QuestSaveComponent }   from '../../quest/save/save.component';
@@ -33,25 +34,21 @@ export class ProjectGanttComponent implements OnInit {
     private projectService: ProjectService,
     private areaService: AreaService,
     private resourceService: ResourceService,
+    private syncfusionService: SyncfusionService,
     private signService: SignService,
     private translateService: TranslateService
   ) { }
 
-  data: any
+  data: Gantt[] = [];
 	editSettings
   toolbarSettings: any;
   treeColumnIndex: number;
   selectGanttData: any;
 
   ngOnInit() {
-    let dataManager = new ej.DataManager({
-      url: this.projectService.getGanttUrl(),
-      crossDomain: true,
-      adaptor: new ej.WebApiAdaptor(),
-      headers: [{
-        "Authorization": this.signService.getAuthToken(),
-      }],
-    });
+    this.syncfusionService.ListGantt().subscribe(gantts => {
+      this.data = gantts;
+    })
 		this.editSettings = {
 				allowDeleting: true,
 				// allowEditing: true,
@@ -59,7 +56,6 @@ export class ProjectGanttComponent implements OnInit {
 				// allowIndent: true,
 				editMode: 'cellEditing'
 		};
-    this.data = dataManager;
     this.treeColumnIndex = 1;
     this.toolbarSettings = {
         showToolbar: true,

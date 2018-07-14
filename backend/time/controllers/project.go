@@ -35,7 +35,6 @@ func (c *Project) Router(router *gin.RouterGroup) {
 	project := router.Group(c.Name).Use(middles.One(c.ProjectSvc, c.Name))
 	project.GET("/get/:id", c.One)
 	project.GET("/list", c.List)
-	project.GET("/list/syncfusion/gantt/", c.ListSyncfusionGanttFormat)
 	project.POST("", c.Add)
 	project.POST("/list", c.ListByCondition)
 	project.PUT("/:id", c.Update)
@@ -54,56 +53,6 @@ func (c *Project) List(ctx *gin.Context) {
 		return
 	}
 	resp.Success(ctx, projects)
-}
-
-func (c *Project) ListSyncfusionGanttFormat(ctx *gin.Context) {
-	user := ctx.MustGet(middles.UserKey).(middles.UserInfo)
-	questTeam := models.QuestTeam{}
-	questTeam.UserId = user.Id
-	questTeams, err := c.QuestTeamSvc.ListWithCondition(&questTeam)
-	if err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorMysql, "quest team get error", err)
-		return
-	}
-
-	questIds := make([]int, 0)
-	for _, one := range questTeams {
-		questIds = append(questIds, one.QuestId)
-	}
-	quest := models.Quest{}
-	quest.Ids = questIds
-	quest.Status = models.QuestStatusExec
-	quests, err := c.QuestSvc.ListWithCondition(&quest)
-	if err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorMysql, "quest get error", err)
-		return
-	}
-
-	project := models.Project{}
-	project.QuestIds = questIds
-	projects, err := c.ProjectSvc.ListWithCondition(&project)
-	if err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorMysql, "project get error", err)
-		return
-	}
-
-	projectIds := make([]int, 0)
-	for _, one := range projects {
-		projectIds = append(projectIds, one.Id)
-	}
-	task := models.Task{}
-	task.ProjectIds = projectIds
-	tasks, err := c.TaskSvc.ListWithCondition(&task)
-	if err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorMysql, "task get error", err)
-		return
-	}
-
-	sync := models.SyncfusionGantt{}
-	tasksMap := sync.BuildTaskMap(tasks)
-	projectsMap := sync.BuildProjectMap(projects, tasksMap)
-	questsSlice := sync.BuildQuestSlice(quests, projectsMap)
-	resp.CustomSuccess(ctx, questsSlice)
 }
 
 func (c *Project) ListByCondition(ctx *gin.Context) {

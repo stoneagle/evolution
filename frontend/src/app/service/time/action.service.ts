@@ -21,10 +21,6 @@ export class ActionService extends BaseService {
     this.resource = 'TIME.RESOURCE.ACTION.CONCEPT';
   }
 
-  getScheduleUrl(): string {
-    return AppConfig.settings.apiServer.endpoint + this.uri + `/list/syncfusion/schedule`;
-  }
-
   List(): Observable<Action[]> {
     this.operation = 'SYSTEM.PROCESS.LIST';
     return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`).pipe(
