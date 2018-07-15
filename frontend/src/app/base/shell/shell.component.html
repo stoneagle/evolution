@@ -38,7 +38,7 @@
       <router-outlet></router-outlet>
     </div>
     <!-- TODO nav组件整合 -->
-    <clr-vertical-nav *ngIf="(nav == 'flow')"  [clrVerticalNavCollapsible]="true" [(clrVerticalNavCollapsed)]="collapsed">
+    <clr-vertical-nav *ngIf="(nav == 'flow')" [clrVerticalNavCollapsible]="true" [(clrVerticalNavCollapsed)]="collapsed">
       <clr-vertical-nav-group routerLinkActive="active">
         <clr-icon shape="bolt" clrVerticalNavIcon></clr-icon>
         {{ 'FLOW.ASSETS.TYPE.STOCK' | translate }}
@@ -61,50 +61,59 @@
         </clr-vertical-nav-group-children>
       </clr-vertical-nav-group>
     </clr-vertical-nav>
-    <clr-vertical-nav *ngIf="(nav == 'time')"  [clrVerticalNavCollapsible]="true" [(clrVerticalNavCollapsed)]="collapsed">
-      <clr-vertical-nav-group routerLinkActive="active">
+    <clr-vertical-nav *ngIf="(nav == 'time')" [clrVerticalNavCollapsible]="true" [(clrVerticalNavCollapsed)]="collapsed">
+      <clr-vertical-nav-group [clrVerticalNavGroupExpanded]="true" routerLinkActive="active">
         <clr-icon shape="dashboard" clrVerticalNavIcon></clr-icon>
         {{ 'TIME.ASSETS.TYPE.SCHEDULE' | translate }}
         <clr-vertical-nav-group-children>
           <a href="#" routerLink="/time/schedule/quest" class="nav-link">
+            <clr-icon shape="search" clrVerticalNavIcon></clr-icon>
             {{ 'TIME.RESOURCE.QUEST.CONCEPT' | translate }} 
           </a>
           <a href="#" routerLink="/time/schedule/project" class="nav-link">
+            <clr-icon shape="box-plot" clrVerticalNavIcon></clr-icon>
             {{ 'TIME.RESOURCE.PROJECT.CONCEPT' | translate }} 
           </a>
           <a href="#" routerLink="/time/schedule/task" class="nav-link">
+            <clr-icon shape="tasks" clrVerticalNavIcon></clr-icon>
             {{ 'TIME.RESOURCE.TASK.CONCEPT' | translate }} 
           </a>
           <a href="#" routerLink="/time/schedule/action" class="nav-link">
+            <clr-icon shape="calendar" clrVerticalNavIcon></clr-icon>
             {{ 'TIME.RESOURCE.ACTION.CONCEPT' | translate }} 
           </a>
         </clr-vertical-nav-group-children>
       </clr-vertical-nav-group>
-      <clr-vertical-nav-group routerLinkActive="active">
+      <clr-vertical-nav-group [clrVerticalNavGroupExpanded]="true" routerLinkActive="active">
         <clr-icon shape="user" clrVerticalNavIcon></clr-icon>
-        {{ 'TIME.ASSETS.TYPE.USER' | translate }} <clr-vertical-nav-group-children>
+        {{ 'TIME.ASSETS.TYPE.USER' | translate }} 
+        <clr-vertical-nav-group-children>
           <a href="#" routerLink="/time/user/resource" class="nav-link">
+            <clr-icon shape="library" clrVerticalNavIcon></clr-icon>
             {{ 'TIME.RESOURCE.RESOURCE.CONCEPT' | translate }} 
           </a>
         </clr-vertical-nav-group-children>
       </clr-vertical-nav-group>
-      <clr-vertical-nav-group routerLinkActive="active">
+      <clr-vertical-nav-group [clrVerticalNavGroupExpanded]="true" routerLinkActive="active">
         <clr-icon shape="cog" clrVerticalNavIcon></clr-icon>
         {{ 'TIME.ASSETS.TYPE.CONFIG' | translate }}
         <clr-vertical-nav-group-children>
           <a href="#" routerLink="/time/config/country" class="nav-link">
+            <clr-icon shape="world" clrVerticalNavIcon></clr-icon>
             {{ 'TIME.RESOURCE.COUNTRY.CONCEPT' | translate }} 
           </a>
           <a href="#" routerLink="/time/config/field" class="nav-link">
+            <clr-icon shape="layers" clrVerticalNavIcon></clr-icon>
             {{ 'TIME.RESOURCE.FIELD.CONCEPT' | translate }} 
           </a>
           <a href="#" routerLink="/time/config/area" class="nav-link">
+            <clr-icon shape="grid-chart" clrVerticalNavIcon></clr-icon>
             {{ 'TIME.RESOURCE.AREA.CONCEPT' | translate }} 
           </a>
         </clr-vertical-nav-group-children>
       </clr-vertical-nav-group>
     </clr-vertical-nav>
-    <clr-vertical-nav *ngIf="(nav == 'system')"  [clrVerticalNavCollapsible]="true" [(clrVerticalNavCollapsed)]="collapsed">
+    <clr-vertical-nav *ngIf="(nav == 'system')" [clrVerticalNavCollapsible]="true" [(clrVerticalNavCollapsed)]="collapsed">
       <clr-vertical-nav-group routerLinkActive="active">
         <clr-icon shape="cog" clrVerticalNavIcon></clr-icon>
         {{ 'SYSTEM.ASSETS.TYPE.USER' | translate }}

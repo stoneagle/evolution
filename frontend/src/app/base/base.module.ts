@@ -28,7 +28,7 @@ import { SignService  }      from '../service/system/sign.service';
     BrowserModule,
     HttpClientModule,
     FormsModule,
-    ClarityModule,
+    ClarityModule.forRoot(),
     TranslateModule,
   ],
   providers: [ 
