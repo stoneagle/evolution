@@ -12,22 +12,18 @@ import { UserResourceListComponent } from './list/list.component';
 })
 export class UserResourceComponent implements OnInit {
   @ViewChild(UserResourceListComponent)
-  listComponent: UserResourceListComponent;
+  userResourceListComponent: UserResourceListComponent;
 
   constructor(
     private areaService: AreaService,
     private fieldService: FieldService,
   ) { }
 
-  currentField: number;
-
   ngOnInit() {
-    this.refresh(this.currentField);
-    this.listComponent.initCurrentField(this.currentField);
   }
 
-  refresh(fieldId: number) {
-    this.currentField = fieldId;
+  selectAreaNode($event) {
+    this.userResourceListComponent.changeFilterArea($event);
   }
 
   getKeys(map) {

@@ -85,21 +85,60 @@ func main() {
 	srcEng.Charset("utf8")
 	// srcEng.ShowSQL(true)
 
-	// userId := 1
-	// new(php.Area).Transfer(srcEng, destEng)
-	// initAreaType(destEng)
-	// new(php.Country).Transfer(srcEng, destEng)
-	// initField(destEng)
-	// initPhase(destEng)
-	// new(php.EntityAsset).Transfer(srcEng, destEng)
-	// new(php.EntityCircle).Transfer(srcEng, destEng)
-	// new(php.EntityQuest).Transfer(srcEng, destEng)
-	// new(php.EntityLife).Transfer(srcEng, destEng)
-	// new(php.EntityWork).Transfer(srcEng, destEng)
+	userId := 1
+	new(php.Area).Transfer(srcEng, destEng)
+	initAreaType(destEng)
+	new(php.Country).Transfer(srcEng, destEng)
+	initField(destEng)
+	initPhase(destEng)
+	new(php.EntityAsset).Transfer(srcEng, destEng)
+	new(php.EntityCircle).Transfer(srcEng, destEng)
+	new(php.EntityQuest).Transfer(srcEng, destEng)
+	new(php.EntityLife).Transfer(srcEng, destEng)
+	new(php.EntityWork).Transfer(srcEng, destEng)
 	new(php.EntitySkill).Transfer(srcEng, destEng)
-	// new(php.TargetEntityLink).Transfer(srcEng, destEng, userId)
-	// new(php.Target).Transfer(srcEng, destEng, userId)
-	// new(php.Project).Transfer(srcEng, destEng, userId)
+	new(php.TargetEntityLink).Transfer(srcEng, destEng, userId)
+	new(php.Target).Transfer(srcEng, destEng, userId)
+	new(php.Project).Transfer(srcEng, destEng, userId)
+	initUserResourceTime(destEng, userId)
+}
+
+func initUserResourceTime(des *xorm.Engine, userId int) {
+	actionsJoin := make([]models.ActionJoin, 0)
+	sql := des.Unscoped().Table("action").Join("INNER", "task", "task.id = action.task_id")
+	err := sql.Find(&actionsJoin)
+	if err != nil {
+		fmt.Printf("action get error:%v\r\n", err.Error())
+		return
+	}
+
+	actions := make([]models.Action, 0)
+	for _, one := range actionsJoin {
+		one.Action.Task = one.Task
+		actions = append(actions, one.Action)
+	}
+	userResourceTime := map[int]int{}
+	for _, one := range actions {
+		resourceTime, ok := userResourceTime[one.Task.ResourceId]
+		if !ok {
+			userResourceTime[one.Task.ResourceId] = 0
+		}
+		resourceTime += one.Time
+		userResourceTime[one.Task.ResourceId] = resourceTime
+	}
+	updateNum := 0
+	for resourceId, sumTime := range userResourceTime {
+		userResource := models.UserResource{}
+		userResource.Time = sumTime
+		_, err = des.Where("resource_id = ?", resourceId).And("user_id = ?", userId).Update(&userResource)
+		if err != nil {
+			fmt.Printf("user resource time update error:%v\r\n", err.Error())
+			return
+		}
+		updateNum++
+	}
+	fmt.Printf("user resource time init success:%v\r\n", updateNum)
+	return
 }
 
 func initField(des *xorm.Engine) {

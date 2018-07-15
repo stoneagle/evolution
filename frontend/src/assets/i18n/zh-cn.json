@@ -136,7 +136,7 @@
           "FINISH": "已完成"
         } 
       },
-      "QUEST-RESOURCEY": {
+      "QUEST-RESOURCE": {
         "CONCEPT": "远征依赖资源",
         "QUEST": "所属团队",
         "RESOURCE": "要求资源",
@@ -151,7 +151,6 @@
       "USER-RESOURCE": {
         "CONCEPT": "资源",
         "USER": "所属用户",
-        "RESOURCE": "所属资源",
         "TIME": "投入时间"
       },
       "GENERAL": {

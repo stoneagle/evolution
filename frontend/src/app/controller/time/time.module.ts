@@ -23,6 +23,7 @@ import { ProjectGanttComponent }     from './project/gantt/gantt.component';
 import { ProjectSaveComponent }      from './project/save/save.component';
 import { TaskComponent }             from './task/task.component';
 import { TaskSaveComponent }         from './task/save/save.component';
+import { TaskListComponent }         from './task/list/list.component';
 import { TaskKanbanComponent }       from './task/kanban/kanban.component';
 import { ActionComponent }           from './action/action.component';
 import { ActionSaveComponent }       from './action/save/save.component';
@@ -69,6 +70,7 @@ import { MessageHandlerService  } from '../../service/base/message-handler.servi
     ProjectSaveComponent,
     TaskComponent,
     TaskSaveComponent,
+    TaskListComponent,
     TaskKanbanComponent,
     ActionComponent,
     ActionSaveComponent,

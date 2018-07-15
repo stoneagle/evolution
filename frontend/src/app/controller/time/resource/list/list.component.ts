@@ -16,7 +16,6 @@ export class ResourceListComponent implements OnInit {
   saveResourceComponent: ResourceSaveComponent;
 
   @Input() initAllFlag: boolean = false;
-
   filterAreaId: number;
 
   resources: Resource[];

@@ -9,10 +9,22 @@ import (
 
 type UserResource struct {
 	es.ModelWithId `xorm:"extends"`
-	UserId         int `xorm:"unique not null default 0 comment('隶属用户') INT(11)" structs:"user_id,omitempty"`
-	ResourceId     int `xorm:"unique(user_id) not null default 0 comment('隶属实体') INT(11)" structs:"resource_id,omitempty"`
-	Time           int `xorm:"not null default 0 comment('总投入时间') INT(11)" structs:"time,omitempty"`
+	UserId         int      `xorm:"unique not null default 0 comment('隶属用户') INT(11)" structs:"user_id,omitempty"`
+	ResourceId     int      `xorm:"unique(user_id) not null default 0 comment('隶属实体') INT(11)" structs:"resource_id,omitempty"`
+	Time           int      `xorm:"not null default 0 comment('总投入时间') INT(11)" structs:"time,omitempty"`
+	Resource       Resource `xorm:"-"`
 }
+
+type UserResourceJoin struct {
+	UserResource `xorm:"extends" json:"-"`
+	Resource     `xorm:"extends" json:"-"`
+	Area         `xorm:"extends" json:"-"`
+}
+
+var (
+	UserResourceStatusRelax = 1
+	UserResourceStatusExec  = 2
+)
 
 func (m *UserResource) TableName() string {
 	return "user_resource"
@@ -22,5 +34,13 @@ func (m *UserResource) BuildCondition() (condition builder.Eq) {
 	keyPrefix := m.TableName() + "."
 	params := structs.Map(m)
 	condition = m.Model.BuildCondition(params, keyPrefix)
+
+	resourceCondition := m.Resource.BuildCondition()
+	if len(resourceCondition) > 0 {
+		for k, v := range resourceCondition {
+			condition[k] = v
+		}
+	}
+
 	return condition
 }

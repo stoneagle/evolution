@@ -12,8 +12,9 @@ type Resource struct {
 	Name                string `xorm:"unique not null default '' comment('名称') VARCHAR(255)" structs:"name,omitempty"`
 	Desc                string `xorm:"not null default '' comment('描述') VARCHAR(255)" structs:"desc,omitempty"`
 	Year                int    `xorm:"not null default 0 comment('年份') INT(11)" structs:"year,omitempty"`
-	Area                Area   `xorm:"-"`
-	WithSub             bool   `xorm:"-" structs:"-"`
+
+	Area    Area `xorm:"-"`
+	WithSub bool `xorm:"-" structs:"-"`
 }
 
 type ResourceJoin struct {

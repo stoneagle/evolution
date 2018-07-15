@@ -60,6 +60,6 @@ func FormatResponseLog(response interface{}) {
 func FormatErrorLog(err error) {
 	if err != nil {
 		_, fn, line, _ := runtime.Caller(3)
-		logger.Get().Infow(fmt.Sprintf("response-error:【%s:%d:%v】", fn, line, err))
+		logger.Get().Warnw(fmt.Sprintf("response-error:【%s:%d:%v】", fn, line, err))
 	}
 }
