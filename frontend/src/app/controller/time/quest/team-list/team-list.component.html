@@ -10,8 +10,8 @@
         <clr-dg-column>{{ 'TIME.RESOURCE.GENERAL.OPERATION' | translate }}</clr-dg-column>
 
         <clr-dg-row *ngFor="let questTeam of questTeams">
-          <!-- <clr-dg-cell>{{country.Id}}</clr-dg-cell> -->
-          <clr-dg-cell>{{ userNameMap.get(questTeam.UserId) }}</clr-dg-cell>
+          <!-- <clr-dg-cell>{{questTeam.Id}}</clr-dg-cell> -->
+          <clr-dg-cell>{{userNameMap.get(questTeam.UserId)}}</clr-dg-cell>
           <clr-dg-cell>{{questTeam.StartDate | date: 'yyyy-MM-dd' }}</clr-dg-cell>
           <clr-dg-cell>{{questTeam.EndDate | date: 'yyyy-MM-dd' }}</clr-dg-cell>
           <clr-dg-cell>{{questTeam.CreatedAt | date: 'yy-MM-dd HH:mm:ss'}}</clr-dg-cell>

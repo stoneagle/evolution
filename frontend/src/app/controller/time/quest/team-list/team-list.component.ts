@@ -12,7 +12,7 @@ import { UserService }      from '../../../../service/system/user.service';
   styleUrls: ['./team-list.component.css']
 })
 export class QuestTeamListComponent implements OnInit {
-  questTeams: QuestTeam[];
+  questTeams: QuestTeam[] = [];
 
   pageSize: number = 10;
   totalCount: number = 0;
@@ -30,13 +30,28 @@ export class QuestTeamListComponent implements OnInit {
 
   ngOnInit() {
     this.pageSize = 10;
-    this.refresh();
   }
 
   New(questId: number): void {
     this.questId = questId;
-    this.modelOpened = true;
-    this.refresh();
+    let questTeam = new QuestTeam();
+    questTeam.QuestId = this.questId;
+    this.questTeamService.ListWithCondition(questTeam).subscribe(res => {
+      this.totalCount = res.length;
+      this.questTeams = res.slice(0, this.pageSize);
+      let user = new User();
+      user.Ids = [];
+      res.forEach((one, k) => {
+        user.Ids.push(one.UserId);
+      });
+      this.userService.ListWithCondition(user).subscribe(res => {
+        this.userNameMap = new Map();
+        res.forEach((u, k) => {
+          this.userNameMap.set(u.Id, u.Name);
+        }) 
+      });
+      this.modelOpened = true;
+    })
   }            
 
   saved(saved: boolean): void {
@@ -59,26 +74,28 @@ export class QuestTeamListComponent implements OnInit {
 
   refresh() {
     this.currentPage = 1;
-    this.refreshClassify(0, 10);
+    this.refreshClassify(0, this.pageSize);
   }
 
   refreshClassify(from: number, to: number): void {
-    let questTeam = new QuestTeam();
-    questTeam.QuestId = this.questId;
-    this.questTeamService.ListWithCondition(questTeam).subscribe(res => {
-      let user = new User();
-      user.Ids = [];
-      res.forEach((one, k) => {
-        user.Ids.push(one.UserId);
-      });
-      this.userService.ListWithCondition(user).subscribe(res => {
-        this.userNameMap = new Map();
-        res.forEach((u, k) => {
-          this.userNameMap.set(u.Id, u.Name);
-        }) 
-      });
-      this.totalCount = res.length;
-      this.questTeams = res.slice(from, to);
-    })
+    if (this.questId != undefined) {
+      let questTeam = new QuestTeam();
+      questTeam.QuestId = this.questId;
+      this.questTeamService.ListWithCondition(questTeam).subscribe(res => {
+        this.totalCount = res.length;
+        this.questTeams = res.slice(from, to);
+        let user = new User();
+        user.Ids = [];
+        res.forEach((one, k) => {
+          user.Ids.push(one.UserId);
+        });
+        this.userService.ListWithCondition(user).subscribe(res => {
+          this.userNameMap = new Map();
+          res.forEach((u, k) => {
+            this.userNameMap.set(u.Id, u.Name);
+          }) 
+        });
+      })
+    }
   }
 }
