@@ -6,6 +6,7 @@ import { catchError, map, tap  }                 from 'rxjs/operators';
 import { CookieService, CookieOptions }          from 'ngx-cookie';
 import { AppConfig }                             from '../base/config.service';
 import { MessageHandlerService  }                from '../base/message-handler.service';
+import { ShareSettings }                         from '../../shared/settings';
 import { BaseService  }                          from '../base/base.service';
 import { SessionUser }                           from '../../model/base/sign';
 import { Resp, RespObject }                      from '../../model/base/resp';
@@ -18,10 +19,11 @@ export class SignService extends BaseService {
   constructor(
     protected http: HttpClient,
     protected messageHandlerService: MessageHandlerService ,
+    protected shareSettings: ShareSettings,
     private cookieService: CookieService,
   ) { 
     super(http, messageHandlerService);
-    this.resource = 'SYSTEM.RESOURCE.USER.CONCEPT';
+    this.resource = this.shareSettings.System.Resource.User;
     this.current();
   }
 
@@ -53,7 +55,7 @@ export class SignService extends BaseService {
   }
 
   login(username: string, password: string): Observable<Boolean> {
-    this.operation = "SYSTEM.PROCESS.SIGNIN";
+    this.operation = this.shareSettings.System.Process.Signin;
     this.username = username;
     this.password = password;
     let headers: HttpHeaders 
@@ -108,7 +110,7 @@ export class SignService extends BaseService {
   }
 
   logout(): Observable<Boolean> {
-    this.operation = "SYSTEM.PROCESS.SIGNOUT";
+    this.operation = this.shareSettings.System.Process.Signout;
     return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/logout`).pipe(
       tap(res => this.log(res)),
       catchError(this.handleError<Resp>()),
@@ -130,7 +132,7 @@ export class SignService extends BaseService {
   }
 
   current(): Observable<SessionUser> {
-    this.operation = "SYSTEM.PROCESS.GET";
+    this.operation = this.shareSettings.System.Process.Get;
     return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/current`).pipe(
       catchError(this.handleError<Resp>()),
       map(res => {

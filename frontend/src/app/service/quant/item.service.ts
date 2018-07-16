@@ -5,10 +5,11 @@ import { of }                       from 'rxjs/observable/of';
 import { catchError, map, tap  }    from 'rxjs/operators';
 import { AppConfig }                from '../base/config.service';
 import { MessageHandlerService  }   from '../base/message-handler.service';
+import { ShareSettings }            from '../../shared/settings';
 import { WebsocketService  }        from '../base/websocket.service';
 import { BaseService  }             from '../base/base.service';
 import { Item }                     from '../../model/quant/item';
-import { Resp }                 from '../../model/base/resp';
+import { Resp }                     from '../../model/base/resp';
 import { Classify }                 from '../../model/quant/classify';
 import { AssetSource }              from '../../model/quant/config';
 import { Event }                    from '../../model/base/socket';
@@ -21,14 +22,15 @@ export class ItemService extends BaseService {
   constructor(
     protected http: HttpClient,
     protected messageHandlerService: MessageHandlerService,
+    protected shareSettings: ShareSettings,
     private websocketService: WebsocketService,
   ) { 
     super(http, messageHandlerService);
-    this.resource = 'FLOW.RESOURCE.ITEM.CONCEPT';
+    this.resource = this.shareSettings.Quant.Resource.Item;
   }
 
   List(item?: Item): Observable<Item[]> {
-    this.operation = 'SYSTEM.PROCESS.LIST';
+    this.operation = this.shareSettings.System.Process.List;
     return this.http.post<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`, JSON.stringify(item)).pipe(
       catchError(this.handleError<Resp>()),
       map(res => {
@@ -46,7 +48,7 @@ export class ItemService extends BaseService {
   }
 
   Get(id: number): Observable<Item> {
-    this.operation = 'SYSTEM.PROCESS.GET';
+    this.operation = this.shareSettings.System.Process.Get;
     return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/get/${id}`).pipe(
       catchError(this.handleError<Resp>()),
       map(res => {
@@ -64,7 +66,7 @@ export class ItemService extends BaseService {
   }
 
   SyncClassify(classify: Classify): Observable<Boolean> {
-    this.operation = 'SYSTEM.PROCESS.SYNC';
+    this.operation = this.shareSettings.System.Process.Sync;
     return this.http.post<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/sync/classify`, JSON.stringify(classify)).pipe(
       tap(res => this.log(res)),
       catchError(this.handleError<Resp>()),
@@ -79,7 +81,7 @@ export class ItemService extends BaseService {
   }
 
   SyncPoint(id: number): Observable<Boolean> {
-    this.operation = 'SYSTEM.PROCESS.SYNC';
+    this.operation = this.shareSettings.System.Process.Sync;
     return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/point/${id}`).pipe(
       tap(res => this.log(res)),
       catchError(this.handleError<Resp>()),
@@ -94,7 +96,7 @@ export class ItemService extends BaseService {
   }
 
   WsSyncSource(classifyBatch: Classify[]): Observable<Boolean> {
-    this.operation = 'SYSTEM.PROCESS.SYNC';
+    this.operation = this.shareSettings.System.Process.Sync;
 
     let url = AppConfig.settings.apiServer.websocket + this.uri + `/sync/classify/ws`;
     this.connection = this.websocketService.connect(url);
@@ -123,7 +125,7 @@ export class ItemService extends BaseService {
   }
 
   Delete(id: number): Observable<Resp> {
-    this.operation = 'SYSTEM.PROCESS.DELETE';
+    this.operation = this.shareSettings.System.Process.Delete;
     return this.http.delete<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/${id}`).pipe(
       tap(res => this.log(res)),
       catchError(this.handleError<Resp>())

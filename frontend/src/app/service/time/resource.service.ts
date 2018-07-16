@@ -5,6 +5,7 @@ import { of }                       from 'rxjs/observable/of';
 import { catchError, map, tap  }    from 'rxjs/operators';
 import { AppConfig }                from '../base/config.service';
 import { MessageHandlerService  }   from '../base/message-handler.service';
+import { ShareSettings }            from '../../shared/settings';
 import { BaseService  }             from '../base/base.service';
 import { Area }                     from '../../model/time/area';
 import { Resource }                 from '../../model/time/resource';
@@ -17,13 +18,14 @@ export class ResourceService extends BaseService {
   constructor(
     protected http: HttpClient,
     protected messageHandlerService: MessageHandlerService,
+    protected shareSettings: ShareSettings,
   ) {
     super(http, messageHandlerService);
-    this.resource = 'TIME.RESOURCE.RESOURCE.CONCEPT';
+    this.resource = this.shareSettings.Time.Resource.Resource;
   }
 
   List(): Observable<Resource[]> {
-    this.operation = 'SYSTEM.PROCESS.LIST';
+    this.operation = this.shareSettings.System.Process.List;
     return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`).pipe(
       catchError(this.handleError<Resp>()),
       map(res => {
@@ -41,7 +43,7 @@ export class ResourceService extends BaseService {
   }
 
   ListAreas(id: number): Observable<Area[]> {
-    this.operation = 'SYSTEM.PROCESS.LIST';
+    this.operation = this.shareSettings.System.Process.List;
     return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/list/areas/${id}`).pipe(
       catchError(this.handleError<Resp>()),
       map(res => {
@@ -59,7 +61,7 @@ export class ResourceService extends BaseService {
   }
 
   ListWithCondition(resource: Resource): Observable<Resource[]> {
-    this.operation = 'SYSTEM.PROCESS.LIST';
+    this.operation = this.shareSettings.System.Process.List;
     return this.http.post<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`, JSON.stringify(resource)).pipe(
       catchError(this.handleError<Resp>()),
       map(res => {
@@ -77,7 +79,7 @@ export class ResourceService extends BaseService {
   }
 
   ListGroupByLeaf(resource: Resource): Observable<Area[]> {
-    this.operation = 'SYSTEM.PROCESS.LIST';
+    this.operation = this.shareSettings.System.Process.List;
     return this.http.post<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/list/leaf`, JSON.stringify(resource)).pipe(
       catchError(this.handleError<Resp>()),
       map(res => {
@@ -95,7 +97,7 @@ export class ResourceService extends BaseService {
   }
 
   Get(id: number): Observable<Resource> {
-    this.operation = 'SYSTEM.PROCESS.GET';
+    this.operation = this.shareSettings.System.Process.Get;
     return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/get/${id}`).pipe(
       catchError(this.handleError<Resp>()),
       map(res => {
@@ -109,7 +111,7 @@ export class ResourceService extends BaseService {
   }
 
   Add(resource: Resource): Observable<Resource> {
-    this.operation = 'SYSTEM.PROCESS.CREATE';
+    this.operation = this.shareSettings.System.Process.Create;
     return this.http.post<Resp>(AppConfig.settings.apiServer.endpoint + this.uri, JSON.stringify(resource)).pipe(
       tap(res => this.log(res)),
       catchError(this.handleError<Resp>()),
@@ -124,7 +126,7 @@ export class ResourceService extends BaseService {
   }
 
   Update(resource: Resource): Observable<Resp> {
-    this.operation = 'SYSTEM.PROCESS.UPDATE';
+    this.operation = this.shareSettings.System.Process.Update;
     return this.http.put<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/${resource.Id}`, JSON.stringify(resource)).pipe(
       tap(res => this.log(res)),
       catchError(this.handleError<Resp>()),
@@ -132,7 +134,7 @@ export class ResourceService extends BaseService {
   }
 
   Delete(id: number): Observable<Resp> {
-    this.operation = 'SYSTEM.PROCESS.DELETE';
+    this.operation = this.shareSettings.System.Process.Delete;
     return this.http.delete<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/${id}`).pipe(
       tap(res => this.log(res)),
       catchError(this.handleError<Resp>())

@@ -5,7 +5,7 @@ import { of }                       from 'rxjs/observable/of';
 import { catchError, map, tap  }    from 'rxjs/operators';
 import { AppConfig }                from './config.service';
 import { MessageHandlerService  }   from '../base/message-handler.service';
-import { Resp }                 from '../../model/base/resp';
+import { Resp }                     from '../../model/base/resp';
 import { WsStatus }                 from '../../shared/const';
 
 @Injectable()

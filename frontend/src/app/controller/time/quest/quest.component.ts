@@ -7,7 +7,8 @@ import { QuestTeamListComponent }            from './team-list/team-list.compone
 import { ShellComponent }                    from '../../../base/shell/shell.component';
 import { QuestTargetService }                from '../../../service/time/quest-target.service';
 import { MessageHandlerService  }            from '../../../service/base/message-handler.service';
-import { InternationalConfig as N18 }        from '../../../service/base/international.service';
+import { ShareSettings }                     from '../../../shared/settings';
+import { ErrorInfo }                         from '../../../shared/error';
 
 @Component({
   selector: 'time-quest',
@@ -26,6 +27,8 @@ export class QuestComponent implements OnInit {
   currentPage: number = 1;
 
   constructor(
+    private errorInfo: ErrorInfo,
+    private shareSettings: ShareSettings,
     private questSettings: QuestSettings,
     private questTargetService: QuestTargetService,
     private questService: QuestService,
@@ -108,9 +111,9 @@ export class QuestComponent implements OnInit {
         })
       } else {
         this.messageHandlerService.showWarning(
-          N18.settings.TIME.RESOURCE.QUEST.CONCEPT, 
-          N18.settings.SYSTEM.PROCESS.UPDATE, 
-          N18.settings.TIME.RESOURCE.QUEST.ERROR.TARGET_NOT_FINISH
+          this.shareSettings.Time.Resource.Quest,
+          this.shareSettings.System.Process.Update,
+          this.errorInfo.Time.TargetNotFinish
         );
       }
     })

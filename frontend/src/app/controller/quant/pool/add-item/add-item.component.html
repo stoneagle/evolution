@@ -1,6 +1,6 @@
 <clr-modal [(clrModalOpen)]="modelOpened" [clrModalSize]="'xl'">
     <h3 class="modal-title">
-      {{ 'SYSTEM.PROCESS.CREATE' | translate }}{{ 'FLOW.RESOURCE.POOL.CONCEPT' | translate }}{{ 'FLOW.RESOURCE.ITEM.CONCEPT' | translate }}
+      {{ 'SYSTEM.PROCESS.CREATE' | translate }}{{ 'QUANT.RESOURCE.POOL.CONCEPT' | translate }}{{ 'QUANT.RESOURCE.ITEM.CONCEPT' | translate }}
     </h3>
     <div class="modal-body clr-row">
       <form #addForm="ngForm" (ngSubmit)="Submit()">
@@ -10,9 +10,9 @@
               <button type="button" class="btn btn-sm btn-secondary" (click)="onAdd()"><clr-icon shape="plus"></clr-icon>{{ 'SYSTEM.PROCESS.CREATE' | translate }}</button>
             </div>
           </clr-dg-action-bar>
-          <clr-dg-column [clrDgField]="'Code'" >{{ 'FLOW.RESOURCE.ITEM.CODE' | translate }}</clr-dg-column>
-          <clr-dg-column [clrDgField]="'Name'" >{{ 'FLOW.RESOURCE.ITEM.NAME' | translate }}</clr-dg-column>
-          <clr-dg-column>{{ 'FLOW.RESOURCE.ITEM.STATUS' | translate }}</clr-dg-column>
+          <clr-dg-column [clrDgField]="'Code'" >{{ 'QUANT.RESOURCE.ITEM.CODE' | translate }}</clr-dg-column>
+          <clr-dg-column [clrDgField]="'Name'" >{{ 'QUANT.RESOURCE.ITEM.NAME' | translate }}</clr-dg-column>
+          <clr-dg-column>{{ 'QUANT.RESOURCE.ITEM.STATUS' | translate }}</clr-dg-column>
           <clr-dg-row *ngFor="let item of showItems" [clrDgItem]="item" >
             <clr-dg-cell>{{item.Code}}</clr-dg-cell>
             <clr-dg-cell>{{item.Name}}</clr-dg-cell>
@@ -21,7 +21,7 @@
           <clr-dg-footer>
             <clr-dg-pagination #showPagination [clrDgPageSize]="showPageSize" [(clrDgPage)]="showCurrentPage" [clrDgTotalItems]="showTotalCount">
               {{showPagination.firstItem + 1}} - {{showPagination.lastItem + 1}}
-              / {{showPagination.totalItems}} {{ 'FLOW.RESOURCE.ITEM.CONCEPT' | translate }}
+              / {{showPagination.totalItems}} {{ 'QUANT.RESOURCE.ITEM.CONCEPT' | translate }}
             </clr-dg-pagination>
           </clr-dg-footer>
         </clr-datagrid>
@@ -31,9 +31,9 @@
               <button type="button" class="btn btn-sm btn-secondary" (click)="onDelete()"><clr-icon shape="close"></clr-icon>{{ 'SYSTEM.PROCESS.DELETE' | translate }}</button>
             </div>
           </clr-dg-action-bar>
-          <clr-dg-column>{{ 'FLOW.RESOURCE.ITEM.CODE' | translate }}</clr-dg-column>
-          <clr-dg-column>{{ 'FLOW.RESOURCE.ITEM.NAME' | translate }}</clr-dg-column>
-          <clr-dg-column>{{ 'FLOW.RESOURCE.ITEM.STATUS' | translate }}</clr-dg-column>
+          <clr-dg-column>{{ 'QUANT.RESOURCE.ITEM.CODE' | translate }}</clr-dg-column>
+          <clr-dg-column>{{ 'QUANT.RESOURCE.ITEM.NAME' | translate }}</clr-dg-column>
+          <clr-dg-column>{{ 'QUANT.RESOURCE.ITEM.STATUS' | translate }}</clr-dg-column>
           <clr-dg-row *ngFor="let item of submitItems" [clrDgItem]="item" >
             <clr-dg-cell>{{item.Code}}</clr-dg-cell>
             <clr-dg-cell>{{item.Name}}</clr-dg-cell>
@@ -42,7 +42,7 @@
           <clr-dg-footer>
             <clr-dg-pagination #submitPagination [clrDgPageSize]="submitPageSize" [(clrDgPage)]="submitCurrentPage" [clrDgTotalItems]="submitTotalCount">
               {{submitPagination.firstItem + 1}} - {{submitPagination.lastItem + 1}}
-              / {{submitPagination.totalItems}} {{ 'FLOW.RESOURCE.ITEM.CONCEPT' | translate }}
+              / {{submitPagination.totalItems}} {{ 'QUANT.RESOURCE.ITEM.CONCEPT' | translate }}
             </clr-dg-pagination>
           </clr-dg-footer>
         </clr-datagrid>

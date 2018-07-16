@@ -11,6 +11,9 @@ export interface International {
         CONFIG: string
       }
     }
+    ERROR: {
+      TARGET_NOT_FINISH: string 
+    }
     RESOURCE: {
       COUNTRY: {
         CONCEPT: string
@@ -88,9 +91,6 @@ export interface International {
         MEMBERS: string
         CONSTRAINT: string
         STATUS: string
-        ERROR: {
-          TARGET_NOT_FINISH: string 
-        }
         STATUS_NAME: {
           RECRUIT: string
           EXEC: string
@@ -166,7 +166,7 @@ export interface International {
       }
     }
   }
-  FLOW: {
+  QUANT: {
     TITLE: string
     ASSETS: {
       TYPE: {

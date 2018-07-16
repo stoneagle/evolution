@@ -5,6 +5,7 @@ import { of }                       from 'rxjs/observable/of';
 import { catchError, map, tap  }    from 'rxjs/operators';
 import { AppConfig }                from '../base/config.service';
 import { MessageHandlerService  }   from '../base/message-handler.service';
+import { ShareSettings }            from '../../shared/settings';
 import { BaseService  }             from '../base/base.service';
 import { Field }                    from '../../model/time/field';
 import { Resp }                     from '../../model/base/resp';
@@ -16,13 +17,14 @@ export class FieldService extends BaseService {
   constructor(
     protected http: HttpClient,
     protected messageHandlerService: MessageHandlerService,
+    protected shareSettings: ShareSettings,
   ) {
     super(http, messageHandlerService);
-    this.resource = 'TIME.RESOURCE.FIELD.CONCEPT';
+    this.resource = this.shareSettings.Time.Resource.Field;
   }
 
   List(): Observable<Field[]> {
-    this.operation = 'SYSTEM.PROCESS.LIST';
+    this.operation = this.shareSettings.System.Process.List;
     return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`).pipe(
       catchError(this.handleError<Resp>()),
       map(res => {
@@ -40,7 +42,7 @@ export class FieldService extends BaseService {
   }
 
   Map(): Observable<Map<number, string>> {
-    this.operation = 'SYSTEM.PROCESS.LIST';
+    this.operation = this.shareSettings.System.Process.List;
     return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`).pipe(
       catchError(this.handleError<Resp>()),
       map(res => {
@@ -57,7 +59,7 @@ export class FieldService extends BaseService {
     )
   }
   Get(id: number): Observable<Field> {
-    this.operation = 'SYSTEM.PROCESS.GET';
+    this.operation = this.shareSettings.System.Process.Get;
     return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/get/${id}`).pipe(
       catchError(this.handleError<Resp>()),
       map(res => {
@@ -71,7 +73,7 @@ export class FieldService extends BaseService {
   }
 
   Add(field: Field): Observable<Field> {
-    this.operation = 'SYSTEM.PROCESS.CREATE';
+    this.operation = this.shareSettings.System.Process.Create;
     return this.http.post<Resp>(AppConfig.settings.apiServer.endpoint + this.uri, JSON.stringify(field)).pipe(
       tap(res => this.log(res)),
       catchError(this.handleError<Resp>()),
@@ -86,7 +88,7 @@ export class FieldService extends BaseService {
   }
 
   Update(field: Field): Observable<Resp> {
-    this.operation = 'SYSTEM.PROCESS.UPDATE';
+    this.operation = this.shareSettings.System.Process.Update;
     return this.http.put<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/${field.Id}`, JSON.stringify(field)).pipe(
       tap(res => this.log(res)),
       catchError(this.handleError<Resp>()),
@@ -94,7 +96,7 @@ export class FieldService extends BaseService {
   }
 
   Delete(id: number): Observable<Resp> {
-    this.operation = 'SYSTEM.PROCESS.DELETE';
+    this.operation = this.shareSettings.System.Process.Delete;
     return this.http.delete<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/${id}`).pipe(
       tap(res => this.log(res)),
       catchError(this.handleError<Resp>())

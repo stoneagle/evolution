@@ -1,14 +1,14 @@
-import { Injectable }                                     from '@angular/core';
-import { HttpClient, HttpHeaders  }                       from '@angular/common/http';
-import { Observable }                                     from 'rxjs';
-import { of }                                             from 'rxjs/observable/of';
-import { catchError, map, tap  }                          from 'rxjs/operators';
-import { AppConfig }                                      from '../base/config.service';
-import { InternationalConfig as N18 }                     from '../base/international.service';
-import { MessageHandlerService  }                         from '../base/message-handler.service';
-import { BaseService  }                                   from '../base/base.service';
-import { Quest, QuestTarget }                             from '../../model/time/quest';
-import { Resp }                                           from '../../model/base/resp';
+import { Injectable }                 from '@angular/core';
+import { HttpClient, HttpHeaders  }   from '@angular/common/http';
+import { Observable }                 from 'rxjs';
+import { of }                         from 'rxjs/observable/of';
+import { catchError, map, tap  }      from 'rxjs/operators';
+import { AppConfig }                  from '../base/config.service';
+import { MessageHandlerService  }     from '../base/message-handler.service';
+import { BaseService  }               from '../base/base.service';
+import { ShareSettings }              from '../../shared/settings';
+import { Quest, QuestTarget }         from '../../model/time/quest';
+import { Resp }                       from '../../model/base/resp';
 
 @Injectable()
 export class QuestService extends BaseService {
@@ -17,13 +17,14 @@ export class QuestService extends BaseService {
   constructor(
     protected http: HttpClient,
     protected messageHandlerService: MessageHandlerService,
+    protected shareSettings: ShareSettings,
   ) {
     super(http, messageHandlerService);
-    this.resource = N18.settings.TIME.RESOURCE.QUEST.CONCEPT;
+    this.resource = this.shareSettings.Time.Resource.Quest;
   }
 
   List(): Observable<Quest[]> {
-    this.operation = N18.settings.SYSTEM.PROCESS.LIST;
+    this.operation = this.shareSettings.System.Process.List;
     return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`).pipe(
       catchError(this.handleError<Resp>()),
       map(res => {
@@ -41,7 +42,7 @@ export class QuestService extends BaseService {
   }
 
   ListWithCondition(quest: Quest): Observable<Quest[]> {
-    this.operation = N18.settings.SYSTEM.PROCESS.LIST;
+    this.operation = this.shareSettings.System.Process.List;
     return this.http.post<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`, JSON.stringify(quest)).pipe(
       catchError(this.handleError<Resp>()),
       map(res => {
@@ -59,7 +60,7 @@ export class QuestService extends BaseService {
   }
 
   Get(id: number): Observable<Quest> {
-    this.operation = N18.settings.SYSTEM.PROCESS.LIST;
+    this.operation = this.shareSettings.System.Process.List;
     return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/get/${id}`).pipe(
       catchError(this.handleError<Resp>()),
       map(res => {
@@ -73,7 +74,7 @@ export class QuestService extends BaseService {
   }
 
   Add(quest: Quest): Observable<Quest> {
-    this.operation = N18.settings.SYSTEM.PROCESS.CREATE;
+    this.operation = this.shareSettings.System.Process.Create;
     return this.http.post<Resp>(AppConfig.settings.apiServer.endpoint + this.uri, JSON.stringify(quest)).pipe(
       tap(res => this.log(res)),
       catchError(this.handleError<Resp>()),
@@ -88,7 +89,7 @@ export class QuestService extends BaseService {
   }
 
   Update(quest: Quest): Observable<Resp> {
-    this.operation = N18.settings.SYSTEM.PROCESS.UPDATE;
+    this.operation = this.shareSettings.System.Process.Update;
     return this.http.put<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/${quest.Id}`, JSON.stringify(quest)).pipe(
       tap(res => this.log(res)),
       catchError(this.handleError<Resp>()),
@@ -96,7 +97,7 @@ export class QuestService extends BaseService {
   }
 
   Delete(id: number): Observable<Resp> {
-    this.operation = 'SYSTEM.PROCESS.DELETE';
+    this.operation = this.shareSettings.System.Process.Delete;
     return this.http.delete<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/${id}`).pipe(
       tap(res => this.log(res)),
       catchError(this.handleError<Resp>())

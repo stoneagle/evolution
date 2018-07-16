@@ -5,17 +5,17 @@
   <div class="modal-body">
     <form #syncForm="ngForm" (ngSubmit)="Submit()">
       <div class="form-group">
-        <label for="Asset">{{ 'FLOW.RESOURCE.CONFIG.ASSET' | translate }}</label>
+        <label for="Asset">{{ 'QUANT.RESOURCE.CONFIG.ASSET' | translate }}</label>
         <div class="select">
           <select id="AssetString" [(ngModel)]="assetSource.AssetString" name="AssetString" required (ngModelChange)="AssetOnChange($event)" >
             <option *ngFor="let key of getKeys(assetMap)" [ngValue]=key>
-              {{ "FLOW.ASSETS.TYPE." + assetMap.get(key) | translate }}
+              {{ "QUANT.ASSETS.TYPE." + assetMap.get(key) | translate }}
             </option>
           </select>
         </div>
       </div> 
       <div class="form-group">
-        <label for="Type">{{ 'FLOW.RESOURCE.CONFIG.TYPE' | translate }}</label>
+        <label for="Type">{{ 'QUANT.RESOURCE.CONFIG.TYPE' | translate }}</label>
         <div class="select">
           <select id="Type" [(ngModel)]="assetSource.Type" name="Type" required (ngModelChange)="TypeOnChange($event)">
             <option *ngFor="let key of getKeys(typeMap)" [ngValue]=key>
@@ -25,7 +25,7 @@
         </div>
       </div>
       <div class="form-group">
-        <label for="Main">{{ 'FLOW.RESOURCE.CONFIG.MAIN' | translate }}</label>
+        <label for="Main">{{ 'QUANT.RESOURCE.CONFIG.MAIN' | translate }}</label>
         <div class="select">
           <select id="Main" [(ngModel)]="assetSource.Main" name="Main" required (ngModelChange)="MainOnChange($event)">
             <option *ngFor="let key of getKeys(mainMap)" [ngValue]=key>
@@ -35,7 +35,7 @@
         </div>
       </div>
       <div class="form-group">
-        <label for="Sub">{{ 'FLOW.RESOURCE.CONFIG.SUB' | translate }}</label>
+        <label for="Sub">{{ 'QUANT.RESOURCE.CONFIG.SUB' | translate }}</label>
         <div class="select">
           <select id="Sub" [(ngModel)]="assetSource.Sub" name="Sub" required >
             <option *ngFor="let key of getKeys(subMap)" [ngValue]=key>

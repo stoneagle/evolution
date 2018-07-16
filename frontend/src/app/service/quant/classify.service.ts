@@ -5,9 +5,10 @@ import { of }                       from 'rxjs/observable/of';
 import { catchError, map, tap  }    from 'rxjs/operators';
 import { AppConfig }                from '../base/config.service';
 import { MessageHandlerService  }   from '../base/message-handler.service';
+import { ShareSettings }            from '../../shared/settings';
 import { BaseService  }             from '../base/base.service';
 import { Classify }                 from '../../model/quant/classify';
-import { Resp }                 from '../../model/base/resp';
+import { Resp }                     from '../../model/base/resp';
 import { AssetSource }              from '../../model/quant/config';
 
 @Injectable()
@@ -17,13 +18,14 @@ export class ClassifyService extends BaseService {
   constructor(
     protected http: HttpClient,
     protected messageHandlerService: MessageHandlerService,
+    protected shareSettings: ShareSettings,
   ) {
     super(http, messageHandlerService);
-    this.resource = 'FLOW.RESOURCE.CLASSIFY.CONCEPT';
+    this.resource = this.shareSettings.Quant.Resource.Classify;
   }
 
   List(): Observable<Classify[]> {
-    this.operation = 'SYSTEM.PROCESS.LIST';
+    this.operation = this.shareSettings.System.Process.List;
     return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`).pipe(
       catchError(this.handleError<Resp>()),
       map(res => {
@@ -41,7 +43,7 @@ export class ClassifyService extends BaseService {
   }
 
   ListByAssetSource(assetSource: AssetSource): Observable<Classify[]> {
-    this.operation = 'SYSTEM.PROCESS.LIST';
+    this.operation = this.shareSettings.System.Process.List;
     return this.http.post<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`, JSON.stringify(assetSource)).pipe(
       catchError(this.handleError<Resp>()),
       map(res => {
@@ -59,7 +61,7 @@ export class ClassifyService extends BaseService {
   }
 
   Get(id: number): Observable<Classify> {
-    this.operation = 'SYSTEM.PROCESS.GET';
+    this.operation = this.shareSettings.System.Process.Get;
     return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/get/${id}`).pipe(
       catchError(this.handleError<Resp>()),
       map(res => {
@@ -73,7 +75,7 @@ export class ClassifyService extends BaseService {
   }
 
   Sync(assetSource: AssetSource): Observable<Boolean> {
-    this.operation = 'SYSTEM.PROCESS.SYNC';
+    this.operation = this.shareSettings.System.Process.Sync;
     return this.http.post<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + '/sync', JSON.stringify(assetSource)).pipe(
       tap(res => this.log(res)),
       catchError(this.handleError<Resp>()),
@@ -88,7 +90,7 @@ export class ClassifyService extends BaseService {
   }
 
   Delete(id: number): Observable<Resp> {
-    this.operation = 'SYSTEM.PROCESS.DELETE';
+    this.operation = this.shareSettings.System.Process.Delete;
     return this.http.delete<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/${id}`).pipe(
       tap(res => this.log(res)),
       catchError(this.handleError<Resp>())

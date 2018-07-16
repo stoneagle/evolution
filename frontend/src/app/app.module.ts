@@ -16,6 +16,8 @@ import { QuantModule }          from './controller/quant/quant.module';
 import { TimeModule }           from './controller/time/time.module';
 import { SystemModule }         from './controller/system/system.module';
 
+import { ShareSettings }         from './shared/settings';
+
 export function initializeApp(appConfig: AppConfig) {
   return () => appConfig.load();
 }
@@ -68,6 +70,7 @@ export function createTranslateLoader(http: HttpClient) {
       useClass: CustomInterceptor ,
       multi: true
     },
+    ShareSettings,
   ],
   bootstrap: [AppComponent]
 })

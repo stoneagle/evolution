@@ -5,6 +5,7 @@ import { of }                       from 'rxjs/observable/of';
 import { catchError, map, tap  }    from 'rxjs/operators';
 import { AppConfig }                from '../base/config.service';
 import { MessageHandlerService  }   from '../base/message-handler.service';
+import { ShareSettings }            from '../../shared/settings';
 import { BaseService  }             from '../base/base.service';
 import { UserResource }             from '../../model/time/user-resource';
 import { Resp }                     from '../../model/base/resp';
@@ -16,13 +17,14 @@ export class UserResourceService extends BaseService {
   constructor(
     protected http: HttpClient,
     protected messageHandlerService: MessageHandlerService,
+    protected shareSettings: ShareSettings,
   ) {
     super(http, messageHandlerService);
-    this.resource = 'TIME.RESOURCE.USER-RESOURCE.CONCEPT';
+    this.resource = this.shareSettings.Time.Resource.UserResource;
   }
 
   List(): Observable<UserResource[]> {
-    this.operation = 'SYSTEM.PROCESS.LIST';
+    this.operation = this.shareSettings.System.Process.List;
     return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`).pipe(
       catchError(this.handleError<Resp>()),
       map(res => {
@@ -40,7 +42,7 @@ export class UserResourceService extends BaseService {
   }
 
   ListWithCondition(userResource: UserResource): Observable<UserResource[]> {
-    this.operation = 'SYSTEM.PROCESS.LIST';
+    this.operation = this.shareSettings.System.Process.List;
     return this.http.post<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`, JSON.stringify(userResource)).pipe(
       catchError(this.handleError<Resp>()),
       map(res => {
@@ -58,7 +60,7 @@ export class UserResourceService extends BaseService {
   }
 
   Get(id: number): Observable<UserResource> {
-    this.operation = 'SYSTEM.PROCESS.GET';
+    this.operation = this.shareSettings.System.Process.Get;
     return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/get/${id}`).pipe(
       catchError(this.handleError<Resp>()),
       map(res => {
@@ -72,7 +74,7 @@ export class UserResourceService extends BaseService {
   }
 
   Add(userResource: UserResource): Observable<UserResource> {
-    this.operation = 'SYSTEM.PROCESS.CREATE';
+    this.operation = this.shareSettings.System.Process.Create;
     return this.http.post<Resp>(AppConfig.settings.apiServer.endpoint + this.uri, JSON.stringify(userResource)).pipe(
       tap(res => this.log(res)),
       catchError(this.handleError<Resp>()),
@@ -87,7 +89,7 @@ export class UserResourceService extends BaseService {
   }
 
   Update(userResource: UserResource): Observable<Resp> {
-    this.operation = 'SYSTEM.PROCESS.UPDATE';
+    this.operation = this.shareSettings.System.Process.Update;
     return this.http.put<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/${userResource.Id}`, JSON.stringify(userResource)).pipe(
       tap(res => this.log(res)),
       catchError(this.handleError<Resp>()),
@@ -95,7 +97,7 @@ export class UserResourceService extends BaseService {
   }
 
   Delete(id: number): Observable<Resp> {
-    this.operation = 'SYSTEM.PROCESS.DELETE';
+    this.operation = this.shareSettings.System.Process.Delete;
     return this.http.delete<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/${id}`).pipe(
       tap(res => this.log(res)),
       catchError(this.handleError<Resp>())

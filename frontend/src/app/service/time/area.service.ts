@@ -6,6 +6,7 @@ import { catchError, map, tap  }    from 'rxjs/operators';
 import { TreeModel }                from 'ng2-tree';
 import { AppConfig }                from '../base/config.service';
 import { MessageHandlerService  }   from '../base/message-handler.service';
+import { ShareSettings }            from '../../shared/settings';
 import { BaseService  }             from '../base/base.service';
 import { Area }                     from '../../model/time/area';
 import { Resp }                     from '../../model/base/resp';
@@ -17,13 +18,14 @@ export class AreaService extends BaseService {
   constructor(
     protected http: HttpClient,
     protected messageHandlerService: MessageHandlerService,
+    protected shareSettings: ShareSettings,
   ) {
     super(http, messageHandlerService);
-    this.resource = 'TIME.RESOURCE.AREA.CONCEPT';
+    this.resource = this.shareSettings.Time.Resource.Area;
   }
 
   ListWithCondition(area: Area): Observable<Area[]> {
-    this.operation = 'SYSTEM.PROCESS.LIST';
+    this.operation = this.shareSettings.System.Process.List;
     return this.http.post<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`, JSON.stringify(area)).pipe(
       catchError(this.handleError<Resp>()),
       map(res => {
@@ -41,7 +43,7 @@ export class AreaService extends BaseService {
   }
 
   ListAllTree(): Observable<Map<number, TreeModel>> {
-    this.operation = 'SYSTEM.PROCESS.LIST';
+    this.operation = this.shareSettings.System.Process.List;
     return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/list/tree/all`).pipe(
       catchError(this.handleError<Resp>()),
       map(res => {
@@ -57,7 +59,7 @@ export class AreaService extends BaseService {
   }
 
   ListOneTree(fieldId: number): Observable<TreeModel> {
-    this.operation = 'SYSTEM.PROCESS.LIST';
+    this.operation = this.shareSettings.System.Process.List;
     return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/list/tree/one/${fieldId}`).pipe(
       catchError(this.handleError<Resp>()),
       map(res => {
@@ -71,7 +73,7 @@ export class AreaService extends BaseService {
   }
 
   ListParent(fieldId: number): Observable<Area[]> {
-    this.operation = 'SYSTEM.PROCESS.LIST';
+    this.operation = this.shareSettings.System.Process.List;
     return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/list/parent/${fieldId}`).pipe(
       catchError(this.handleError<Resp>()),
       map(res => {
@@ -89,7 +91,7 @@ export class AreaService extends BaseService {
   }
 
   ListChildren(parentId: number): Observable<Area[]> {
-    this.operation = 'SYSTEM.PROCESS.LIST';
+    this.operation = this.shareSettings.System.Process.List;
     return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/list/children/${parentId}`).pipe(
       catchError(this.handleError<Resp>()),
       map(res => {
@@ -107,7 +109,7 @@ export class AreaService extends BaseService {
   }
 
   List(): Observable<Area[]> {
-    this.operation = 'SYSTEM.PROCESS.LIST';
+    this.operation = this.shareSettings.System.Process.List;
     return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`).pipe(
       catchError(this.handleError<Resp>()),
       map(res => {
@@ -125,7 +127,7 @@ export class AreaService extends BaseService {
   }
 
   Get(id: number): Observable<Area> {
-    this.operation = 'SYSTEM.PROCESS.GET';
+    this.operation = this.shareSettings.System.Process.Get;
     return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/get/${id}`).pipe(
       catchError(this.handleError<Resp>()),
       map(res => {
@@ -139,7 +141,7 @@ export class AreaService extends BaseService {
   }
 
   Add(area: Area): Observable<Area> {
-    this.operation = 'SYSTEM.PROCESS.CREATE';
+    this.operation = this.shareSettings.System.Process.Create;
     return this.http.post<Resp>(AppConfig.settings.apiServer.endpoint + this.uri, JSON.stringify(area)).pipe(
       tap(res => this.log(res)),
       catchError(this.handleError<Resp>()),
@@ -154,7 +156,7 @@ export class AreaService extends BaseService {
   }
 
   Update(area: Area): Observable<Resp> {
-    this.operation = 'SYSTEM.PROCESS.UPDATE';
+    this.operation = this.shareSettings.System.Process.Update;
     return this.http.put<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/${area.Id}`, JSON.stringify(area)).pipe(
       tap(res => this.log(res)),
       catchError(this.handleError<Resp>()),
@@ -162,7 +164,7 @@ export class AreaService extends BaseService {
   }
 
   Delete(id: number): Observable<Resp> {
-    this.operation = 'SYSTEM.PROCESS.DELETE';
+    this.operation = this.shareSettings.System.Process.Delete;
     return this.http.delete<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/${id}`).pipe(
       tap(res => this.log(res)),
       catchError(this.handleError<Resp>())

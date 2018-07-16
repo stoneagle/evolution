@@ -15,8 +15,9 @@ import { QuestTargetService  }        from '../../../../service/time/quest-targe
 import { QuestTeamService  }          from '../../../../service/time/quest-team.service';
 import { UserService  }               from '../../../../service/system/user.service';
 import { MessageHandlerService  }     from '../../../../service/base/message-handler.service';
-import { InternationalConfig as N18 } from '../../../../service/base/international.service';
 import { AreaTreeGridComponent }      from '../../area/tree-grid/tree-grid.component';
+import { ShareSettings }              from '../../../../shared/settings';
+import { ErrorInfo }                  from '../../../../shared/error';
 
 
 @Component({
@@ -27,6 +28,8 @@ import { AreaTreeGridComponent }      from '../../area/tree-grid/tree-grid.compo
 
 export class QuestSaveComponent implements OnInit {
   constructor(
+    private errorInfo: ErrorInfo,
+    private shareSettings: ShareSettings,
     private questService: QuestService,
     private projectService: ProjectService,
     private questTargetService: QuestTargetService,
@@ -109,9 +112,9 @@ export class QuestSaveComponent implements OnInit {
       if (one.AreaId === questTarget.AreaId) {
         if ((one.QuestId != undefined) && (one.Status == this.questSettings.TargetStatus.Wait)) {
           this.messageHandlerService.showWarning(
-            N18.settings.TIME.RESOURCE.QUEST.CONCEPT, 
-            N18.settings.SYSTEM.PROCESS.UPDATE, 
-            N18.settings.TIME.RESOURCE.QUEST.ERROR.TARGET_NOT_FINISH
+            this.shareSettings.Time.Resource.Quest,
+            this.shareSettings.System.Process.Update,
+            this.errorInfo.Time.TargetNotFinish
           );
           return;
         }

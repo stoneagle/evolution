@@ -3,9 +3,10 @@ import { HttpClient, HttpHeaders  } from '@angular/common/http';
 import { Observable }               from 'rxjs';
 import { of }                       from 'rxjs/observable/of';
 import { catchError, map, tap  }    from 'rxjs/operators';
-import { Resp }                 from '../../model/base/resp';
+import { Resp }                     from '../../model/base/resp';
 import { AppConfig }                from '../base/config.service';
 import { MessageHandlerService  }   from '../base/message-handler.service';
+import { ShareSettings }            from '../../shared/settings';
 import { BaseService  }             from '../base/base.service';
 
 @Injectable()
@@ -15,13 +16,14 @@ export class ConfigService extends BaseService {
   constructor(
     protected http: HttpClient,
     protected messageHandlerService: MessageHandlerService,
+    protected shareSettings: ShareSettings,
   ) { 
     super(http, messageHandlerService);
-    this.resource = "FLOW.RESOURCE.CONFIG.CONCEPT";
+    this.resource = this.shareSettings.Quant.Resource.Config;
   }
 
   AssetList(): Observable<Map<string, string>> {
-    this.operation = 'SYSTEM.PROCESS.LIST';
+    this.operation = this.shareSettings.System.Process.List;
     return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + "/asset").pipe(
       catchError(this.handleError<Resp>()),
       map(res => {
@@ -37,7 +39,7 @@ export class ConfigService extends BaseService {
   }
 
   TypeList(resource: string): Observable<Map<string, Map<string, string[]>>> {
-    this.operation = 'SYSTEM.PROCESS.LIST';
+    this.operation = this.shareSettings.System.Process.List;
     return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/type/${resource}`).pipe(
       catchError(this.handleError<Resp>()),
       map(res => {
@@ -57,7 +59,7 @@ export class ConfigService extends BaseService {
   }
 
   StrategyList(ctype: string): Observable<Map<string, string>> {
-    this.operation = 'SYSTEM.PROCESS.LIST';
+    this.operation = this.shareSettings.System.Process.List;
     return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/strategy/${ctype}`).pipe(
       catchError(this.handleError<Resp>()),
       map(res => {

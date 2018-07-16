@@ -11,6 +11,9 @@
         "CONFIG": "配置"
       }
     },
+    "ERROR": {
+      "TARGET_NOT_FINISH": "目标未完成"
+    },
     "RESOURCE": {
       "COUNTRY": {
         "CONCEPT": "国家",
@@ -88,9 +91,6 @@
         "MEMBERS": "成员数量",
         "CONSTRAINT": "优先级",
         "STATUS": "状态",
-        "ERROR": {
-          "TARGET_NOT_FINISH": "目标未完成"
-        },
         "STATUS_NAME": {
           "RECRUIT": "招募中",
           "EXEC": "执行中",
@@ -166,7 +166,7 @@
       }
     }
   },
-  "FLOW": {
+  "QUANT": {
     "TITLE": "流水",
     "ASSETS": {
       "TYPE": {

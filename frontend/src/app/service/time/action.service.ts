@@ -5,6 +5,7 @@ import { of }                       from 'rxjs/observable/of';
 import { catchError, map, tap  }    from 'rxjs/operators';
 import { AppConfig }                from '../base/config.service';
 import { MessageHandlerService  }   from '../base/message-handler.service';
+import { ShareSettings }            from '../../shared/settings';
 import { BaseService  }             from '../base/base.service';
 import { Action }                   from '../../model/time/action';
 import { Resp }                     from '../../model/base/resp';
@@ -16,13 +17,14 @@ export class ActionService extends BaseService {
   constructor(
     protected http: HttpClient,
     protected messageHandlerService: MessageHandlerService,
+    protected shareSettings: ShareSettings,
   ) {
     super(http, messageHandlerService);
-    this.resource = 'TIME.RESOURCE.ACTION.CONCEPT';
+    this.resource = this.shareSettings.Time.Resource.Action;
   }
 
   List(): Observable<Action[]> {
-    this.operation = 'SYSTEM.PROCESS.LIST';
+    this.operation = this.shareSettings.System.Process.List;
     return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`).pipe(
       catchError(this.handleError<Resp>()),
       map(res => {
@@ -40,7 +42,7 @@ export class ActionService extends BaseService {
   }
 
   ListWithCondition(action: Action): Observable<Action[]> {
-    this.operation = 'SYSTEM.PROCESS.LIST';
+    this.operation = this.shareSettings.System.Process.List;
     return this.http.post<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`, JSON.stringify(action)).pipe(
       catchError(this.handleError<Resp>()),
       map(res => {
@@ -58,7 +60,7 @@ export class ActionService extends BaseService {
   }
 
   Get(id: number): Observable<Action> {
-    this.operation = 'SYSTEM.PROCESS.GET';
+    this.operation = this.shareSettings.System.Process.Get;
     return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/get/${id}`).pipe(
       catchError(this.handleError<Resp>()),
       map(res => {
@@ -72,7 +74,7 @@ export class ActionService extends BaseService {
   }
 
   Add(action: Action): Observable<Action> {
-    this.operation = 'SYSTEM.PROCESS.CREATE';
+    this.operation = this.shareSettings.System.Process.Create;
     // action.StartDate.toJSON = this.DateJsonKeepFormat;
     // action.EndDate.toJSON = this.DateJsonKeepFormat;
     return this.http.post<Resp>(AppConfig.settings.apiServer.endpoint + this.uri, JSON.stringify(action)).pipe(
@@ -89,7 +91,7 @@ export class ActionService extends BaseService {
   }
 
   Update(action: Action): Observable<Resp> {
-    this.operation = 'SYSTEM.PROCESS.UPDATE';
+    this.operation = this.shareSettings.System.Process.Update;
     return this.http.put<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/${action.Id}`, JSON.stringify(action)).pipe(
       tap(res => this.log(res)),
       catchError(this.handleError<Resp>()),
@@ -97,7 +99,7 @@ export class ActionService extends BaseService {
   }
 
   Delete(id: number): Observable<Resp> {
-    this.operation = 'SYSTEM.PROCESS.DELETE';
+    this.operation = this.shareSettings.System.Process.Delete;
     return this.http.delete<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/${id}`).pipe(
       tap(res => this.log(res)),
       catchError(this.handleError<Resp>())

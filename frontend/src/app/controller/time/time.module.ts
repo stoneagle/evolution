@@ -65,6 +65,9 @@ import { QuestSettings  } from '../../model/time/quest';
 import { TaskSettings  }  from '../../model/time/task';
 import { AreaSettings  }  from '../../model/time/area';
 
+import { ShareSettings  } from '../../shared/settings';
+import { ErrorInfo  }     from '../../shared/error';
+
 @NgModule({
   declarations: [
     QuestComponent,
@@ -132,6 +135,9 @@ import { AreaSettings  }  from '../../model/time/area';
     QuestSettings,
     TaskSettings,
     AreaSettings,
+
+    ShareSettings,
+    ErrorInfo,
   ],
   exports: [
   ]

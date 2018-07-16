@@ -6,6 +6,7 @@ import { catchError, map, tap  }    from 'rxjs/operators';
 import { AppConfig }                from '../base/config.service';
 import { MessageHandlerService  }   from '../base/message-handler.service';
 import { BaseService  }             from '../base/base.service';
+import { ShareSettings }            from '../../shared/settings';
 import { SignService  }             from '../system/sign.service';
 import { Kanban, Gantt }            from '../../model/time/syncfusion';
 import { Resp }                     from '../../model/base/resp';
@@ -18,6 +19,7 @@ export class SyncfusionService extends BaseService {
     protected http: HttpClient,
     protected messageHandlerService: MessageHandlerService,
     protected signService: SignService,
+    protected shareSettings: ShareSettings,
   ) {
     super(http, messageHandlerService);
   }
@@ -45,8 +47,8 @@ export class SyncfusionService extends BaseService {
   }
 
   ListKanban(): Observable<Kanban[]> {
-    this.resource = 'TIME.RESOURCE.TASK.CONCEPT';
-    this.operation = 'SYSTEM.PROCESS.LIST';
+    this.resource = this.shareSettings.Time.Resource.Task;
+    this.operation = this.shareSettings.System.Process.List;
     return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/list/kanban`).pipe(
       catchError(this.handleError<Resp>()),
       map(res => {
@@ -64,8 +66,8 @@ export class SyncfusionService extends BaseService {
   }
 
   ListGantt(): Observable<Gantt[]> {
-    this.resource = 'TIME.RESOURCE.QUEST.CONCEPT';
-    this.operation = 'SYSTEM.PROCESS.LIST';
+    this.resource = this.shareSettings.Time.Resource.Quest;
+    this.operation = this.shareSettings.System.Process.List;
     return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/list/gantt`).pipe(
       catchError(this.handleError<Resp>()),
       map(res => {
