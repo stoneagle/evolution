@@ -30,7 +30,7 @@
           </label>
         </div> 
         <div class="form-block">
-          <div class="form-group" *ngIf="(quest.Id) && (quest.Status != questRecruitStatus)">
+          <div class="form-group" *ngIf="(quest.Id) && (quest.Status != questSettings.Status.Recruit)">
             <label for="StartDate">{{ 'TIME.RESOURCE.QUEST.STARTDATE' | translate }}</label>
             <input type="text" ej-datepicker dateFormat="yyyy/MM/dd" id="StartDate" name="StartDate" required readonly [(ngModel)]="quest.StartDate" />
           </div>
@@ -41,7 +41,7 @@
         </div>
         <div class="form-group">
           <label for="Founder">{{ 'TIME.RESOURCE.QUEST.FOUNDER' | translate }}</label>
-          <input type="text" class="form-control" id="Founder" readonly name="Founder" value="{{ currentUser.Name }}" />
+          <input type="text" class="form-control" id="Founder" readonly name="Founder" value="{{ founderUser.Name }}" />
         </div> 
         <div class="form-group">
           <label>{{ 'TIME.RESOURCE.QUEST.MEMBERS' | translate }}</label>
@@ -53,7 +53,7 @@
             >
               <select id="Members" #Members="ngModel" [(ngModel)]="quest.Members" name="Members" required >
                 <option *ngFor="let key of _.keys(membersMap)" [ngValue]="membersMap[key]">
-                  {{ membersInfoMap[membersMap[key]] | translate }}
+                  {{ questSettings.MembersInfo[membersMap[key]] | translate }}
                 </option>
               </select>
               <span class="tooltip-content">{{ 'TIME.RESOURCE.QUEST.MEMBERS' | translate }}{{ 'SYSTEM.TOOLTIP.EMPTY' | translate }}</span>
@@ -70,7 +70,7 @@
             >
               <select id="Constraint" #Constraint="ngModel" [(ngModel)]="quest.Constraint" name="Constraint" required >
                 <option *ngFor="let key of _.keys(constraintMap)" [ngValue]="constraintMap[key]">
-                  {{ constraintInfoMap[constraintMap[key]] | translate }}
+                  {{ questSettings.ConstraintInfo[constraintMap[key]] | translate }}
                 </option>
               </select>
               <span class="tooltip-content">{{ 'TIME.RESOURCE.QUEST.CONSTRAINT' | translate }}{{ 'SYSTEM.TOOLTIP.EMPTY' | translate }}</span>
@@ -97,12 +97,12 @@
               <clr-dg-column>{{ 'TIME.RESOURCE.AREA.NAME' | translate }}</clr-dg-column>
               <clr-dg-column>{{ 'TIME.RESOURCE.GENERAL.OPERATION' | translate }}</clr-dg-column>
 
-              <clr-dg-row *ngFor="let area of targetAreas">
-                <!-- <clr-dg-cell>{{area.Id}}</clr-dg-cell> -->
-                <clr-dg-cell>{{area.Name}}</clr-dg-cell>
+              <clr-dg-row *ngFor="let questTarget of questTargets">
+                <!-- <clr-dg-cell>{{questTarget.Area.Id}}</clr-dg-cell> -->
+                <clr-dg-cell>{{questTarget.Area.Name}}</clr-dg-cell>
                 <clr-dg-cell>
                   <div class="btn-group btn-primary btn-icon">
-                    <button (click)="deleteTargetArea(area)" class="btn btn-danger">
+                    <button (click)="deleteQuestTarget(questTarget)" class="btn btn-danger">
                       <clr-icon shape="trash"></clr-icon>
                       <span class="clr-icon-title"></span>
                     </button>

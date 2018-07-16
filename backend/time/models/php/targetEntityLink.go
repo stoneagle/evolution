@@ -78,7 +78,7 @@ func (c *TargetEntityLink) Transfer(src, des *xorm.Engine, userId int) {
 	fmt.Printf("target and entity transfer success:%v\r\n", insertNum)
 }
 
-func getResourceJoin(src, des *xorm.Engine, entityId int, field int) (newResource models.ResourceJoin, err error) {
+func getResourceJoin(src, des *xorm.Engine, entityId int, field int) (newResourceJoin models.ResourceJoin, err error) {
 	var name string
 	switch field {
 	case 1:
@@ -131,13 +131,13 @@ func getResourceJoin(src, des *xorm.Engine, entityId int, field int) (newResourc
 		name = oldEntity.Name
 	}
 
-	_, err = des.Table("resource").Join("LEFT", "map_area_resource", "map_area_resource.resource_id = resource.id").Join("LEFT", "area", "area.id = map_area_resource.area_id").Where("area.field_id = ?", field).And("resource.name = ?", name).Get(&newResource)
+	_, err = des.Table("resource").Join("LEFT", "map_area_resource", "map_area_resource.resource_id = resource.id").Join("LEFT", "area", "area.id = map_area_resource.area_id").Where("area.field_id = ?", field).And("resource.name = ?", name).Get(&newResourceJoin)
 	if err != nil {
 		return
 	}
-	if newResource.Resource.Name == "" {
-		fmt.Printf("%v:%v:%v\r\n", field, name, newResource.Resource.Name)
-		errors.New(fmt.Sprintf("new resource name not exist:%v\r\n", newResource))
+	if newResourceJoin.Resource.Name == "" {
+		fmt.Printf("%v:%v:%v\r\n", field, name, newResourceJoin.Resource.Name)
+		errors.New(fmt.Sprintf("new resource name not exist:%v\r\n", newResourceJoin))
 		return
 	}
 	return

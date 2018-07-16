@@ -30,7 +30,7 @@ func (c *QuestTarget) Router(router *gin.RouterGroup) {
 	questTarget.GET("/get/:id", c.One)
 	questTarget.GET("/list", c.List)
 	questTarget.POST("", c.Add)
-	questTarget.POST("/batch", c.BatchAdd)
+	questTarget.POST("/batch", c.BatchSave)
 	questTarget.POST("/list", c.ListByCondition)
 	questTarget.PUT("/:id", c.Update)
 	questTarget.DELETE("/:id", c.Delete)
@@ -79,14 +79,14 @@ func (c *QuestTarget) Add(ctx *gin.Context) {
 	resp.Success(ctx, questTarget)
 }
 
-func (c *QuestTarget) BatchAdd(ctx *gin.Context) {
+func (c *QuestTarget) BatchSave(ctx *gin.Context) {
 	batchQuestTarget := make([]models.QuestTarget, 0)
 	if err := ctx.ShouldBindJSON(&batchQuestTarget); err != nil {
 		resp.ErrorBusiness(ctx, resp.ErrorParams, "params error: ", err)
 		return
 	}
 
-	err := c.QuestTargetSvc.BatchAdd(batchQuestTarget)
+	err := c.QuestTargetSvc.BatchSave(batchQuestTarget)
 	if err != nil {
 		resp.ErrorBusiness(ctx, resp.ErrorMysql, "questTarget batch insert error", err)
 		return

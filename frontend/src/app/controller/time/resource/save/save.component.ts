@@ -1,10 +1,9 @@
 import { Component, OnInit, Output, Input, EventEmitter } from '@angular/core'; 
 
-import { Area }             from '../../../../model/time/area';
-import { AreaService }      from '../../../../service/time/area.service';
-import { Resource }         from '../../../../model/time/resource';
-import { ResourceService  } from '../../../../service/time/resource.service';
-import { AreaType  }        from '../../../../shared/const';
+import { Area, AreaSettings } from '../../../../model/time/area';
+import { AreaService }        from '../../../../service/time/area.service';
+import { Resource }           from '../../../../model/time/resource';
+import { ResourceService  }   from '../../../../service/time/resource.service';
 
 @Component({
   selector: 'time-resource-save',
@@ -29,7 +28,7 @@ export class ResourceSaveComponent implements OnInit {
     this.resource = new Resource();
     this.resource.Area = new Area();
     let area = new Area();
-    area.Type = AreaType.Leaf; 
+    area.Type = AreaSettings.Type.Leaf; 
     this.areaService.ListWithCondition(area).subscribe(res => {
       this.areas = res;
     })

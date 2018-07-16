@@ -4,16 +4,19 @@ import * as _                                                         from 'loda
 import { NgForm  }                                                    from '@angular/forms';
 import { EJ_SCHEDULE_COMPONENTS }       from 'ej-angular2/src/ej/schedule.component';
 
-import { SessionUser }                    from '../../../../model/base/sign';
-import { Quest, QuestTarget, QuestTeam, } from '../../../../model/time/quest';
-import { Area }                           from '../../../../model/time/area';
+import { User }                                        from '../../../../model/system/user';
+import { Quest, QuestTarget, QuestTeam, QuestSettings} from '../../../../model/time/quest';
+import { Area }                                        from '../../../../model/time/area';
+import { Project }                                     from '../../../../model/time/project';
 
-import { QuestService  }         from '../../../../service/time/quest.service';
-import { QuestTargetService  }   from '../../../../service/time/quest-target.service';
-import { QuestTeamService  }     from '../../../../service/time/quest-team.service';
-import { SignService  }          from '../../../../service/system/sign.service';
-import { Quest as QuestConst }   from '../../../../shared/const';
-import { AreaTreeGridComponent } from '../../area/tree-grid/tree-grid.component';
+import { QuestService  }              from '../../../../service/time/quest.service';
+import { ProjectService  }            from '../../../../service/time/project.service';
+import { QuestTargetService  }        from '../../../../service/time/quest-target.service';
+import { QuestTeamService  }          from '../../../../service/time/quest-team.service';
+import { UserService  }               from '../../../../service/system/user.service';
+import { MessageHandlerService  }     from '../../../../service/base/message-handler.service';
+import { InternationalConfig as N18 } from '../../../../service/base/international.service';
+import { AreaTreeGridComponent }      from '../../area/tree-grid/tree-grid.component';
 
 
 @Component({
@@ -25,9 +28,12 @@ import { AreaTreeGridComponent } from '../../area/tree-grid/tree-grid.component'
 export class QuestSaveComponent implements OnInit {
   constructor(
     private questService: QuestService,
+    private projectService: ProjectService,
     private questTargetService: QuestTargetService,
     private questTeamService: QuestTeamService,
-    private signService: SignService,
+    private userService: UserService,
+    private questSettings: QuestSettings,
+    private messageHandlerService: MessageHandlerService,
   ) { 
   }
 
@@ -38,103 +44,107 @@ export class QuestSaveComponent implements OnInit {
   @ViewChild(AreaTreeGridComponent) 
   areaTreeGrid: AreaTreeGridComponent;
 
-  currentUser: SessionUser = new SessionUser();
-  quest: Quest             = new Quest;
-  targets: QuestTarget[]   = [];
-  targetAreas: Area[]      = [];
-  teams: QuestTeam[]       = [];
+  founderUser: User           = new User();
+  quest: Quest                = new Quest;
+  questTargets: QuestTarget[] = [];
+  teams: QuestTeam[]          = [];
 
   _: any = _;
 
-  membersMap         = QuestConst.Members;
-  membersInfoMap     = QuestConst.MembersInfo;
-  constraintMap      = QuestConst.Constraint;
-  constraintInfoMap  = QuestConst.ConstraintInfo;
-  questRecruitStatus = QuestConst.Status.Recruit;
+  membersMap         = this.questSettings.Members;
+  constraintMap      = this.questSettings.Constraint;
 
   modelOpened: boolean = false;
-
   @Output() save = new EventEmitter<boolean>();
 
   ngOnInit() {
   }
 
-  New(id?: number): void {
+  New(userId: number, id?: number): void {
     this.wizard.reset();
-    this.signService.current().subscribe( res=> {
-      this.currentUser = res;
+    this.userService.Get(userId).subscribe(user => {
+      this.founderUser = user;
     });
     if (id) {
       this.questService.Get(id).subscribe(res => {
         this.quest = res;
-
         let questTarget = new QuestTarget();
         questTarget.QuestId = this.quest.Id;
-        this.targetAreas = []; 
+        this.questTargets = []; 
         this.questTargetService.ListWithCondition(questTarget).subscribe(res => {
           res.forEach((target, k) => {
-            this.targetAreas.push(target.Area);
+            this.questTargets.push(target);
           });
         });
-
         this.modelOpened = true;
       })
     } else {
-      this.quest = new Quest();
-      this.targetAreas = [];
-      this.modelOpened = true;
+      this.quest        = new Quest();
+      this.questTargets = [];
+      this.modelOpened  = true;
     }
   }            
 
   addTargetArea($event: Area) {
     if ($event.Id != undefined) {
       let addFlag = true;
-      this.targetAreas.forEach((one, k) => {
-        if (one.Id == $event.Id) {
+      this.questTargets.forEach((one, k) => {
+        if (one.Area.Id == $event.Id) {
           addFlag = false;
           return;
         }
       });
       if (addFlag) {
-        this.targetAreas.push($event);
+        let questTarget = new QuestTarget();
+        questTarget.QuestId = this.quest.Id;
+        questTarget.AreaId = $event.Id;
+        questTarget.Area = $event;
+        this.questTargets.push(questTarget);
       }
     }
   }
 
-  deleteTargetArea(area: Area) {
-    this.targetAreas.forEach( (one, k) => {
-      if (one.Id === area.Id) {
-        this.targetAreas.splice(k, 1); 
+  deleteQuestTarget(questTarget: QuestTarget) {
+    this.questTargets.forEach((one, k) => {
+      if (one.AreaId === questTarget.AreaId) {
+        if ((one.QuestId != undefined) && (one.Status == this.questSettings.TargetStatus.Wait)) {
+          this.messageHandlerService.showWarning(
+            N18.settings.TIME.RESOURCE.QUEST.CONCEPT, 
+            N18.settings.SYSTEM.PROCESS.UPDATE, 
+            N18.settings.TIME.RESOURCE.QUEST.ERROR.TARGET_NOT_FINISH
+          );
+          return;
+        }
+        this.questTargets.splice(k, 1); 
         return;
       }
     });
   }
 
   onTargetCommit(): void {
-    if (this.targetAreas.length <= 0) {
+    if (this.questTargets.length <= 0) {
       return;
     }
-    if (this.targetAreas.length >= 5) {
+    if (this.questTargets.length >= 10) {
       return;
     }
-    this.wizard.forceNext();
+    // TODO 新增quest其他配置后再支持
+    // this.wizard.forceNext();
   }
 
   finish(): void {
     this.quest.EndDate = new Date(this.quest.EndDate);
-    this.quest.FounderId = this.currentUser.Id;
+    this.quest.FounderId = this.founderUser.Id;
     if (this.quest.Id == null) {
-      this.quest.Status = QuestConst.Status.Recruit; 
+      this.quest.Status = this.questSettings.Status.Recruit; 
       this.questService.Add(this.quest).subscribe(res => {
-        if (res.Id != undefined) {
-          this.saveQuestTarget(res.Id);
-          this.saveQuestTeamFounder(res.Id, res.EndDate);
-        }
+        this.saveQuestTarget(res.Id);
+        this.saveQuestTeamFounder(res.Id, res.EndDate);
         this.modelOpened = false;
         this.save.emit(true);
       })
     } else {
-      if (this.quest.Status != QuestConst.Status.Recruit) {
+      if (this.quest.Status != this.questSettings.Status.Recruit) {
         this.quest.StartDate = new Date(this.quest.StartDate);
       }
       this.questService.Update(this.quest).subscribe(res => {
@@ -147,14 +157,10 @@ export class QuestSaveComponent implements OnInit {
 
   saveQuestTarget(questId: number): void {
     let questTargets: QuestTarget[] = [];
-    this.targetAreas.forEach((one, k) => {
-      let questTarget = new QuestTarget();
-      questTarget.QuestId = questId;
-      questTarget.AreaId = one.Id;
-      questTarget.Status = QuestConst.TargetStatus.Wait;
-      questTargets.push(questTarget);
-    })
-    this.questTargetService.BatchAdd(questTargets).subscribe(res => {
+    for (let k in this.questTargets) {
+      this.questTargets[k].QuestId = questId;
+    }
+    this.questTargetService.BatchSave(questTargets).subscribe(res => {
     })
   }
 
@@ -163,7 +169,7 @@ export class QuestSaveComponent implements OnInit {
     questTeam.QuestId = questId;
     questTeam.StartDate = new Date();
     questTeam.EndDate = endDate; 
-    questTeam.UserId = this.currentUser.Id; 
+    questTeam.UserId = this.founderUser.Id; 
     this.questTeamService.Add(questTeam).subscribe(res => {
     });
   }

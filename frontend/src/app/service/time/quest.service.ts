@@ -1,13 +1,14 @@
-import { Injectable }               from '@angular/core';
-import { HttpClient, HttpHeaders  } from '@angular/common/http';
-import { Observable }               from 'rxjs';
-import { of }                       from 'rxjs/observable/of';
-import { catchError, map, tap  }    from 'rxjs/operators';
-import { AppConfig }                from '../base/config.service';
-import { MessageHandlerService  }   from '../base/message-handler.service';
-import { BaseService  }             from '../base/base.service';
-import { Quest }                    from '../../model/time/quest';
-import { Resp }                     from '../../model/base/resp';
+import { Injectable }                                     from '@angular/core';
+import { HttpClient, HttpHeaders  }                       from '@angular/common/http';
+import { Observable }                                     from 'rxjs';
+import { of }                                             from 'rxjs/observable/of';
+import { catchError, map, tap  }                          from 'rxjs/operators';
+import { AppConfig }                                      from '../base/config.service';
+import { InternationalConfig as N18 }                     from '../base/international.service';
+import { MessageHandlerService  }                         from '../base/message-handler.service';
+import { BaseService  }                                   from '../base/base.service';
+import { Quest, QuestTarget }                             from '../../model/time/quest';
+import { Resp }                                           from '../../model/base/resp';
 
 @Injectable()
 export class QuestService extends BaseService {
@@ -18,11 +19,11 @@ export class QuestService extends BaseService {
     protected messageHandlerService: MessageHandlerService,
   ) {
     super(http, messageHandlerService);
-    this.resource = 'TIME.RESOURCE.QUEST.CONCEPT';
+    this.resource = N18.settings.TIME.RESOURCE.QUEST.CONCEPT;
   }
 
   List(): Observable<Quest[]> {
-    this.operation = 'SYSTEM.PROCESS.LIST';
+    this.operation = N18.settings.SYSTEM.PROCESS.LIST;
     return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`).pipe(
       catchError(this.handleError<Resp>()),
       map(res => {
@@ -40,7 +41,7 @@ export class QuestService extends BaseService {
   }
 
   ListWithCondition(quest: Quest): Observable<Quest[]> {
-    this.operation = 'SYSTEM.PROCESS.LIST';
+    this.operation = N18.settings.SYSTEM.PROCESS.LIST;
     return this.http.post<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`, JSON.stringify(quest)).pipe(
       catchError(this.handleError<Resp>()),
       map(res => {
@@ -58,7 +59,7 @@ export class QuestService extends BaseService {
   }
 
   Get(id: number): Observable<Quest> {
-    this.operation = 'SYSTEM.PROCESS.GET';
+    this.operation = N18.settings.SYSTEM.PROCESS.LIST;
     return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/get/${id}`).pipe(
       catchError(this.handleError<Resp>()),
       map(res => {
@@ -72,7 +73,7 @@ export class QuestService extends BaseService {
   }
 
   Add(quest: Quest): Observable<Quest> {
-    this.operation = 'SYSTEM.PROCESS.CREATE';
+    this.operation = N18.settings.SYSTEM.PROCESS.CREATE;
     return this.http.post<Resp>(AppConfig.settings.apiServer.endpoint + this.uri, JSON.stringify(quest)).pipe(
       tap(res => this.log(res)),
       catchError(this.handleError<Resp>()),
@@ -87,7 +88,7 @@ export class QuestService extends BaseService {
   }
 
   Update(quest: Quest): Observable<Resp> {
-    this.operation = 'SYSTEM.PROCESS.UPDATE';
+    this.operation = N18.settings.SYSTEM.PROCESS.UPDATE;
     return this.http.put<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/${quest.Id}`, JSON.stringify(quest)).pipe(
       tap(res => this.log(res)),
       catchError(this.handleError<Resp>()),

@@ -1,13 +1,14 @@
-import { NgModule }                     from '@angular/core';
-import { BrowserModule }                from '@angular/platform-browser';
-import { BrowserAnimationsModule   }    from '@angular/platform-browser/animations';
-import { HttpClientModule  }            from '@angular/common/http';
-import { HttpModule   }                 from '@angular/http';
-import { FormsModule }                  from '@angular/forms';
-import { ClarityModule  }               from "@clr/angular";
-import { TranslateModule  }             from "@ngx-translate/core";
-import { NgSelectModule  }              from '@ng-select/ng-select';
-import { TreeModule }                   from 'ng2-tree';
+import { NgModule }                  from '@angular/core';
+import { BrowserModule }             from '@angular/platform-browser';
+import { BrowserAnimationsModule   } from '@angular/platform-browser/animations';
+import { HttpClientModule  }         from '@angular/common/http';
+import { HttpModule   }              from '@angular/http';
+import { FormsModule }               from '@angular/forms';
+import { ClarityModule  }            from "@clr/angular";
+import { TranslateModule  }          from "@ngx-translate/core";
+import { NgSelectModule  }           from '@ng-select/ng-select';
+import { TreeModule }                from 'ng2-tree';
+
 import { EJ_GANTT_COMPONENTS }          from 'ej-angular2/src/ej/gantt.component';
 import { EJ_TREEGRID_COMPONENTS }       from 'ej-angular2/src/ej/treegrid.component';
 import { EJ_SCHEDULE_COMPONENTS }       from 'ej-angular2/src/ej/schedule.component';
@@ -59,6 +60,10 @@ import { AreaService }            from '../../service/time/area.service';
 import { UserResourceService }    from '../../service/time/user-resource.service';
 import { SyncfusionService }      from '../../service/time/syncfusion.service';
 import { MessageHandlerService  } from '../../service/base/message-handler.service';
+
+import { QuestSettings  } from '../../model/time/quest';
+import { TaskSettings  }  from '../../model/time/task';
+import { AreaSettings  }  from '../../model/time/area';
 
 @NgModule({
   declarations: [
@@ -123,6 +128,10 @@ import { MessageHandlerService  } from '../../service/base/message-handler.servi
     UserResourceService,
     SyncfusionService,
     MessageHandlerService,
+
+    QuestSettings,
+    TaskSettings,
+    AreaSettings,
   ],
   exports: [
   ]

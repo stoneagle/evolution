@@ -55,7 +55,7 @@
         "ENDDATE": "结束时间",
         "DURATION": "持续时间",
         "STATUS": "状态",
-        "STATUS-NAME": {
+        "STATUS_NAME": {
           "BACKLOG": "未分配",
           "TODO": "等待中",
           "PROGRESS": "进行中",
@@ -88,67 +88,70 @@
         "MEMBERS": "成员数量",
         "CONSTRAINT": "优先级",
         "STATUS": "状态",
-        "STATUS-NAME": {
+        "ERROR": {
+          "TARGET_NOT_FINISH": "目标未完成"
+        },
+        "STATUS_NAME": {
           "RECRUIT": "招募中",
           "EXEC": "执行中",
           "FINISH": "已完成",
           "FAIL": "已放弃"
         },
-        "MEMBERS-NAME": {
+        "MEMBERS_NAME": {
           "ONE": "单人",
           "SMALL": "小型5人",
           "MIDDLE": "中型25人",
           "LARGE": "大型100人"
         },
-        "CONSTRAINT-NAME": {
-          "IMPORTANT-BUSY": "重要且紧急",
+        "CONSTRAINT_NAME": {
+          "IMPORTANT_BUSY": "重要且紧急",
           "IMPORTANT": "重要",
           "BUSY": "紧急",
           "NORMAL": "日常"
         }
       },
-      "QUEST-TEAM": {
+      "QUEST_TEAM": {
         "CONCEPT": "远征团队",
         "QUEST": "所属团队",
         "STARTDATE": "参与开始日期",
         "ENDDATE": "参与结束日期",
         "USER": "成员"
       },
-      "QUEST-TIMETABLE": {
+      "QUEST_TIMETABLE": {
         "CONCEPT": "远征出席时间",
         "QUEST": "所属团队",
         "STARTTIME": "开始时间",
         "ENDDATE": "结束时间",
         "TYPE": "类别",
-        "TYPE-NAME": {
+        "TYPE_NAME": {
           "WORKDAY": "工作日",
           "HOLIDAY": "节假日"
         } 
       },
-      "QUEST-TARGET": {
+      "QUEST_TARGET": {
         "CONCEPT": "远征目标",
         "QUEST": "所属团队",
         "RESOURCE": "目标资源",
         "DESC": "描述",
         "STATUS": "状态",
-        "STATUS-NAME": {
+        "STATUS_NAME": {
           "WAIT": "未完成",
           "FINISH": "已完成"
         } 
       },
-      "QUEST-RESOURCE": {
+      "QUEST_RESOURCE": {
         "CONCEPT": "远征依赖资源",
         "QUEST": "所属团队",
         "RESOURCE": "要求资源",
         "DESC": "描述",
         "NUMBER": "数量",
         "STATUS": "状态",
-        "STATUS-NAME": {
+        "STATUS_NAME": {
           "WAIT": "未匹配",
           "FINISH": "已匹配"
         } 
       },
-      "USER-RESOURCE": {
+      "USER_RESOURCE": {
         "CONCEPT": "资源",
         "USER": "所属用户",
         "TIME": "投入时间"

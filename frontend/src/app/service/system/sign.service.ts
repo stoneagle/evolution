@@ -22,6 +22,7 @@ export class SignService extends BaseService {
   ) { 
     super(http, messageHandlerService);
     this.resource = 'SYSTEM.RESOURCE.USER.CONCEPT';
+    this.current();
   }
 
   currentUser: SessionUser = new SessionUser();
@@ -83,6 +84,7 @@ export class SignService extends BaseService {
         }
 
         this.currentUser = new SessionUser(resp.data);
+        console.log(AppConfig.settings.apiServer.auth.type);
         switch (AppConfig.settings.apiServer.auth.type) {
           case AuthType.BasicAuthJwt:
             if (res.headers == undefined) {
@@ -95,6 +97,8 @@ export class SignService extends BaseService {
                 path: "/",
                 expires: date
             };
+            console.log(AppConfig.settings.apiServer.auth.token);
+            console.log(token);
             this.cookieService.put(AppConfig.settings.apiServer.auth.token, token, cookieOptions);
             break;
         }

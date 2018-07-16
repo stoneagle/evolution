@@ -1,4 +1,4 @@
-import { Comparator, State } from 'clarity-angular';
+import { Comparator, State }          from 'clarity-angular';
 
 export class CustomComparator<T> implements Comparator<T> {
   fieldName: string;

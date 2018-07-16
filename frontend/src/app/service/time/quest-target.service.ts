@@ -86,7 +86,7 @@ export class QuestTargetService extends BaseService {
     );
   }
 
-  BatchAdd(questTargets: QuestTarget[]): Observable<Boolean> {
+  BatchSave(questTargets: QuestTarget[]): Observable<Boolean> {
     this.operation = 'SYSTEM.PROCESS.CREATE';
     return this.http.post<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/batch`, JSON.stringify(questTargets)).pipe(
       tap(res => this.log(res)),

@@ -18,23 +18,23 @@
   <clr-dg-row *ngFor="let quest of quests">
     <!-- <clr-dg-cell>{{quest.Id}}</clr-dg-cell> -->
     <clr-dg-cell>{{quest.Name}}</clr-dg-cell>
-    <clr-dg-cell>{{quest.Members}}</clr-dg-cell>
-    <clr-dg-cell>{{constraintInfoMap[quest.Constraint] | translate}}</clr-dg-cell>
-    <clr-dg-cell>{{statusInfoMap[quest.Status] | translate}}</clr-dg-cell>
-    <clr-dg-cell>{{(quest.Status == recruitStatus) ? ('-') : (quest.StartDate | date: 'yyyy-MM-dd') }}</clr-dg-cell>
+    <clr-dg-cell>{{this.questSettings.MembersInfo[quest.Members]}}</clr-dg-cell>
+    <clr-dg-cell>{{this.questSettings.ConstraintInfo[quest.Constraint]}}</clr-dg-cell>
+    <clr-dg-cell>{{this.questSettings.StatusInfo[quest.Status]}}</clr-dg-cell>
+    <clr-dg-cell>{{(quest.Status == questSettings.Status.Recruit) ? ('-') : (quest.StartDate | date: 'yyyy-MM-dd') }}</clr-dg-cell>
     <clr-dg-cell>{{quest.EndDate | date: 'yyyy-MM-dd' }}</clr-dg-cell>
     <clr-dg-cell>{{quest.CreatedAt | date: 'yy-MM-dd HH:mm:ss'}}</clr-dg-cell>
     <clr-dg-cell>
       <div class="btn-group btn-primary btn-icon">
-        <button *ngIf="(quest.Status == recruitStatus)" (click)="exec(quest)" class="btn">
+        <button *ngIf="(quest.Status == questSettings.Status.Recruit) || (quest.Status == questSettings.Status.Fail)" (click)="exec(quest)" class="btn">
           <clr-icon shape="play"></clr-icon>
           <span class="clr-icon-title"></span>
         </button>
-        <button *ngIf="(quest.Status == execStatus)" (click)="finish(quest)" class="btn btn-success">
+        <button *ngIf="(quest.Status == questSettings.Status.Exec)" (click)="finish(quest)" class="btn btn-success">
           <clr-icon shape="check"></clr-icon>
           <span class="clr-icon-title"></span>
         </button>
-        <button (click)="openSaveModel(quest.Id)" class="btn">
+        <button (click)="openSaveModel(quest)" class="btn">
           <clr-icon shape="wrench"></clr-icon>
           <span class="clr-icon-title"></span>
         </button>
@@ -42,11 +42,11 @@
           <clr-icon shape="users"></clr-icon>
           <span class="clr-icon-title"></span>
         </button>
-        <button *ngIf="(quest.Status == execStatus)" (click)="fail(quest)" class="btn btn-danger">
+        <button *ngIf="(quest.Status == questSettings.Status.Exec)" (click)="fail(quest)" class="btn btn-danger">
           <clr-icon shape="ban"></clr-icon>
           <span class="clr-icon-title"></span>
         </button>
-        <button *ngIf="(quest.Status == recruitStatus)" (click)="delete(quest)" class="btn btn-danger">
+        <button *ngIf="(quest.Status == questSettings.Status.Recruit) || (quest.Status == questSettings.Status.Fail)" (click)="delete(quest)" class="btn btn-danger">
           <clr-icon shape="trash"></clr-icon>
           <span class="clr-icon-title"></span>
         </button>

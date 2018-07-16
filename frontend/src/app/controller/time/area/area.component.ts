@@ -1,9 +1,8 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { TreeModel, TreeModelSettings, NodeEvent } from 'ng2-tree';
 
-import { Area }                  from '../../../model/time/area';
-import { AreaService }           from '../../../service/time/area.service';
-import { AreaType }              from '../../../shared/const';
+import { Area }        from '../../../model/time/area';
+import { AreaService } from '../../../service/time/area.service';
 
 import { ResourceListComponent } from '../resource//list/list.component';
 import { AreaNg2TreeComponent }  from './ng2-tree/ng2-tree.component';

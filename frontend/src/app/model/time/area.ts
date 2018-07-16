@@ -8,3 +8,11 @@ export class Area extends Basic {
   Type: number;
   Resources: Resource[];
 }
+
+export class AreaSettings {
+  public static Type = {
+    Root: 1,
+    Node: 2,
+    Leaf: 3,
+  }
+}

@@ -1,11 +1,10 @@
 import { Component, OnInit, Input, Output, ViewChild, EventEmitter  } from '@angular/core';
 import { TreeModel, TreeModelSettings, NodeEvent }                    from 'ng2-tree';
 
-import { Area }         from '../../../../model/time/area';
-import { AreaService }  from '../../../../service/time/area.service';
-import { Resource }     from '../../../../model/time/resource';
-import { FieldService } from '../../../../service/time/field.service';
-import { AreaType }     from '../../../../shared/const';
+import { Area, AreaSettings } from '../../../../model/time/area';
+import { AreaService }        from '../../../../service/time/area.service';
+import { Resource }           from '../../../../model/time/resource';
+import { FieldService }       from '../../../../service/time/field.service';
 
 import { ResourceSaveComponent }            from '../../resource/save/save.component';
 
@@ -71,7 +70,7 @@ export class AreaNg2TreeComponent implements OnInit {
     };
     tree.settings = new TreeModelSettings();
     tree.settings.isCollapsedOnInit = true; 
-    if (one.Type == AreaType.Leaf) {
+    if (one.Type == AreaSettings.Type.Leaf) {
       tree.settings.menuItems = [
         { action: 0, name: '新节点', cssClass: 'fa fa-arrow-right' },
         { action: 2, name: '重命名', cssClass: 'fa fa-arrow-right' },

@@ -1,13 +1,12 @@
 import { Component, OnInit, Input, ViewChild } from '@angular/core';
 import { EJ_KANBAN_COMPONENTS }                from 'ej-angular2/src/ej/kanban.component';
-import { TranslateService }                    from '@ngx-translate/core';
 
-import { Task }              from '../../../../model/time/task';
-import { Kanban }            from '../../../../model/time/syncfusion';
-import { TaskService }       from '../../../../service/time/task.service';
-import { SyncfusionService } from '../../../../service/time/syncfusion.service';
-import { FieldService }      from '../../../../service/time/field.service';
-import { Task as TaskConst } from '../../../../shared/const';
+import { Task, TaskSettings }         from '../../../../model/time/task';
+import { Kanban }                     from '../../../../model/time/syncfusion';
+import { TaskService }                from '../../../../service/time/task.service';
+import { SyncfusionService }          from '../../../../service/time/syncfusion.service';
+import { FieldService }               from '../../../../service/time/field.service';
+import { InternationalConfig as N18 } from '../../../../service/base/international.service';
 
 import { TaskSaveComponent }   from '../save/save.component';
 
@@ -36,9 +35,9 @@ export class TaskKanbanComponent implements OnInit {
 
   constructor(
     private taskService: TaskService,
-    private translateService: TranslateService,
     private fieldService: FieldService,
     private syncfusionService: SyncfusionService,
+    private taskSettings: TaskSettings,
   ) { }
 
   ngOnInit() {
@@ -77,64 +76,64 @@ export class TaskKanbanComponent implements OnInit {
     }
     this.kanbanWorkflow =  [
       { 
-        key: TaskConst.StatusName[TaskConst.Status.Backlog], 
-        allowedTransitions: TaskConst.StatusName[TaskConst.Status.Todo] + "," + TaskConst.StatusName[TaskConst.Status.Progress]
+        key: this.taskSettings.StatusName[this.taskSettings.Status.Backlog], 
+        allowedTransitions: this.taskSettings.StatusName[this.taskSettings.Status.Todo] + "," + this.taskSettings.StatusName[this.taskSettings.Status.Progress]
       },
       { 
-        key: TaskConst.StatusName[TaskConst.Status.Todo], 
-        allowedTransitions: TaskConst.StatusName[TaskConst.Status.Backlog] + "," + TaskConst.StatusName[TaskConst.Status.Progress]
+        key: this.taskSettings.StatusName[this.taskSettings.Status.Todo], 
+        allowedTransitions: this.taskSettings.StatusName[this.taskSettings.Status.Backlog] + "," + this.taskSettings.StatusName[this.taskSettings.Status.Progress]
       },
       { 
-        key: TaskConst.StatusName[TaskConst.Status.Progress], 
-        allowedTransitions: TaskConst.StatusName[TaskConst.Status.Todo] + "," + TaskConst.StatusName[TaskConst.Status.Done]
+        key: this.taskSettings.StatusName[this.taskSettings.Status.Progress], 
+        allowedTransitions: this.taskSettings.StatusName[this.taskSettings.Status.Todo] + "," + this.taskSettings.StatusName[this.taskSettings.Status.Done]
       },
     ]
-    this.translateService.get('TIME.RESOURCE.TASK.CONCEPT').subscribe(taskName => {
-      this.kanbanColumns = [
-        { 
-          headerText: this.translateService.instant(TaskConst.StatusInfo[TaskConst.Status.Backlog]), 
-          key: TaskConst.StatusName[TaskConst.Status.Backlog],
-          totalCount: { text: taskName },
-          isCollapsed: true,
-        },
-        { 
-          headerText: this.translateService.instant(TaskConst.StatusInfo[TaskConst.Status.Todo]), 
-          key: TaskConst.StatusName[TaskConst.Status.Todo],
-          constraints: { 
-            max: this.kanbanConstraint,
-          }, 
-          totalCount: { text: taskName },
-        },
-        { 
-          headerText: this.translateService.instant(TaskConst.StatusInfo[TaskConst.Status.Progress]), 
-          key: TaskConst.StatusName[TaskConst.Status.Progress],
-          constraints: { 
-            max: this.kanbanConstraint,
-          }, 
-          totalCount: { text: taskName },
-        },
-        { 
-          headerText: this.translateService.instant(TaskConst.StatusInfo[TaskConst.Status.Done]), 
-          key: TaskConst.StatusName[TaskConst.Status.Done],
-          totalCount: { text: taskName },
-        }
-      ]
 
-      let processCreate = this.translateService.instant('SYSTEM.PROCESS.CREATE');
-      let processUpdate = this.translateService.instant('SYSTEM.PROCESS.UPDATE');
-      let processDelete = this.translateService.instant('SYSTEM.PROCESS.DELETE');
-      this.kanbanCustomMenuItems = [
-        // {
-        //   text: processCreate + taskName,
-        // },
-        {
-          text: processUpdate + taskName,
-        },
-        {
-          text: processDelete + taskName,
-        },
-      ]
-    });
+    let taskName = N18.settings.TIME.RESOURCE.TASK.CONCEPT;
+    this.kanbanColumns = [
+      { 
+        headerText: this.taskSettings.StatusInfo[this.taskSettings.Status.Backlog], 
+        key: this.taskSettings.StatusName[this.taskSettings.Status.Backlog],
+        totalCount: { text: taskName },
+        isCollapsed: true,
+      },
+      { 
+        headerText: this.taskSettings.StatusInfo[this.taskSettings.Status.Todo], 
+        key: this.taskSettings.StatusName[this.taskSettings.Status.Todo],
+        constraints: { 
+          max: this.kanbanConstraint,
+        }, 
+        totalCount: { text: taskName },
+      },
+      { 
+        headerText: this.taskSettings.StatusInfo[this.taskSettings.Status.Progress], 
+        key: this.taskSettings.StatusName[this.taskSettings.Status.Progress],
+        constraints: { 
+          max: this.kanbanConstraint,
+        }, 
+        totalCount: { text: taskName },
+      },
+      { 
+        headerText: this.taskSettings.StatusInfo[this.taskSettings.Status.Done], 
+        key: this.taskSettings.StatusName[this.taskSettings.Status.Done],
+        totalCount: { text: taskName },
+      }
+    ]
+
+    let processCreate = N18.settings.SYSTEM.PROCESS.CREATE;
+    let processUpdate = N18.settings.SYSTEM.PROCESS.UPDATE;
+    let processDelete = N18.settings.SYSTEM.PROCESS.DELETE;
+    this.kanbanCustomMenuItems = [
+      // {
+      //   text: processCreate + taskName,
+      // },
+      {
+        text: processUpdate + taskName,
+      },
+      {
+        text: processDelete + taskName,
+      },
+    ]
   }
 
   onContextOpen($event): void {
@@ -144,10 +143,10 @@ export class TaskKanbanComponent implements OnInit {
   }
 
   onContextClick($event): void {
-    let taskName = this.translateService.instant('TIME.RESOURCE.TASK.CONCEPT');
-    let processCreate = this.translateService.instant('SYSTEM.PROCESS.CREATE');
-    let processUpdate = this.translateService.instant('SYSTEM.PROCESS.UPDATE');
-    let processDelete = this.translateService.instant('SYSTEM.PROCESS.DELETE');
+    let taskName      = N18.settings.TIME.RESOURCE.TASK.CONCEPT;
+    let processCreate = N18.settings.SYSTEM.PROCESS.CREATE;
+    let processUpdate = N18.settings.SYSTEM.PROCESS.UPDATE;
+    let processDelete = N18.settings.SYSTEM.PROCESS.DELETE;
     switch ($event.text) {
       case processUpdate + taskName:
         this.taskSaveComponent.New($event.cardData.ProjectId, $event.cardData.Id);
@@ -172,7 +171,7 @@ export class TaskKanbanComponent implements OnInit {
     let tagsArray = this.updateBeforeTag.split(",");
     tagsArray[2] = $event.Resource.Name;
     let kanbanObj = $("#" + this.kanbanId).data("ejKanban"); 
-    kanbanObj.updateCard(TaskConst.StatusName[$event.Status], [{
+    kanbanObj.updateCard(this.taskSettings.StatusName[$event.Status], [{
       Id: $event.Id, 
       Name: $event.Name, 
       Desc: $event.Desc, 
@@ -181,7 +180,7 @@ export class TaskKanbanComponent implements OnInit {
   }
 
   onTaskDrop($event): void {
-    let statusNameMap = TaskConst.StatusName
+    let statusNameMap = this.taskSettings.StatusName
     if ($event.data.length == 0) {
       return
     }
@@ -192,19 +191,19 @@ export class TaskKanbanComponent implements OnInit {
         task.Status = +key;
 
         // source status
-        if ($event.data[0].Status == TaskConst.Status.Backlog) {
+        if ($event.data[0].Status == this.taskSettings.Status.Backlog) {
           task.StartDate = new Date();
         }
-        if ($event.data[0].Status == TaskConst.Status.Done) {
+        if ($event.data[0].Status == this.taskSettings.Status.Done) {
           task.EndDateReset = true;
           task.Duration = 0;
         }
 
         // target status
-        if (+key == TaskConst.Status.Backlog) {
+        if (+key == this.taskSettings.Status.Backlog) {
           task.StartDateReset = true;
         }
-        if (+key == TaskConst.Status.Done) {
+        if (+key == this.taskSettings.Status.Done) {
           task.EndDate = new Date();
         }
         this.taskService.Update(task).subscribe(res => {

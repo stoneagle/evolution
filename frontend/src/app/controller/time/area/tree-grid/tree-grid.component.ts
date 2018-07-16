@@ -1,13 +1,12 @@
 import { Component, OnInit, Output, ViewChild, EventEmitter } from '@angular/core';
 import { EJ_TREEGRID_COMPONENTS }       from 'ej-angular2/src/ej/treegrid.component';
 
-import { Area }              from '../../../../model/time/area';
-import { TreeGrid }          from '../../../../model/time/syncfusion';
-import { AreaService }       from '../../../../service/time/area.service';
-import { FieldService }      from '../../../../service/time/field.service';
-import { SyncfusionService } from '../../../../service/time/syncfusion.service';
-import { SignService }       from '../../../../service/system/sign.service';
-import { AreaType }          from '../../../../shared/const';
+import { Area, AreaSettings } from '../../../../model/time/area';
+import { TreeGrid }           from '../../../../model/time/syncfusion';
+import { AreaService }        from '../../../../service/time/area.service';
+import { FieldService }       from '../../../../service/time/field.service';
+import { SyncfusionService }  from '../../../../service/time/syncfusion.service';
+import { SignService }        from '../../../../service/system/sign.service';
 
 @Component({
   selector: 'time-area-tree-grid',
@@ -60,7 +59,7 @@ export class AreaTreeGridComponent implements OnInit {
       area.Id      = $event.data.Id
       area.Name    = $event.data.Name
       area.FieldId = this.currentFieldId
-      area.Type    = AreaType.Leaf
+      area.Type    = AreaSettings.Type.Leaf
       this.selectArea.emit(area);
     }
   }
