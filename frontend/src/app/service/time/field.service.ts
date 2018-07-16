@@ -3,103 +3,65 @@ import { HttpClient, HttpHeaders  } from '@angular/common/http';
 import { Observable }               from 'rxjs';
 import { of }                       from 'rxjs/observable/of';
 import { catchError, map, tap  }    from 'rxjs/operators';
-import { AppConfig }                from '../base/config.service';
 import { MessageHandlerService  }   from '../base/message-handler.service';
-import { ShareSettings }            from '../../shared/settings';
 import { BaseService  }             from '../base/base.service';
 import { Field }                    from '../../model/time/field';
 import { Resp }                     from '../../model/base/resp';
 
 @Injectable()
 export class FieldService extends BaseService {
-  private uri = AppConfig.settings.apiServer.prefix.time + '/field';
-
   constructor(
     protected http: HttpClient,
     protected messageHandlerService: MessageHandlerService,
-    protected shareSettings: ShareSettings,
   ) {
     super(http, messageHandlerService);
     this.resource = this.shareSettings.Time.Resource.Field;
-  }
-
-  List(): Observable<Field[]> {
-    this.operation = this.shareSettings.System.Process.List;
-    return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`).pipe(
-      catchError(this.handleError<Resp>()),
-      map(res => {
-        let ret:Field[] = []; 
-        if (res && res.code == 0) {
-          res.data.map(
-            one => {
-              ret.push(new Field(one));
-            }
-          )
-        }
-        return ret; 
-      }),
-    )
+    this.uri = this.appSettings.apiServer.endpoint + this.appSettings.apiServer.prefix.time + '/field';
   }
 
   Map(): Observable<Map<number, string>> {
-    this.operation = this.shareSettings.System.Process.List;
-    return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`).pipe(
-      catchError(this.handleError<Resp>()),
-      map(res => {
-        let ret:Map<number, string> = new Map(); 
-        if (res && res.code == 0) {
-          res.data.map(
-            one => {
-              ret.set(one.Id, one.Name);
-            }
-          )
-        }
-        return ret; 
-      }),
-    )
+    return this.BaseList<Field>(Field, this.uri + `/list`).pipe(map(fields => {
+      let ret:Map<number, string> = new Map(); 
+      fields.forEach((one, k) => {
+        ret.set(one.Id, one.Name);
+      })
+      return ret;
+    }))
   }
+
+  List(): Observable<Field[]> {
+    return this.BaseList<Field>(Field, this.uri + `/list`).pipe(map(fields => {
+      return fields;
+    }))
+  }
+
+  ListWithCondition(field: Field): Observable<Field[]> {
+    return this.BaseListWithCondition<Field>(field, Field, this.uri + `/list`).pipe(map(fields => {
+      return fields;
+    }))
+  }
+
   Get(id: number): Observable<Field> {
-    this.operation = this.shareSettings.System.Process.Get;
-    return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/get/${id}`).pipe(
-      catchError(this.handleError<Resp>()),
-      map(res => {
-        if (res && res.code == 0) {
-          return new Field(res.data);
-        } else {
-          return new Field();
-        }
-      }),
-    )
+    return this.BaseGet<Field>(Field, this.uri + `/get/${id}`).pipe(map(field => {
+      return field;
+    }))
   }
 
   Add(field: Field): Observable<Field> {
-    this.operation = this.shareSettings.System.Process.Create;
-    return this.http.post<Resp>(AppConfig.settings.apiServer.endpoint + this.uri, JSON.stringify(field)).pipe(
-      tap(res => this.log(res)),
-      catchError(this.handleError<Resp>()),
-      map(res => {
-        if (res && res.code == 0) {
-          return new Field(res.data);
-        } else {
-          return new Field();
-        }
-      }),
-    );
+    return this.BaseAdd<Field>(field, Field, this.uri).pipe(map(field => {
+      return field;
+    }))
   }
 
-  Update(field: Field): Observable<Resp> {
-    this.operation = this.shareSettings.System.Process.Update;
-    return this.http.put<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/${field.Id}`, JSON.stringify(field)).pipe(
-      tap(res => this.log(res)),
-      catchError(this.handleError<Resp>()),
-    );
+  Update(field: Field): Observable<Field> {
+    return this.BaseUpdate<Field>(field, Field, this.uri + `/${field.Id}`).pipe(map(field => {
+      return field;
+    }))
   }
 
-  Delete(id: number): Observable<Resp> {
-    this.operation = this.shareSettings.System.Process.Delete;
-    return this.http.delete<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/${id}`).pipe(
-      tap(res => this.log(res)),
-      catchError(this.handleError<Resp>())
-    );
+  Delete(id: number): Observable<Boolean> {
+    return this.BaseDelete<Field>(Field, this.uri + `/${id}`).pipe(map(field => {
+      return field;
+    }))
   }
 }

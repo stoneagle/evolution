@@ -13,8 +13,6 @@ import { BaseService  }             from '../base/base.service';
 
 @Injectable()
 export class PoolService extends BaseService {
-  private uri = '/pool';
-
   constructor(
     protected http: HttpClient,
     protected messageHandlerService: MessageHandlerService,
@@ -22,29 +20,12 @@ export class PoolService extends BaseService {
   ) { 
     super(http, messageHandlerService);
     this.resource = this.shareSettings.Quant.Resource.Pool;
-  }
-
-  List(): Observable<Pool[]> {
-    this.operation = this.shareSettings.System.Process.List;
-    return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`).pipe(
-      catchError(this.handleError<Resp>()),
-      map(res => {
-        let ret:Pool[] = []; 
-        if (res && res.code == 0) {
-          res.data.map(
-            one => {
-              ret.push(new Pool(one));
-            }
-          )
-        }
-        return ret; 
-      }),
-    )
+    this.uri = this.appSettings.apiServer.endpoint + this.appSettings.apiServer.prefix.time + '/pool';
   }
 
   ListItem(pool: Pool): Observable<Item[]> {
     this.operation = this.shareSettings.System.Process.List;
-    return this.http.post<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/list/item`, JSON.stringify(pool)).pipe(
+    return this.http.post<Resp>(this.appSettings.apiServer.endpoint + this.uri + `/list/item`, JSON.stringify(pool)).pipe(
       catchError(this.handleError<Resp>()),
       map(res => {
         let ret:Item[] = []; 
@@ -60,42 +41,9 @@ export class PoolService extends BaseService {
     )
   }
 
-  Get(id: number): Observable<Pool> {
-    this.operation = this.shareSettings.System.Process.Get;
-    return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/get/${id}`).pipe(
-      catchError(this.handleError<Resp>()),
-      map(res => {
-        if (res && res.code == 0) {
-          let pool = new Pool(res.data);
-          if (pool.Item == null) {
-            pool.Item = [];
-          }
-          return pool;
-        } else {
-          return new Pool();
-        }
-      }),
-    )
-  }
-
-  Add(pool: Pool): Observable<Pool> {
-    this.operation = this.shareSettings.System.Process.Create;
-    return this.http.post<Resp>(AppConfig.settings.apiServer.endpoint + this.uri, JSON.stringify(pool)).pipe(
-      tap(res => this.log(res)),
-      catchError(this.handleError<Resp>()),
-      map(res => {
-        if (res && res.code == 0) {
-          return new Pool(res.data);
-        } else {
-          return new Pool();
-        }
-      }),
-    );
-  }
-
   AddItems(pool: Pool): Observable<Boolean> {
     this.operation = this.shareSettings.System.Process.Create;
-    return this.http.post<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + "/items/add", JSON.stringify(pool)).pipe(
+    return this.http.post<Resp>(this.appSettings.apiServer.endpoint + this.uri + "/items/add", JSON.stringify(pool)).pipe(
       tap(res => this.log(res)),
       catchError(this.handleError<Resp>()),
       map(res => {
@@ -110,7 +58,7 @@ export class PoolService extends BaseService {
 
   DeleteItems(pool: Pool): Observable<Boolean> {
     this.operation = this.shareSettings.System.Process.Delete;
-    return this.http.post<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/items/delete`, JSON.stringify(pool)).pipe(
+    return this.http.post<Resp>(this.appSettings.apiServer.endpoint + this.uri + `/items/delete`, JSON.stringify(pool)).pipe(
       tap(res => this.log(res)),
       catchError(this.handleError<Resp>()),
       map(res => {
@@ -123,19 +71,39 @@ export class PoolService extends BaseService {
     );
   }
 
-  Update(pool: Pool): Observable<Resp> {
-    this.operation = this.shareSettings.System.Process.Update;
-    return this.http.put<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/${pool.Id}`, JSON.stringify(pool)).pipe(
-      tap(res => this.log(res)),
-      catchError(this.handleError<Resp>()),
-    );
+  List(): Observable<Pool[]> {
+    return this.BaseList<Pool>(Pool, this.uri + `/list`).pipe(map(pools => {
+      return pools;
+    }))
   }
-
-  Delete(id: number): Observable<Resp> {
-    this.operation = this.shareSettings.System.Process.Delete;
-    return this.http.delete<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/${id}`).pipe(
-      tap(res => this.log(res)),
-      catchError(this.handleError<Resp>())
-    );
+  
+  ListWithCondition(pool: Pool): Observable<Pool[]> {
+    return this.BaseListWithCondition<Pool>(pool, Pool, this.uri + `/list`).pipe(map(pools => {
+      return pools;
+    }))
+  }
+  
+  Get(id: number): Observable<Pool> {
+    return this.BaseGet<Pool>(Pool, this.uri + `/get/${id}`).pipe(map(pool => {
+      return pool;
+    }))
+  }
+  
+  Add(pool: Pool): Observable<Pool> {
+    return this.BaseAdd<Pool>(pool, Pool, this.uri).pipe(map(pool => {
+      return pool;
+    }))
+  }
+  
+  Update(pool: Pool): Observable<Pool> {
+    return this.BaseUpdate<Pool>(pool, Pool, this.uri + `/${pool.Id}`).pipe(map(pool => {
+      return pool;
+    }))
+  }
+  
+  Delete(id: number): Observable<Boolean> {
+    return this.BaseDelete<Pool>(Pool, this.uri + `/${id}`).pipe(map(pool => {
+      return pool;
+    }))
   }
 }

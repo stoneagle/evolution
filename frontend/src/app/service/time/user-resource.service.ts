@@ -3,104 +3,55 @@ import { HttpClient, HttpHeaders  } from '@angular/common/http';
 import { Observable }               from 'rxjs';
 import { of }                       from 'rxjs/observable/of';
 import { catchError, map, tap  }    from 'rxjs/operators';
-import { AppConfig }                from '../base/config.service';
 import { MessageHandlerService  }   from '../base/message-handler.service';
-import { ShareSettings }            from '../../shared/settings';
 import { BaseService  }             from '../base/base.service';
 import { UserResource }             from '../../model/time/user-resource';
 import { Resp }                     from '../../model/base/resp';
 
 @Injectable()
 export class UserResourceService extends BaseService {
-  private uri = AppConfig.settings.apiServer.prefix.time + '/user-resource';
-
   constructor(
     protected http: HttpClient,
     protected messageHandlerService: MessageHandlerService,
-    protected shareSettings: ShareSettings,
   ) {
     super(http, messageHandlerService);
     this.resource = this.shareSettings.Time.Resource.UserResource;
+    this.uri = this.appSettings.apiServer.endpoint + this.appSettings.apiServer.prefix.time + '/user-resource';
   }
 
   List(): Observable<UserResource[]> {
-    this.operation = this.shareSettings.System.Process.List;
-    return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`).pipe(
-      catchError(this.handleError<Resp>()),
-      map(res => {
-        let ret:UserResource[] = []; 
-        if (res && res.code == 0) {
-          res.data.map(
-            one => {
-              ret.push(new UserResource(one));
-            }
-          )
-        }
-        return ret; 
-      }),
-    )
+    return this.BaseList<UserResource>(UserResource, this.uri + `/list`).pipe(map(userResources => {
+      return userResources;
+    }))
   }
-
+  
   ListWithCondition(userResource: UserResource): Observable<UserResource[]> {
-    this.operation = this.shareSettings.System.Process.List;
-    return this.http.post<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`, JSON.stringify(userResource)).pipe(
-      catchError(this.handleError<Resp>()),
-      map(res => {
-        let ret:UserResource[] = []; 
-        if (res && res.code == 0) {
-          res.data.map(
-            one => {
-              ret.push(new UserResource(one));
-            }
-          )
-        }
-        return ret; 
-      }),
-    )
+    return this.BaseListWithCondition<UserResource>(userResource, UserResource, this.uri + `/list`).pipe(map(userResources => {
+      return userResources;
+    }))
   }
-
+  
   Get(id: number): Observable<UserResource> {
-    this.operation = this.shareSettings.System.Process.Get;
-    return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/get/${id}`).pipe(
-      catchError(this.handleError<Resp>()),
-      map(res => {
-        if (res && res.code == 0) {
-          return new UserResource(res.data);
-        } else {
-          return new UserResource();
-        }
-      }),
-    )
+    return this.BaseGet<UserResource>(UserResource, this.uri + `/get/${id}`).pipe(map(userResource => {
+      return userResource;
+    }))
   }
-
+  
   Add(userResource: UserResource): Observable<UserResource> {
-    this.operation = this.shareSettings.System.Process.Create;
-    return this.http.post<Resp>(AppConfig.settings.apiServer.endpoint + this.uri, JSON.stringify(userResource)).pipe(
-      tap(res => this.log(res)),
-      catchError(this.handleError<Resp>()),
-      map(res => {
-        if (res && res.code == 0) {
-          return new UserResource(res.data);
-        } else {
-          return new UserResource();
-        }
-      }),
-    );
+    return this.BaseAdd<UserResource>(userResource, UserResource, this.uri).pipe(map(userResource => {
+      return userResource;
+    }))
   }
-
-  Update(userResource: UserResource): Observable<Resp> {
-    this.operation = this.shareSettings.System.Process.Update;
-    return this.http.put<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/${userResource.Id}`, JSON.stringify(userResource)).pipe(
-      tap(res => this.log(res)),
-      catchError(this.handleError<Resp>()),
-    );
+  
+  Update(userResource: UserResource): Observable<UserResource> {
+    return this.BaseUpdate<UserResource>(userResource, UserResource, this.uri + `/${userResource.Id}`).pipe(map(userResource => {
+      return userResource;
+    }))
   }
-
-  Delete(id: number): Observable<Resp> {
-    this.operation = this.shareSettings.System.Process.Delete;
-    return this.http.delete<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/${id}`).pipe(
-      tap(res => this.log(res)),
-      catchError(this.handleError<Resp>())
-    );
+  
+  Delete(id: number): Observable<Boolean> {
+    return this.BaseDelete<UserResource>(UserResource, this.uri + `/${id}`).pipe(map(userResource => {
+      return userResource;
+    }))
   }
 }

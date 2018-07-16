@@ -11,8 +11,6 @@ import { BaseService  }             from '../base/base.service';
 
 @Injectable()
 export class ConfigService extends BaseService {
-  private uri = '/config';
-
   constructor(
     protected http: HttpClient,
     protected messageHandlerService: MessageHandlerService,
@@ -20,11 +18,12 @@ export class ConfigService extends BaseService {
   ) { 
     super(http, messageHandlerService);
     this.resource = this.shareSettings.Quant.Resource.Config;
+    this.uri = this.appSettings.apiServer.endpoint + this.appSettings.apiServer.prefix.time + '/config';
   }
 
   AssetList(): Observable<Map<string, string>> {
     this.operation = this.shareSettings.System.Process.List;
-    return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + "/asset").pipe(
+    return this.http.get<Resp>(this.uri + "/asset").pipe(
       catchError(this.handleError<Resp>()),
       map(res => {
         let ret:Map<string, string> = new Map();
@@ -40,7 +39,7 @@ export class ConfigService extends BaseService {
 
   TypeList(resource: string): Observable<Map<string, Map<string, string[]>>> {
     this.operation = this.shareSettings.System.Process.List;
-    return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/type/${resource}`).pipe(
+    return this.http.get<Resp>(this.uri + `/type/${resource}`).pipe(
       catchError(this.handleError<Resp>()),
       map(res => {
         let ret:Map<string, Map<string, string[]>> = new Map();
@@ -60,7 +59,7 @@ export class ConfigService extends BaseService {
 
   StrategyList(ctype: string): Observable<Map<string, string>> {
     this.operation = this.shareSettings.System.Process.List;
-    return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/strategy/${ctype}`).pipe(
+    return this.http.get<Resp>(this.uri + `/strategy/${ctype}`).pipe(
       catchError(this.handleError<Resp>()),
       map(res => {
         let ret:Map<string, string> = new Map();

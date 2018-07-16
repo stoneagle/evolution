@@ -3,30 +3,27 @@ import { HttpClient, HttpHeaders  } from '@angular/common/http';
 import { Observable }               from 'rxjs';
 import { of }                       from 'rxjs/observable/of';
 import { catchError, map, tap  }    from 'rxjs/operators';
-import { AppConfig }                from '../base/config.service';
 import { MessageHandlerService  }   from '../base/message-handler.service';
 import { BaseService  }             from '../base/base.service';
-import { ShareSettings }            from '../../shared/settings';
 import { SignService  }             from '../system/sign.service';
 import { Kanban, Gantt }            from '../../model/time/syncfusion';
 import { Resp }                     from '../../model/base/resp';
 
 @Injectable()
 export class SyncfusionService extends BaseService {
-  private uri = AppConfig.settings.apiServer.prefix.time + '/syncfusion';
+  protected uri = this.appSettings.apiServer.prefix.time + '/syncfusion';
 
   constructor(
     protected http: HttpClient,
     protected messageHandlerService: MessageHandlerService,
     protected signService: SignService,
-    protected shareSettings: ShareSettings,
   ) {
     super(http, messageHandlerService);
   }
 
   GetScheduleManager(): any {
     return new ej.DataManager({
-      url: AppConfig.settings.apiServer.endpoint + this.uri + `/list/schedule`,
+      url: this.appSettings.apiServer.endpoint + this.uri + `/list/schedule`,
       crossDomain: true,
       adaptor: new ej.WebApiAdaptor(),
       headers: [{
@@ -37,7 +34,7 @@ export class SyncfusionService extends BaseService {
 
   GetTreeGridManager(fieldId: number): any {
     return new ej.DataManager({
-      url: AppConfig.settings.apiServer.endpoint + this.uri + `/list/treegrid/${fieldId}`,
+      url: this.appSettings.apiServer.endpoint + this.uri + `/list/treegrid/${fieldId}`,
       crossDomain: true,
       adaptor: new ej.WebApiAdaptor(),
       headers: [{
@@ -49,7 +46,7 @@ export class SyncfusionService extends BaseService {
   ListKanban(): Observable<Kanban[]> {
     this.resource = this.shareSettings.Time.Resource.Task;
     this.operation = this.shareSettings.System.Process.List;
-    return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/list/kanban`).pipe(
+    return this.http.get<Resp>(this.appSettings.apiServer.endpoint + this.uri + `/list/kanban`).pipe(
       catchError(this.handleError<Resp>()),
       map(res => {
         let ret:Kanban[] = []; 
@@ -68,7 +65,7 @@ export class SyncfusionService extends BaseService {
   ListGantt(): Observable<Gantt[]> {
     this.resource = this.shareSettings.Time.Resource.Quest;
     this.operation = this.shareSettings.System.Process.List;
-    return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/list/gantt`).pipe(
+    return this.http.get<Resp>(this.appSettings.apiServer.endpoint + this.uri + `/list/gantt`).pipe(
       catchError(this.handleError<Resp>()),
       map(res => {
         let ret:Gantt[] = []; 

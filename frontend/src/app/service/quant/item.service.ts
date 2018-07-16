@@ -16,9 +16,7 @@ import { Event }                    from '../../model/base/socket';
 
 @Injectable()
 export class ItemService extends BaseService {
-  private uri = '/item';
   private connection;
-
   constructor(
     protected http: HttpClient,
     protected messageHandlerService: MessageHandlerService,
@@ -27,47 +25,12 @@ export class ItemService extends BaseService {
   ) { 
     super(http, messageHandlerService);
     this.resource = this.shareSettings.Quant.Resource.Item;
-  }
-
-  List(item?: Item): Observable<Item[]> {
-    this.operation = this.shareSettings.System.Process.List;
-    return this.http.post<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`, JSON.stringify(item)).pipe(
-      catchError(this.handleError<Resp>()),
-      map(res => {
-        let ret:Item[] = []; 
-        if (res && res.code == 0) {
-          res.data.map(
-            one => {
-              ret.push(new Item(one));
-            }
-          )
-        }
-        return ret; 
-      }),
-    )
-  }
-
-  Get(id: number): Observable<Item> {
-    this.operation = this.shareSettings.System.Process.Get;
-    return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/get/${id}`).pipe(
-      catchError(this.handleError<Resp>()),
-      map(res => {
-        if (res && res.code == 0) {
-          let item = new Item(res.data);
-          if (item.Classify == null) {
-            item.Classify = [];
-          }
-          return item;
-        } else {
-          return new Item();
-        }
-      }),
-    )
+    this.uri = this.appSettings.apiServer.endpoint + this.appSettings.apiServer.prefix.time + '/item';
   }
 
   SyncClassify(classify: Classify): Observable<Boolean> {
     this.operation = this.shareSettings.System.Process.Sync;
-    return this.http.post<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/sync/classify`, JSON.stringify(classify)).pipe(
+    return this.http.post<Resp>(this.uri + `/sync/classify`, JSON.stringify(classify)).pipe(
       tap(res => this.log(res)),
       catchError(this.handleError<Resp>()),
       map(res => {
@@ -82,7 +45,7 @@ export class ItemService extends BaseService {
 
   SyncPoint(id: number): Observable<Boolean> {
     this.operation = this.shareSettings.System.Process.Sync;
-    return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/point/${id}`).pipe(
+    return this.http.get<Resp>(this.uri + `/point/${id}`).pipe(
       tap(res => this.log(res)),
       catchError(this.handleError<Resp>()),
       map(res => {
@@ -98,7 +61,7 @@ export class ItemService extends BaseService {
   WsSyncSource(classifyBatch: Classify[]): Observable<Boolean> {
     this.operation = this.shareSettings.System.Process.Sync;
 
-    let url = AppConfig.settings.apiServer.websocket + this.uri + `/sync/classify/ws`;
+    let url = this.appSettings.apiServer.websocket + this.uri + `/sync/classify/ws`;
     this.connection = this.websocketService.connect(url);
 
     let index = 0;
@@ -124,11 +87,39 @@ export class ItemService extends BaseService {
     return sub;
   }
 
-  Delete(id: number): Observable<Resp> {
-    this.operation = this.shareSettings.System.Process.Delete;
-    return this.http.delete<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/${id}`).pipe(
-      tap(res => this.log(res)),
-      catchError(this.handleError<Resp>())
-    );
+  List(): Observable<Item[]> {
+    return this.BaseList<Item>(Item, this.uri + `/list`).pipe(map(items => {
+      return items;
+    }))
+  }
+  
+  ListWithCondition(item: Item): Observable<Item[]> {
+    return this.BaseListWithCondition<Item>(item, Item, this.uri + `/list`).pipe(map(items => {
+      return items;
+    }))
+  }
+  
+  Get(id: number): Observable<Item> {
+    return this.BaseGet<Item>(Item, this.uri + `/get/${id}`).pipe(map(item => {
+      return item;
+    }))
+  }
+  
+  Add(item: Item): Observable<Item> {
+    return this.BaseAdd<Item>(item, Item, this.uri).pipe(map(item => {
+      return item;
+    }))
+  }
+  
+  Update(item: Item): Observable<Item> {
+    return this.BaseUpdate<Item>(item, Item, this.uri + `/${item.Id}`).pipe(map(item => {
+      return item;
+    }))
+  }
+  
+  Delete(id: number): Observable<Boolean> {
+    return this.BaseDelete<Item>(Item, this.uri + `/${id}`).pipe(map(item => {
+      return item;
+    }))
   }
 }

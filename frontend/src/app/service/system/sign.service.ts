@@ -4,9 +4,7 @@ import { Observable }                            from 'rxjs';
 import { of }                                    from 'rxjs/observable/of';
 import { catchError, map, tap  }                 from 'rxjs/operators';
 import { CookieService, CookieOptions }          from 'ngx-cookie';
-import { AppConfig }                             from '../base/config.service';
 import { MessageHandlerService  }                from '../base/message-handler.service';
-import { ShareSettings }                         from '../../shared/settings';
 import { BaseService  }                          from '../base/base.service';
 import { SessionUser }                           from '../../model/base/sign';
 import { Resp, RespObject }                      from '../../model/base/resp';
@@ -14,17 +12,14 @@ import { AuthType }                              from '../../shared/const';
 
 @Injectable()
 export class SignService extends BaseService {
-  private uri = AppConfig.settings.apiServer.prefix.system + '/sign';
-
   constructor(
     protected http: HttpClient,
     protected messageHandlerService: MessageHandlerService ,
-    protected shareSettings: ShareSettings,
     private cookieService: CookieService,
   ) { 
     super(http, messageHandlerService);
     this.resource = this.shareSettings.System.Resource.User;
-    this.current();
+    this.uri = this.appSettings.apiServer.endpoint + this.appSettings.apiServer.prefix.system + '/sign';
   }
 
   currentUser: SessionUser = new SessionUser();
@@ -41,9 +36,9 @@ export class SignService extends BaseService {
 
   getAuthToken(): string {
     let token: string = "";
-    switch (AppConfig.settings.apiServer.auth.type) {
+    switch (this.appSettings.apiServer.auth.type) {
       case AuthType.BasicAuthJwt:
-        token = this.cookieService.get(AppConfig.settings.apiServer.auth.token);
+        token = this.cookieService.get(this.appSettings.apiServer.auth.token);
         break;
     }
     return token;
@@ -59,7 +54,7 @@ export class SignService extends BaseService {
     this.username = username;
     this.password = password;
     let headers: HttpHeaders 
-    switch (AppConfig.settings.apiServer.auth.type) {
+    switch (this.appSettings.apiServer.auth.type) {
       case AuthType.BasicAuth:
       case AuthType.BasicAuthJwt:
         headers = new HttpHeaders({
@@ -67,7 +62,7 @@ export class SignService extends BaseService {
         });
         break;
     }
-    return this.http.get<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/login`, {
+    return this.http.get<Response>(this.uri + `/login`, {
           headers: headers,
           observe: "response",
           responseType: "json",
@@ -75,33 +70,28 @@ export class SignService extends BaseService {
       catchError(this.handleError<Response>()), 
       map(res => {
         if (res == undefined || res.body == undefined) {
-          return false;
+          let msg = this.errorInfo.Server.Exception.NoResponse;
+          this.messageHandlerService.showError(this.resource, this.operation, msg);
+          throw(this.errorInfo.Server.Exception.NoResponse);
         }
         let resp = new RespObject(res.body);
-        if (resp == undefined) {
-          return false;
-        }
-        if (resp.code != 0) {
-          return false;
-        }
-
+        this.handleResponse(resp)
         this.currentUser = new SessionUser(resp.data);
-        console.log(AppConfig.settings.apiServer.auth.type);
-        switch (AppConfig.settings.apiServer.auth.type) {
+        switch (this.appSettings.apiServer.auth.type) {
           case AuthType.BasicAuthJwt:
             if (res.headers == undefined) {
-              return false
+              let msg = this.errorInfo.Server.Exception.NoResponse;
+              this.messageHandlerService.showError(this.resource, this.operation, msg);
+              throw(this.errorInfo.Server.Exception.NoResponse);
             }
-            let token = res.headers.get(AppConfig.settings.apiServer.auth.jwt);
+            let token = res.headers.get(this.appSettings.apiServer.auth.jwt);
             let expires: number = 3600 * 24 * 1000;
             let date = new Date(Date.now() + expires);
             let cookieOptions: CookieOptions = {
                 path: "/",
                 expires: date
             };
-            console.log(AppConfig.settings.apiServer.auth.token);
-            console.log(token);
-            this.cookieService.put(AppConfig.settings.apiServer.auth.token, token, cookieOptions);
+            this.cookieService.put(this.appSettings.apiServer.auth.token, token, cookieOptions);
             break;
         }
         return true;
@@ -111,43 +101,31 @@ export class SignService extends BaseService {
 
   logout(): Observable<Boolean> {
     this.operation = this.shareSettings.System.Process.Signout;
-    return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/logout`).pipe(
+    return this.http.get<Resp>(this.uri + `/logout`).pipe(
       tap(res => this.log(res)),
       catchError(this.handleError<Resp>()),
       map(res => {
-        if (res.code != 0) {
-          return false;
-        } else {
-          switch (AppConfig.settings.apiServer.auth.type) {
-            case AuthType.BasicAuthJwt:
-              this.cookieService.remove(AppConfig.settings.apiServer.auth.token);
-            case AuthType.BasicAuth:
-              this.cookieService.remove(AppConfig.settings.apiServer.auth.session);
-          }
-          this.resetUser();
-          return true;
+        this.handleResponse(res)
+        switch (this.appSettings.apiServer.auth.type) {
+          case AuthType.BasicAuthJwt:
+            this.cookieService.remove(this.appSettings.apiServer.auth.token);
+          case AuthType.BasicAuth:
+            this.cookieService.remove(this.appSettings.apiServer.auth.session);
         }
+        this.resetUser();
+        return true;
       }),
     );
   }
 
   current(): Observable<SessionUser> {
     this.operation = this.shareSettings.System.Process.Get;
-    return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/current`).pipe(
+    return this.http.get<Resp>(this.uri + `/current`).pipe(
       catchError(this.handleError<Resp>()),
       map(res => {
-        if (res == undefined) {
-          return new SessionUser();
-        }
-
-        let ret:SessionUser
-        if (res.code != 0) {
-          ret = new SessionUser();
-        } else {
-          ret = new SessionUser(res.data);
-        }
-        this.currentUser = ret;
-        return ret;
+        this.handleResponse(res)
+        this.currentUser = new SessionUser(res.data);
+        return this.currentUser;
       }),
     );
   }

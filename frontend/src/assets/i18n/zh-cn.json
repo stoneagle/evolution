@@ -221,6 +221,21 @@
     "TOOLTIP": {
       "EMPTY": "不能为空"
     },
+    "EXCEPTION": {
+      "NORESPONSE": "没有响应内容"
+    },
+    "ERROR": {
+      "PARAMS": "参数错误",
+      "FILES": "文件错误",
+      "DATABASE": "数据获取错误",
+      "CACHE": "缓存读取错误",
+      "AUTH": "授权错误",
+      "ENGINE": "算法引擎错误",
+      "DATA_SERVICE": "数据转换错误",
+      "LOGIN": "登录错误",
+      "API": "中间件错误",
+      "SERVER": "服务端异常"
+    },
     "RESOURCE": {
       "USER": {
         "CONCEPT": "用户",

@@ -218,6 +218,21 @@ export interface International {
         USER: string
       }
     }
+    EXCEPTION: {
+      NORESPONSE: string
+    }
+    ERROR: {
+      PARAMS: string
+      FILES: string 
+      DATABASE: string
+      CACHE: string
+      AUTH: string
+      ENGINE: string
+      DATA_SERVICE: string
+      LOGIN: string
+      API: string
+      SERVER: string
+    }
     TOOLTIP: {
       EMPTY: string
     }

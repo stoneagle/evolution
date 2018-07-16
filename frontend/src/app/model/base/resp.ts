@@ -1,6 +1,6 @@
 import { Serializable } from '../base/serializable';
 
-export interface Resp {
+export class Resp {
   status: number;
   code: number;
   data: any;

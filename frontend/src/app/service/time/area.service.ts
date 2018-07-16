@@ -4,170 +4,85 @@ import { Observable }               from 'rxjs';
 import { of }                       from 'rxjs/observable/of';
 import { catchError, map, tap  }    from 'rxjs/operators';
 import { TreeModel }                from 'ng2-tree';
-import { AppConfig }                from '../base/config.service';
 import { MessageHandlerService  }   from '../base/message-handler.service';
-import { ShareSettings }            from '../../shared/settings';
 import { BaseService  }             from '../base/base.service';
 import { Area }                     from '../../model/time/area';
 import { Resp }                     from '../../model/base/resp';
 
 @Injectable()
 export class AreaService extends BaseService {
-  private uri = AppConfig.settings.apiServer.prefix.time + '/area';
-
   constructor(
     protected http: HttpClient,
     protected messageHandlerService: MessageHandlerService,
-    protected shareSettings: ShareSettings,
   ) {
     super(http, messageHandlerService);
     this.resource = this.shareSettings.Time.Resource.Area;
+    this.uri = this.appSettings.apiServer.endpoint + this.appSettings.apiServer.prefix.time + '/area';
   }
 
   ListWithCondition(area: Area): Observable<Area[]> {
-    this.operation = this.shareSettings.System.Process.List;
-    return this.http.post<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`, JSON.stringify(area)).pipe(
-      catchError(this.handleError<Resp>()),
-      map(res => {
-        let ret:Area[] = []; 
-        if (res && res.code == 0) {
-          res.data.map(
-            one => {
-              ret.push(new Area(one));
-            }
-          )
-        }
-        return ret; 
-      }),
-    )
+    return this.BaseListWithCondition<Area>(area, Area, this.uri + `/list`).pipe(map(areas => {
+      return areas;
+    }))
   }
 
   ListAllTree(): Observable<Map<number, TreeModel>> {
-    this.operation = this.shareSettings.System.Process.List;
-    return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/list/tree/all`).pipe(
-      catchError(this.handleError<Resp>()),
-      map(res => {
-        let ret:Map<number, TreeModel> = new Map(); 
-        if (res && res.code == 0) {
-          for (let key in res.data) {
-            ret.set(+key, res.data[key]);
-          }
-        }
-        return ret; 
-      }),
-    )
+    return this.BaseGet<Resp>(Resp, this.uri + `/list/tree/all`).pipe(map(res => {
+      let ret:Map<number, TreeModel> = new Map(); 
+      for (let key in res.data) {
+        ret.set(+key, res.data[key]);
+      }
+      return ret; 
+    }))
   }
 
   ListOneTree(fieldId: number): Observable<TreeModel> {
-    this.operation = this.shareSettings.System.Process.List;
-    return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/list/tree/one/${fieldId}`).pipe(
-      catchError(this.handleError<Resp>()),
-      map(res => {
-        let ret:TreeModel; 
-        if (res && res.code == 0) {
-          ret = res.data;
-        }
-        return ret; 
-      }),
-    )
+    return this.BaseGet<Resp>(Resp, this.uri + `/list/tree/one/${fieldId}`).pipe(map(res => {
+      let ret:TreeModel; 
+      ret = res.data;
+      return ret; 
+    }))
   }
 
   ListParent(fieldId: number): Observable<Area[]> {
-    this.operation = this.shareSettings.System.Process.List;
-    return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/list/parent/${fieldId}`).pipe(
-      catchError(this.handleError<Resp>()),
-      map(res => {
-        let ret:Area[] = []; 
-        if (res && res.code == 0) {
-          res.data.map(
-            one => {
-              ret.push(new Area(one));
-            }
-          )
-        }
-        return ret; 
-      }),
-    )
+    return this.BaseList<Area>(Area, this.uri + `/list/parent/${fieldId}`).pipe(map(areas => {
+      return areas; 
+    }))
   }
 
   ListChildren(parentId: number): Observable<Area[]> {
-    this.operation = this.shareSettings.System.Process.List;
-    return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/list/children/${parentId}`).pipe(
-      catchError(this.handleError<Resp>()),
-      map(res => {
-        let ret:Area[] = []; 
-        if (res && res.code == 0) {
-          res.data.map(
-            one => {
-              ret.push(new Area(one));
-            }
-          )
-        }
-        return ret; 
-      }),
-    )
+    return this.BaseList<Area>(Area, this.uri + `/list/children/${parentId}`).pipe(map(areas => {
+      return areas; 
+    }))
   }
 
   List(): Observable<Area[]> {
-    this.operation = this.shareSettings.System.Process.List;
-    return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`).pipe(
-      catchError(this.handleError<Resp>()),
-      map(res => {
-        let ret:Area[] = []; 
-        if (res && res.code == 0) {
-          res.data.map(
-            one => {
-              ret.push(new Area(one));
-            }
-          )
-        }
-        return ret; 
-      }),
-    )
+    return this.BaseList<Area>(Area, this.uri + `/list`).pipe(map(areas => {
+      return areas;
+    }))
   }
 
   Get(id: number): Observable<Area> {
-    this.operation = this.shareSettings.System.Process.Get;
-    return this.http.get<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/get/${id}`).pipe(
-      catchError(this.handleError<Resp>()),
-      map(res => {
-        if (res && res.code == 0) {
-          return new Area(res.data);
-        } else {
-          return new Area();
-        }
-      }),
-    )
+    return this.BaseGet<Area>(Area, this.uri + `/get/${id}`).pipe(map(area => {
+      return area;
+    }))
   }
 
   Add(area: Area): Observable<Area> {
-    this.operation = this.shareSettings.System.Process.Create;
-    return this.http.post<Resp>(AppConfig.settings.apiServer.endpoint + this.uri, JSON.stringify(area)).pipe(
-      tap(res => this.log(res)),
-      catchError(this.handleError<Resp>()),
-      map(res => {
-        if (res && res.code == 0) {
-          return new Area(res.data);
-        } else {
-          return new Area();
-        }
-      }),
-    );
+    return this.BaseAdd<Area>(area, Area, this.uri).pipe(map(area => {
+      return area;
+    }))
   }
 
-  Update(area: Area): Observable<Resp> {
-    this.operation = this.shareSettings.System.Process.Update;
-    return this.http.put<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/${area.Id}`, JSON.stringify(area)).pipe(
-      tap(res => this.log(res)),
-      catchError(this.handleError<Resp>()),
-    );
+  Update(area: Area): Observable<Area> {
+    return this.BaseUpdate<Area>(area, Area, this.uri + `/${area.Id}`).pipe(map(area => {
+      return area;
+    }))
   }
 
-  Delete(id: number): Observable<Resp> {
-    this.operation = this.shareSettings.System.Process.Delete;
-    return this.http.delete<Resp>(AppConfig.settings.apiServer.endpoint + this.uri + `/${id}`).pipe(
-      tap(res => this.log(res)),
-      catchError(this.handleError<Resp>())
-    );
+  Delete(id: number): Observable<Boolean> {
+    return this.BaseDelete<Area>(Area, this.uri + `/${id}`).pipe(map(area => {
+      return area;
+    }))
   }
 }
