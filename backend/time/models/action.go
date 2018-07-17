@@ -18,7 +18,7 @@ type Action struct {
 	Time           int       `xorm:"not null default 0 comment('花费时间:单位分钟') INT(11)" structs:"time,omitempty"`
 
 	TaskIds []int `xorm:"-" structs:"task_id,omitempty"`
-	Task    Task  `xorm:"-" structs:"-"`
+	Task    Task  `xorm:"-" structs:"-" json:"Task,omitempty"`
 }
 
 func (m *Action) TableName() string {

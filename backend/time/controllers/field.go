@@ -10,7 +10,7 @@ import (
 )
 
 type Field struct {
-	Base
+	BaseController
 }
 
 func NewField() *Field {
@@ -20,7 +20,7 @@ func NewField() *Field {
 }
 
 func (c *Field) Router(router *gin.RouterGroup) {
-	field := router.Group(c.Resource).Use(middles.OnInit(c)).Use(middles.One(c.FieldSvc, c.Resource, models.Field{}))
+	field := router.Group(c.Resource).Use(middles.OnInit(c))
 	field.GET("/get/:id", c.One)
 	field.GET("/list", c.List)
 	field.POST("", c.Add)

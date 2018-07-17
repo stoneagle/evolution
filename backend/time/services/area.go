@@ -14,7 +14,7 @@ import (
 )
 
 type Area struct {
-	Base
+	ServicePackage
 	structs.Service
 }
 

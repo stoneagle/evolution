@@ -14,7 +14,7 @@ import (
 )
 
 type Syncfusion struct {
-	Base
+	ServicePackage
 	structs.Service
 }
 

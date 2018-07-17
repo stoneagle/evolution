@@ -10,7 +10,7 @@ import (
 )
 
 type Phase struct {
-	Base
+	BaseController
 }
 
 func NewPhase() *Phase {
@@ -20,7 +20,7 @@ func NewPhase() *Phase {
 }
 
 func (c *Phase) Router(router *gin.RouterGroup) {
-	phase := router.Group(c.Resource).Use(middles.OnInit(c)).Use(middles.One(c.PhaseSvc, c.Resource, models.Phase{}))
+	phase := router.Group(c.Resource).Use(middles.OnInit(c))
 	phase.GET("/get/:id", c.One)
 	phase.GET("/list", c.List)
 	phase.POST("", c.Add)

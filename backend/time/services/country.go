@@ -10,7 +10,7 @@ import (
 )
 
 type Country struct {
-	Base
+	ServicePackage
 	structs.Service
 }
 

@@ -10,7 +10,7 @@ import (
 )
 
 type Project struct {
-	Base
+	BaseController
 }
 
 func NewProject() *Project {
@@ -20,7 +20,7 @@ func NewProject() *Project {
 }
 
 func (c *Project) Router(router *gin.RouterGroup) {
-	project := router.Group(c.Resource).Use(middles.OnInit(c)).Use(middles.One(c.ProjectSvc, c.Resource, models.Project{}))
+	project := router.Group(c.Resource).Use(middles.OnInit(c))
 	project.GET("/get/:id", c.One)
 	project.GET("/list", c.List)
 	project.POST("", c.Add)

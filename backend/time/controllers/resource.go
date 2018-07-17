@@ -10,7 +10,7 @@ import (
 )
 
 type Resource struct {
-	Base
+	BaseController
 }
 
 func NewResource() *Resource {
@@ -20,7 +20,7 @@ func NewResource() *Resource {
 }
 
 func (c *Resource) Router(router *gin.RouterGroup) {
-	resource := router.Group(c.Resource).Use(middles.OnInit(c)).Use(middles.One(c.ResourceSvc, c.Resource, models.Resource{}))
+	resource := router.Group(c.Resource).Use(middles.OnInit(c))
 	resource.GET("/get/:id", c.One)
 	resource.GET("/list", c.List)
 	resource.GET("/list/areas/:id", c.ListAreas)

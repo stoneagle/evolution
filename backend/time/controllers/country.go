@@ -3,14 +3,13 @@ package controllers
 import (
 	"evolution/backend/common/middles"
 	"evolution/backend/common/resp"
-
 	"evolution/backend/time/models"
 
 	"github.com/gin-gonic/gin"
 )
 
 type Country struct {
-	Base
+	BaseController
 }
 
 func NewCountry() *Country {
@@ -20,7 +19,7 @@ func NewCountry() *Country {
 }
 
 func (c *Country) Router(router *gin.RouterGroup) {
-	country := router.Group(c.Resource).Use(middles.OnInit(c)).Use(middles.One(c.CountrySvc, c.Resource, models.Resource{}))
+	country := router.Group(c.Resource).Use(middles.OnInit(c))
 	country.GET("/get/:id", c.One)
 	country.GET("/list", c.List)
 	country.POST("", c.Add)

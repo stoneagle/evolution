@@ -1,7 +1,9 @@
 package middles
 
 import (
+	"errors"
 	"evolution/backend/common/resp"
+	"fmt"
 	"io"
 
 	"github.com/gin-gonic/gin"
@@ -23,5 +25,7 @@ func RecoveryWithWriter(f func(c *gin.Context, err interface{}), out io.Writer) 
 }
 
 func RecoveryHandler(ctx *gin.Context, err interface{}) {
-	resp.ExceptionServer(ctx, err.(error))
+	exception := errors.New(fmt.Sprintf("%v", err))
+	resp.ExceptionServer(ctx, exception)
+	return
 }

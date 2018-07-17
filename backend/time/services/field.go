@@ -10,7 +10,7 @@ import (
 )
 
 type Field struct {
-	Base
+	ServicePackage
 	structs.Service
 }
 

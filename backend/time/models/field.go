@@ -2,6 +2,9 @@ package models
 
 import (
 	es "evolution/backend/common/structs"
+
+	"github.com/fatih/structs"
+	"github.com/go-xorm/builder"
 )
 
 type Field struct {
@@ -13,4 +16,11 @@ type Field struct {
 
 func (m *Field) TableName() string {
 	return "field"
+}
+
+func (m *Field) BuildCondition() (condition builder.Eq) {
+	keyPrefix := m.TableName() + "."
+	params := structs.Map(m)
+	condition = m.Model.BuildCondition(params, keyPrefix)
+	return condition
 }

@@ -10,7 +10,7 @@ import (
 )
 
 type QuestTeam struct {
-	Base
+	BaseController
 }
 
 func NewQuestTeam() *QuestTeam {
@@ -20,7 +20,7 @@ func NewQuestTeam() *QuestTeam {
 }
 
 func (c *QuestTeam) Router(router *gin.RouterGroup) {
-	questTeam := router.Group(c.Resource).Use(middles.OnInit(c)).Use(middles.One(c.QuestTeamSvc, c.Resource, models.QuestTeam{}))
+	questTeam := router.Group(c.Resource).Use(middles.OnInit(c))
 	questTeam.GET("/get/:id", c.One)
 	questTeam.GET("/list", c.List)
 	questTeam.POST("", c.Add)

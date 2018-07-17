@@ -11,7 +11,7 @@ import (
 )
 
 type Area struct {
-	Base
+	BaseController
 }
 
 func NewArea() *Area {
@@ -21,7 +21,7 @@ func NewArea() *Area {
 }
 
 func (c *Area) Router(router *gin.RouterGroup) {
-	area := router.Group(c.Resource).Use(middles.OnInit(c)).Use(middles.One(c.AreaSvc, c.Resource, models.Area{}))
+	area := router.Group(c.Resource).Use(middles.OnInit(c))
 	area.GET("/get/:id", c.One)
 	area.GET("/list/all", c.List)
 	area.GET("/list/parent/:fieldId", c.ListParent)

@@ -72,6 +72,6 @@ func ExceptionServer(ctx *gin.Context, err error) {
 	}
 	ctx.AbortWithStatusJSON(http.StatusOK, res)
 	log := logger.Get()
-	log.Caller = 8
+	log.Caller = 10
 	log.Log(logger.ErrorLevel, res, err)
 }

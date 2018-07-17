@@ -10,7 +10,7 @@ import (
 )
 
 type QuestTimeTable struct {
-	Base
+	ServicePackage
 	structs.Service
 }
 

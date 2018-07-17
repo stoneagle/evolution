@@ -10,7 +10,7 @@ import (
 )
 
 type Phase struct {
-	Base
+	ServicePackage
 	structs.Service
 }
 

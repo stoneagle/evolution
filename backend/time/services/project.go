@@ -10,7 +10,7 @@ import (
 )
 
 type Project struct {
-	Base
+	ServicePackage
 	structs.Service
 }
 

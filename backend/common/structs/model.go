@@ -7,6 +7,10 @@ import (
 	"github.com/go-xorm/builder"
 )
 
+type ModelGeneral interface {
+	BuildCondition() builder.Eq
+}
+
 type Model struct {
 	CreatedAt time.Time `xorm:"created comment('创建时间')" structs:"created_at,omitempty"`
 	UpdatedAt time.Time `xorm:"updated comment('修改时间')" structs:"updated_at,omitempty"`

@@ -10,7 +10,7 @@ import (
 )
 
 type Quest struct {
-	Base
+	BaseController
 }
 
 func NewQuest() *Quest {
@@ -20,7 +20,7 @@ func NewQuest() *Quest {
 }
 
 func (c *Quest) Router(router *gin.RouterGroup) {
-	quest := router.Group(c.Resource).Use(middles.OnInit(c)).Use(middles.One(c.QuestSvc, c.Resource, models.Quest{}))
+	quest := router.Group(c.Resource).Use(middles.OnInit(c))
 	quest.GET("/get/:id", c.One)
 	quest.GET("/list", c.List)
 	quest.POST("", c.Add)

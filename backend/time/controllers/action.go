@@ -9,7 +9,7 @@ import (
 )
 
 type Action struct {
-	Base
+	BaseController
 }
 
 func NewAction() *Action {
@@ -19,18 +19,13 @@ func NewAction() *Action {
 }
 
 func (c *Action) Router(router *gin.RouterGroup) {
-	action := router.Group(c.Resource).Use(middles.OnInit(c)).Use(middles.One(c.ActionSvc, c.Resource, &models.Action{}))
+	action := router.Group(c.Resource).Use(middles.OnInit(c))
 	action.GET("/get/:id", c.One)
 	action.GET("/list", c.List)
 	action.POST("", c.Add)
 	action.POST("/list", c.ListByCondition)
 	action.PUT("/:id", c.Update)
 	action.DELETE("/:id", c.Delete)
-}
-
-func (c *Action) One(ctx *gin.Context) {
-	one := ctx.MustGet(c.Resource).(models.Action)
-	resp.Success(ctx, one)
 }
 
 func (c *Action) List(ctx *gin.Context) {

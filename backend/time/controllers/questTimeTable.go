@@ -10,7 +10,7 @@ import (
 )
 
 type QuestTimeTable struct {
-	Base
+	BaseController
 }
 
 func NewQuestTimeTable() *QuestTimeTable {
@@ -19,7 +19,7 @@ func NewQuestTimeTable() *QuestTimeTable {
 }
 
 func (c *QuestTimeTable) Router(router *gin.RouterGroup) {
-	questTimeTable := router.Group(c.Resource).Use(middles.OnInit(c)).Use(middles.One(c.QuestTimeTableSvc, c.Resource, models.QuestTimeTable{}))
+	questTimeTable := router.Group(c.Resource).Use(middles.OnInit(c))
 	questTimeTable.GET("/get/:id", c.One)
 	questTimeTable.GET("/list", c.List)
 	questTimeTable.POST("", c.Add)

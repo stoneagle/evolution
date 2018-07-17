@@ -15,7 +15,7 @@ import (
 )
 
 type Syncfusion struct {
-	Base
+	BaseController
 }
 
 func NewSyncfusion() *Syncfusion {

@@ -11,7 +11,7 @@ import (
 )
 
 type Resource struct {
-	Base
+	ServicePackage
 	structs.Service
 }
 

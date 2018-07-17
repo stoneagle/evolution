@@ -12,7 +12,7 @@ import (
 )
 
 type Task struct {
-	Base
+	ServicePackage
 	structs.Service
 }
 

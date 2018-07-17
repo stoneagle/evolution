@@ -9,7 +9,7 @@ import (
 )
 
 type User struct {
-	Base
+	BaseController
 }
 
 func NewUser() *User {
@@ -19,7 +19,7 @@ func NewUser() *User {
 }
 
 func (c *User) Router(router *gin.RouterGroup) {
-	user := router.Group(c.Resource).Use(middles.OnInit(c)).Use(middles.One(c.UserSvc, c.Resource, &models.User{}))
+	user := router.Group(c.Resource).Use(middles.OnInit(c))
 	user.GET("/get/:id", c.One)
 	user.GET("/list", c.List)
 	user.POST("", c.Add)

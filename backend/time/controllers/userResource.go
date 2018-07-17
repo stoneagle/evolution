@@ -10,7 +10,7 @@ import (
 )
 
 type UserResource struct {
-	Base
+	BaseController
 }
 
 func NewUserResource() *UserResource {
@@ -20,7 +20,7 @@ func NewUserResource() *UserResource {
 }
 
 func (c *UserResource) Router(router *gin.RouterGroup) {
-	userResource := router.Group(c.Resource).Use(middles.OnInit(c)).Use(middles.One(c.UserResourceSvc, c.Resource, models.UserResource{}))
+	userResource := router.Group(c.Resource).Use(middles.OnInit(c))
 	userResource.GET("/get/:id", c.One)
 	userResource.GET("/list", c.List)
 	userResource.POST("", c.Add)

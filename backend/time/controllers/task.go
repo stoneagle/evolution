@@ -11,7 +11,7 @@ import (
 )
 
 type Task struct {
-	Base
+	BaseController
 }
 
 func NewTask() *Task {
@@ -21,7 +21,7 @@ func NewTask() *Task {
 }
 
 func (c *Task) Router(router *gin.RouterGroup) {
-	task := router.Group(c.Resource).Use(middles.OnInit(c)).Use(middles.One(c.TaskSvc, c.Resource, models.Task{}))
+	task := router.Group(c.Resource).Use(middles.OnInit(c))
 	task.GET("/get/:id", c.One)
 	task.GET("/list", c.List)
 	task.GET("/list/user/:uid", c.ListByUser)

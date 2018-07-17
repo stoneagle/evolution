@@ -10,7 +10,7 @@ import (
 )
 
 type User struct {
-	Base
+	ServicePackage
 	structs.Service
 }
 

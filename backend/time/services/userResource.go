@@ -10,7 +10,7 @@ import (
 )
 
 type UserResource struct {
-	Base
+	ServicePackage
 	structs.Service
 }
 
