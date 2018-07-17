@@ -25,7 +25,7 @@ export class ResourceTreeGridComponent implements OnInit {
   fieldMap: Map<number, string> = new Map(); 
   currentFieldId: number;
 
-  treeGridData: TreeGrid[] = [];
+  treeGridData: TreeGrid[];
   treePageSettings: any;
   treeColumns: any[] = [];
   contextMenuSettings: any
@@ -44,11 +44,6 @@ export class ResourceTreeGridComponent implements OnInit {
   treeColumnIndex: number = 1;
 
   ngOnInit() {
-    // TODO init field load failed
-    this.treeGridData.push(new TreeGrid({"Id":0,"Name":"init","Parent":"init", "Children":[
-      {"Id":1,"Name":"test","Parent":"test"}
-    ]}));
-    
     this.treeColumns = [
       { field: "Id", headerText: "ID", width: "45", visible: false },
       { field: "Name", headerText: "Name" },
@@ -79,7 +74,6 @@ export class ResourceTreeGridComponent implements OnInit {
       let resource = new Resource();
       resource.Id = $event.data.Id
       resource.Name = $event.data.Name
-      resource.Area = new Area();
       resource.Area.Id = $event.data.ParentId
       resource.Area.Name = $event.data.Parent;
       this.selectResource.emit(resource);
@@ -93,10 +87,9 @@ export class ResourceTreeGridComponent implements OnInit {
 
   refresh() {
     let resource = new Resource();
-    resource.Area = new Area();
     resource.Area.FieldId = this.currentFieldId;
     this.resourceService.ListGroupByLeaf(resource).subscribe(res => {
-      this.treeGridData = [];
+      let tmpTreeGridData = [];
       res.forEach((area, k) => {
         let Leaf: TreeGrid = new TreeGrid();
         Leaf.Id = area.Id;
@@ -116,8 +109,9 @@ export class ResourceTreeGridComponent implements OnInit {
             Leaf.Children.push(resource);
           })
         }
-        this.treeGridData.push(Leaf);
+        tmpTreeGridData.push(Leaf);
       });
+      this.treeGridData = tmpTreeGridData;
       // this.treePageSettings["pageCount"] = this.treeGridData.length;
       // this.treePageSettings["currentPage"] = 1;
     });

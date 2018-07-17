@@ -13,6 +13,14 @@ export class Quest extends Basic {
   Members: number;
   Constraint: number;
   Status: number;
+  constructor (json?: any) {
+    if (json != undefined) {
+      super(json)
+    } else {
+      this.StartDate = new Date();
+      this.EndDate = new Date();
+    }
+  }
 }
 
 export class QuestTarget extends Basic {

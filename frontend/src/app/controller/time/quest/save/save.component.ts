@@ -170,7 +170,6 @@ export class QuestSaveComponent implements OnInit {
   saveQuestTeamFounder(questId: number, endDate: Date): void {
     let questTeam: QuestTeam = new QuestTeam();
     questTeam.QuestId = questId;
-    questTeam.StartDate = new Date();
     questTeam.EndDate = endDate; 
     questTeam.UserId = this.founderUser.Id; 
     this.questTeamService.Add(questTeam).subscribe(res => {

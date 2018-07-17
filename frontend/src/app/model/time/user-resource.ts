@@ -1,6 +1,5 @@
 import { Basic }    from '../base/basic';
 import { Resource } from './resource';
-import { Area }     from './area';
 
 export class UserResource extends Basic {
   UserId: number;
@@ -12,7 +11,6 @@ export class UserResource extends Basic {
       super(json)
     } else {
       this.Resource = new Resource();
-      this.Resource.Area = new Area();
     }
   }
 }

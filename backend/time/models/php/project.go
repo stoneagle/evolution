@@ -80,14 +80,14 @@ func (c *Project) Transfer(src, des *xorm.Engine, userId int) {
 			}
 			newTask.CreatedAt = oldTask.Ctime
 			newTask.UpdatedAt = oldTask.Utime
-			tasksSlice, ok := newAreaTasksMap[newResourceJoin.Resource.Area.Id]
+			tasksSlice, ok := newAreaTasksMap[newResourceJoin.Area.Id]
 			if !ok {
-				newAreaTasksMap[newResourceJoin.Resource.Area.Id] = make([]models.Task, 0)
+				newAreaTasksMap[newResourceJoin.Area.Id] = make([]models.Task, 0)
 			}
 			tasksSlice = append(tasksSlice, newTask)
-			newAreaTasksMap[newResourceJoin.Resource.Area.Id] = tasksSlice
+			newAreaTasksMap[newResourceJoin.Area.Id] = tasksSlice
 		}
-		newProject.QuestId = quest.Id
+		newProject.QuestTarget.QuestId = quest.Id
 		newProject.StartDate = oldProject.Project.StartDate
 		newProject.Duration = oldProject.Project.Duration
 		if oldProject.Project.Del != 0 {
@@ -99,9 +99,24 @@ func (c *Project) Transfer(src, des *xorm.Engine, userId int) {
 		// base on merge area to insert project and task
 		for areaId, tasksSlice := range newAreaTasksMap {
 			newProject.Id = 0
-			newProject.AreaId = areaId
+			newProject.QuestTarget.AreaId = areaId
+			// get relate quest target
+			relateQuestTarget := models.QuestTarget{}
+			has, err := des.Where("quest_id = ?", newProject.QuestTarget.QuestId).And("area_id = ?", newProject.QuestTarget.AreaId).Get(&relateQuestTarget)
+			if !has {
+				fmt.Printf("quest target not exist quest_id:%v, area_id:%v\r\n", newProject.QuestTarget.QuestId, newProject.QuestTarget.AreaId)
+				session.Rollback()
+				return
+			}
+			if err != nil {
+				fmt.Printf("quest target get error %+v\r\n", err.Error())
+				session.Rollback()
+				return
+			}
+			newProject.QuestTargetId = relateQuestTarget.Id
+
 			newArea := models.Area{}
-			_, err := session.Id(areaId).Get(&newArea)
+			_, err = session.Id(areaId).Get(&newArea)
 			if err != nil {
 				fmt.Printf("new area get error %v\r\n", err.Error())
 				session.Rollback()

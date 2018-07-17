@@ -7,6 +7,13 @@ export class TreeGrid extends Basic {
   ParentId: number;
   IsParent: boolean;
   Children: TreeGrid[];
+  constructor (json?: any) {
+    if (json != undefined) {
+      super(json)
+    } else {
+      this.Children = [];
+    }
+  }
 }
 
 export class Gantt extends Basic {
@@ -18,8 +25,15 @@ export class Gantt extends Basic {
   Progress: number;
   Duration: number;
   Expended: boolean;
-  Children: Gantt[];
   Parent: number;
+  Children: Gantt[];
+  constructor (json?: any) {
+    if (json != undefined) {
+      super(json)
+    } else {
+      this.Children = [];
+    }
+  }
 }
 
 export class Schedule extends Basic {

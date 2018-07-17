@@ -71,7 +71,6 @@ export class ResourceListComponent implements OnInit {
       })
     } else if (this.filterAreaId != undefined) {
       let resource = new Resource();
-      resource.Area = new Area(); 
       resource.Area.Id = this.filterAreaId;
       resource.WithSub = true;
       this.resourceService.ListWithCondition(resource).subscribe(res => {

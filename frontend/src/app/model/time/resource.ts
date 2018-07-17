@@ -7,4 +7,11 @@ export class Resource extends Basic {
   Year: number;
   Area: Area;
   WithSub: boolean;
+  constructor (json?: any) {
+    if (json != undefined) {
+      super(json)
+    } else {
+      this.Area = new Area();
+    }
+  }
 }

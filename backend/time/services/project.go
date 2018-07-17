@@ -20,8 +20,12 @@ func NewProject(engine *xorm.Engine, cache *redis.Client) *Project {
 }
 
 func (s *Project) One(id int) (interface{}, error) {
+	projectJoin := models.ProjectJoin{}
+	sql := s.Engine.Unscoped().Table("project").Join("INNER", "quest_target", "quest_target.id = project.quest_target_id").Join("INNER", "area", "area.id = quest_target.area_id")
+	_, err := sql.Where("project.id = ?", id).Get(&projectJoin)
 	model := models.Project{}
-	_, err := s.Engine.Where("id = ?", id).Get(&model)
+	model.Area = projectJoin.Area
+	model.QuestTarget = projectJoin.QuestTarget
 	return model, err
 }
 
@@ -51,8 +55,7 @@ func (s *Project) List() (projects []models.Project, err error) {
 
 func (s *Project) ListWithCondition(project *models.Project) (projects []models.Project, err error) {
 	projectsJoin := make([]models.ProjectJoin, 0)
-	sql := s.Engine.Unscoped().Table("project").Join("INNER", "area", "area.id = project.area_id")
-
+	sql := s.Engine.Unscoped().Table("project").Join("INNER", "quest_target", "quest_target.id = project.quest_target_id").Join("INNER", "area", "area.id = quest_target.area_id")
 	condition := project.BuildCondition()
 	sql = sql.Where(condition)
 	err = sql.Find(&projectsJoin)
@@ -63,6 +66,7 @@ func (s *Project) ListWithCondition(project *models.Project) (projects []models.
 	projects = make([]models.Project, 0)
 	for _, one := range projectsJoin {
 		one.Project.Area = one.Area
+		one.Project.QuestTarget = one.QuestTarget
 		projects = append(projects, one.Project)
 	}
 	return

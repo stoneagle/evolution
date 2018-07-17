@@ -17,6 +17,14 @@ export class Task extends Basic {
   Status: number;
   Project: Project;
   Resource: Resource;
+  constructor (json?: any) {
+    if (json != undefined) {
+      super(json)
+    } else {
+      this.Project = new Project();
+      this.Resource = new Resource();
+    }
+  }
 
   StartDateReset: boolean;
   EndDateReset: boolean;

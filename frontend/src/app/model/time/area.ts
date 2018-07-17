@@ -7,6 +7,13 @@ export class Area extends Basic {
   FieldId: number;
   Type: number;
   Resources: Resource[];
+  constructor (json?: any) {
+    if (json != undefined) {
+      super(json)
+    } else {
+      this.Resources = [];
+    }
+  }
 }
 
 export class AreaSettings {

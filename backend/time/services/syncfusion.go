@@ -36,7 +36,7 @@ func (s *Syncfusion) ListKanban(userId int) (kanbans []models.SyncfusionKanban, 
 		questIds = append(questIds, one.QuestId)
 	}
 	project := models.Project{}
-	project.QuestIds = questIds
+	project.QuestTarget.QuestIds = questIds
 	projects, err := NewProject(s.Engine, s.Cache).ListWithCondition(&project)
 	if err != nil {
 		return
@@ -48,7 +48,7 @@ func (s *Syncfusion) ListKanban(userId int) (kanbans []models.SyncfusionKanban, 
 	for _, one := range projects {
 		projectIds = append(projectIds, one.Id)
 		projectsMap[one.Id] = one
-		areaIds = append(areaIds, one.AreaId)
+		areaIds = append(areaIds, one.QuestTarget.AreaId)
 	}
 	task := models.Task{}
 	task.ProjectIds = projectIds
@@ -197,7 +197,7 @@ func (s *Syncfusion) ListGantt(userId int) (gantts []models.SyncfusionGantt, err
 	}
 
 	project := models.Project{}
-	project.QuestIds = questIds
+	project.QuestTarget.QuestIds = questIds
 	projects, err := NewProject(s.Engine, s.Cache).ListWithCondition(&project)
 	if err != nil {
 		return
@@ -246,12 +246,12 @@ func (s *Syncfusion) buildTaskMap(tasks []models.Task) map[int][]models.Syncfusi
 func (s *Syncfusion) buildProjectMap(projects []models.Project, tasksMap map[int][]models.SyncfusionGantt) map[int][]models.SyncfusionGantt {
 	result := make(map[int][]models.SyncfusionGantt)
 	for _, one := range projects {
-		if _, ok := result[one.QuestId]; !ok {
-			result[one.QuestId] = make([]models.SyncfusionGantt, 0)
+		if _, ok := result[one.QuestTarget.QuestId]; !ok {
+			result[one.QuestTarget.QuestId] = make([]models.SyncfusionGantt, 0)
 		}
 		gantt := models.SyncfusionGantt{}
 		gantt.Id = one.Id
-		gantt.Parent = one.QuestId
+		gantt.Parent = one.QuestTarget.QuestId
 		gantt.Relate = one.Area.Name
 		gantt.Name = one.Name
 		gantt.StartDate = one.StartDate
@@ -265,7 +265,7 @@ func (s *Syncfusion) buildProjectMap(projects []models.Project, tasksMap map[int
 			child := make([]models.SyncfusionGantt, 0)
 			gantt.Children = child
 		}
-		result[one.QuestId] = append(result[one.QuestId], gantt)
+		result[one.QuestTarget.QuestId] = append(result[one.QuestTarget.QuestId], gantt)
 	}
 	return result
 }

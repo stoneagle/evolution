@@ -69,7 +69,6 @@ export class ActionScheduleComponent implements OnInit {
   }
   
   onMenuItemClick($event) {
-    console.log($event);
     switch($event.events.ID) {
       case "add-action":
         let startDate = $event.targetInfo.startTime;
@@ -116,7 +115,6 @@ export class ActionScheduleComponent implements OnInit {
     this.actionService.Update(action).subscribe(res => {
       $event.cancel = false;
     })
-    console.log($event);
   }
 
   actionShow($event) {

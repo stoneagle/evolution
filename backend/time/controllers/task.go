@@ -79,7 +79,7 @@ func (c *Task) ListByUser(ctx *gin.Context) {
 	}
 
 	project := models.Project{}
-	project.QuestIds = questIds
+	project.QuestTarget.QuestIds = questIds
 	projects, err := c.ProjectSvc.ListWithCondition(&project)
 	if err != nil {
 		resp.ErrorBusiness(ctx, resp.ErrorMysql, "project get error", err)

@@ -13,4 +13,11 @@ export class Pool extends Serializable {
   UpdatedAt: string;
   DeletedAt: string;
   Item: Item[];
+  constructor (json?: any) {
+    if (json != undefined) {
+      super(json)
+    } else {
+      this.Item = [];
+    }
+  }
 }

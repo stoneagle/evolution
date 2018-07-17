@@ -13,7 +13,9 @@ type QuestTarget struct {
 	AreaId         int    `xorm:"unique(quest_id) not null default 0 comment('目标资源id') INT(11)" structs:"area_id,omitempty"`
 	Desc           string `xorm:"not null default '' comment('描述') VARCHAR(255)" structs:"desc,omitempty"`
 	Status         int    `xorm:"not null default 1 comment('当前状态:1未完成2已完成') INT(11)" structs:"status,omitempty"`
-	Area           Area   `xorm:"-" structs:"-"`
+
+	QuestIds []int `xorm:"-" structs:"quest_id,omitempty"`
+	Area     Area  `xorm:"-" structs:"-"`
 }
 
 type QuestTargetJoin struct {

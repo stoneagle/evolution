@@ -9,4 +9,11 @@ export class Item extends Serializable {
   CreatedAt: string;
   UpdatedAt: string;
   Classify: Classify[];
+  constructor (json?: any) {
+    if (json != undefined) {
+      super(json)
+    } else {
+      this.Classify = [];
+    }
+  }
 }

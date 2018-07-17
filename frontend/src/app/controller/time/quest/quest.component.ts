@@ -86,7 +86,6 @@ export class QuestComponent implements OnInit {
   }
 
   exec(quest: Quest): void {
-    quest.StartDate = new Date();
     quest.Status = this.questSettings.Status.Exec;
     this.questService.Update(quest).subscribe(res => {
       this.refresh();

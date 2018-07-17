@@ -1,5 +1,5 @@
-import { Component, OnInit, ViewChild, Input } from '@angular/core';
-import { Comparator, State }                   from "clarity-angular";
+import { Component, OnInit, ViewChild, Input, Inject, forwardRef  } from '@angular/core';
+import { Comparator, State }                                        from "clarity-angular";
 
 import { Area }                        from '../../../../model/time/area';
 import { Resource }                    from '../../../../model/time/resource';
@@ -13,6 +13,7 @@ import { SignService }                 from '../../../../service/system/sign.ser
 import { CustomComparator, doSorting } from '../../../../shared/utils';
 
 import { TaskListComponent } from '../../task/list/list.component';
+import { ShellComponent }    from '../../../../base/shell/shell.component';
 
 @Component({
   selector: 'time-user-resource-list',
@@ -30,7 +31,6 @@ export class UserResourceListComponent implements OnInit {
   filterArea: Area = new Area();
   filterAreaSumTime: number = 0;
   filterAreaPhase: Phase = new Phase();
-	currentUser: SessionUser = new SessionUser();
   currentState: State;
 
   timeComparator: Comparator<UserResource> = new CustomComparator<UserResource>("Time", "number");
@@ -44,6 +44,8 @@ export class UserResourceListComponent implements OnInit {
     private phaseService: PhaseService,
     private userResourceService: UserResourceService,
     private signService: SignService,
+    @Inject(forwardRef(() => ShellComponent))
+    private shell: ShellComponent,
   ) { }
 
   ngOnInit() {
@@ -58,12 +60,6 @@ export class UserResourceListComponent implements OnInit {
         this.fieldPhasesMap.set(one.FieldId, phaseArray);
       })
     })
-    this.currentUser = this.signService.getCurrentUser();
-    if (this.currentUser.Id == null) {
-      this.signService.current().subscribe(user => {
-        this.currentUser = user;
-      });
-    }
   }
 
   changeFilterArea(areaId: number) {
@@ -93,7 +89,7 @@ export class UserResourceListComponent implements OnInit {
       })
     } else if (this.filterArea.Id != undefined) {
       let userResource = new UserResource();
-      userResource.UserId = this.currentUser.Id;
+      userResource.UserId = this.shell.currentUser.Id;
       userResource.Resource.Area = new Area();
       userResource.Resource.Area.Id = this.filterArea.Id;
       userResource.Resource.WithSub = true;

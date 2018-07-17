@@ -1,16 +1,17 @@
-import { Component, OnInit, Output, Input, EventEmitter } from '@angular/core'; 
-import { EJ_DATETIMEPICKER_COMPONENTS } from 'ej-angular2/src/ej/datetimepicker.component';
-import { EJ_SCHEDULE_COMPONENTS } from 'ej-angular2/src/ej/schedule.component';
+import { Component, OnInit, Output, Input, EventEmitter, Inject, forwardRef } from '@angular/core';
+import { EJ_DATETIMEPICKER_COMPONENTS }                                       from 'ej-angular2/src/ej/datetimepicker.component';
+import { EJ_SCHEDULE_COMPONENTS }                                             from 'ej-angular2/src/ej/schedule.component';
 
-import { QuestTeam }         from '../../../../model/time/quest';
-import { Task }              from '../../../../model/time/task';
-import { Action }            from '../../../../model/time/action';
-import { Project }           from '../../../../model/time/project';
-import { SessionUser }       from '../../../../model/base/sign';
-import { ActionService  }    from '../../../../service/time/action.service';
-import { TaskService  }      from '../../../../service/time/task.service';
-import { ProjectService  }   from '../../../../service/time/project.service';
-import { SignService  }      from '../../../../service/system/sign.service';
+import { QuestTeam }       from '../../../../model/time/quest';
+import { Task }            from '../../../../model/time/task';
+import { Action }          from '../../../../model/time/action';
+import { Project }         from '../../../../model/time/project';
+import { SessionUser }     from '../../../../model/base/sign';
+import { ActionService  }  from '../../../../service/time/action.service';
+import { TaskService  }    from '../../../../service/time/task.service';
+import { ProjectService  } from '../../../../service/time/project.service';
+import { SignService  }    from '../../../../service/system/sign.service';
+import { ShellComponent }  from '../../../../base/shell/shell.component';
 
 @Component({
   selector: 'time-action-save',
@@ -19,10 +20,9 @@ import { SignService  }      from '../../../../service/system/sign.service';
 })
 
 export class ActionSaveComponent implements OnInit {
-  action: Action = new Action;
+  action: Action;
   modelOpened: boolean = false;
   taskMaps: Map<number, Task> = new Map();
-	currentUser: SessionUser = new SessionUser();
 
   @Output() save = new EventEmitter<Action>();
 
@@ -31,36 +31,27 @@ export class ActionSaveComponent implements OnInit {
     private projectService: ProjectService,
     private signService: SignService,
     private actionService: ActionService,
+    @Inject(forwardRef(() => ShellComponent))
+    private shell: ShellComponent,
   ) { }
 
   ngOnInit() {
-    this.action.Task = new Task();
-    this.action.StartDate = new Date();
-    this.action.EndDate = new Date();
-    this.currentUser = this.signService.getCurrentUser();
-    if (this.currentUser.Id == null) {
-      this.signService.current().subscribe(user => {
-        this.currentUser = user;
-      });
-    }
+    this.action = new Action();
   }
 
   NewWithDate(startDate: Date, endDate: Date): void {
-    this.taskService.ListByUser(this.currentUser.Id).subscribe(tasks => {
+    this.taskService.ListByUser(this.shell.currentUser.Id).subscribe(tasks => {
       tasks.forEach((one, k) => {
         this.taskMaps.set(one.Id, one)
       })
-
       this.action = new Action();
-      this.action.StartDate = startDate;
-      this.action.EndDate = endDate;
-      this.action.UserId = this.currentUser.Id;
+      this.action.UserId = this.shell.currentUser.Id;
       this.modelOpened = true;
     })
   }
 
   New(id?: number): void {
-    this.taskService.ListByUser(this.currentUser.Id).subscribe(tasks => {
+    this.taskService.ListByUser(this.shell.currentUser.Id).subscribe(tasks => {
       tasks.forEach((one, k) => {
         this.taskMaps.set(one.Id, one)
       })
@@ -68,7 +59,7 @@ export class ActionSaveComponent implements OnInit {
       if (id) {
         this.actionService.Get(id).subscribe(res => {
           this.action = res;
-          this.action.UserId = this.currentUser.Id;
+          this.action.UserId = this.shell.currentUser.Id;
           this.action.StartDate = new Date(this.action.StartDate);
           this.action.EndDate = new Date(this.action.EndDate);
           this.modelOpened = true;
@@ -77,7 +68,7 @@ export class ActionSaveComponent implements OnInit {
         this.action = new Action();
         this.action.StartDate = new Date();
         this.action.EndDate = new Date();
-        this.action.UserId = this.currentUser.Id;
+        this.action.UserId = this.shell.currentUser.Id;
         this.modelOpened = true;
       }
     })

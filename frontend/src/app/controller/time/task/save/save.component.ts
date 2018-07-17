@@ -18,7 +18,7 @@ import { UserService  }      from '../../../../service/system/user.service';
 })
 
 export class TaskSaveComponent implements OnInit {
-  task: Task = new Task;
+  task: Task;
   modelOpened: boolean = false;
   resourceMaps: Map<number, Resource> = new Map();
   userMaps: Map<number, User> = new Map();
@@ -34,13 +34,13 @@ export class TaskSaveComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.task.Project = new Project();
+    this.task = new Task();
   }
 
   New(projectId: number, id?: number): void {
     this.projectService.Get(projectId).subscribe(project => {
       let questTeam = new QuestTeam();
-      questTeam.QuestId = project.QuestId;
+      questTeam.QuestId = project.QuestTarget.QuestId;
       this.questTeamService.ListWithCondition(questTeam).subscribe(teams => {
         let user = new User();
         user.Ids = [];
@@ -56,7 +56,7 @@ export class TaskSaveComponent implements OnInit {
       });
 
       let resource = new Resource();
-      resource.Area.Id = project.AreaId;
+      resource.Area.Id = project.QuestTarget.AreaId;
       this.resourceService.ListWithCondition(resource).subscribe(resources => {
         this.resourceMaps = new Map();
         resources.forEach((one, k) => {

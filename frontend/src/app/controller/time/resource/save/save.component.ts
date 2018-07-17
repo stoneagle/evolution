@@ -26,7 +26,6 @@ export class ResourceSaveComponent implements OnInit {
 
   ngOnInit() {
     this.resource = new Resource();
-    this.resource.Area = new Area();
     let area = new Area();
     area.Type = AreaSettings.Type.Leaf; 
     this.areaService.ListWithCondition(area).subscribe(res => {
@@ -55,9 +54,6 @@ export class ResourceSaveComponent implements OnInit {
   }            
 
   Submit(): void {
-    if (this.resource.Area == undefined) {
-      this.resource.Area = new Area();
-    }
     this.resource.Area.Ids = this.areaIds;
     if (this.resource.Id == null) {
       this.resourceService.Add(this.resource).subscribe(res => {

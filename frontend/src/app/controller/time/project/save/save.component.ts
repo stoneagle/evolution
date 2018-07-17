@@ -17,7 +17,7 @@ import { QuestTargetService  } from '../../../../service/time/quest-target.servi
 })
 
 export class ProjectSaveComponent implements OnInit {
-  project: Project = new Project();
+  project: Project;
   modelOpened: boolean = false;
   areaMaps: Map<number, Area> = new Map();
   tasks: Task[] = [];
@@ -32,7 +32,7 @@ export class ProjectSaveComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.project.Quest = new Quest();
+    this.project = new Project();
   }
 
   New(questId: number, id?: number): void {
@@ -54,13 +54,13 @@ export class ProjectSaveComponent implements OnInit {
         this.projectService.Get(id).subscribe(res => {
           this.project = res;
           this.project.Quest = quest;
-          this.project.QuestId = this.project.Quest.Id;
+          this.project.QuestTarget.QuestId = this.project.Quest.Id;
           this.modelOpened = true;
         })
       } else {
         this.project = new Project();
         this.project.Quest = quest;
-        this.project.QuestId = this.project.Quest.Id;
+        this.project.QuestTarget.QuestId = this.project.Quest.Id;
         this.modelOpened = true;
       }
     })
