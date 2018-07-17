@@ -1,6 +1,7 @@
 package services
 
 import (
+	"evolution/backend/common/logger"
 	"evolution/backend/common/structs"
 	"evolution/backend/time/models"
 
@@ -9,20 +10,14 @@ import (
 )
 
 type Field struct {
+	Base
 	structs.Service
 }
 
-func NewField(engine *xorm.Engine, cache *redis.Client) *Field {
+func NewField(engine *xorm.Engine, cache *redis.Client, log *logger.Logger) *Field {
 	ret := Field{}
-	ret.Engine = engine
-	ret.Cache = cache
+	ret.Init(engine, cache, log)
 	return &ret
-}
-
-func (s *Field) One(id int) (interface{}, error) {
-	model := models.Field{}
-	_, err := s.Engine.Where("id = ?", id).Get(&model)
-	return model, err
 }
 
 func (s *Field) Add(model models.Field) (err error) {
@@ -32,14 +27,6 @@ func (s *Field) Add(model models.Field) (err error) {
 
 func (s *Field) Update(id int, model models.Field) (err error) {
 	_, err = s.Engine.Id(id).Update(&model)
-	return
-}
-
-func (s *Field) Delete(id int, model models.Field) (err error) {
-	_, err = s.Engine.Id(id).Get(&model)
-	if err == nil {
-		_, err = s.Engine.Id(id).Delete(&model)
-	}
 	return
 }
 

@@ -49,3 +49,7 @@ import:
   version: ^3.2.0
 - package: github.com/araddon/dateparse
 - package: github.com/jinzhu/now
+- package: github.com/davecgh/go-spew
+  version: ^1.1.0
+  subpackages:
+  - spew

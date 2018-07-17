@@ -1,6 +1,7 @@
 package services
 
 import (
+	"evolution/backend/common/logger"
 	"evolution/backend/common/structs"
 	"evolution/backend/common/utils"
 	"evolution/backend/time/models"
@@ -10,20 +11,14 @@ import (
 )
 
 type Resource struct {
+	Base
 	structs.Service
 }
 
-func NewResource(engine *xorm.Engine, cache *redis.Client) *Resource {
+func NewResource(engine *xorm.Engine, cache *redis.Client, log *logger.Logger) *Resource {
 	ret := Resource{}
-	ret.Engine = engine
-	ret.Cache = cache
+	ret.Init(engine, cache, log)
 	return &ret
-}
-
-func (s *Resource) One(id int) (interface{}, error) {
-	model := models.Resource{}
-	_, err := s.Engine.Where("id = ?", id).Get(&model)
-	return model, err
 }
 
 func (s *Resource) Add(model models.Resource) (err error) {
@@ -131,7 +126,8 @@ func (s *Resource) Update(id int, model models.Resource) (err error) {
 	return
 }
 
-func (s *Resource) Delete(id int, model models.Resource) (err error) {
+func (s *Resource) Delete(id int, model interface{}) (err error) {
+	model = model.(models.Resource)
 	session := s.Engine.NewSession()
 	defer session.Close()
 	err = session.Begin()
@@ -147,7 +143,7 @@ func (s *Resource) Delete(id int, model models.Resource) (err error) {
 	}
 
 	if len(relateTasks) == 0 {
-		_, err = session.Unscoped().Delete(&model)
+		_, err = session.Unscoped().Delete(model)
 		if err != nil {
 			session.Rollback()
 			return
@@ -160,7 +156,7 @@ func (s *Resource) Delete(id int, model models.Resource) (err error) {
 			return
 		}
 	} else {
-		_, err = session.Id(id).Delete(&model)
+		_, err = session.Id(id).Delete(model)
 		if err != nil {
 			session.Rollback()
 			return
@@ -181,7 +177,7 @@ func (s *Resource) ListWithCondition(resource *models.Resource) (resources []mod
 
 	condition := resource.BuildCondition()
 	if resource.WithSub {
-		areaIdSlice, err := NewArea(s.Engine, s.Cache).GetAllLeafId(resource.Area.Id)
+		areaIdSlice, err := s.AreaSvc.GetAllLeafId(resource.Area.Id)
 		if err != nil {
 			return resources, err
 		}

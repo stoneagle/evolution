@@ -1,6 +1,7 @@
 package services
 
 import (
+	"evolution/backend/common/logger"
 	"evolution/backend/common/structs"
 	"evolution/backend/time/models"
 
@@ -9,25 +10,25 @@ import (
 )
 
 type Project struct {
+	Base
 	structs.Service
 }
 
-func NewProject(engine *xorm.Engine, cache *redis.Client) *Project {
+func NewProject(engine *xorm.Engine, cache *redis.Client, log *logger.Logger) *Project {
 	ret := Project{}
-	ret.Engine = engine
-	ret.Cache = cache
+	ret.Init(engine, cache, log)
 	return &ret
 }
 
-func (s *Project) One(id int) (interface{}, error) {
-	projectJoin := models.ProjectJoin{}
-	sql := s.Engine.Unscoped().Table("project").Join("INNER", "quest_target", "quest_target.id = project.quest_target_id").Join("INNER", "area", "area.id = quest_target.area_id")
-	_, err := sql.Where("project.id = ?", id).Get(&projectJoin)
-	model := models.Project{}
-	model.Area = projectJoin.Area
-	model.QuestTarget = projectJoin.QuestTarget
-	return model, err
-}
+// func (s *Project) One(id int) (interface{}, error) {
+// 	projectJoin := models.ProjectJoin{}
+// 	sql := s.Engine.Unscoped().Table("project").Join("INNER", "quest_target", "quest_target.id = project.quest_target_id").Join("INNER", "area", "area.id = quest_target.area_id")
+// 	_, err := sql.Where("project.id = ?", id).Get(&projectJoin)
+// 	model := models.Project{}
+// 	model.Area = projectJoin.Area
+// 	model.QuestTarget = projectJoin.QuestTarget
+// 	return model, err
+// }
 
 func (s *Project) Add(model models.Project) (err error) {
 	_, err = s.Engine.Insert(&model)
@@ -36,14 +37,6 @@ func (s *Project) Add(model models.Project) (err error) {
 
 func (s *Project) Update(id int, model models.Project) (err error) {
 	_, err = s.Engine.Id(id).Update(&model)
-	return
-}
-
-func (s *Project) Delete(id int, model models.Project) (err error) {
-	_, err = s.Engine.Id(id).Get(&model)
-	if err == nil {
-		_, err = s.Engine.Id(id).Delete(&model)
-	}
 	return
 }
 

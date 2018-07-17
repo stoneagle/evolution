@@ -2,29 +2,25 @@ package services
 
 import (
 	"errors"
-	"evolution/backend/common/structs"
-	"evolution/backend/common/utils"
-	"evolution/backend/time/models"
 
 	"github.com/go-redis/redis"
 	"github.com/go-xorm/xorm"
+
+	"evolution/backend/common/logger"
+	"evolution/backend/common/structs"
+	"evolution/backend/common/utils"
+	"evolution/backend/time/models"
 )
 
 type QuestTarget struct {
+	Base
 	structs.Service
 }
 
-func NewQuestTarget(engine *xorm.Engine, cache *redis.Client) *QuestTarget {
+func NewQuestTarget(engine *xorm.Engine, cache *redis.Client, log *logger.Logger) *QuestTarget {
 	ret := QuestTarget{}
-	ret.Engine = engine
-	ret.Cache = cache
+	ret.Init(engine, cache, log)
 	return &ret
-}
-
-func (s *QuestTarget) One(id int) (interface{}, error) {
-	model := models.QuestTarget{}
-	_, err := s.Engine.Where("id = ?", id).Get(&model)
-	return model, err
 }
 
 func (s *QuestTarget) Add(model *models.QuestTarget) (err error) {
@@ -110,14 +106,6 @@ func (s *QuestTarget) BatchSave(targets []models.QuestTarget) (err error) {
 
 func (s *QuestTarget) Update(id int, model models.QuestTarget) (err error) {
 	_, err = s.Engine.Id(id).Update(&model)
-	return
-}
-
-func (s *QuestTarget) Delete(id int, model models.QuestTarget) (err error) {
-	_, err = s.Engine.Id(id).Get(&model)
-	if err == nil {
-		_, err = s.Engine.Id(id).Delete(&model)
-	}
 	return
 }
 

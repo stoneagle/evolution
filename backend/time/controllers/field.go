@@ -3,30 +3,24 @@ package controllers
 import (
 	"evolution/backend/common/middles"
 	"evolution/backend/common/resp"
-	"evolution/backend/common/structs"
+
 	"evolution/backend/time/models"
-	"evolution/backend/time/services"
 
 	"github.com/gin-gonic/gin"
 )
 
 type Field struct {
-	structs.Controller
-	FieldSvc *services.Field
+	Base
 }
 
 func NewField() *Field {
 	Field := &Field{}
-	Field.Init()
-	Field.ProjectName = Field.Config.Time.System.Name
-	Field.Name = "field"
-	Field.Prepare()
-	Field.FieldSvc = services.NewField(Field.Engine, Field.Cache)
+	Field.Resource = ResourceField
 	return Field
 }
 
 func (c *Field) Router(router *gin.RouterGroup) {
-	field := router.Group(c.Name).Use(middles.One(c.FieldSvc, c.Name))
+	field := router.Group(c.Resource).Use(middles.OnInit(c)).Use(middles.One(c.FieldSvc, c.Resource, models.Field{}))
 	field.GET("/get/:id", c.One)
 	field.GET("/list", c.List)
 	field.POST("", c.Add)
@@ -35,14 +29,14 @@ func (c *Field) Router(router *gin.RouterGroup) {
 }
 
 func (c *Field) One(ctx *gin.Context) {
-	field := ctx.MustGet(c.Name).(models.Field)
+	field := ctx.MustGet(c.Resource).(*models.Field)
 	resp.Success(ctx, field)
 }
 
 func (c *Field) List(ctx *gin.Context) {
 	fields, err := c.FieldSvc.List()
 	if err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorMysql, "field get error", err)
+		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "field get error", err)
 		return
 	}
 	resp.Success(ctx, fields)
@@ -57,7 +51,7 @@ func (c *Field) Add(ctx *gin.Context) {
 
 	err := c.FieldSvc.Add(field)
 	if err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorMysql, "field insert error", err)
+		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "field insert error", err)
 		return
 	}
 	resp.Success(ctx, struct{}{})
@@ -72,17 +66,17 @@ func (c *Field) Update(ctx *gin.Context) {
 
 	err := c.FieldSvc.Update(field.Id, field)
 	if err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorMysql, "field update error", err)
+		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "field update error", err)
 		return
 	}
 	resp.Success(ctx, struct{}{})
 }
 
 func (c *Field) Delete(ctx *gin.Context) {
-	field := ctx.MustGet(c.Name).(models.Field)
+	field := ctx.MustGet(c.Resource).(*models.Field)
 	err := c.FieldSvc.Delete(field.Id, field)
 	if err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorMysql, "field delete error", err)
+		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "field delete error", err)
 		return
 	}
 	resp.Success(ctx, field.Id)

@@ -3,35 +3,25 @@ package controllers
 import (
 	"evolution/backend/common/middles"
 	"evolution/backend/common/resp"
-	"evolution/backend/common/structs"
+
 	"evolution/backend/time/models"
-	"evolution/backend/time/services"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
 type Task struct {
-	structs.Controller
-	TaskSvc      *services.Task
-	ProjectSvc   *services.Project
-	QuestTeamSvc *services.QuestTeam
+	Base
 }
 
 func NewTask() *Task {
 	Task := &Task{}
-	Task.Init()
-	Task.ProjectName = Task.Config.Time.System.Name
-	Task.Name = "task"
-	Task.Prepare()
-	Task.TaskSvc = services.NewTask(Task.Engine, Task.Cache)
-	Task.ProjectSvc = services.NewProject(Task.Engine, Task.Cache)
-	Task.QuestTeamSvc = services.NewQuestTeam(Task.Engine, Task.Cache)
+	Task.Resource = ResourceTask
 	return Task
 }
 
 func (c *Task) Router(router *gin.RouterGroup) {
-	task := router.Group(c.Name).Use(middles.One(c.TaskSvc, c.Name))
+	task := router.Group(c.Resource).Use(middles.OnInit(c)).Use(middles.One(c.TaskSvc, c.Resource, models.Task{}))
 	task.GET("/get/:id", c.One)
 	task.GET("/list", c.List)
 	task.GET("/list/user/:uid", c.ListByUser)
@@ -42,14 +32,14 @@ func (c *Task) Router(router *gin.RouterGroup) {
 }
 
 func (c *Task) One(ctx *gin.Context) {
-	task := ctx.MustGet(c.Name).(models.Task)
+	task := ctx.MustGet(c.Resource).(*models.Task)
 	resp.Success(ctx, task)
 }
 
 func (c *Task) List(ctx *gin.Context) {
 	tasks, err := c.TaskSvc.List()
 	if err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorMysql, "task get error", err)
+		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "task get error", err)
 		return
 	}
 	resp.Success(ctx, tasks)
@@ -69,7 +59,7 @@ func (c *Task) ListByUser(ctx *gin.Context) {
 
 	teams, err := c.QuestTeamSvc.ListWithCondition(&questTeam)
 	if err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorMysql, "team get error", err)
+		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "team get error", err)
 		return
 	}
 
@@ -82,7 +72,7 @@ func (c *Task) ListByUser(ctx *gin.Context) {
 	project.QuestTarget.QuestIds = questIds
 	projects, err := c.ProjectSvc.ListWithCondition(&project)
 	if err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorMysql, "project get error", err)
+		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "project get error", err)
 		return
 	}
 
@@ -95,7 +85,7 @@ func (c *Task) ListByUser(ctx *gin.Context) {
 	task.ProjectIds = projectIds
 	tasks, err := c.TaskSvc.ListWithCondition(&task)
 	if err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorMysql, "task get error", err)
+		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "task get error", err)
 		return
 	}
 	resp.Success(ctx, tasks)
@@ -109,7 +99,7 @@ func (c *Task) ListByCondition(ctx *gin.Context) {
 	}
 	tasks, err := c.TaskSvc.ListWithCondition(&task)
 	if err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorMysql, "task get error", err)
+		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "task get error", err)
 		return
 	}
 	resp.Success(ctx, tasks)
@@ -124,7 +114,7 @@ func (c *Task) Add(ctx *gin.Context) {
 
 	err := c.TaskSvc.Add(task)
 	if err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorMysql, "task insert error", err)
+		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "task insert error", err)
 		return
 	}
 	resp.Success(ctx, struct{}{})
@@ -139,17 +129,17 @@ func (c *Task) Update(ctx *gin.Context) {
 
 	err := c.TaskSvc.Update(task.Id, task)
 	if err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorMysql, "task update error", err)
+		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "task update error", err)
 		return
 	}
 	resp.Success(ctx, struct{}{})
 }
 
 func (c *Task) Delete(ctx *gin.Context) {
-	task := ctx.MustGet(c.Name).(models.Task)
+	task := ctx.MustGet(c.Resource).(*models.Task)
 	err := c.TaskSvc.Delete(task.Id, task)
 	if err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorMysql, "task delete error", err)
+		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "task delete error", err)
 		return
 	}
 	resp.Success(ctx, task.Id)

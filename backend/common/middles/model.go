@@ -16,7 +16,7 @@ var (
 	UserKey = "user"
 )
 
-func One(svc structs.ServiceGeneral, name string) gin.HandlerFunc {
+func One(svc structs.ServiceGeneral, name string, model interface{}) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		idStr := ctx.Param("id")
 		if idStr != "" {
@@ -25,9 +25,9 @@ func One(svc structs.ServiceGeneral, name string) gin.HandlerFunc {
 				resp.ErrorBusiness(ctx, resp.ErrorParams, "id params error", err)
 				return
 			}
-			model, err := svc.One(id)
+			err = svc.One(id, model)
 			if err != nil {
-				resp.ErrorBusiness(ctx, resp.ErrorMysql, fmt.Sprintf("get model %s error", name), err)
+				resp.ErrorBusiness(ctx, resp.ErrorDatabase, fmt.Sprintf("get model %s error", name), err)
 				return
 			}
 			ctx.Set(name, model)
@@ -42,7 +42,7 @@ func UserFromSession(sessionKey string) gin.HandlerFunc {
 		username := session.Get(sessionKey)
 		if username == nil {
 			ctx.AbortWithStatusJSON(http.StatusOK, resp.Response{
-				Code: resp.ErrorLogin,
+				Code: resp.ErrorSign,
 				Data: struct{}{},
 				Desc: "invalid user session",
 			})

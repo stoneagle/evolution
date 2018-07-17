@@ -1,6 +1,7 @@
 package services
 
 import (
+	"evolution/backend/common/logger"
 	"evolution/backend/common/structs"
 	"evolution/backend/system/models"
 
@@ -9,20 +10,14 @@ import (
 )
 
 type User struct {
+	Base
 	structs.Service
 }
 
-func NewUser(engine *xorm.Engine, cache *redis.Client) *User {
+func NewUser(engine *xorm.Engine, cache *redis.Client, log *logger.Logger) *User {
 	ret := User{}
-	ret.Engine = engine
-	ret.Cache = cache
+	ret.Init(engine, cache, log)
 	return &ret
-}
-
-func (s *User) One(id int) (interface{}, error) {
-	model := models.User{}
-	_, err := s.Engine.Where("id = ?", id).Get(&model)
-	return model, err
 }
 
 func (s *User) OneByCondition(user *models.User) (models.User, error) {
@@ -39,14 +34,6 @@ func (s *User) Add(model models.User) (err error) {
 
 func (s *User) Update(id int, model models.User) (err error) {
 	_, err = s.Engine.Id(id).Update(&model)
-	return
-}
-
-func (s *User) Delete(id int, model models.User) (err error) {
-	_, err = s.Engine.Id(id).Get(&model)
-	if err == nil {
-		_, err = s.Engine.Id(id).Delete(&model)
-	}
 	return
 }
 

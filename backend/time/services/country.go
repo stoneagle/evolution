@@ -1,6 +1,7 @@
 package services
 
 import (
+	"evolution/backend/common/logger"
 	"evolution/backend/common/structs"
 	"evolution/backend/time/models"
 
@@ -9,20 +10,14 @@ import (
 )
 
 type Country struct {
+	Base
 	structs.Service
 }
 
-func NewCountry(engine *xorm.Engine, cache *redis.Client) *Country {
+func NewCountry(engine *xorm.Engine, cache *redis.Client, log *logger.Logger) *Country {
 	ret := Country{}
-	ret.Engine = engine
-	ret.Cache = cache
+	ret.Init(engine, cache, log)
 	return &ret
-}
-
-func (s *Country) One(id int) (interface{}, error) {
-	model := models.Country{}
-	_, err := s.Engine.Where("id = ?", id).Get(&model)
-	return model, err
 }
 
 func (s *Country) Add(model models.Country) (err error) {
@@ -32,14 +27,6 @@ func (s *Country) Add(model models.Country) (err error) {
 
 func (s *Country) Update(id int, model models.Country) (err error) {
 	_, err = s.Engine.Id(id).Update(&model)
-	return
-}
-
-func (s *Country) Delete(id int, model models.Country) (err error) {
-	_, err = s.Engine.Id(id).Get(&model)
-	if err == nil {
-		_, err = s.Engine.Id(id).Delete(&model)
-	}
 	return
 }
 

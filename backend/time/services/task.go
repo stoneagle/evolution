@@ -1,6 +1,7 @@
 package services
 
 import (
+	"evolution/backend/common/logger"
 	"evolution/backend/common/structs"
 	"evolution/backend/time/models"
 	"math"
@@ -11,20 +12,14 @@ import (
 )
 
 type Task struct {
+	Base
 	structs.Service
 }
 
-func NewTask(engine *xorm.Engine, cache *redis.Client) *Task {
+func NewTask(engine *xorm.Engine, cache *redis.Client, log *logger.Logger) *Task {
 	ret := Task{}
-	ret.Engine = engine
-	ret.Cache = cache
+	ret.Init(engine, cache, log)
 	return &ret
-}
-
-func (s *Task) One(id int) (interface{}, error) {
-	model := models.Task{}
-	_, err := s.Engine.Where("id = ?", id).Get(&model)
-	return model, err
 }
 
 func (s *Task) Add(model models.Task) (err error) {
@@ -35,11 +30,12 @@ func (s *Task) Add(model models.Task) (err error) {
 func (s *Task) Update(id int, model models.Task) (err error) {
 	emptyTime := time.Time{}
 	if model.EndDate != emptyTime {
-		task, err := s.One(id)
+		task := models.Task{}
+		err := s.One(id, task)
 		if err != nil {
 			return err
 		}
-		diffHours := model.EndDate.Sub(task.(models.Task).StartDate).Hours()
+		diffHours := model.EndDate.Sub(task.StartDate).Hours()
 		model.Duration = int(math.Ceil(diffHours / 24))
 	}
 	_, err = s.Engine.Id(id).Update(&model)
@@ -65,14 +61,6 @@ func (s *Task) Update(id int, model models.Task) (err error) {
 
 func (s *Task) UpdateByMap(id int, model map[string]interface{}) (err error) {
 	_, err = s.Engine.Table(new(models.Task)).Id(id).Update(&model)
-	return
-}
-
-func (s *Task) Delete(id int, model models.Task) (err error) {
-	_, err = s.Engine.Id(id).Get(&model)
-	if err == nil {
-		_, err = s.Engine.Id(id).Delete(&model)
-	}
 	return
 }
 

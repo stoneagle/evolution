@@ -1,6 +1,7 @@
 package services
 
 import (
+	"evolution/backend/common/logger"
 	"evolution/backend/common/structs"
 	"evolution/backend/time/models"
 
@@ -9,20 +10,14 @@ import (
 )
 
 type Phase struct {
+	Base
 	structs.Service
 }
 
-func NewPhase(engine *xorm.Engine, cache *redis.Client) *Phase {
+func NewPhase(engine *xorm.Engine, cache *redis.Client, log *logger.Logger) *Phase {
 	ret := Phase{}
-	ret.Engine = engine
-	ret.Cache = cache
+	ret.Init(engine, cache, log)
 	return &ret
-}
-
-func (s *Phase) One(id int) (interface{}, error) {
-	model := models.Phase{}
-	_, err := s.Engine.Where("id = ?", id).Get(&model)
-	return model, err
 }
 
 func (s *Phase) Add(model models.Phase) (err error) {
@@ -32,14 +27,6 @@ func (s *Phase) Add(model models.Phase) (err error) {
 
 func (s *Phase) Update(id int, model models.Phase) (err error) {
 	_, err = s.Engine.Id(id).Update(&model)
-	return
-}
-
-func (s *Phase) Delete(id int, model models.Phase) (err error) {
-	_, err = s.Engine.Id(id).Get(&model)
-	if err == nil {
-		_, err = s.Engine.Id(id).Delete(&model)
-	}
 	return
 }
 

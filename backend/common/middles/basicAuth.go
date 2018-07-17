@@ -1,8 +1,6 @@
 package middles
 
 import (
-	"evolution/backend/common/config"
-	"evolution/backend/common/database"
 	"evolution/backend/common/resp"
 	systemModel "evolution/backend/system/models"
 	"evolution/backend/system/services"
@@ -19,19 +17,19 @@ var (
 	TypeBAJwt        = "BAJwt"
 )
 
-func BasicAuthLogin() gin.HandlerFunc {
+func BasicAuthLogin(userSvc *services.User) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		username := c.MustGet(gin.AuthUserKey).(string)
 		session := sessions.Default(c)
 		session.Set(SessionBasicAuth, username)
 		err := session.Save()
 		if err != nil {
-			resp.ErrorBusiness(c, resp.ErrorLogin, "session save error", err)
+			resp.ErrorBusiness(c, resp.ErrorSign, "session save error", err)
 		} else {
 			condition := systemModel.User{
 				Name: username,
 			}
-			user, err := services.NewUser(database.GetXorm(config.Get().System.System.Name), nil).OneByCondition(&condition)
+			user, err := userSvc.OneByCondition(&condition)
 			if err != nil {
 				resp.ErrorBusiness(c, resp.ErrorApi, fmt.Sprintf("get user %s error", username), err)
 				return
@@ -47,7 +45,7 @@ func BasicAuthLogout() gin.HandlerFunc {
 		session := sessions.Default(c)
 		user := session.Get(SessionBasicAuth)
 		if user == nil {
-			resp.ErrorBusiness(c, resp.ErrorLogin, "invalid session token", nil)
+			resp.ErrorBusiness(c, resp.ErrorSign, "invalid session token", nil)
 		} else {
 			session.Delete(SessionBasicAuth)
 			session.Save()
@@ -56,18 +54,18 @@ func BasicAuthLogout() gin.HandlerFunc {
 	}
 }
 
-func BasicAuthCurrent() gin.HandlerFunc {
+func BasicAuthCurrent(userSvc *services.User) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		session := sessions.Default(c)
 		username := session.Get(SessionBasicAuth)
 		if username == nil {
-			resp.ErrorBusiness(c, resp.ErrorLogin, "invalid session token", nil)
+			resp.ErrorBusiness(c, resp.ErrorSign, "invalid session token", nil)
 		} else {
 			name := username.(string)
 			condition := systemModel.User{
 				Name: name,
 			}
-			user, err := services.NewUser(database.GetXorm(config.Get().System.System.Name), nil).OneByCondition(&condition)
+			user, err := userSvc.OneByCondition(&condition)
 			if err != nil {
 				resp.ErrorBusiness(c, resp.ErrorApi, fmt.Sprintf("get user %s error", name), err)
 				return
@@ -84,7 +82,7 @@ func BasicAuthCheck() gin.HandlerFunc {
 		user := session.Get(SessionBasicAuth)
 		if user == nil {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, resp.Response{
-				Code: resp.ErrorLogin,
+				Code: resp.ErrorSign,
 				Data: struct{}{},
 				Desc: "invalid session token",
 			})

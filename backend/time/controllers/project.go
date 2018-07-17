@@ -3,36 +3,24 @@ package controllers
 import (
 	"evolution/backend/common/middles"
 	"evolution/backend/common/resp"
-	"evolution/backend/common/structs"
+
 	"evolution/backend/time/models"
-	"evolution/backend/time/services"
 
 	"github.com/gin-gonic/gin"
 )
 
 type Project struct {
-	structs.Controller
-	TaskSvc      *services.Task
-	ProjectSvc   *services.Project
-	QuestSvc     *services.Quest
-	QuestTeamSvc *services.QuestTeam
+	Base
 }
 
 func NewProject() *Project {
 	Project := &Project{}
-	Project.Init()
-	Project.ProjectName = Project.Config.Time.System.Name
-	Project.Name = "project"
-	Project.Prepare()
-	Project.TaskSvc = services.NewTask(Project.Engine, Project.Cache)
-	Project.ProjectSvc = services.NewProject(Project.Engine, Project.Cache)
-	Project.QuestSvc = services.NewQuest(Project.Engine, Project.Cache)
-	Project.QuestTeamSvc = services.NewQuestTeam(Project.Engine, Project.Cache)
+	Project.Resource = ResourceProject
 	return Project
 }
 
 func (c *Project) Router(router *gin.RouterGroup) {
-	project := router.Group(c.Name).Use(middles.One(c.ProjectSvc, c.Name))
+	project := router.Group(c.Resource).Use(middles.OnInit(c)).Use(middles.One(c.ProjectSvc, c.Resource, models.Project{}))
 	project.GET("/get/:id", c.One)
 	project.GET("/list", c.List)
 	project.POST("", c.Add)
@@ -42,14 +30,14 @@ func (c *Project) Router(router *gin.RouterGroup) {
 }
 
 func (c *Project) One(ctx *gin.Context) {
-	project := ctx.MustGet(c.Name).(models.Project)
+	project := ctx.MustGet(c.Resource).(*models.Project)
 	resp.Success(ctx, project)
 }
 
 func (c *Project) List(ctx *gin.Context) {
 	projects, err := c.ProjectSvc.List()
 	if err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorMysql, "project get error", err)
+		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "project get error", err)
 		return
 	}
 	resp.Success(ctx, projects)
@@ -63,7 +51,7 @@ func (c *Project) ListByCondition(ctx *gin.Context) {
 	}
 	projects, err := c.ProjectSvc.ListWithCondition(&project)
 	if err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorMysql, "project get error", err)
+		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "project get error", err)
 		return
 	}
 	resp.Success(ctx, projects)
@@ -78,7 +66,7 @@ func (c *Project) Add(ctx *gin.Context) {
 
 	err := c.ProjectSvc.Add(project)
 	if err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorMysql, "project insert error", err)
+		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "project insert error", err)
 		return
 	}
 	resp.Success(ctx, struct{}{})
@@ -93,17 +81,17 @@ func (c *Project) Update(ctx *gin.Context) {
 
 	err := c.ProjectSvc.Update(project.Id, project)
 	if err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorMysql, "project update error", err)
+		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "project update error", err)
 		return
 	}
 	resp.Success(ctx, struct{}{})
 }
 
 func (c *Project) Delete(ctx *gin.Context) {
-	project := ctx.MustGet(c.Name).(models.Project)
+	project := ctx.MustGet(c.Resource).(*models.Project)
 	err := c.ProjectSvc.Delete(project.Id, project)
 	if err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorMysql, "project delete error", err)
+		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "project delete error", err)
 		return
 	}
 	resp.Success(ctx, project.Id)

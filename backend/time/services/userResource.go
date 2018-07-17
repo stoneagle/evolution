@@ -1,6 +1,7 @@
 package services
 
 import (
+	"evolution/backend/common/logger"
 	"evolution/backend/common/structs"
 	"evolution/backend/time/models"
 
@@ -9,20 +10,14 @@ import (
 )
 
 type UserResource struct {
+	Base
 	structs.Service
 }
 
-func NewUserResource(engine *xorm.Engine, cache *redis.Client) *UserResource {
+func NewUserResource(engine *xorm.Engine, cache *redis.Client, log *logger.Logger) *UserResource {
 	ret := UserResource{}
-	ret.Engine = engine
-	ret.Cache = cache
+	ret.Init(engine, cache, log)
 	return &ret
-}
-
-func (s *UserResource) One(id int) (interface{}, error) {
-	model := models.UserResource{}
-	_, err := s.Engine.Where("id = ?", id).Get(&model)
-	return model, err
 }
 
 func (s *UserResource) Add(model models.UserResource) (err error) {
@@ -32,14 +27,6 @@ func (s *UserResource) Add(model models.UserResource) (err error) {
 
 func (s *UserResource) Update(id int, model models.UserResource) (err error) {
 	_, err = s.Engine.Id(id).Update(&model)
-	return
-}
-
-func (s *UserResource) Delete(id int, model models.UserResource) (err error) {
-	_, err = s.Engine.Id(id).Get(&model)
-	if err == nil {
-		_, err = s.Engine.Id(id).Delete(&model)
-	}
 	return
 }
 
@@ -55,7 +42,7 @@ func (s *UserResource) ListWithCondition(userResource *models.UserResource) (use
 
 	condition := userResource.BuildCondition()
 	if userResource.Resource.WithSub {
-		areaIdSlice, err := NewArea(s.Engine, s.Cache).GetAllLeafId(userResource.Resource.Area.Id)
+		areaIdSlice, err := s.AreaSvc.GetAllLeafId(userResource.Resource.Area.Id)
 		if err != nil {
 			return userResources, err
 		}

@@ -11,9 +11,9 @@ import (
 )
 
 func Configure(b *bootstrap.Bootstrapper) {
-
 	prefix := b.Config.Time.System.Prefix + "/" + b.Config.Time.System.Version
 	var v1 *gin.RouterGroup
+
 	switch b.Config.System.Auth.Type {
 	case middles.TypeBasicAuth:
 		store, err := database.SessionByRedis(b.Config.System.Redis)

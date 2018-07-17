@@ -1,6 +1,7 @@
 package services
 
 import (
+	"evolution/backend/common/logger"
 	"evolution/backend/common/structs"
 	"evolution/backend/time/models"
 	"time"
@@ -11,20 +12,14 @@ import (
 )
 
 type Action struct {
+	Base
 	structs.Service
 }
 
-func NewAction(engine *xorm.Engine, cache *redis.Client) *Action {
+func NewAction(engine *xorm.Engine, cache *redis.Client, log *logger.Logger) *Action {
 	ret := Action{}
-	ret.Engine = engine
-	ret.Cache = cache
+	ret.Init(engine, cache, log)
 	return &ret
-}
-
-func (s *Action) One(id int) (interface{}, error) {
-	model := models.Action{}
-	_, err := s.Engine.Where("id = ?", id).Get(&model)
-	return model, err
 }
 
 func (s *Action) Add(model *models.Action) (err error) {
@@ -37,17 +32,14 @@ func (s *Action) Update(id int, model models.Action) (err error) {
 	return
 }
 
-func (s *Action) Delete(id int, model models.Action) (err error) {
-	_, err = s.Engine.Id(id).Get(&model)
-	if err == nil {
-		_, err = s.Engine.Id(id).Delete(&model)
-	}
-	return
-}
-
 func (s *Action) List() (actions []models.Action, err error) {
 	actions = make([]models.Action, 0)
-	err = s.Engine.Find(&actions)
+	session := s.Engine.Where("1 = 1")
+	err = session.Find(&actions)
+	if err != nil {
+		sql, args := session.LastSQL()
+		s.LogSql(sql, args, err)
+	}
 	return
 }
 

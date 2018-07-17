@@ -3,30 +3,24 @@ package controllers
 import (
 	"evolution/backend/common/middles"
 	"evolution/backend/common/resp"
-	"evolution/backend/common/structs"
+
 	"evolution/backend/time/models"
-	"evolution/backend/time/services"
 
 	"github.com/gin-gonic/gin"
 )
 
 type Phase struct {
-	structs.Controller
-	PhaseSvc *services.Phase
+	Base
 }
 
 func NewPhase() *Phase {
 	Phase := &Phase{}
-	Phase.Init()
-	Phase.ProjectName = Phase.Config.Time.System.Name
-	Phase.Name = "phase"
-	Phase.Prepare()
-	Phase.PhaseSvc = services.NewPhase(Phase.Engine, Phase.Cache)
+	Phase.Resource = ResourcePhase
 	return Phase
 }
 
 func (c *Phase) Router(router *gin.RouterGroup) {
-	phase := router.Group(c.Name).Use(middles.One(c.PhaseSvc, c.Name))
+	phase := router.Group(c.Resource).Use(middles.OnInit(c)).Use(middles.One(c.PhaseSvc, c.Resource, models.Phase{}))
 	phase.GET("/get/:id", c.One)
 	phase.GET("/list", c.List)
 	phase.POST("", c.Add)
@@ -36,14 +30,14 @@ func (c *Phase) Router(router *gin.RouterGroup) {
 }
 
 func (c *Phase) One(ctx *gin.Context) {
-	phase := ctx.MustGet(c.Name).(models.Phase)
+	phase := ctx.MustGet(c.Resource).(*models.Phase)
 	resp.Success(ctx, phase)
 }
 
 func (c *Phase) List(ctx *gin.Context) {
 	phases, err := c.PhaseSvc.List()
 	if err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorMysql, "phase get error", err)
+		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "phase get error", err)
 		return
 	}
 	resp.Success(ctx, phases)
@@ -57,7 +51,7 @@ func (c *Phase) ListByCondition(ctx *gin.Context) {
 	}
 	phases, err := c.PhaseSvc.ListWithCondition(&phase)
 	if err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorMysql, "phase get error", err)
+		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "phase get error", err)
 		return
 	}
 	resp.Success(ctx, phases)
@@ -72,7 +66,7 @@ func (c *Phase) Add(ctx *gin.Context) {
 
 	err := c.PhaseSvc.Add(phase)
 	if err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorMysql, "phase insert error", err)
+		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "phase insert error", err)
 		return
 	}
 	resp.Success(ctx, struct{}{})
@@ -87,17 +81,17 @@ func (c *Phase) Update(ctx *gin.Context) {
 
 	err := c.PhaseSvc.Update(phase.Id, phase)
 	if err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorMysql, "phase update error", err)
+		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "phase update error", err)
 		return
 	}
 	resp.Success(ctx, struct{}{})
 }
 
 func (c *Phase) Delete(ctx *gin.Context) {
-	phase := ctx.MustGet(c.Name).(models.Phase)
+	phase := ctx.MustGet(c.Resource).(*models.Phase)
 	err := c.PhaseSvc.Delete(phase.Id, phase)
 	if err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorMysql, "phase delete error", err)
+		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "phase delete error", err)
 		return
 	}
 	resp.Success(ctx, phase.Id)

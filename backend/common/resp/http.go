@@ -1,12 +1,9 @@
 package resp
 
 import (
-	"encoding/json"
+	"evolution/backend/common/logger"
 	"fmt"
 	"net/http"
-	"runtime"
-
-	"evolution/backend/common/logger"
 
 	"github.com/gin-gonic/gin"
 )
@@ -28,38 +25,53 @@ func Success(ctx *gin.Context, data interface{}) {
 		Desc: "success",
 	}
 	ctx.JSON(http.StatusOK, res)
-	FormatResponseLog(res)
+	log := logger.Get()
+	log.Caller = 3
+	log.Log(logger.InfoLevel, res, nil)
 }
 
 func CustomSuccess(ctx *gin.Context, res interface{}) {
 	ctx.JSON(http.StatusOK, res)
-	FormatResponseLog(res)
+	log := logger.Get()
+	log.Caller = 3
+	log.Log(logger.InfoLevel, res, nil)
 }
 
 func ErrorBusiness(ctx *gin.Context, code ErrorCode, desc string, err error) {
+	message, ok := ErrorMessages[code]
+	if !ok {
+		logger.Get().Log(logger.WarnLevel, "code message not exist", nil)
+		message = "unknown code message"
+	}
+	desc = fmt.Sprintf("%s:%s", message, desc)
 	if err != nil {
-		desc += ":" + err.Error()
+		desc += "[" + err.Error() + "]"
 	}
 	res := Response{
 		Code: code,
 		Data: struct{}{},
 		Desc: desc,
 	}
-	FormatResponseLog(res)
-	FormatErrorLog(err)
 	ctx.AbortWithStatusJSON(http.StatusOK, res)
+	log := logger.Get()
+	log.Caller = 3
+	log.Log(logger.InfoLevel, res, err)
 }
 
-func FormatResponseLog(response interface{}) {
-	logResponse, _ := json.Marshal(response)
-	if string(logResponse) != "" {
-		logger.Get().Infow("response:【" + string(logResponse) + "】")
+func ExceptionServer(ctx *gin.Context, err error) {
+	code := ErrorServer
+	message, ok := ErrorMessages[code]
+	if !ok {
+		logger.Get().Log(logger.WarnLevel, "code message not exist", nil)
+		message = "unknown code message"
 	}
-}
-
-func FormatErrorLog(err error) {
-	if err != nil {
-		_, fn, line, _ := runtime.Caller(3)
-		logger.Get().Warnw(fmt.Sprintf("response-error:【%s:%d:%v】", fn, line, err))
+	res := Response{
+		Code: code,
+		Data: struct{}{},
+		Desc: message,
 	}
+	ctx.AbortWithStatusJSON(http.StatusOK, res)
+	log := logger.Get()
+	log.Caller = 8
+	log.Log(logger.ErrorLevel, res, err)
 }

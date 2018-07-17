@@ -3,9 +3,8 @@ package controllers
 import (
 	"evolution/backend/common/middles"
 	"evolution/backend/common/resp"
-	"evolution/backend/common/structs"
+
 	"evolution/backend/time/models"
-	"evolution/backend/time/services"
 	"strconv"
 	"strings"
 	"time"
@@ -16,22 +15,17 @@ import (
 )
 
 type Syncfusion struct {
-	structs.Controller
-	SyncfusionSvc *services.Syncfusion
+	Base
 }
 
 func NewSyncfusion() *Syncfusion {
 	Syncfusion := &Syncfusion{}
-	Syncfusion.Init()
-	Syncfusion.ProjectName = Syncfusion.Config.Time.System.Name
-	Syncfusion.Name = "syncfusion"
-	Syncfusion.Prepare()
-	Syncfusion.SyncfusionSvc = services.NewSyncfusion(Syncfusion.Engine, Syncfusion.Cache)
+	Syncfusion.Resource = ResourceSyncfusion
 	return Syncfusion
 }
 
 func (c *Syncfusion) Router(router *gin.RouterGroup) {
-	syncfusion := router.Group(c.Name)
+	syncfusion := router.Group(c.Resource).Use(middles.OnInit(c))
 	syncfusion.GET("/list/kanban", c.ListKanban)
 	syncfusion.GET("/list/gantt", c.ListGantt)
 	syncfusion.GET("/list/schedule/", c.ListSchedule)
@@ -42,7 +36,7 @@ func (c *Syncfusion) ListKanban(ctx *gin.Context) {
 	user := ctx.MustGet(middles.UserKey).(middles.UserInfo)
 	kanbans, err := c.SyncfusionSvc.ListKanban(user.Id)
 	if err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorMysql, "task kanban get error", err)
+		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "task kanban get error", err)
 		return
 	}
 	resp.Success(ctx, kanbans)
@@ -51,17 +45,17 @@ func (c *Syncfusion) ListKanban(ctx *gin.Context) {
 func (c *Syncfusion) ListSchedule(ctx *gin.Context) {
 	currentDate := ctx.Query("CurrentDate")
 	if len(currentDate) == 0 {
-		resp.ErrorBusiness(ctx, resp.ErrorMysql, "current date not exist", nil)
+		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "current date not exist", nil)
 		return
 	}
 	currentView := ctx.Query("CurrentView")
 	if len(currentView) == 0 {
-		resp.ErrorBusiness(ctx, resp.ErrorMysql, "current view not exist", nil)
+		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "current view not exist", nil)
 		return
 	}
 	currentTime, err := dateparse.ParseLocal(currentDate)
 	if err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorMysql, "current date get error", err)
+		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "current date get error", err)
 		return
 	}
 
@@ -86,12 +80,12 @@ func (c *Syncfusion) ListSchedule(ctx *gin.Context) {
 		endDate = now.New(currentTime).EndOfMonth()
 		break
 	default:
-		resp.ErrorBusiness(ctx, resp.ErrorMysql, "current view not match", nil)
+		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "current view not match", nil)
 		return
 	}
 	schedules, err := c.SyncfusionSvc.ListSchedule(user.Id, startDate, endDate)
 	if err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorMysql, "action schedules get error", nil)
+		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "action schedules get error", nil)
 		return
 	}
 	resp.CustomSuccess(ctx, schedules)
@@ -129,7 +123,7 @@ func (c *Syncfusion) ListTreeGrid(ctx *gin.Context) {
 
 	treeGrids, err := c.SyncfusionSvc.ListTreeGrid(fieldId, parentId)
 	if err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorMysql, "area treegrid get error", err)
+		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "area treegrid get error", err)
 		return
 	}
 	res := map[string]interface{}{}
@@ -142,7 +136,7 @@ func (c *Syncfusion) ListGantt(ctx *gin.Context) {
 	user := ctx.MustGet(middles.UserKey).(middles.UserInfo)
 	gantts, err := c.SyncfusionSvc.ListGantt(user.Id)
 	if err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorMysql, "quest to task gantt get error", err)
+		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "quest to task gantt get error", err)
 		return
 	}
 	resp.Success(ctx, gantts)

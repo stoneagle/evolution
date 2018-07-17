@@ -2,29 +2,34 @@ package structs
 
 import (
 	"evolution/backend/common/config"
-	"evolution/backend/common/database"
 	"evolution/backend/common/logger"
-
-	"github.com/go-redis/redis"
-	"github.com/go-xorm/xorm"
-	"go.uber.org/zap"
 )
 
 type Controller struct {
-	Name        string
-	ProjectName string
-	Config      config.Conf
-	Engine      *xorm.Engine
-	Cache       *redis.Client
-	Logger      *zap.SugaredLogger
+	Resource string
+	Project  string
+	Config   config.Conf
+	Logger   *logger.Logger
 }
 
-func (b *Controller) Init() {
-	b.Config = *config.Get()
+type ControllerGeneral interface {
+	Init()
+}
+
+func (b *Controller) Prepare(ptype config.ProjectType) {
 	b.Logger = logger.Get()
-}
-
-func (b *Controller) Prepare() {
-	b.Cache = database.GetRedis()
-	b.Engine = database.GetXorm(b.ProjectName)
+	b.Config = *config.Get()
+	switch ptype {
+	case config.ProjectQuant:
+		b.Project = b.Config.Quant.System.Name
+	case config.ProjectTime:
+		b.Project = b.Config.Time.System.Name
+	case config.ProjectSystem:
+		b.Project = b.Config.System.System.Name
+	default:
+		panic("error")
+	}
+	b.Logger.Log(logger.InfoLevel, b, nil)
+	b.Logger.Project = b.Project
+	b.Logger.Resource = b.Resource
 }

@@ -3,30 +3,24 @@ package controllers
 import (
 	"evolution/backend/common/middles"
 	"evolution/backend/common/resp"
-	"evolution/backend/common/structs"
+
 	"evolution/backend/time/models"
-	"evolution/backend/time/services"
 
 	"github.com/gin-gonic/gin"
 )
 
 type QuestTeam struct {
-	structs.Controller
-	QuestTeamSvc *services.QuestTeam
+	Base
 }
 
 func NewQuestTeam() *QuestTeam {
 	QuestTeam := &QuestTeam{}
-	QuestTeam.Init()
-	QuestTeam.ProjectName = QuestTeam.Config.Time.System.Name
-	QuestTeam.Name = "quest-team"
-	QuestTeam.Prepare()
-	QuestTeam.QuestTeamSvc = services.NewQuestTeam(QuestTeam.Engine, QuestTeam.Cache)
+	QuestTeam.Resource = ResourceQuestTeam
 	return QuestTeam
 }
 
 func (c *QuestTeam) Router(router *gin.RouterGroup) {
-	questTeam := router.Group(c.Name).Use(middles.One(c.QuestTeamSvc, c.Name))
+	questTeam := router.Group(c.Resource).Use(middles.OnInit(c)).Use(middles.One(c.QuestTeamSvc, c.Resource, models.QuestTeam{}))
 	questTeam.GET("/get/:id", c.One)
 	questTeam.GET("/list", c.List)
 	questTeam.POST("", c.Add)
@@ -36,14 +30,14 @@ func (c *QuestTeam) Router(router *gin.RouterGroup) {
 }
 
 func (c *QuestTeam) One(ctx *gin.Context) {
-	questTeam := ctx.MustGet(c.Name).(models.QuestTeam)
+	questTeam := ctx.MustGet(c.Resource).(*models.QuestTeam)
 	resp.Success(ctx, questTeam)
 }
 
 func (c *QuestTeam) List(ctx *gin.Context) {
 	questTeams, err := c.QuestTeamSvc.List()
 	if err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorMysql, "questTeam get error", err)
+		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "questTeam get error", err)
 		return
 	}
 	resp.Success(ctx, questTeams)
@@ -57,7 +51,7 @@ func (c *QuestTeam) ListByCondition(ctx *gin.Context) {
 	}
 	questTeams, err := c.QuestTeamSvc.ListWithCondition(&questTeam)
 	if err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorMysql, "questTeam get error", err)
+		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "questTeam get error", err)
 		return
 	}
 	resp.Success(ctx, questTeams)
@@ -72,7 +66,7 @@ func (c *QuestTeam) Add(ctx *gin.Context) {
 
 	err := c.QuestTeamSvc.Add(questTeam)
 	if err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorMysql, "questTeam insert error", err)
+		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "questTeam insert error", err)
 		return
 	}
 	resp.Success(ctx, struct{}{})
@@ -87,17 +81,17 @@ func (c *QuestTeam) Update(ctx *gin.Context) {
 
 	err := c.QuestTeamSvc.Update(questTeam.Id, questTeam)
 	if err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorMysql, "questTeam update error", err)
+		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "questTeam update error", err)
 		return
 	}
 	resp.Success(ctx, struct{}{})
 }
 
 func (c *QuestTeam) Delete(ctx *gin.Context) {
-	questTeam := ctx.MustGet(c.Name).(models.QuestTeam)
+	questTeam := ctx.MustGet(c.Resource).(*models.QuestTeam)
 	err := c.QuestTeamSvc.Delete(questTeam.Id, questTeam)
 	if err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorMysql, "questTeam delete error", err)
+		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "questTeam delete error", err)
 		return
 	}
 	resp.Success(ctx, questTeam.Id)

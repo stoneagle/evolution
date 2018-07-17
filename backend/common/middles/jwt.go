@@ -2,8 +2,6 @@ package middles
 
 import (
 	"errors"
-	"evolution/backend/common/config"
-	"evolution/backend/common/database"
 	"evolution/backend/common/resp"
 	systemModel "evolution/backend/system/models"
 	"evolution/backend/system/services"
@@ -36,15 +34,15 @@ type UserInfo struct {
 	jwt.StandardClaims
 }
 
-func JWTAuthLogin() gin.HandlerFunc {
+func JWTAuthLogin(userSvc *services.User) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		username := c.MustGet(gin.AuthUserKey).(string)
 		condition := systemModel.User{
 			Name: username,
 		}
-		user, err := services.NewUser(database.GetXorm(config.Get().System.System.Name), nil).OneByCondition(&condition)
+		user, err := userSvc.OneByCondition(&condition)
 		if err != nil {
-			resp.ErrorBusiness(c, resp.ErrorLogin, fmt.Sprintf("get user %s error", username), err)
+			resp.ErrorBusiness(c, resp.ErrorSign, fmt.Sprintf("get user %s error", username), err)
 			return
 		}
 		j := NewJWT()
@@ -54,7 +52,7 @@ func JWTAuthLogin() gin.HandlerFunc {
 		userInfo.Email = user.Email
 		token, err := j.CreateToken(userInfo)
 		if err != nil {
-			resp.ErrorBusiness(c, resp.ErrorLogin, fmt.Sprintf("create token %s error", username), err)
+			resp.ErrorBusiness(c, resp.ErrorSign, fmt.Sprintf("create token %s error", username), err)
 			return
 		}
 		c.Header(JwtTokenHeader, "Bear "+token)
@@ -81,7 +79,7 @@ func JWTAuthCheck() gin.HandlerFunc {
 					return
 				}
 			}
-			resp.ErrorBusiness(c, resp.ErrorLogin, "token check error", err)
+			resp.ErrorBusiness(c, resp.ErrorSign, "token check error", err)
 			return
 		}
 		c.Set(UserKey, *userInfo)
@@ -100,7 +98,7 @@ func JWTAuthCurrent() gin.HandlerFunc {
 		j := NewJWT()
 		userInfo, err := j.ParseToken(token)
 		if err != nil {
-			resp.ErrorBusiness(c, resp.ErrorLogin, "token check error", err)
+			resp.ErrorBusiness(c, resp.ErrorSign, "token check error", err)
 			return
 		}
 		resp.Success(c, userInfo)

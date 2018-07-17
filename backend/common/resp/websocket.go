@@ -49,14 +49,11 @@ func (ws *Websocket) BuildContext(callback WsCallback) map[string]interface{} {
 func (ws *Websocket) HandleMessage(s *melody.Session, msg []byte) {
 	var res WebsocketResponse
 	ctx := s.Keys
-
-	logger.Get().Infow("websocket-request:【" + string(msg) + "】")
-
 	res = ctx[wsCBKey].(WsCallback)(msg)
 	ret, _ := json.Marshal(&res)
 
-	logger.Get().Infow("websocket-response:【" + string(ret) + "】")
-
+	logger.Get().Log(logger.InfoLevel, "websocket-request:【"+string(msg)+"】", nil)
+	logger.Get().Log(logger.InfoLevel, "websocket-response:【"+string(ret)+"】", nil)
 	s.Write(ret)
 }
 

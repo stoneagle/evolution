@@ -1,6 +1,7 @@
 package services
 
 import (
+	"evolution/backend/common/logger"
 	"evolution/backend/common/structs"
 	"evolution/backend/time/models"
 
@@ -9,20 +10,14 @@ import (
 )
 
 type Quest struct {
+	Base
 	structs.Service
 }
 
-func NewQuest(engine *xorm.Engine, cache *redis.Client) *Quest {
+func NewQuest(engine *xorm.Engine, cache *redis.Client, log *logger.Logger) *Quest {
 	ret := Quest{}
-	ret.Engine = engine
-	ret.Cache = cache
+	ret.Init(engine, cache, log)
 	return &ret
-}
-
-func (s *Quest) One(id int) (interface{}, error) {
-	model := models.Quest{}
-	_, err := s.Engine.Where("id = ?", id).Get(&model)
-	return model, err
 }
 
 func (s *Quest) Add(model *models.Quest) (err error) {
@@ -32,14 +27,6 @@ func (s *Quest) Add(model *models.Quest) (err error) {
 
 func (s *Quest) Update(id int, model models.Quest) (err error) {
 	_, err = s.Engine.Id(id).Update(&model)
-	return
-}
-
-func (s *Quest) Delete(id int, model models.Quest) (err error) {
-	_, err = s.Engine.Id(id).Get(&model)
-	if err == nil {
-		_, err = s.Engine.Id(id).Delete(&model)
-	}
 	return
 }
 

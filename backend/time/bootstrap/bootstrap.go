@@ -2,6 +2,7 @@ package bootstrap
 
 import (
 	"evolution/backend/common/config"
+	"evolution/backend/common/middles"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -33,6 +34,7 @@ func (b *Bootstrapper) Bootstrap() *Bootstrapper {
 	gin.SetMode(b.Config.App.Mode)
 	b.App.Use(gin.Logger())
 	b.App.Use(gin.Recovery())
+	b.App.Use(middles.Recovery(middles.RecoveryHandler))
 	// cors must set in bootstrap
 	if b.Config.App.Mode == "debug" {
 		b.App.Use(cors.New(cors.Config{

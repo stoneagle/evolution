@@ -3,30 +3,24 @@ package controllers
 import (
 	"evolution/backend/common/middles"
 	"evolution/backend/common/resp"
-	"evolution/backend/common/structs"
+
 	"evolution/backend/time/models"
-	"evolution/backend/time/services"
 
 	"github.com/gin-gonic/gin"
 )
 
 type Resource struct {
-	structs.Controller
-	ResourceSvc *services.Resource
+	Base
 }
 
 func NewResource() *Resource {
 	Resource := &Resource{}
-	Resource.Init()
-	Resource.ProjectName = Resource.Config.Time.System.Name
-	Resource.Name = "resource"
-	Resource.Prepare()
-	Resource.ResourceSvc = services.NewResource(Resource.Engine, Resource.Cache)
+	Resource.Resource = ResourceResource
 	return Resource
 }
 
 func (c *Resource) Router(router *gin.RouterGroup) {
-	resource := router.Group(c.Name).Use(middles.One(c.ResourceSvc, c.Name))
+	resource := router.Group(c.Resource).Use(middles.OnInit(c)).Use(middles.One(c.ResourceSvc, c.Resource, models.Resource{}))
 	resource.GET("/get/:id", c.One)
 	resource.GET("/list", c.List)
 	resource.GET("/list/areas/:id", c.ListAreas)
@@ -38,24 +32,24 @@ func (c *Resource) Router(router *gin.RouterGroup) {
 }
 
 func (c *Resource) One(ctx *gin.Context) {
-	resource := ctx.MustGet(c.Name).(models.Resource)
+	resource := ctx.MustGet(c.Resource).(*models.Resource)
 	resp.Success(ctx, resource)
 }
 
 func (c *Resource) List(ctx *gin.Context) {
 	resources, err := c.ResourceSvc.List()
 	if err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorMysql, "resource get error", err)
+		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "resource get error", err)
 		return
 	}
 	resp.Success(ctx, resources)
 }
 
 func (c *Resource) ListAreas(ctx *gin.Context) {
-	resource := ctx.MustGet(c.Name).(models.Resource)
+	resource := ctx.MustGet(c.Resource).(*models.Resource)
 	areas, err := c.ResourceSvc.ListAreas(resource.Id)
 	if err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorMysql, "area get error", err)
+		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "area get error", err)
 		return
 	}
 	resp.Success(ctx, areas)
@@ -70,7 +64,7 @@ func (c *Resource) ListByCondition(ctx *gin.Context) {
 
 	resources, err := c.ResourceSvc.ListWithCondition(&resource)
 	if err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorMysql, "resource get error", err)
+		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "resource get error", err)
 		return
 	}
 	resp.Success(ctx, resources)
@@ -85,7 +79,7 @@ func (c *Resource) ListGroupByLeaf(ctx *gin.Context) {
 
 	resources, err := c.ResourceSvc.ListWithCondition(&resource)
 	if err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorMysql, "resource get error", err)
+		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "resource get error", err)
 		return
 	}
 	areas := c.ResourceSvc.GroupByArea(resources)
@@ -101,7 +95,7 @@ func (c *Resource) Add(ctx *gin.Context) {
 
 	err := c.ResourceSvc.Add(resource)
 	if err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorMysql, "resource insert error", err)
+		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "resource insert error", err)
 		return
 	}
 	resp.Success(ctx, struct{}{})
@@ -116,17 +110,17 @@ func (c *Resource) Update(ctx *gin.Context) {
 
 	err := c.ResourceSvc.Update(resource.Id, resource)
 	if err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorMysql, "resource update error", err)
+		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "resource update error", err)
 		return
 	}
 	resp.Success(ctx, struct{}{})
 }
 
 func (c *Resource) Delete(ctx *gin.Context) {
-	resource := ctx.MustGet(c.Name).(models.Resource)
+	resource := ctx.MustGet(c.Resource).(*models.Resource)
 	err := c.ResourceSvc.Delete(resource.Id, resource)
 	if err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorMysql, "resource delete error", err)
+		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "resource delete error", err)
 		return
 	}
 	resp.Success(ctx, resource.Id)

@@ -1,6 +1,7 @@
 package services
 
 import (
+	"evolution/backend/common/logger"
 	"evolution/backend/common/structs"
 	"evolution/backend/time/models"
 
@@ -9,20 +10,14 @@ import (
 )
 
 type QuestTimeTable struct {
+	Base
 	structs.Service
 }
 
-func NewQuestTimeTable(engine *xorm.Engine, cache *redis.Client) *QuestTimeTable {
+func NewQuestTimeTable(engine *xorm.Engine, cache *redis.Client, log *logger.Logger) *QuestTimeTable {
 	ret := QuestTimeTable{}
-	ret.Engine = engine
-	ret.Cache = cache
+	ret.Init(engine, cache, log)
 	return &ret
-}
-
-func (s *QuestTimeTable) One(id int) (interface{}, error) {
-	model := models.QuestTimeTable{}
-	_, err := s.Engine.Where("id = ?", id).Get(&model)
-	return model, err
 }
 
 func (s *QuestTimeTable) Add(model models.QuestTimeTable) (err error) {
@@ -32,14 +27,6 @@ func (s *QuestTimeTable) Add(model models.QuestTimeTable) (err error) {
 
 func (s *QuestTimeTable) Update(id int, model models.QuestTimeTable) (err error) {
 	_, err = s.Engine.Id(id).Update(&model)
-	return
-}
-
-func (s *QuestTimeTable) Delete(id int, model models.QuestTimeTable) (err error) {
-	_, err = s.Engine.Id(id).Get(&model)
-	if err == nil {
-		_, err = s.Engine.Id(id).Delete(&model)
-	}
 	return
 }
 

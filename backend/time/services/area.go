@@ -2,30 +2,26 @@ package services
 
 import (
 	"errors"
+
+	"github.com/go-redis/redis"
+	"github.com/go-xorm/xorm"
+
+	"evolution/backend/common/logger"
 	"evolution/backend/common/structs"
 	"evolution/backend/time/models"
 	"fmt"
 	"strconv"
-
-	"github.com/go-redis/redis"
-	"github.com/go-xorm/xorm"
 )
 
 type Area struct {
+	Base
 	structs.Service
 }
 
-func NewArea(engine *xorm.Engine, cache *redis.Client) *Area {
+func NewArea(engine *xorm.Engine, cache *redis.Client, log *logger.Logger) *Area {
 	ret := Area{}
-	ret.Engine = engine
-	ret.Cache = cache
+	ret.Init(engine, cache, log)
 	return &ret
-}
-
-func (s *Area) One(id int) (interface{}, error) {
-	model := models.Area{}
-	_, err := s.Engine.Where("id = ?", id).Get(&model)
-	return model, err
 }
 
 func (s *Area) Add(model models.Area) (err error) {
@@ -40,14 +36,6 @@ func (s *Area) UpdateByMap(id int, model map[string]interface{}) (err error) {
 
 func (s *Area) Update(id int, model models.Area) (err error) {
 	_, err = s.Engine.Id(id).Update(&model)
-	return
-}
-
-func (s *Area) Delete(id int, model models.Area) (err error) {
-	_, err = s.Engine.Id(id).Get(&model)
-	if err == nil {
-		_, err = s.Engine.Id(id).Delete(&model)
-	}
 	return
 }
 
