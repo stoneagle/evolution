@@ -21,7 +21,7 @@ func NewArea() *Area {
 }
 
 func (c *Area) Router(router *gin.RouterGroup) {
-	area := router.Group(c.Resource).Use(middles.OnInit(c))
+	area := router.Group(c.Resource.String()).Use(middles.OnInit(c))
 	area.GET("/get/:id", c.One)
 	area.GET("/list/all", c.List)
 	area.GET("/list/parent/:fieldId", c.ListParent)
@@ -29,23 +29,9 @@ func (c *Area) Router(router *gin.RouterGroup) {
 	area.GET("/list/tree/one/:fieldId", c.ListOneTree)
 	area.GET("/list/tree/all", c.ListAllTree)
 	area.POST("/list", c.ListWithCondition)
-	area.POST("", c.Add)
+	area.POST("", c.Create)
 	area.PUT("/:id", c.Update)
 	area.DELETE("/:id", c.Delete)
-}
-
-func (c *Area) One(ctx *gin.Context) {
-	area := ctx.MustGet(c.Resource).(*models.Area)
-	resp.Success(ctx, area)
-}
-
-func (c *Area) List(ctx *gin.Context) {
-	areas, err := c.AreaSvc.List()
-	if err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "area get error", err)
-		return
-	}
-	resp.Success(ctx, areas)
 }
 
 func (c *Area) ListWithCondition(ctx *gin.Context) {
@@ -64,7 +50,8 @@ func (c *Area) ListWithCondition(ctx *gin.Context) {
 }
 
 func (c *Area) ListAllTree(ctx *gin.Context) {
-	areas, err := c.AreaSvc.List()
+	areas := make([]models.Area, 0)
+	err := c.AreaSvc.List(&areas)
 	if err != nil {
 		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "area get error", err)
 		return
@@ -164,45 +151,4 @@ func (c *Area) ListOneTree(ctx *gin.Context) {
 		}
 	}
 	resp.Success(ctx, areaTrees[fieldId])
-}
-
-func (c *Area) Add(ctx *gin.Context) {
-	var area models.Area
-	if err := ctx.ShouldBindJSON(&area); err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorParams, "params error: ", err)
-		return
-	}
-
-	err := c.AreaSvc.Add(area)
-	if err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "area insert error", err)
-		return
-	}
-	resp.Success(ctx, struct{}{})
-}
-
-func (c *Area) Update(ctx *gin.Context) {
-	var area models.Area
-	if err := ctx.ShouldBindJSON(&area); err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorParams, "params error: ", err)
-		return
-	}
-
-	err := c.AreaSvc.Update(area.Id, area)
-	if err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "area update error", err)
-		return
-	}
-
-	resp.Success(ctx, struct{}{})
-}
-
-func (c *Area) Delete(ctx *gin.Context) {
-	area := ctx.MustGet(c.Resource).(*models.Area)
-	err := c.AreaSvc.Delete(area.Id, area)
-	if err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "area delete error", err)
-		return
-	}
-	resp.Success(ctx, area.Id)
 }

@@ -20,22 +20,6 @@ func NewQuestTeam(engine *xorm.Engine, cache *redis.Client, log *logger.Logger) 
 	return &ret
 }
 
-func (s *QuestTeam) Add(model models.QuestTeam) (err error) {
-	_, err = s.Engine.Insert(&model)
-	return
-}
-
-func (s *QuestTeam) Update(id int, model models.QuestTeam) (err error) {
-	_, err = s.Engine.Id(id).Update(&model)
-	return
-}
-
-func (s *QuestTeam) List() (questTeam []models.QuestTeam, err error) {
-	questTeam = make([]models.QuestTeam, 0)
-	err = s.Engine.Find(&questTeam)
-	return
-}
-
 func (s *QuestTeam) ListWithCondition(questTeam *models.QuestTeam) (questTeams []models.QuestTeam, err error) {
 	questTeamsJoin := make([]models.QuestTeamJoin, 0)
 	sql := s.Engine.Unscoped().Table("quest_team").Join("INNER", "quest", "quest.id = quest_team.quest_id")

@@ -20,22 +20,6 @@ func NewPhase(engine *xorm.Engine, cache *redis.Client, log *logger.Logger) *Pha
 	return &ret
 }
 
-func (s *Phase) Add(model models.Phase) (err error) {
-	_, err = s.Engine.Insert(&model)
-	return
-}
-
-func (s *Phase) Update(id int, model models.Phase) (err error) {
-	_, err = s.Engine.Id(id).Update(&model)
-	return
-}
-
-func (s *Phase) List() (phases []models.Phase, err error) {
-	phases = make([]models.Phase, 0)
-	err = s.Engine.Find(&phases)
-	return
-}
-
 func (s *Phase) ListWithCondition(phase *models.Phase) (phases []models.Phase, err error) {
 	phases = make([]models.Phase, 0)
 	sql := s.Engine.Asc("level")

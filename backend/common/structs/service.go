@@ -11,6 +11,9 @@ import (
 
 type ServiceGeneral interface {
 	One(int, interface{}) error
+	List(interface{}) error
+	Create(interface{}) error
+	Update(int, interface{}) error
 	Delete(int, interface{}) error
 }
 
@@ -39,32 +42,60 @@ func (s *Service) LogSql(sql string, args interface{}, err error) {
 	s.Logger.Log(logger.WarnLevel, info, err)
 }
 
-func (s *Service) One(id int, model interface{}) (err error) {
-	// modelValue := reflect.ValueOf(model)
-	// resource := reflect.Indirect(reflect.ValueOf(model))
+func (s *Service) One(id int, modelPtr interface{}) (err error) {
 	session := s.Engine.Where("id = ?", id)
-	has, err := session.Get(model)
+	has, err := session.Get(modelPtr)
 	if err != nil {
 		sql, args := session.LastSQL()
 		s.LogSql(sql, args, err)
 	}
 	if !has {
-		return errors.New("resource not exist")
+		return errors.New(fmt.Sprintf("%v not exist", s.Logger.Resource))
 	}
 	return
 }
 
-func (s *Service) Delete(id int, model interface{}) (err error) {
+func (s *Service) Delete(id int, modelPtr interface{}) (err error) {
 	session := s.Engine.Id(id)
-	has, err := session.Get(model)
+	has, err := session.Get(modelPtr)
 	if err != nil {
 		sql, args := session.LastSQL()
 		s.LogSql(sql, args, err)
 	}
 	if !has {
-		return errors.New("resource not exist")
+		return errors.New(fmt.Sprintf("%v not exist", s.Logger.Resource))
 	}
-	_, err = s.Engine.Id(id).Delete(model)
+	_, err = s.Engine.Id(id).Delete(modelPtr)
+	if err != nil {
+		sql, args := session.LastSQL()
+		s.LogSql(sql, args, err)
+	}
+	return
+}
+
+func (s *Service) List(modelsPtr interface{}) (err error) {
+	session := s.Engine.Where("1 = 1")
+	err = session.Limit(10).Find(modelsPtr)
+	if err != nil {
+		sql, args := session.LastSQL()
+		s.LogSql(sql, args, err)
+	}
+	return
+}
+
+func (s *Service) Create(modelPtr interface{}) (err error) {
+	session := s.Engine.Where("1 = 1")
+	_, err = session.Insert(modelPtr)
+	if err != nil {
+		sql, args := session.LastSQL()
+		s.LogSql(sql, args, err)
+	}
+	return
+}
+
+func (s *Service) Update(id int, modelPtr interface{}) (err error) {
+	session := s.Engine.Id(id)
+	_, err = session.Update(modelPtr)
 	if err != nil {
 		sql, args := session.LastSQL()
 		s.LogSql(sql, args, err)

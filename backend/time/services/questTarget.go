@@ -23,11 +23,6 @@ func NewQuestTarget(engine *xorm.Engine, cache *redis.Client, log *logger.Logger
 	return &ret
 }
 
-func (s *QuestTarget) Add(model *models.QuestTarget) (err error) {
-	_, err = s.Engine.Insert(model)
-	return
-}
-
 func (s *QuestTarget) BatchSave(targets []models.QuestTarget) (err error) {
 	session := s.Engine.NewSession()
 	defer session.Close()
@@ -101,17 +96,6 @@ func (s *QuestTarget) BatchSave(targets []models.QuestTarget) (err error) {
 		session.Rollback()
 		return
 	}
-	return
-}
-
-func (s *QuestTarget) Update(id int, model models.QuestTarget) (err error) {
-	_, err = s.Engine.Id(id).Update(&model)
-	return
-}
-
-func (s *QuestTarget) List() (questTargets []models.QuestTarget, err error) {
-	questTargets = make([]models.QuestTarget, 0)
-	err = s.Engine.Find(&questTargets)
 	return
 }
 

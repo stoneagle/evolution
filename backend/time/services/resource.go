@@ -21,7 +21,8 @@ func NewResource(engine *xorm.Engine, cache *redis.Client, log *logger.Logger) *
 	return &ret
 }
 
-func (s *Resource) Add(model models.Resource) (err error) {
+func (s *Resource) Create(modelPtr interface{}) (err error) {
+	resourcePtr := modelPtr.(*models.Resource)
 	session := s.Engine.NewSession()
 	defer session.Close()
 	err = session.Begin()
@@ -29,26 +30,26 @@ func (s *Resource) Add(model models.Resource) (err error) {
 		return
 	}
 
-	_, err = session.Insert(&model)
+	_, err = session.Insert(&resourcePtr)
 	if err != nil {
 		session.Rollback()
 		return
 	}
-	if model.Area.Id != 0 {
+	if resourcePtr.Area.Id != 0 {
 		mapAreaResource := models.MapAreaResource{}
-		mapAreaResource.AreaId = model.Area.Id
-		mapAreaResource.ResourceId = model.Id
+		mapAreaResource.AreaId = resourcePtr.Area.Id
+		mapAreaResource.ResourceId = resourcePtr.Id
 		_, err = session.Insert(&mapAreaResource)
 		if err != nil {
 			session.Rollback()
 			return
 		}
 	}
-	if len(model.Area.Ids) > 0 {
-		for _, areaId := range model.Area.Ids {
+	if len(resourcePtr.Area.Ids) > 0 {
+		for _, areaId := range resourcePtr.Area.Ids {
 			mapAreaResource := models.MapAreaResource{}
 			mapAreaResource.AreaId = areaId
-			mapAreaResource.ResourceId = model.Id
+			mapAreaResource.ResourceId = resourcePtr.Id
 			_, err = session.Insert(&mapAreaResource)
 			if err != nil {
 				session.Rollback()
@@ -64,7 +65,8 @@ func (s *Resource) Add(model models.Resource) (err error) {
 	return
 }
 
-func (s *Resource) Update(id int, model models.Resource) (err error) {
+func (s *Resource) Update(id int, modelPtr interface{}) (err error) {
+	resourcePtr := modelPtr.(*models.Resource)
 	session := s.Engine.NewSession()
 	defer session.Close()
 	err = session.Begin()
@@ -72,12 +74,12 @@ func (s *Resource) Update(id int, model models.Resource) (err error) {
 		return
 	}
 
-	_, err = session.Id(id).Update(&model)
+	_, err = session.Id(id).Update(resourcePtr)
 	if err != nil {
 		session.Rollback()
 		return
 	}
-	if len(model.Area.Ids) > 0 {
+	if len(resourcePtr.Area.Ids) > 0 {
 		oldMap := make([]models.MapAreaResource, 0)
 		err = session.Where("map_area_resource.resource_id = ?", id).Find(&oldMap)
 		if err != nil {
@@ -90,7 +92,7 @@ func (s *Resource) Update(id int, model models.Resource) (err error) {
 		for _, old := range oldMap {
 			oldAreaIdsSlice = append(oldAreaIdsSlice, old.AreaId)
 		}
-		for _, newAreaId := range model.Area.Ids {
+		for _, newAreaId := range resourcePtr.Area.Ids {
 			newAreaIdsSlice = append(newAreaIdsSlice, newAreaId)
 		}
 		needAddSlice := utils.SliceDiff(newAreaIdsSlice, oldAreaIdsSlice)
@@ -126,8 +128,8 @@ func (s *Resource) Update(id int, model models.Resource) (err error) {
 	return
 }
 
-func (s *Resource) Delete(id int, model interface{}) (err error) {
-	model = model.(models.Resource)
+func (s *Resource) Delete(id int, modelPtr interface{}) (err error) {
+	resourcePtr := modelPtr.(*models.Resource)
 	session := s.Engine.NewSession()
 	defer session.Close()
 	err = session.Begin()
@@ -143,7 +145,7 @@ func (s *Resource) Delete(id int, model interface{}) (err error) {
 	}
 
 	if len(relateTasks) == 0 {
-		_, err = session.Unscoped().Delete(model)
+		_, err = session.Unscoped().Delete(resourcePtr)
 		if err != nil {
 			session.Rollback()
 			return
@@ -156,7 +158,7 @@ func (s *Resource) Delete(id int, model interface{}) (err error) {
 			return
 		}
 	} else {
-		_, err = session.Id(id).Delete(model)
+		_, err = session.Id(id).Delete(resourcePtr)
 		if err != nil {
 			session.Rollback()
 			return
@@ -212,12 +214,6 @@ func (s *Resource) ListAreas(id int) (areas []models.Area, err error) {
 	for _, one := range resourcesJoin {
 		areas = append(areas, one.Area)
 	}
-	return
-}
-
-func (s *Resource) List() (resources []models.Resource, err error) {
-	resources = make([]models.Resource, 0)
-	err = s.Engine.Find(&resources)
 	return
 }
 

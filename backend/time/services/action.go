@@ -22,27 +22,6 @@ func NewAction(engine *xorm.Engine, cache *redis.Client, log *logger.Logger) *Ac
 	return &ret
 }
 
-func (s *Action) Add(model *models.Action) (err error) {
-	_, err = s.Engine.Insert(model)
-	return
-}
-
-func (s *Action) Update(id int, model models.Action) (err error) {
-	_, err = s.Engine.Id(id).Update(&model)
-	return
-}
-
-func (s *Action) List() (actions []models.Action, err error) {
-	actions = make([]models.Action, 0)
-	session := s.Engine.Where("1 = 1")
-	err = session.Find(&actions)
-	if err != nil {
-		sql, args := session.LastSQL()
-		s.LogSql(sql, args, err)
-	}
-	return
-}
-
 func (s *Action) ListWithCondition(action *models.Action) (actions []models.Action, err error) {
 	actionsJoin := make([]models.ActionJoin, 0)
 	sql := s.Engine.Unscoped().Table("action").Join("INNER", "task", "task.id = action.task_id")

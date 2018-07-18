@@ -24,18 +24,8 @@ func NewArea(engine *xorm.Engine, cache *redis.Client, log *logger.Logger) *Area
 	return &ret
 }
 
-func (s *Area) Add(model models.Area) (err error) {
-	_, err = s.Engine.Insert(&model)
-	return
-}
-
 func (s *Area) UpdateByMap(id int, model map[string]interface{}) (err error) {
 	_, err = s.Engine.Table(new(models.Area)).Id(id).Update(&model)
-	return
-}
-
-func (s *Area) Update(id int, model models.Area) (err error) {
-	_, err = s.Engine.Id(id).Update(&model)
 	return
 }
 
@@ -48,12 +38,6 @@ func (s *Area) ListWithCondition(area *models.Area) (areas []models.Area, err er
 	if err != nil {
 		return
 	}
-	return
-}
-
-func (s *Area) List() (areas []models.Area, err error) {
-	areas = make([]models.Area, 0)
-	err = s.Engine.Asc("parent").Find(&areas)
 	return
 }
 

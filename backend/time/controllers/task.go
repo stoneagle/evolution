@@ -21,28 +21,14 @@ func NewTask() *Task {
 }
 
 func (c *Task) Router(router *gin.RouterGroup) {
-	task := router.Group(c.Resource).Use(middles.OnInit(c))
+	task := router.Group(c.Resource.String()).Use(middles.OnInit(c))
 	task.GET("/get/:id", c.One)
 	task.GET("/list", c.List)
 	task.GET("/list/user/:uid", c.ListByUser)
-	task.POST("", c.Add)
+	task.POST("", c.Create)
 	task.POST("/list", c.ListByCondition)
 	task.PUT("/:id", c.Update)
 	task.DELETE("/:id", c.Delete)
-}
-
-func (c *Task) One(ctx *gin.Context) {
-	task := ctx.MustGet(c.Resource).(*models.Task)
-	resp.Success(ctx, task)
-}
-
-func (c *Task) List(ctx *gin.Context) {
-	tasks, err := c.TaskSvc.List()
-	if err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "task get error", err)
-		return
-	}
-	resp.Success(ctx, tasks)
 }
 
 func (c *Task) ListByUser(ctx *gin.Context) {
@@ -103,44 +89,4 @@ func (c *Task) ListByCondition(ctx *gin.Context) {
 		return
 	}
 	resp.Success(ctx, tasks)
-}
-
-func (c *Task) Add(ctx *gin.Context) {
-	var task models.Task
-	if err := ctx.ShouldBindJSON(&task); err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorParams, "params error: ", err)
-		return
-	}
-
-	err := c.TaskSvc.Add(task)
-	if err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "task insert error", err)
-		return
-	}
-	resp.Success(ctx, struct{}{})
-}
-
-func (c *Task) Update(ctx *gin.Context) {
-	var task models.Task
-	if err := ctx.ShouldBindJSON(&task); err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorParams, "params error: ", err)
-		return
-	}
-
-	err := c.TaskSvc.Update(task.Id, task)
-	if err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "task update error", err)
-		return
-	}
-	resp.Success(ctx, struct{}{})
-}
-
-func (c *Task) Delete(ctx *gin.Context) {
-	task := ctx.MustGet(c.Resource).(*models.Task)
-	err := c.TaskSvc.Delete(task.Id, task)
-	if err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "task delete error", err)
-		return
-	}
-	resp.Success(ctx, task.Id)
 }

@@ -36,3 +36,8 @@ func (m *Action) BuildCondition() (condition builder.Eq) {
 	condition = m.Model.BuildCondition(params, keyPrefix)
 	return condition
 }
+
+func (m *Action) SlicePtr() interface{} {
+	ret := make([]Action, 0)
+	return &ret
+}

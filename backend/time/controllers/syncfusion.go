@@ -25,7 +25,7 @@ func NewSyncfusion() *Syncfusion {
 }
 
 func (c *Syncfusion) Router(router *gin.RouterGroup) {
-	syncfusion := router.Group(c.Resource).Use(middles.OnInit(c))
+	syncfusion := router.Group(c.Resource.String()).Use(middles.OnInit(c))
 	syncfusion.GET("/list/kanban", c.ListKanban)
 	syncfusion.GET("/list/gantt", c.ListGantt)
 	syncfusion.GET("/list/schedule/", c.ListSchedule)

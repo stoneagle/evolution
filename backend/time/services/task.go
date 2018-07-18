@@ -22,24 +22,20 @@ func NewTask(engine *xorm.Engine, cache *redis.Client, log *logger.Logger) *Task
 	return &ret
 }
 
-func (s *Task) Add(model models.Task) (err error) {
-	_, err = s.Engine.Insert(&model)
-	return
-}
-
-func (s *Task) Update(id int, model models.Task) (err error) {
+func (s *Task) Update(id int, modelPtr interface{}) (err error) {
+	taskPtr := modelPtr.(*models.Task)
 	emptyTime := time.Time{}
-	if model.EndDate != emptyTime {
+	if taskPtr.EndDate != emptyTime {
 		task := models.Task{}
-		err := s.One(id, task)
+		err := s.One(id, &task)
 		if err != nil {
 			return err
 		}
-		diffHours := model.EndDate.Sub(task.StartDate).Hours()
-		model.Duration = int(math.Ceil(diffHours / 24))
+		diffHours := taskPtr.EndDate.Sub(task.StartDate).Hours()
+		taskPtr.Duration = int(math.Ceil(diffHours / 24))
 	}
-	_, err = s.Engine.Id(id).Update(&model)
-	if model.StartDateReset {
+	_, err = s.Engine.Id(id).Update(taskPtr)
+	if taskPtr.StartDateReset {
 		err = s.UpdateByMap(id, map[string]interface{}{
 			"start_date": nil,
 		})
@@ -47,7 +43,7 @@ func (s *Task) Update(id int, model models.Task) (err error) {
 			return
 		}
 	}
-	if model.EndDateReset {
+	if taskPtr.EndDateReset {
 		err = s.UpdateByMap(id, map[string]interface{}{
 			"end_date": nil,
 			"duration": 0,
@@ -61,12 +57,6 @@ func (s *Task) Update(id int, model models.Task) (err error) {
 
 func (s *Task) UpdateByMap(id int, model map[string]interface{}) (err error) {
 	_, err = s.Engine.Table(new(models.Task)).Id(id).Update(&model)
-	return
-}
-
-func (s *Task) List() (tasks []models.Task, err error) {
-	tasks = make([]models.Task, 0)
-	err = s.Engine.Find(&tasks)
 	return
 }
 

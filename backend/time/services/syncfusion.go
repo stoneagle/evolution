@@ -70,7 +70,8 @@ func (s *Syncfusion) ListKanban(userId int) (kanbans []models.SyncfusionKanban, 
 		areasMap[one.Id] = one
 	}
 
-	fields, err := s.FieldSvc.List()
+	fields := make([]models.Field, 0)
+	err = s.FieldSvc.List(&fields)
 	if err != nil {
 		return
 	}

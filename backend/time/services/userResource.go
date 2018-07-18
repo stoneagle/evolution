@@ -20,22 +20,6 @@ func NewUserResource(engine *xorm.Engine, cache *redis.Client, log *logger.Logge
 	return &ret
 }
 
-func (s *UserResource) Add(model models.UserResource) (err error) {
-	_, err = s.Engine.Insert(&model)
-	return
-}
-
-func (s *UserResource) Update(id int, model models.UserResource) (err error) {
-	_, err = s.Engine.Id(id).Update(&model)
-	return
-}
-
-func (s *UserResource) List() (userResources []models.UserResource, err error) {
-	userResources = make([]models.UserResource, 0)
-	err = s.Engine.Find(&userResources)
-	return
-}
-
 func (s *UserResource) ListWithCondition(userResource *models.UserResource) (userResources []models.UserResource, err error) {
 	userResourcesJoin := make([]models.UserResourceJoin, 0)
 	sql := s.Engine.Unscoped().Table("user_resource").Join("INNER", "resource", "resource.id = user_resource.resource_id").Join("INNER", "map_area_resource", "map_area_resource.resource_id = resource.id").Join("INNER", "area", "area.id = map_area_resource.area_id")

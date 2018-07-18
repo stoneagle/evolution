@@ -9,6 +9,7 @@ import (
 
 type ModelGeneral interface {
 	BuildCondition() builder.Eq
+	SlicePtr() interface{}
 }
 
 type Model struct {
@@ -43,4 +44,9 @@ func (m *Model) BuildCondition(params map[string]interface{}, keyPrefix string) 
 		condition[keyPrefix+key] = value
 	}
 	return condition
+}
+
+func (m *Model) SlicePtr() interface{} {
+	models := make([]Model, 0)
+	return &models
 }
