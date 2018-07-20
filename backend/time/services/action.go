@@ -12,7 +12,7 @@ import (
 )
 
 type Action struct {
-	ServicePackage
+	Pack ServicePackage
 	structs.Service
 }
 

@@ -41,4 +41,20 @@ func (s *ServicePackage) PrepareService(engine *xorm.Engine, cache *redis.Client
 	s.SyncfusionSvc = NewSyncfusion(engine, cache, log)
 	s.TaskSvc = NewTask(engine, cache, log)
 	s.UserResourceSvc = NewUserResource(engine, cache, log)
+
+	s.ActionSvc.Pack = *s
+	s.AreaSvc.Pack = *s
+	s.CountrySvc.Pack = *s
+	s.FieldSvc.Pack = *s
+	s.PhaseSvc.Pack = *s
+	s.ProjectSvc.Pack = *s
+	s.QuestSvc.Pack = *s
+	s.QuestResourceSvc.Pack = *s
+	s.QuestTargetSvc.Pack = *s
+	s.QuestTeamSvc.Pack = *s
+	s.QuestTimeTableSvc.Pack = *s
+	s.ResourceSvc.Pack = *s
+	s.SyncfusionSvc.Pack = *s
+	s.TaskSvc.Pack = *s
+	s.UserResourceSvc.Pack = *s
 }

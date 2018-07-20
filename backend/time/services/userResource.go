@@ -10,7 +10,7 @@ import (
 )
 
 type UserResource struct {
-	ServicePackage
+	Pack ServicePackage
 	structs.Service
 }
 
@@ -26,7 +26,7 @@ func (s *UserResource) ListWithCondition(userResource *models.UserResource) (use
 
 	condition := userResource.BuildCondition()
 	if userResource.Resource.WithSub {
-		areaIdSlice, err := s.AreaSvc.GetAllLeafId(userResource.Resource.Area.Id)
+		areaIdSlice, err := s.Pack.AreaSvc.GetAllLeafId(userResource.Resource.Area.Id)
 		if err != nil {
 			return userResources, err
 		}

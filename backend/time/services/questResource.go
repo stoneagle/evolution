@@ -10,7 +10,7 @@ import (
 )
 
 type QuestResource struct {
-	ServicePackage
+	Pack ServicePackage
 	structs.Service
 }
 

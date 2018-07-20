@@ -10,11 +10,11 @@ import (
 )
 
 type ServiceGeneral interface {
-	One(int, interface{}) error
+	One(int, ModelGeneral) error
 	List(interface{}) error
-	Create(interface{}) error
-	Update(int, interface{}) error
-	Delete(int, interface{}) error
+	Create(ModelGeneral) error
+	Update(int, ModelGeneral) error
+	Delete(int, ModelGeneral) error
 }
 
 type Service struct {
@@ -42,7 +42,7 @@ func (s *Service) LogSql(sql string, args interface{}, err error) {
 	s.Logger.Log(logger.WarnLevel, info, err)
 }
 
-func (s *Service) One(id int, modelPtr interface{}) (err error) {
+func (s *Service) One(id int, modelPtr ModelGeneral) (err error) {
 	session := s.Engine.Where("id = ?", id)
 	has, err := session.Get(modelPtr)
 	if err != nil {
@@ -55,7 +55,7 @@ func (s *Service) One(id int, modelPtr interface{}) (err error) {
 	return
 }
 
-func (s *Service) Delete(id int, modelPtr interface{}) (err error) {
+func (s *Service) Delete(id int, modelPtr ModelGeneral) (err error) {
 	session := s.Engine.Id(id)
 	has, err := session.Get(modelPtr)
 	if err != nil {
@@ -83,7 +83,7 @@ func (s *Service) List(modelsPtr interface{}) (err error) {
 	return
 }
 
-func (s *Service) Create(modelPtr interface{}) (err error) {
+func (s *Service) Create(modelPtr ModelGeneral) (err error) {
 	session := s.Engine.Where("1 = 1")
 	_, err = session.Insert(modelPtr)
 	if err != nil {
@@ -93,7 +93,7 @@ func (s *Service) Create(modelPtr interface{}) (err error) {
 	return
 }
 
-func (s *Service) Update(id int, modelPtr interface{}) (err error) {
+func (s *Service) Update(id int, modelPtr ModelGeneral) (err error) {
 	session := s.Engine.Id(id)
 	_, err = session.Update(modelPtr)
 	if err != nil {

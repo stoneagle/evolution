@@ -11,7 +11,7 @@ import (
 )
 
 type Resource struct {
-	ServicePackage
+	Pack ServicePackage
 	structs.Service
 }
 
@@ -21,7 +21,7 @@ func NewResource(engine *xorm.Engine, cache *redis.Client, log *logger.Logger) *
 	return &ret
 }
 
-func (s *Resource) Create(modelPtr interface{}) (err error) {
+func (s *Resource) Create(modelPtr structs.ModelGeneral) (err error) {
 	resourcePtr := modelPtr.(*models.Resource)
 	session := s.Engine.NewSession()
 	defer session.Close()
@@ -65,7 +65,7 @@ func (s *Resource) Create(modelPtr interface{}) (err error) {
 	return
 }
 
-func (s *Resource) Update(id int, modelPtr interface{}) (err error) {
+func (s *Resource) Update(id int, modelPtr structs.ModelGeneral) (err error) {
 	resourcePtr := modelPtr.(*models.Resource)
 	session := s.Engine.NewSession()
 	defer session.Close()
@@ -128,7 +128,7 @@ func (s *Resource) Update(id int, modelPtr interface{}) (err error) {
 	return
 }
 
-func (s *Resource) Delete(id int, modelPtr interface{}) (err error) {
+func (s *Resource) Delete(id int, modelPtr structs.ModelGeneral) (err error) {
 	resourcePtr := modelPtr.(*models.Resource)
 	session := s.Engine.NewSession()
 	defer session.Close()
@@ -179,7 +179,7 @@ func (s *Resource) ListWithCondition(resource *models.Resource) (resources []mod
 
 	condition := resource.BuildCondition()
 	if resource.WithSub {
-		areaIdSlice, err := s.AreaSvc.GetAllLeafId(resource.Area.Id)
+		areaIdSlice, err := s.Pack.AreaSvc.GetAllLeafId(resource.Area.Id)
 		if err != nil {
 			return resources, err
 		}

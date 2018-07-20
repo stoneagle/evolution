@@ -14,7 +14,7 @@ import (
 )
 
 type Syncfusion struct {
-	ServicePackage
+	Pack ServicePackage
 	structs.Service
 }
 
@@ -28,7 +28,7 @@ func (s *Syncfusion) ListKanban(userId int) (kanbans []models.SyncfusionKanban, 
 	questTeam := models.QuestTeam{}
 	questTeam.UserId = userId
 	questTeam.Quest.Status = models.QuestStatusExec
-	questTeams, err := s.QuestTeamSvc.ListWithCondition(&questTeam)
+	questTeams, err := s.Pack.QuestTeamSvc.ListWithCondition(&questTeam)
 	if err != nil {
 		return
 	}
@@ -39,7 +39,7 @@ func (s *Syncfusion) ListKanban(userId int) (kanbans []models.SyncfusionKanban, 
 	}
 	project := models.Project{}
 	project.QuestTarget.QuestIds = questIds
-	projects, err := s.ProjectSvc.ListWithCondition(&project)
+	projects, err := s.Pack.ProjectSvc.ListWithCondition(&project)
 	if err != nil {
 		return
 	}
@@ -54,14 +54,14 @@ func (s *Syncfusion) ListKanban(userId int) (kanbans []models.SyncfusionKanban, 
 	}
 	task := models.Task{}
 	task.ProjectIds = projectIds
-	tasks, err := s.TaskSvc.ListWithCondition(&task)
+	tasks, err := s.Pack.TaskSvc.ListWithCondition(&task)
 	if err != nil {
 		return
 	}
 
 	area := models.Area{}
 	area.Ids = areaIds
-	areas, err := s.AreaSvc.ListWithCondition(&area)
+	areas, err := s.Pack.AreaSvc.ListWithCondition(&area)
 	if err != nil {
 		return
 	}
@@ -71,7 +71,7 @@ func (s *Syncfusion) ListKanban(userId int) (kanbans []models.SyncfusionKanban, 
 	}
 
 	fields := make([]models.Field, 0)
-	err = s.FieldSvc.List(&fields)
+	err = s.Pack.FieldSvc.List(&fields)
 	if err != nil {
 		return
 	}
@@ -124,7 +124,7 @@ func (s *Syncfusion) ListSchedule(userId int, startDate, endDate time.Time) (sch
 	action.UserId = userId
 	action.StartDate = startDate
 	action.EndDate = endDate
-	actions, err := s.ActionSvc.ListWithCondition(&action)
+	actions, err := s.Pack.ActionSvc.ListWithCondition(&action)
 	if err != nil {
 		return
 	}
@@ -152,7 +152,7 @@ func (s *Syncfusion) ListTreeGrid(fieldId, parentId int) (treeGrids []models.Syn
 		area.Parent = parentId
 	}
 
-	areas, err := s.AreaSvc.ListWithCondition(&area)
+	areas, err := s.Pack.AreaSvc.ListWithCondition(&area)
 	if err != nil {
 		return
 	}
@@ -187,7 +187,7 @@ func (s *Syncfusion) ListGantt(userId int) (gantts []models.SyncfusionGantt, err
 	questTeam := models.QuestTeam{}
 	questTeam.UserId = userId
 	questTeam.Quest.Status = models.QuestStatusExec
-	questTeams, err := s.QuestTeamSvc.ListWithCondition(&questTeam)
+	questTeams, err := s.Pack.QuestTeamSvc.ListWithCondition(&questTeam)
 	if err != nil {
 		return
 	}
@@ -201,7 +201,7 @@ func (s *Syncfusion) ListGantt(userId int) (gantts []models.SyncfusionGantt, err
 
 	project := models.Project{}
 	project.QuestTarget.QuestIds = questIds
-	projects, err := s.ProjectSvc.ListWithCondition(&project)
+	projects, err := s.Pack.ProjectSvc.ListWithCondition(&project)
 	if err != nil {
 		return
 	}
@@ -212,7 +212,7 @@ func (s *Syncfusion) ListGantt(userId int) (gantts []models.SyncfusionGantt, err
 	}
 	task := models.Task{}
 	task.ProjectIds = projectIds
-	tasks, err := s.TaskSvc.ListWithCondition(&task)
+	tasks, err := s.Pack.TaskSvc.ListWithCondition(&task)
 	if err != nil {
 		return
 	}

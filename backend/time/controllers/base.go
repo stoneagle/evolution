@@ -38,8 +38,10 @@ func (c *BaseController) Init() {
 	engine := database.GetXorm(c.Project)
 	c.PrepareService(engine, cache, c.Logger)
 	c.PrepareModel()
-	c.ChangeSvc(c.Resource)
-	c.ChangeModel(c.Resource)
+	if c.Resource != ResourceSyncfusion {
+		c.ChangeSvc(c.Resource)
+		c.ChangeModel(c.Resource)
+	}
 }
 
 func (c *BaseController) ChangeSvc(resource structs.ResourceType) {

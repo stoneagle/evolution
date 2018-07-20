@@ -12,7 +12,7 @@ import (
 )
 
 type Task struct {
-	ServicePackage
+	Pack ServicePackage
 	structs.Service
 }
 
@@ -22,7 +22,7 @@ func NewTask(engine *xorm.Engine, cache *redis.Client, log *logger.Logger) *Task
 	return &ret
 }
 
-func (s *Task) Update(id int, modelPtr interface{}) (err error) {
+func (s *Task) Update(id int, modelPtr structs.ModelGeneral) (err error) {
 	taskPtr := modelPtr.(*models.Task)
 	emptyTime := time.Time{}
 	if taskPtr.EndDate != emptyTime {

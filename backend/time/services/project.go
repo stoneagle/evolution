@@ -10,7 +10,7 @@ import (
 )
 
 type Project struct {
-	ServicePackage
+	Pack ServicePackage
 	structs.Service
 }
 
@@ -20,7 +20,7 @@ func NewProject(engine *xorm.Engine, cache *redis.Client, log *logger.Logger) *P
 	return &ret
 }
 
-func (s *Project) One(id int, modelPtr interface{}) error {
+func (s *Project) One(id int, modelPtr structs.ModelGeneral) error {
 	projectJoin := models.ProjectJoin{}
 	sql := s.Engine.Unscoped().Table("project").Join("INNER", "quest_target", "quest_target.id = project.quest_target_id").Join("INNER", "area", "area.id = quest_target.area_id")
 	_, err := sql.Where("project.id = ?", id).Get(&projectJoin)
