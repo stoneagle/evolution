@@ -22,10 +22,9 @@ func NewResource() *Resource {
 func (c *Resource) Router(router *gin.RouterGroup) {
 	resource := router.Group(c.Resource.String()).Use(middles.OnInit(c))
 	resource.GET("/get/:id", c.One)
-	resource.GET("/list", c.List)
 	resource.GET("/list/areas/:id", c.ListAreas)
 	resource.POST("", c.Create)
-	resource.POST("/list", c.ListWithCondition)
+	resource.POST("/list", c.List)
 	resource.POST("/list/leaf", c.ListGroupByLeaf)
 	resource.PUT("/:id", c.Update)
 	resource.DELETE("/:id", c.Delete)
@@ -48,7 +47,7 @@ func (c *Resource) ListGroupByLeaf(ctx *gin.Context) {
 		return
 	}
 
-	resourcesPtr, err := c.ResourceSvc.ListWithJoin(&resource)
+	resourcesPtr, err := c.ResourceSvc.List(&resource)
 	if err != nil {
 		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "resource get error", err)
 		return

@@ -19,9 +19,8 @@ func NewCountry() *Country {
 func (c *Country) Router(router *gin.RouterGroup) {
 	country := router.Group(c.Resource.String()).Use(middles.OnInit(c))
 	country.GET("/get/:id", c.One)
-	country.GET("/list", c.List)
 	country.POST("", c.Create)
-	country.POST("/list", c.ListWithCondition)
+	country.POST("/list", c.List)
 	country.PUT("/:id", c.Update)
 	country.DELETE("/:id", c.Delete)
 }

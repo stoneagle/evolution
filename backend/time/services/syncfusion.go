@@ -28,7 +28,7 @@ func (s *Syncfusion) ListKanban(userId int) (kanbans []models.SyncfusionKanban, 
 	questTeam := models.QuestTeam{}
 	questTeam.UserId = userId
 	questTeam.Quest.Status = models.QuestStatusExec
-	questTeamsPtr, err := s.Pack.QuestTeamSvc.ListWithJoin(&questTeam)
+	questTeamsPtr, err := s.Pack.QuestTeamSvc.List(&questTeam)
 	if err != nil {
 		return
 	}
@@ -40,7 +40,7 @@ func (s *Syncfusion) ListKanban(userId int) (kanbans []models.SyncfusionKanban, 
 	}
 	project := models.Project{}
 	project.QuestTarget.QuestIds = questIds
-	projectsPtr, err := s.Pack.ProjectSvc.ListWithJoin(&project)
+	projectsPtr, err := s.Pack.ProjectSvc.List(&project)
 	if err != nil {
 		return
 	}
@@ -56,7 +56,7 @@ func (s *Syncfusion) ListKanban(userId int) (kanbans []models.SyncfusionKanban, 
 	}
 	task := models.Task{}
 	task.ProjectIds = projectIds
-	tasksPtr, err := s.Pack.TaskSvc.ListWithJoin(&task)
+	tasksPtr, err := s.Pack.TaskSvc.List(&task)
 	if err != nil {
 		return
 	}
@@ -130,7 +130,7 @@ func (s *Syncfusion) ListSchedule(userId int, startDate, endDate time.Time) (sch
 	action.UserId = userId
 	action.StartDate = startDate
 	action.EndDate = endDate
-	actionsPtr, err := s.Pack.ActionSvc.ListWithJoin(&action)
+	actionsPtr, err := s.Pack.ActionSvc.List(&action)
 	if err != nil {
 		return
 	}
@@ -195,7 +195,7 @@ func (s *Syncfusion) ListGantt(userId int) (gantts []models.SyncfusionGantt, err
 	questTeam := models.QuestTeam{}
 	questTeam.UserId = userId
 	questTeam.Quest.Status = models.QuestStatusExec
-	questTeamsPtr, err := s.Pack.QuestTeamSvc.ListWithJoin(&questTeam)
+	questTeamsPtr, err := s.Pack.QuestTeamSvc.List(&questTeam)
 	if err != nil {
 		return
 	}
@@ -210,7 +210,7 @@ func (s *Syncfusion) ListGantt(userId int) (gantts []models.SyncfusionGantt, err
 
 	project := models.Project{}
 	project.QuestTarget.QuestIds = questIds
-	projectsPtr, err := s.Pack.ProjectSvc.ListWithJoin(&project)
+	projectsPtr, err := s.Pack.ProjectSvc.List(&project)
 	if err != nil {
 		return
 	}
@@ -222,7 +222,7 @@ func (s *Syncfusion) ListGantt(userId int) (gantts []models.SyncfusionGantt, err
 	}
 	task := models.Task{}
 	task.ProjectIds = projectIds
-	tasksPtr, err := s.Pack.TaskSvc.ListWithJoin(&task)
+	tasksPtr, err := s.Pack.TaskSvc.List(&task)
 	if err != nil {
 		return
 	}

@@ -23,10 +23,9 @@ func NewTask() *Task {
 func (c *Task) Router(router *gin.RouterGroup) {
 	task := router.Group(c.Resource.String()).Use(middles.OnInit(c))
 	task.GET("/get/:id", c.One)
-	task.GET("/list", c.List)
 	task.GET("/list/user/:uid", c.ListByUser)
 	task.POST("", c.Create)
-	task.POST("/list", c.ListWithCondition)
+	task.POST("/list", c.List)
 	task.PUT("/:id", c.Update)
 	task.DELETE("/:id", c.Delete)
 }
@@ -43,7 +42,7 @@ func (c *Task) ListByUser(ctx *gin.Context) {
 		questTeam.UserId = userId
 	}
 
-	teamsPtr, err := c.QuestTeamSvc.ListWithJoin(&questTeam)
+	teamsPtr, err := c.QuestTeamSvc.List(&questTeam)
 	if err != nil {
 		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "team get error", err)
 		return
@@ -57,7 +56,7 @@ func (c *Task) ListByUser(ctx *gin.Context) {
 
 	project := models.Project{}
 	project.QuestTarget.QuestIds = questIds
-	projectsPtr, err := c.ProjectSvc.ListWithJoin(&project)
+	projectsPtr, err := c.ProjectSvc.List(&project)
 	if err != nil {
 		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "project get error", err)
 		return
@@ -71,7 +70,7 @@ func (c *Task) ListByUser(ctx *gin.Context) {
 
 	task := models.Task{}
 	task.ProjectIds = projectIds
-	tasks, err := c.TaskSvc.ListWithJoin(&task)
+	tasks, err := c.TaskSvc.List(&task)
 	if err != nil {
 		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "task get error", err)
 		return

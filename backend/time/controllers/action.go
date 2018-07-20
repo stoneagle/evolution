@@ -19,9 +19,8 @@ func NewAction() *Action {
 func (c *Action) Router(router *gin.RouterGroup) {
 	action := router.Group(c.Resource.String()).Use(middles.OnInit(c))
 	action.GET("/get/:id", c.One)
-	action.GET("/list", c.List)
 	action.POST("", c.Create)
-	action.POST("/list", c.ListWithCondition)
+	action.POST("/list", c.List)
 	action.PUT("/:id", c.Update)
 	action.DELETE("/:id", c.Delete)
 }

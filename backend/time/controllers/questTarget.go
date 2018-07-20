@@ -22,10 +22,9 @@ func NewQuestTarget() *QuestTarget {
 func (c *QuestTarget) Router(router *gin.RouterGroup) {
 	questTarget := router.Group(c.Resource.String()).Use(middles.OnInit(c))
 	questTarget.GET("/get/:id", c.One)
-	questTarget.GET("/list", c.List)
 	questTarget.POST("", c.Create)
 	questTarget.POST("/batch", c.BatchSave)
-	questTarget.POST("/list", c.ListWithCondition)
+	questTarget.POST("/list", c.List)
 	questTarget.PUT("/:id", c.Update)
 	questTarget.DELETE("/:id", c.Delete)
 }

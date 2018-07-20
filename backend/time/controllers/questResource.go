@@ -22,9 +22,8 @@ func NewQuestResource() *QuestResource {
 func (c *QuestResource) Router(router *gin.RouterGroup) {
 	questResource := router.Group(c.Resource.String()).Use(middles.OnInit(c))
 	questResource.GET("/get/:id", c.One)
-	questResource.GET("/list", c.List)
 	questResource.POST("", c.Create)
-	questResource.POST("/list", c.ListWithCondition)
+	questResource.POST("/list", c.List)
 	questResource.PUT("/:id", c.Update)
 	questResource.DELETE("/:id", c.Delete)
 }
@@ -45,7 +44,7 @@ func (c *QuestResource) ListWithCondition(ctx *gin.Context) {
 		areaIdSlice = append(areaIdSlice, resource.Area.Id)
 		resource.Area.Ids = areaIdSlice
 	}
-	resourcesPtr, err := c.Service.ListWithJoin(resource)
+	resourcesPtr, err := c.Service.List(resource)
 	if err != nil {
 		resp.ErrorBusiness(ctx, resp.ErrorDatabase, fmt.Sprintf("%v list fail", c.Resource), err)
 		return

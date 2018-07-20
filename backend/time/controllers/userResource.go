@@ -22,14 +22,13 @@ func NewUserResource() *UserResource {
 func (c *UserResource) Router(router *gin.RouterGroup) {
 	userResource := router.Group(c.Resource.String()).Use(middles.OnInit(c))
 	userResource.GET("/get/:id", c.One)
-	userResource.GET("/list", c.List)
 	userResource.POST("", c.Create)
-	userResource.POST("/list", c.ListWithCondition)
+	userResource.POST("/list", c.List)
 	userResource.PUT("/:id", c.Update)
 	userResource.DELETE("/:id", c.Delete)
 }
 
-func (c *UserResource) ListWithCondition(ctx *gin.Context) {
+func (c *UserResource) List(ctx *gin.Context) {
 	if err := ctx.ShouldBindJSON(c.Model); err != nil {
 		resp.ErrorBusiness(ctx, resp.ErrorParams, fmt.Sprintf("%v resource json bind error", c.Resource), err)
 		return
@@ -45,7 +44,7 @@ func (c *UserResource) ListWithCondition(ctx *gin.Context) {
 		areaIdSlice = append(areaIdSlice, userResource.Resource.Area.Id)
 		userResource.Resource.Area.Ids = areaIdSlice
 	}
-	resourcesPtr, err := c.Service.ListWithJoin(c.Model)
+	resourcesPtr, err := c.Service.List(c.Model)
 	if err != nil {
 		resp.ErrorBusiness(ctx, resp.ErrorDatabase, fmt.Sprintf("%v list fail", c.Resource), err)
 		return

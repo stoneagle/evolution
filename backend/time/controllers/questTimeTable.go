@@ -18,9 +18,8 @@ func NewQuestTimeTable() *QuestTimeTable {
 func (c *QuestTimeTable) Router(router *gin.RouterGroup) {
 	questTimeTable := router.Group(c.Resource.String()).Use(middles.OnInit(c))
 	questTimeTable.GET("/get/:id", c.One)
-	questTimeTable.GET("/list", c.List)
 	questTimeTable.POST("", c.Create)
-	questTimeTable.POST("/list", c.ListWithCondition)
+	questTimeTable.POST("/list", c.List)
 	questTimeTable.PUT("/:id", c.Update)
 	questTimeTable.DELETE("/:id", c.Delete)
 }

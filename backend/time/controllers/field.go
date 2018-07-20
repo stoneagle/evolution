@@ -19,9 +19,8 @@ func NewField() *Field {
 func (c *Field) Router(router *gin.RouterGroup) {
 	field := router.Group(c.Resource.String()).Use(middles.OnInit(c))
 	field.GET("/get/:id", c.One)
-	field.GET("/list", c.List)
 	field.POST("", c.Create)
-	field.POST("/list", c.ListWithCondition)
+	field.POST("/list", c.List)
 	field.PUT("/:id", c.Update)
 	field.DELETE("/:id", c.Delete)
 }

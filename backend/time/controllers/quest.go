@@ -19,9 +19,8 @@ func NewQuest() *Quest {
 func (c *Quest) Router(router *gin.RouterGroup) {
 	quest := router.Group(c.Resource.String()).Use(middles.OnInit(c))
 	quest.GET("/get/:id", c.One)
-	quest.GET("/list", c.List)
 	quest.POST("", c.Create)
-	quest.POST("/list", c.ListWithCondition)
+	quest.POST("/list", c.List)
 	quest.PUT("/:id", c.Update)
 	quest.DELETE("/:id", c.Delete)
 }

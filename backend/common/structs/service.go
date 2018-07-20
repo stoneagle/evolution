@@ -12,7 +12,6 @@ import (
 type ServiceGeneral interface {
 	One(int, ModelGeneral) error
 	List(ModelGeneral) (interface{}, error)
-	ListWithJoin(ModelGeneral) (interface{}, error)
 	Create(ModelGeneral) error
 	Update(int, ModelGeneral) error
 	Delete(int, ModelGeneral) error
@@ -75,33 +74,32 @@ func (s *Service) Delete(id int, modelPtr ModelGeneral) (err error) {
 }
 
 func (s *Service) List(modelPtr ModelGeneral) (modelsPtr interface{}, err error) {
-	session := s.Engine.Unscoped().Table(modelPtr.TableName())
-	modelPtr.BuildCondition(session)
-	modelsPtr = modelPtr.SlicePtr()
-	err = session.Limit(10).Find(modelsPtr)
-	if err != nil {
-		sql, args := session.LastSQL()
-		s.LogSql(sql, args, err)
-	}
-	return
-}
-
-func (s *Service) ListWithJoin(modelPtr ModelGeneral) (modelsPtr interface{}, err error) {
 	join := modelPtr.Join()
-	joinsPtr := join.SlicePtr()
-	session := s.Engine.Unscoped().Table(modelPtr.TableName())
-	links := join.Links()
-	for _, link := range links {
-		session.Join(link.Type.String(), link.Table, fmt.Sprintf("%s.%s = %s.%s", link.LeftTable, link.LeftField, link.RightTable, link.RightField))
+	if join != nil {
+		joinsPtr := join.SlicePtr()
+		session := s.Engine.Unscoped().Table(modelPtr.TableName())
+		links := join.Links()
+		for _, link := range links {
+			session.Join(link.Type.String(), link.Table, fmt.Sprintf("%s.%s = %s.%s", link.LeftTable, link.LeftField, link.RightTable, link.RightField))
+		}
+		modelPtr.BuildCondition(session)
+		err = session.Find(joinsPtr)
+		if err != nil {
+			sql, args := session.LastSQL()
+			s.LogSql(sql, args, err)
+			return
+		}
+		modelsPtr = join.TransferSlicePtr(joinsPtr)
+	} else {
+		session := s.Engine.Unscoped().Table(modelPtr.TableName())
+		modelPtr.BuildCondition(session)
+		modelsPtr = modelPtr.SlicePtr()
+		err = session.Limit(10).Find(modelsPtr)
+		if err != nil {
+			sql, args := session.LastSQL()
+			s.LogSql(sql, args, err)
+		}
 	}
-	modelPtr.BuildCondition(session)
-	err = session.Find(joinsPtr)
-	if err != nil {
-		sql, args := session.LastSQL()
-		s.LogSql(sql, args, err)
-		return
-	}
-	modelsPtr = join.TransferSlicePtr(joinsPtr)
 	return
 }
 
