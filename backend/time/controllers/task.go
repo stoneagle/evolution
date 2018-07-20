@@ -26,7 +26,7 @@ func (c *Task) Router(router *gin.RouterGroup) {
 	task.GET("/list", c.List)
 	task.GET("/list/user/:uid", c.ListByUser)
 	task.POST("", c.Create)
-	task.POST("/list", c.ListByCondition)
+	task.POST("/list", c.ListWithCondition)
 	task.PUT("/:id", c.Update)
 	task.DELETE("/:id", c.Delete)
 }
@@ -43,11 +43,12 @@ func (c *Task) ListByUser(ctx *gin.Context) {
 		questTeam.UserId = userId
 	}
 
-	teams, err := c.QuestTeamSvc.ListWithCondition(&questTeam)
+	teamsPtr, err := c.QuestTeamSvc.ListWithJoin(&questTeam)
 	if err != nil {
 		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "team get error", err)
 		return
 	}
+	teams := *(teamsPtr.(*[]models.QuestTeam))
 
 	questIds := make([]int, 0)
 	for _, one := range teams {
@@ -56,11 +57,12 @@ func (c *Task) ListByUser(ctx *gin.Context) {
 
 	project := models.Project{}
 	project.QuestTarget.QuestIds = questIds
-	projects, err := c.ProjectSvc.ListWithCondition(&project)
+	projectsPtr, err := c.ProjectSvc.ListWithJoin(&project)
 	if err != nil {
 		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "project get error", err)
 		return
 	}
+	projects := *(projectsPtr.(*[]models.Project))
 
 	projectIds := make([]int, 0)
 	for _, one := range projects {
@@ -69,21 +71,7 @@ func (c *Task) ListByUser(ctx *gin.Context) {
 
 	task := models.Task{}
 	task.ProjectIds = projectIds
-	tasks, err := c.TaskSvc.ListWithCondition(&task)
-	if err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "task get error", err)
-		return
-	}
-	resp.Success(ctx, tasks)
-}
-
-func (c *Task) ListByCondition(ctx *gin.Context) {
-	var task models.Task
-	if err := ctx.ShouldBindJSON(&task); err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorParams, "params error: ", err)
-		return
-	}
-	tasks, err := c.TaskSvc.ListWithCondition(&task)
+	tasks, err := c.TaskSvc.ListWithJoin(&task)
 	if err != nil {
 		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "task get error", err)
 		return

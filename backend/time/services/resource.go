@@ -173,34 +173,6 @@ func (s *Resource) Delete(id int, modelPtr structs.ModelGeneral) (err error) {
 	return
 }
 
-func (s *Resource) ListWithCondition(resource *models.Resource) (resources []models.Resource, err error) {
-	resourcesJoin := make([]models.ResourceJoin, 0)
-	sql := s.Engine.Unscoped().Table("resource").Join("INNER", "map_area_resource", "map_area_resource.resource_id = resource.id").Join("INNER", "area", "area.id = map_area_resource.area_id")
-
-	condition := resource.BuildCondition()
-	if resource.WithSub {
-		areaIdSlice, err := s.Pack.AreaSvc.GetAllLeafId(resource.Area.Id)
-		if err != nil {
-			return resources, err
-		}
-		areaIdSlice = append(areaIdSlice, resource.Area.Id)
-		condition["area.id"] = areaIdSlice
-	}
-
-	sql = sql.Where(condition)
-	sql = sql.And("resource.deleted_at is NULL")
-	err = sql.Find(&resourcesJoin)
-	if err != nil {
-		return
-	}
-	resources = make([]models.Resource, 0)
-	for _, one := range resourcesJoin {
-		one.Resource.Area = one.Area
-		resources = append(resources, one.Resource)
-	}
-	return
-}
-
 func (s *Resource) ListAreas(id int) (areas []models.Area, err error) {
 	resourcesJoin := make([]models.ResourceJoin, 0)
 	sql := s.Engine.Unscoped().Table("resource").Join("INNER", "map_area_resource", "map_area_resource.resource_id = resource.id").Join("INNER", "area", "area.id = map_area_resource.area_id")

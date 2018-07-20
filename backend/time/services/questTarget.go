@@ -98,22 +98,3 @@ func (s *QuestTarget) BatchSave(targets []models.QuestTarget) (err error) {
 	}
 	return
 }
-
-func (s *QuestTarget) ListWithCondition(questTarget *models.QuestTarget) (questTargets []models.QuestTarget, err error) {
-	questTargetsJoin := make([]models.QuestTargetJoin, 0)
-	sql := s.Engine.Unscoped().Table("quest_target").Join("INNER", "area", "area.id = quest_target.area_id")
-
-	condition := questTarget.BuildCondition()
-	sql = sql.Where(condition)
-	err = sql.Find(&questTargetsJoin)
-	if err != nil {
-		return
-	}
-
-	questTargets = make([]models.QuestTarget, 0)
-	for _, one := range questTargetsJoin {
-		one.QuestTarget.Area = one.Area
-		questTargets = append(questTargets, one.QuestTarget)
-	}
-	return
-}

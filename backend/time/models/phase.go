@@ -4,7 +4,7 @@ import (
 	es "evolution/backend/common/structs"
 
 	"github.com/fatih/structs"
-	"github.com/go-xorm/builder"
+	"github.com/go-xorm/xorm"
 )
 
 type Phase struct {
@@ -20,9 +20,16 @@ func (m *Phase) TableName() string {
 	return "phase"
 }
 
-func (m *Phase) BuildCondition() (condition builder.Eq) {
+func (m *Phase) BuildCondition(session *xorm.Session) {
 	keyPrefix := m.TableName() + "."
 	params := structs.Map(m)
-	condition = m.Model.BuildCondition(params, keyPrefix)
-	return condition
+	condition := m.Model.BuildCondition(params, keyPrefix)
+	session.Where(condition)
+	session.Asc("level")
+	return
+}
+
+func (m *Phase) SlicePtr() interface{} {
+	ret := make([]Phase, 0)
+	return &ret
 }

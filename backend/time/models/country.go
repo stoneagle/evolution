@@ -4,7 +4,7 @@ import (
 	es "evolution/backend/common/structs"
 
 	"github.com/fatih/structs"
-	"github.com/go-xorm/builder"
+	"github.com/go-xorm/xorm"
 )
 
 type Country struct {
@@ -17,9 +17,15 @@ func (m *Country) TableName() string {
 	return "country"
 }
 
-func (m *Country) BuildCondition() (condition builder.Eq) {
+func (m *Country) BuildCondition(session *xorm.Session) {
 	keyPrefix := m.TableName() + "."
 	params := structs.Map(m)
-	condition = m.Model.BuildCondition(params, keyPrefix)
-	return condition
+	condition := m.Model.BuildCondition(params, keyPrefix)
+	session.Where(condition)
+	return
+}
+
+func (m *Country) SlicePtr() interface{} {
+	ret := make([]Country, 0)
+	return &ret
 }

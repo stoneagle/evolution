@@ -29,18 +29,6 @@ func (s *Area) UpdateByMap(id int, model map[string]interface{}) (err error) {
 	return
 }
 
-func (s *Area) ListWithCondition(area *models.Area) (areas []models.Area, err error) {
-	areas = make([]models.Area, 0)
-	sql := s.Engine.Asc("parent")
-	condition := area.BuildCondition()
-	sql = sql.Where(condition)
-	err = sql.Find(&areas)
-	if err != nil {
-		return
-	}
-	return
-}
-
 func (s *Area) TransferListToTree(areas []models.Area, fieldMap map[int]string) (areaTrees map[int]models.AreaTree, err error) {
 	areaTrees = make(map[int]models.AreaTree)
 buildTreeLoop:

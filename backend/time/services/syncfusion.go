@@ -28,22 +28,24 @@ func (s *Syncfusion) ListKanban(userId int) (kanbans []models.SyncfusionKanban, 
 	questTeam := models.QuestTeam{}
 	questTeam.UserId = userId
 	questTeam.Quest.Status = models.QuestStatusExec
-	questTeams, err := s.Pack.QuestTeamSvc.ListWithCondition(&questTeam)
+	questTeamsPtr, err := s.Pack.QuestTeamSvc.ListWithJoin(&questTeam)
 	if err != nil {
 		return
 	}
 
+	questTeams := *(questTeamsPtr.(*[]models.QuestTeam))
 	questIds := make([]int, 0)
 	for _, one := range questTeams {
 		questIds = append(questIds, one.QuestId)
 	}
 	project := models.Project{}
 	project.QuestTarget.QuestIds = questIds
-	projects, err := s.Pack.ProjectSvc.ListWithCondition(&project)
+	projectsPtr, err := s.Pack.ProjectSvc.ListWithJoin(&project)
 	if err != nil {
 		return
 	}
 
+	projects := *(projectsPtr.(*[]models.Project))
 	projectIds := make([]int, 0)
 	areaIds := make([]int, 0)
 	projectsMap := make(map[int]models.Project)
@@ -54,27 +56,31 @@ func (s *Syncfusion) ListKanban(userId int) (kanbans []models.SyncfusionKanban, 
 	}
 	task := models.Task{}
 	task.ProjectIds = projectIds
-	tasks, err := s.Pack.TaskSvc.ListWithCondition(&task)
+	tasksPtr, err := s.Pack.TaskSvc.ListWithJoin(&task)
+	if err != nil {
+		return
+	}
+	tasks := *(tasksPtr.(*[]models.Task))
+
+	area := models.Area{}
+	area.Ids = areaIds
+	areasPtr, err := s.Pack.AreaSvc.List(&area)
 	if err != nil {
 		return
 	}
 
-	area := models.Area{}
-	area.Ids = areaIds
-	areas, err := s.Pack.AreaSvc.ListWithCondition(&area)
-	if err != nil {
-		return
-	}
+	areas := *(areasPtr.(*[]models.Area))
 	areasMap := make(map[int]models.Area)
 	for _, one := range areas {
 		areasMap[one.Id] = one
 	}
 
-	fields := make([]models.Field, 0)
-	err = s.Pack.FieldSvc.List(&fields)
+	field := models.Field{}
+	fieldsPtr, err := s.Pack.FieldSvc.List(&field)
 	if err != nil {
 		return
 	}
+	fields := *(fieldsPtr.(*[]models.Field))
 	fieldsMap := make(map[int]models.Field)
 	for _, one := range fields {
 		fieldsMap[one.Id] = one
@@ -124,10 +130,11 @@ func (s *Syncfusion) ListSchedule(userId int, startDate, endDate time.Time) (sch
 	action.UserId = userId
 	action.StartDate = startDate
 	action.EndDate = endDate
-	actions, err := s.Pack.ActionSvc.ListWithCondition(&action)
+	actionsPtr, err := s.Pack.ActionSvc.ListWithJoin(&action)
 	if err != nil {
 		return
 	}
+	actions := *(actionsPtr.(*[]models.Action))
 	schedules = make([]models.SyncfusionSchedule, 0)
 	hour, _ := time.ParseDuration("-4h")
 	for _, one := range actions {
@@ -152,10 +159,11 @@ func (s *Syncfusion) ListTreeGrid(fieldId, parentId int) (treeGrids []models.Syn
 		area.Parent = parentId
 	}
 
-	areas, err := s.Pack.AreaSvc.ListWithCondition(&area)
+	areasPtr, err := s.Pack.AreaSvc.List(&area)
 	if err != nil {
 		return
 	}
+	areas := *(areasPtr.(*[]models.Area))
 
 	treeGrids = make([]models.SyncfusionTreeGrid, 0)
 	for _, one := range areas {
@@ -187,10 +195,11 @@ func (s *Syncfusion) ListGantt(userId int) (gantts []models.SyncfusionGantt, err
 	questTeam := models.QuestTeam{}
 	questTeam.UserId = userId
 	questTeam.Quest.Status = models.QuestStatusExec
-	questTeams, err := s.Pack.QuestTeamSvc.ListWithCondition(&questTeam)
+	questTeamsPtr, err := s.Pack.QuestTeamSvc.ListWithJoin(&questTeam)
 	if err != nil {
 		return
 	}
+	questTeams := *(questTeamsPtr.(*[]models.QuestTeam))
 
 	questIds := make([]int, 0)
 	quests := make([]models.Quest, 0)
@@ -201,10 +210,11 @@ func (s *Syncfusion) ListGantt(userId int) (gantts []models.SyncfusionGantt, err
 
 	project := models.Project{}
 	project.QuestTarget.QuestIds = questIds
-	projects, err := s.Pack.ProjectSvc.ListWithCondition(&project)
+	projectsPtr, err := s.Pack.ProjectSvc.ListWithJoin(&project)
 	if err != nil {
 		return
 	}
+	projects := *(projectsPtr.(*[]models.Project))
 
 	projectIds := make([]int, 0)
 	for _, one := range projects {
@@ -212,10 +222,11 @@ func (s *Syncfusion) ListGantt(userId int) (gantts []models.SyncfusionGantt, err
 	}
 	task := models.Task{}
 	task.ProjectIds = projectIds
-	tasks, err := s.Pack.TaskSvc.ListWithCondition(&task)
+	tasksPtr, err := s.Pack.TaskSvc.ListWithJoin(&task)
 	if err != nil {
 		return
 	}
+	tasks := *(tasksPtr.(*[]models.Task))
 
 	tasksMap := s.buildTaskMap(tasks)
 	projectsMap := s.buildProjectMap(projects, tasksMap)

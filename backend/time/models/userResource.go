@@ -4,7 +4,7 @@ import (
 	es "evolution/backend/common/structs"
 
 	"github.com/fatih/structs"
-	"github.com/go-xorm/builder"
+	"github.com/go-xorm/xorm"
 )
 
 type UserResource struct {
@@ -16,9 +16,10 @@ type UserResource struct {
 }
 
 type UserResourceJoin struct {
-	UserResource `xorm:"extends" json:"-"`
-	Resource     `xorm:"extends" json:"-"`
-	Area         `xorm:"extends" json:"-"`
+	UserResource    `xorm:"extends" json:"-"`
+	Resource        `xorm:"extends" json:"-"`
+	MapAreaResource `xorm:"extends" json:"-"`
+	Area            `xorm:"extends" json:"-"`
 }
 
 var (
@@ -30,17 +31,77 @@ func (m *UserResource) TableName() string {
 	return "user_resource"
 }
 
-func (m *UserResource) BuildCondition() (condition builder.Eq) {
+func (m *UserResource) BuildCondition(session *xorm.Session) {
 	keyPrefix := m.TableName() + "."
 	params := structs.Map(m)
-	condition = m.Model.BuildCondition(params, keyPrefix)
+	condition := m.Model.BuildCondition(params, keyPrefix)
+	session.Where(condition)
+	m.Resource.BuildCondition(session)
+	return
+}
 
-	resourceCondition := m.Resource.BuildCondition()
-	if len(resourceCondition) > 0 {
-		for k, v := range resourceCondition {
-			condition[k] = v
-		}
+func (m *UserResource) SlicePtr() interface{} {
+	ret := make([]UserResource, 0)
+	return &ret
+}
+
+func (m *UserResource) Join() es.JoinGeneral {
+	ret := UserResourceJoin{}
+	return &ret
+}
+
+func (j *UserResourceJoin) Links() []es.JoinLinks {
+	links := make([]es.JoinLinks, 0)
+	resourceLink := es.JoinLinks{
+		Type:       es.InnerJoin,
+		Table:      j.Resource.TableName(),
+		LeftTable:  j.Resource.TableName(),
+		LeftField:  "id",
+		RightTable: j.UserResource.TableName(),
+		RightField: "resource_id",
 	}
+	mapAreaResourceLink := es.JoinLinks{
+		Type:       es.InnerJoin,
+		Table:      j.MapAreaResource.TableName(),
+		LeftTable:  j.MapAreaResource.TableName(),
+		LeftField:  "resource_id",
+		RightTable: j.Resource.TableName(),
+		RightField: "id",
+	}
+	areaLink := es.JoinLinks{
+		Type:       es.InnerJoin,
+		Table:      j.Area.TableName(),
+		LeftTable:  j.Area.TableName(),
+		LeftField:  "id",
+		RightTable: j.MapAreaResource.TableName(),
+		RightField: "area_id",
+	}
+	links = append(links, resourceLink)
+	links = append(links, mapAreaResourceLink)
+	links = append(links, areaLink)
+	return links
+}
 
-	return condition
+func (j *UserResourceJoin) SlicePtr() interface{} {
+	ret := make([]UserResourceJoin, 0)
+	return &ret
+}
+
+func (j *UserResourceJoin) Transfer() es.ModelGeneral {
+	join := *j
+	ret := join.UserResource
+	ret.Resource = join.Resource
+	ret.Resource.Area = join.Area
+	return &ret
+}
+
+func (j *UserResourceJoin) TransferSlicePtr(slicePtr interface{}) interface{} {
+	joinSlicePtr := slicePtr.(*[]UserResourceJoin)
+	joinSlice := *joinSlicePtr
+	userResources := make([]UserResource, 0)
+	for _, one := range joinSlice {
+		userResourcePtr := (&one).Transfer().(*UserResource)
+		userResources = append(userResources, *userResourcePtr)
+	}
+	return &userResources
 }

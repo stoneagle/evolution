@@ -21,6 +21,7 @@ func (c *Country) Router(router *gin.RouterGroup) {
 	country.GET("/get/:id", c.One)
 	country.GET("/list", c.List)
 	country.POST("", c.Create)
+	country.POST("/list", c.ListWithCondition)
 	country.PUT("/:id", c.Update)
 	country.DELETE("/:id", c.Delete)
 }

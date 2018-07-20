@@ -2,9 +2,6 @@ package controllers
 
 import (
 	"evolution/backend/common/middles"
-	"evolution/backend/common/resp"
-
-	"evolution/backend/time/models"
 
 	"github.com/gin-gonic/gin"
 )
@@ -23,21 +20,7 @@ func (c *QuestTimeTable) Router(router *gin.RouterGroup) {
 	questTimeTable.GET("/get/:id", c.One)
 	questTimeTable.GET("/list", c.List)
 	questTimeTable.POST("", c.Create)
-	questTimeTable.POST("/list", c.ListByCondition)
+	questTimeTable.POST("/list", c.ListWithCondition)
 	questTimeTable.PUT("/:id", c.Update)
 	questTimeTable.DELETE("/:id", c.Delete)
-}
-
-func (c *QuestTimeTable) ListByCondition(ctx *gin.Context) {
-	var questTimeTable models.QuestTimeTable
-	if err := ctx.ShouldBindJSON(&questTimeTable); err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorParams, "params error: ", err)
-		return
-	}
-	questTimeTables, err := c.QuestTimeTableSvc.ListWithCondition(&questTimeTable)
-	if err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "questTimeTable get error", err)
-		return
-	}
-	resp.Success(ctx, questTimeTables)
 }

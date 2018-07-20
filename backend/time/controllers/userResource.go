@@ -3,8 +3,8 @@ package controllers
 import (
 	"evolution/backend/common/middles"
 	"evolution/backend/common/resp"
-
 	"evolution/backend/time/models"
+	"fmt"
 
 	"github.com/gin-gonic/gin"
 )
@@ -24,21 +24,31 @@ func (c *UserResource) Router(router *gin.RouterGroup) {
 	userResource.GET("/get/:id", c.One)
 	userResource.GET("/list", c.List)
 	userResource.POST("", c.Create)
-	userResource.POST("/list", c.ListByCondition)
+	userResource.POST("/list", c.ListWithCondition)
 	userResource.PUT("/:id", c.Update)
 	userResource.DELETE("/:id", c.Delete)
 }
 
-func (c *UserResource) ListByCondition(ctx *gin.Context) {
-	var userResource models.UserResource
-	if err := ctx.ShouldBindJSON(&userResource); err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorParams, "params error: ", err)
+func (c *UserResource) ListWithCondition(ctx *gin.Context) {
+	if err := ctx.ShouldBindJSON(c.Model); err != nil {
+		resp.ErrorBusiness(ctx, resp.ErrorParams, fmt.Sprintf("%v resource json bind error", c.Resource), err)
 		return
 	}
-	userResources, err := c.UserResourceSvc.ListWithCondition(&userResource)
+
+	userResource := c.Model.(*models.UserResource)
+	if userResource.Resource.WithSub {
+		areaIdSlice, err := c.AreaSvc.GetAllLeafId(userResource.Resource.Area.Id)
+		if err != nil {
+			resp.ErrorBusiness(ctx, resp.ErrorDatabase, fmt.Sprintf("%v relate area list fail", c.Resource), err)
+			return
+		}
+		areaIdSlice = append(areaIdSlice, userResource.Resource.Area.Id)
+		userResource.Resource.Area.Ids = areaIdSlice
+	}
+	resourcesPtr, err := c.Service.ListWithJoin(c.Model)
 	if err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "userResource get error", err)
+		resp.ErrorBusiness(ctx, resp.ErrorDatabase, fmt.Sprintf("%v list fail", c.Resource), err)
 		return
 	}
-	resp.Success(ctx, userResources)
+	resp.Success(ctx, resourcesPtr)
 }

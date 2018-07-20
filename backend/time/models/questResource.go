@@ -4,7 +4,7 @@ import (
 	es "evolution/backend/common/structs"
 
 	"github.com/fatih/structs"
-	"github.com/go-xorm/builder"
+	"github.com/go-xorm/xorm"
 )
 
 type QuestResource struct {
@@ -25,9 +25,15 @@ func (m *QuestResource) TableName() string {
 	return "quest_resource"
 }
 
-func (m *QuestResource) BuildCondition() (condition builder.Eq) {
+func (m *QuestResource) BuildCondition(session *xorm.Session) {
 	keyPrefix := m.TableName() + "."
 	params := structs.Map(m)
-	condition = m.Model.BuildCondition(params, keyPrefix)
-	return condition
+	condition := m.Model.BuildCondition(params, keyPrefix)
+	session.Where(condition)
+	return
+}
+
+func (m *QuestResource) SlicePtr() interface{} {
+	ret := make([]QuestResource, 0)
+	return &ret
 }

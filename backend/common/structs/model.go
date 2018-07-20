@@ -5,11 +5,42 @@ import (
 	"time"
 
 	"github.com/go-xorm/builder"
+	"github.com/go-xorm/xorm"
+)
+
+type JoinType string
+
+func (jtype JoinType) String() string {
+	return string(jtype)
+}
+
+const (
+	InnerJoin JoinType = "INNER"
+	LeftJoin  JoinType = "LEFT"
+	RightJoin JoinType = "RIGHT"
 )
 
 type ModelGeneral interface {
-	BuildCondition() builder.Eq
+	TableName() string
+	Join() JoinGeneral
+	BuildCondition(*xorm.Session)
 	SlicePtr() interface{}
+}
+
+type JoinGeneral interface {
+	Links() []JoinLinks
+	SlicePtr() interface{}
+	Transfer() ModelGeneral
+	TransferSlicePtr(interface{}) interface{}
+}
+
+type JoinLinks struct {
+	Table      string
+	Type       JoinType
+	LeftTable  string
+	LeftField  string
+	RightTable string
+	RightField string
 }
 
 type Model struct {
@@ -46,7 +77,6 @@ func (m *Model) BuildCondition(params map[string]interface{}, keyPrefix string) 
 	return condition
 }
 
-func (m *Model) SlicePtr() interface{} {
-	models := make([]Model, 0)
-	return &models
+func (m *Model) Join() JoinGeneral {
+	return nil
 }

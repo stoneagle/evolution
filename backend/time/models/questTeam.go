@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/fatih/structs"
-	"github.com/go-xorm/builder"
+	"github.com/go-xorm/xorm"
 )
 
 type QuestTeam struct {
@@ -17,26 +17,67 @@ type QuestTeam struct {
 	Quest          Quest     `xorm:"-"`
 }
 
-func (m *QuestTeam) TableName() string {
-	return "quest_team"
-}
-
 type QuestTeamJoin struct {
 	QuestTeam `xorm:"extends" json:"-"`
 	Quest     `xorm:"extends" json:"-"`
 }
 
-func (m *QuestTeam) BuildCondition() (condition builder.Eq) {
+func (m *QuestTeam) TableName() string {
+	return "quest_team"
+}
+
+func (m *QuestTeam) BuildCondition(session *xorm.Session) {
 	keyPrefix := m.TableName() + "."
 	params := structs.Map(m)
-	condition = m.Model.BuildCondition(params, keyPrefix)
+	condition := m.Model.BuildCondition(params, keyPrefix)
+	session.Where(condition)
+	m.Quest.BuildCondition(session)
+	return
+}
 
-	questCondition := m.Quest.BuildCondition()
-	if len(questCondition) > 0 {
-		for k, v := range questCondition {
-			condition[k] = v
-		}
+func (m *QuestTeam) SlicePtr() interface{} {
+	ret := make([]QuestTeam, 0)
+	return &ret
+}
+
+func (m *QuestTeam) Join() es.JoinGeneral {
+	ret := QuestTeamJoin{}
+	return &ret
+}
+
+func (j *QuestTeamJoin) Links() []es.JoinLinks {
+	links := make([]es.JoinLinks, 0)
+	questLink := es.JoinLinks{
+		Type:       es.InnerJoin,
+		Table:      j.Quest.TableName(),
+		LeftTable:  j.Quest.TableName(),
+		LeftField:  "id",
+		RightTable: j.QuestTeam.TableName(),
+		RightField: "quest_id",
 	}
+	links = append(links, questLink)
+	return links
+}
 
-	return condition
+func (j *QuestTeamJoin) SlicePtr() interface{} {
+	ret := make([]QuestTeamJoin, 0)
+	return &ret
+}
+
+func (j *QuestTeamJoin) Transfer() es.ModelGeneral {
+	join := *j
+	ret := join.QuestTeam
+	ret.Quest = join.Quest
+	return &ret
+}
+
+func (j *QuestTeamJoin) TransferSlicePtr(slicePtr interface{}) interface{} {
+	joinSlicePtr := slicePtr.(*[]QuestTeamJoin)
+	joinSlice := *joinSlicePtr
+	questTeams := make([]QuestTeam, 0)
+	for _, one := range joinSlice {
+		questTeamPtr := (&one).Transfer().(*QuestTeam)
+		questTeams = append(questTeams, *questTeamPtr)
+	}
+	return &questTeams
 }

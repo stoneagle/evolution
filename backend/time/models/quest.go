@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/fatih/structs"
-	"github.com/go-xorm/builder"
+	"github.com/go-xorm/xorm"
 )
 
 type Quest struct {
@@ -35,9 +35,15 @@ func (m *Quest) TableName() string {
 	return "quest"
 }
 
-func (m *Quest) BuildCondition() (condition builder.Eq) {
+func (m *Quest) BuildCondition(session *xorm.Session) {
 	keyPrefix := m.TableName() + "."
 	params := structs.Map(m)
-	condition = m.Model.BuildCondition(params, keyPrefix)
-	return condition
+	condition := m.Model.BuildCondition(params, keyPrefix)
+	session.Where(condition)
+	return
+}
+
+func (m *Quest) SlicePtr() interface{} {
+	ret := make([]Quest, 0)
+	return &ret
 }

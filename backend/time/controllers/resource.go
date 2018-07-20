@@ -25,7 +25,7 @@ func (c *Resource) Router(router *gin.RouterGroup) {
 	resource.GET("/list", c.List)
 	resource.GET("/list/areas/:id", c.ListAreas)
 	resource.POST("", c.Create)
-	resource.POST("/list", c.ListByCondition)
+	resource.POST("/list", c.ListWithCondition)
 	resource.POST("/list/leaf", c.ListGroupByLeaf)
 	resource.PUT("/:id", c.Update)
 	resource.DELETE("/:id", c.Delete)
@@ -41,21 +41,6 @@ func (c *Resource) ListAreas(ctx *gin.Context) {
 	resp.Success(ctx, areas)
 }
 
-func (c *Resource) ListByCondition(ctx *gin.Context) {
-	var resource models.Resource
-	if err := ctx.ShouldBindJSON(&resource); err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorParams, "params error: ", err)
-		return
-	}
-
-	resources, err := c.ResourceSvc.ListWithCondition(&resource)
-	if err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "resource get error", err)
-		return
-	}
-	resp.Success(ctx, resources)
-}
-
 func (c *Resource) ListGroupByLeaf(ctx *gin.Context) {
 	var resource models.Resource
 	if err := ctx.ShouldBindJSON(&resource); err != nil {
@@ -63,11 +48,12 @@ func (c *Resource) ListGroupByLeaf(ctx *gin.Context) {
 		return
 	}
 
-	resources, err := c.ResourceSvc.ListWithCondition(&resource)
+	resourcesPtr, err := c.ResourceSvc.ListWithJoin(&resource)
 	if err != nil {
 		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "resource get error", err)
 		return
 	}
+	resources := *(resourcesPtr.(*[]models.Resource))
 	areas := c.ResourceSvc.GroupByArea(resources)
 	resp.Success(ctx, areas)
 }

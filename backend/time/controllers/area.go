@@ -34,28 +34,13 @@ func (c *Area) Router(router *gin.RouterGroup) {
 	area.DELETE("/:id", c.Delete)
 }
 
-func (c *Area) ListWithCondition(ctx *gin.Context) {
-	var area models.Area
-	if err := ctx.ShouldBindJSON(&area); err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorParams, "params error: ", err)
-		return
-	}
-
-	areas, err := c.AreaSvc.ListWithCondition(&area)
-	if err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "area get error", err)
-		return
-	}
-	resp.Success(ctx, areas)
-}
-
 func (c *Area) ListAllTree(ctx *gin.Context) {
-	areas := make([]models.Area, 0)
-	err := c.AreaSvc.List(&areas)
+	areasPtr, err := c.AreaSvc.List(&models.Area{})
 	if err != nil {
 		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "area get error", err)
 		return
 	}
+	areas := *(areasPtr.(*[]models.Area))
 
 	fieldMap, err := c.FieldSvc.Map()
 	if err != nil {
@@ -83,7 +68,7 @@ func (c *Area) ListParent(ctx *gin.Context) {
 		FieldId: fieldId,
 		Type:    models.AreaTypeRoot,
 	}
-	areas, err := c.AreaSvc.ListWithCondition(&area)
+	areas, err := c.AreaSvc.List(&area)
 	if err != nil {
 		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "area get error", err)
 		return
@@ -102,7 +87,7 @@ func (c *Area) ListChildren(ctx *gin.Context) {
 	area := models.Area{
 		Parent: id,
 	}
-	areas, err := c.AreaSvc.ListWithCondition(&area)
+	areas, err := c.AreaSvc.List(&area)
 	if err != nil {
 		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "area get error", err)
 		return
@@ -121,11 +106,12 @@ func (c *Area) ListOneTree(ctx *gin.Context) {
 	area := models.Area{
 		FieldId: fieldId,
 	}
-	areas, err := c.AreaSvc.ListWithCondition(&area)
+	areasPtr, err := c.AreaSvc.List(&area)
 	if err != nil {
 		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "area get error", err)
 		return
 	}
+	areas := *(areasPtr.(*[]models.Area))
 
 	fieldMap, err := c.FieldSvc.Map()
 	if err != nil {

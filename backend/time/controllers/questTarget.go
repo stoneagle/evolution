@@ -25,23 +25,9 @@ func (c *QuestTarget) Router(router *gin.RouterGroup) {
 	questTarget.GET("/list", c.List)
 	questTarget.POST("", c.Create)
 	questTarget.POST("/batch", c.BatchSave)
-	questTarget.POST("/list", c.ListByCondition)
+	questTarget.POST("/list", c.ListWithCondition)
 	questTarget.PUT("/:id", c.Update)
 	questTarget.DELETE("/:id", c.Delete)
-}
-
-func (c *QuestTarget) ListByCondition(ctx *gin.Context) {
-	var questTarget models.QuestTarget
-	if err := ctx.ShouldBindJSON(&questTarget); err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorParams, "params error: ", err)
-		return
-	}
-	questTargets, err := c.QuestTargetSvc.ListWithCondition(&questTarget)
-	if err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "questTarget get error", err)
-		return
-	}
-	resp.Success(ctx, questTargets)
 }
 
 func (c *QuestTarget) BatchSave(ctx *gin.Context) {

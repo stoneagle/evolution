@@ -44,6 +44,7 @@ type GinBaseController interface {
 	Init()
 	One(ctx *gin.Context)
 	List(ctx *gin.Context)
+	ListWithCondition(ctx *gin.Context)
 	Create(ctx *gin.Context)
 	Update(ctx *gin.Context)
 	Delete(ctx *gin.Context)
@@ -89,11 +90,39 @@ func (c *Controller) One(ctx *gin.Context) {
 }
 
 func (c *Controller) List(ctx *gin.Context) {
-	resourcesPtr := c.Model.SlicePtr()
-	err := c.Service.List(resourcesPtr)
+	if err := ctx.ShouldBindJSON(c.Model); err != nil {
+		resp.ErrorBusiness(ctx, resp.ErrorParams, fmt.Sprintf("%v resource json bind error", c.Resource), err)
+		return
+	}
+
+	resourcesPtr, err := c.Service.List(c.Model)
 	if err != nil {
 		resp.ErrorBusiness(ctx, resp.ErrorDatabase, fmt.Sprintf("%v list fail", c.Resource), err)
 		return
+	}
+	resp.Success(ctx, resourcesPtr)
+}
+
+func (c *Controller) ListWithCondition(ctx *gin.Context) {
+	if err := ctx.ShouldBindJSON(c.Model); err != nil {
+		resp.ErrorBusiness(ctx, resp.ErrorParams, fmt.Sprintf("%v resource json bind error", c.Resource), err)
+		return
+	}
+
+	var resourcesPtr interface{}
+	var err error
+	if c.Model.Join() != nil {
+		resourcesPtr, err = c.Service.ListWithJoin(c.Model)
+		if err != nil {
+			resp.ErrorBusiness(ctx, resp.ErrorDatabase, fmt.Sprintf("%v list fail", c.Resource), err)
+			return
+		}
+	} else {
+		resourcesPtr, err = c.Service.List(c.Model)
+		if err != nil {
+			resp.ErrorBusiness(ctx, resp.ErrorDatabase, fmt.Sprintf("%v list fail", c.Resource), err)
+			return
+		}
 	}
 	resp.Success(ctx, resourcesPtr)
 }

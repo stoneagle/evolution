@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/fatih/structs"
-	"github.com/go-xorm/builder"
+	"github.com/go-xorm/xorm"
 )
 
 type Task struct {
@@ -49,9 +49,67 @@ func (m *Task) TableName() string {
 	return "task"
 }
 
-func (m *Task) BuildCondition() (condition builder.Eq) {
+func (m *Task) BuildCondition(session *xorm.Session) {
 	keyPrefix := m.TableName() + "."
 	params := structs.Map(m)
-	condition = m.Model.BuildCondition(params, keyPrefix)
+	condition := m.Model.BuildCondition(params, keyPrefix)
+	session.Where(condition)
 	return
+}
+
+func (m *Task) SlicePtr() interface{} {
+	ret := make([]Task, 0)
+	return &ret
+}
+
+func (m *Task) Join() es.JoinGeneral {
+	ret := TaskJoin{}
+	return &ret
+}
+
+func (j *TaskJoin) Links() []es.JoinLinks {
+	links := make([]es.JoinLinks, 0)
+	resourceLink := es.JoinLinks{
+		Type:       es.InnerJoin,
+		Table:      j.Resource.TableName(),
+		LeftTable:  j.Resource.TableName(),
+		LeftField:  "id",
+		RightTable: j.Task.TableName(),
+		RightField: "resource_id",
+	}
+	mapAreaResourceLink := es.JoinLinks{
+		Type:       es.InnerJoin,
+		Table:      j.MapAreaResource.TableName(),
+		LeftTable:  j.MapAreaResource.TableName(),
+		LeftField:  "resource_id",
+		RightTable: j.Resource.TableName(),
+		RightField: "id",
+	}
+	links = append(links, resourceLink)
+	links = append(links, mapAreaResourceLink)
+	return links
+}
+
+func (j *TaskJoin) SlicePtr() interface{} {
+	ret := make([]TaskJoin, 0)
+	return &ret
+}
+
+func (j *TaskJoin) Transfer() es.ModelGeneral {
+	join := *j
+	ret := join.Task
+	ret.Resource = join.Resource
+	ret.Resource.Area.Id = join.MapAreaResource.AreaId
+	return &ret
+}
+
+func (j *TaskJoin) TransferSlicePtr(slicePtr interface{}) interface{} {
+	joinSlicePtr := slicePtr.(*[]TaskJoin)
+	joinSlice := *joinSlicePtr
+	tasks := make([]Task, 0)
+	for _, one := range joinSlice {
+		taskPtr := (&one).Transfer().(*Task)
+		tasks = append(tasks, *taskPtr)
+	}
+	return &tasks
 }

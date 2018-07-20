@@ -2,9 +2,6 @@ package controllers
 
 import (
 	"evolution/backend/common/middles"
-	"evolution/backend/common/resp"
-
-	"evolution/backend/time/models"
 
 	"github.com/gin-gonic/gin"
 )
@@ -24,21 +21,7 @@ func (c *Phase) Router(router *gin.RouterGroup) {
 	phase.GET("/get/:id", c.One)
 	phase.GET("/list", c.List)
 	phase.POST("", c.Create)
-	phase.POST("/list", c.ListByCondition)
+	phase.POST("/list", c.ListWithCondition)
 	phase.PUT("/:id", c.Update)
 	phase.DELETE("/:id", c.Delete)
-}
-
-func (c *Phase) ListByCondition(ctx *gin.Context) {
-	var phase models.Phase
-	if err := ctx.ShouldBindJSON(&phase); err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorParams, "params error: ", err)
-		return
-	}
-	phases, err := c.PhaseSvc.ListWithCondition(&phase)
-	if err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "phase get error", err)
-		return
-	}
-	resp.Success(ctx, phases)
 }
