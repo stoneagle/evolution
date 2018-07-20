@@ -19,14 +19,8 @@ export class UserResourceService extends BaseService {
     this.uri = this.appSettings.apiServer.endpoint + this.appSettings.apiServer.prefix.time + '/user-resource';
   }
 
-  List(): Observable<UserResource[]> {
-    return this.BaseList<UserResource>(UserResource, this.uri + `/list`).pipe(map(userResources => {
-      return userResources;
-    }))
-  }
-  
-  ListWithCondition(userResource: UserResource): Observable<UserResource[]> {
-    return this.BaseListWithCondition<UserResource>(userResource, UserResource, this.uri + `/list`).pipe(map(userResources => {
+  List(userResource: UserResource): Observable<UserResource[]> {
+    return this.BaseList<UserResource>(userResource, UserResource, this.uri + `/list`).pipe(map(userResources => {
       return userResources;
     }))
   }

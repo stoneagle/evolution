@@ -71,14 +71,8 @@ export class PoolService extends BaseService {
     );
   }
 
-  List(): Observable<Pool[]> {
-    return this.BaseList<Pool>(Pool, this.uri + `/list`).pipe(map(pools => {
-      return pools;
-    }))
-  }
-  
-  ListWithCondition(pool: Pool): Observable<Pool[]> {
-    return this.BaseListWithCondition<Pool>(pool, Pool, this.uri + `/list`).pipe(map(pools => {
+  List(pool: Pool): Observable<Pool[]> {
+    return this.BaseList<Pool>(pool, Pool, this.uri + `/list`).pipe(map(pools => {
       return pools;
     }))
   }

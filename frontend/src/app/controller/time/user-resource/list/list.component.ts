@@ -50,7 +50,7 @@ export class UserResourceListComponent implements OnInit {
 
   ngOnInit() {
     this.pageSize = 10;
-    this.phaseService.List().subscribe(res => {
+    this.phaseService.List(null).subscribe(res => {
       res.forEach((one, k) => {
         if (this.fieldPhasesMap.get(one.FieldId) == undefined) {
           this.fieldPhasesMap.set(one.FieldId, []);
@@ -83,7 +83,7 @@ export class UserResourceListComponent implements OnInit {
 
   refreshAll(from: number, to: number): void {
     if ((this.filterArea.Id == undefined) && (this.initAllFlag)) {
-      this.userResourceService.List().subscribe(res => {
+      this.userResourceService.List(null).subscribe(res => {
         this.totalCount = res.length;
         this.userResources = res.slice(from, to);
       })
@@ -93,7 +93,7 @@ export class UserResourceListComponent implements OnInit {
       userResource.Resource.Area = new Area();
       userResource.Resource.Area.Id = this.filterArea.Id;
       userResource.Resource.WithSub = true;
-      this.userResourceService.ListWithCondition(userResource).subscribe(res => {
+      this.userResourceService.List(userResource).subscribe(res => {
         this.filterAreaSumTime = 0;
         res.forEach((one, k) => {
           this.filterAreaSumTime += one.Time;

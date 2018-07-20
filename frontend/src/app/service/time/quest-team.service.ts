@@ -19,14 +19,8 @@ export class QuestTeamService extends BaseService {
     this.uri = this.appSettings.apiServer.endpoint + this.appSettings.apiServer.prefix.time + '/quest-team';
   }
 
-  List(): Observable<QuestTeam[]> {
-    return this.BaseList<QuestTeam>(QuestTeam, this.uri + `/list`).pipe(map(questTeams => {
-      return questTeams;
-    }))
-  }
-
-  ListWithCondition(questTeam: QuestTeam): Observable<QuestTeam[]> {
-    return this.BaseListWithCondition<QuestTeam>(questTeam, QuestTeam, this.uri + `/list`).pipe(map(questTeams => {
+  List(questTeam: QuestTeam): Observable<QuestTeam[]> {
+    return this.BaseList<QuestTeam>(questTeam, QuestTeam, this.uri + `/list`).pipe(map(questTeams => {
       return questTeams;
     }))
   }

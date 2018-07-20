@@ -79,7 +79,7 @@ export class QuestComponent implements OnInit {
   }
 
   refreshClassify(from: number, to: number): void {
-    this.questService.List().subscribe(res => {
+    this.questService.List(null).subscribe(res => {
       this.totalCount = res.length;
       this.quests = res.slice(from, to);
     })
@@ -95,7 +95,7 @@ export class QuestComponent implements OnInit {
   finish(quest: Quest): void {
     let questTarget = new QuestTarget();
     questTarget.QuestId = quest.Id;
-    this.questTargetService.ListWithCondition(questTarget).subscribe(res => {
+    this.questTargetService.List(questTarget).subscribe(res => {
       let updateFlag = true;
       for (let k in res) {
         if (res[k].Status == this.questSettings.TargetStatus.Wait) {

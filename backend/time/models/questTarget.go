@@ -77,6 +77,13 @@ func (j *QuestTargetJoin) Transfer() es.ModelGeneral {
 	return &ret
 }
 
+func (j *QuestTargetJoin) TransferCopy(modelPtr es.ModelGeneral) {
+	questTargetPtr := modelPtr.(*QuestTarget)
+	(*questTargetPtr) = (*j).QuestTarget
+	(*questTargetPtr).Area = (*j).Area
+	return
+}
+
 func (j *QuestTargetJoin) TransferSlicePtr(slicePtr interface{}) interface{} {
 	joinSlicePtr := slicePtr.(*[]QuestTargetJoin)
 	joinSlice := *joinSlicePtr

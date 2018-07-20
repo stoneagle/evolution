@@ -87,14 +87,8 @@ export class ItemService extends BaseService {
     return sub;
   }
 
-  List(): Observable<Item[]> {
-    return this.BaseList<Item>(Item, this.uri + `/list`).pipe(map(items => {
-      return items;
-    }))
-  }
-  
-  ListWithCondition(item: Item): Observable<Item[]> {
-    return this.BaseListWithCondition<Item>(item, Item, this.uri + `/list`).pipe(map(items => {
+  List(item: Item): Observable<Item[]> {
+    return this.BaseList<Item>(item, Item, this.uri + `/list`).pipe(map(items => {
       return items;
     }))
   }

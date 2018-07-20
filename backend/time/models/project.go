@@ -21,7 +21,7 @@ type Project struct {
 }
 
 type ProjectJoin struct {
-	Project     `xorm:"extends" json:"-"`
+	Project     Project `xorm:"extends" json:"-"`
 	QuestTarget `xorm:"extends" json:"-"`
 	Area        `xorm:"extends" json:"-"`
 }
@@ -83,6 +83,14 @@ func (j *ProjectJoin) Transfer() es.ModelGeneral {
 	ret.Area = join.Area
 	ret.QuestTarget = join.QuestTarget
 	return &ret
+}
+
+func (j *ProjectJoin) TransferCopy(modelPtr es.ModelGeneral) {
+	projectPtr := modelPtr.(*Project)
+	(*projectPtr) = (*j).Project
+	(*projectPtr).Area = (*j).Area
+	(*projectPtr).QuestTarget = (*j).QuestTarget
+	return
 }
 
 func (j *ProjectJoin) TransferSlicePtr(slicePtr interface{}) interface{} {

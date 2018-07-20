@@ -71,6 +71,13 @@ func (j *QuestTeamJoin) Transfer() es.ModelGeneral {
 	return &ret
 }
 
+func (j *QuestTeamJoin) TransferCopy(modelPtr es.ModelGeneral) {
+	questTeamPtr := modelPtr.(*QuestTeam)
+	(*questTeamPtr) = (*j).QuestTeam
+	(*questTeamPtr).Quest = (*j).Quest
+	return
+}
+
 func (j *QuestTeamJoin) TransferSlicePtr(slicePtr interface{}) interface{} {
 	joinSlicePtr := slicePtr.(*[]QuestTeamJoin)
 	joinSlice := *joinSlicePtr

@@ -19,14 +19,8 @@ export class QuestTimeTableService extends BaseService {
     this.uri = this.appSettings.apiServer.endpoint + this.appSettings.apiServer.prefix.time + '/quest-timetable';
   }
   
-  List(): Observable<QuestTimeTable[]> {
-    return this.BaseList<QuestTimeTable>(QuestTimeTable, this.uri + `/list`).pipe(map(questTimeTables => {
-      return questTimeTables;
-    }))
-  }
-  
-  ListWithCondition(questTimeTable: QuestTimeTable): Observable<QuestTimeTable[]> {
-    return this.BaseListWithCondition<QuestTimeTable>(questTimeTable, QuestTimeTable, this.uri + `/list`).pipe(map(questTimeTables => {
+  List(questTimeTable: QuestTimeTable): Observable<QuestTimeTable[]> {
+    return this.BaseList<QuestTimeTable>(questTimeTable, QuestTimeTable, this.uri + `/list`).pipe(map(questTimeTables => {
       return questTimeTables;
     }))
   }

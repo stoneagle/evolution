@@ -65,7 +65,7 @@ export class FieldComponent implements OnInit {
   }
 
   refreshClassify(from: number, to: number): void {
-    this.fieldService.List().subscribe(res => {
+    this.fieldService.List(null).subscribe(res => {
       this.totalCount = res.length;
       this.fields = res.slice(from, to);
     })

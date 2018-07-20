@@ -64,7 +64,7 @@ export class PoolComponent implements OnInit {
   }
 
   refreshPools(from: number, to: number): void {
-    this.poolService.List().subscribe(res => {
+    this.poolService.List(null).subscribe(res => {
       this.totalCount = res.length;
       this.pools = res.slice(from, to);
     })

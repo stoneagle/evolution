@@ -19,14 +19,8 @@ export class QuestResourceService extends BaseService {
     this.uri = this.appSettings.apiServer.endpoint + this.appSettings.apiServer.prefix.time + '/quest-resource';
   }
 
-  List(): Observable<QuestResource[]> {
-    return this.BaseList<QuestResource>(QuestResource, this.uri + `/list`).pipe(map(questResources => {
-      return questResources;
-    }))
-  }
-
-  ListWithCondition(questResource: QuestResource): Observable<QuestResource[]> {
-    return this.BaseListWithCondition<QuestResource>(questResource, QuestResource, this.uri + `/list`).pipe(map(questResources => {
+  List(questResource: QuestResource): Observable<QuestResource[]> {
+    return this.BaseList<QuestResource>(questResource, QuestResource, this.uri + `/list`).pipe(map(questResources => {
       return questResources;
     }))
   }

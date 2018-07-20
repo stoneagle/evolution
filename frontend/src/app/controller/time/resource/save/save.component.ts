@@ -28,7 +28,7 @@ export class ResourceSaveComponent implements OnInit {
     this.resource = new Resource();
     let area = new Area();
     area.Type = AreaSettings.Type.Leaf; 
-    this.areaService.ListWithCondition(area).subscribe(res => {
+    this.areaService.List(area).subscribe(res => {
       this.areas = res;
     })
   }

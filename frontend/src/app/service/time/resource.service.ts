@@ -21,25 +21,19 @@ export class ResourceService extends BaseService {
   }
 
   ListAreas(id: number): Observable<Area[]> {
-    return this.BaseList<Area>(Area, this.uri + `/list/areas/${id}`).pipe(map(areas => {
+    return this.BaseList<Area>(null, Area, this.uri + `/list/areas/${id}`).pipe(map(areas => {
       return areas;
     }))
   }
 
   ListGroupByLeaf(resource: Resource): Observable<Area[]> {
-    return this.BaseListWithCondition<Area>(resource, Area, this.uri + `/list/leaf`).pipe(map(areas => {
+    return this.BaseList<Area>(resource, Area, this.uri + `/list/leaf`).pipe(map(areas => {
       return areas;
     }))
   }
 
-  List(): Observable<Resource[]> {
-    return this.BaseList<Resource>(Resource, this.uri + `/list`).pipe(map(resources => {
-      return resources;
-    }))
-  }
-  
-  ListWithCondition(resource: Resource): Observable<Resource[]> {
-    return this.BaseListWithCondition<Resource>(resource, Resource, this.uri + `/list`).pipe(map(resources => {
+  List(resource: Resource): Observable<Resource[]> {
+    return this.BaseList<Resource>(resource, Resource, this.uri + `/list`).pipe(map(resources => {
       return resources;
     }))
   }

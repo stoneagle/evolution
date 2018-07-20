@@ -20,7 +20,7 @@ export class FieldService extends BaseService {
   }
 
   Map(): Observable<Map<number, string>> {
-    return this.BaseList<Field>(Field, this.uri + `/list`).pipe(map(fields => {
+    return this.BaseList<Field>(null, Field, this.uri + `/list`).pipe(map(fields => {
       let ret:Map<number, string> = new Map(); 
       fields.forEach((one, k) => {
         ret.set(one.Id, one.Name);
@@ -29,14 +29,8 @@ export class FieldService extends BaseService {
     }))
   }
 
-  List(): Observable<Field[]> {
-    return this.BaseList<Field>(Field, this.uri + `/list`).pipe(map(fields => {
-      return fields;
-    }))
-  }
-
-  ListWithCondition(field: Field): Observable<Field[]> {
-    return this.BaseListWithCondition<Field>(field, Field, this.uri + `/list`).pipe(map(fields => {
+  List(field: Field): Observable<Field[]> {
+    return this.BaseList<Field>(field, Field, this.uri + `/list`).pipe(map(fields => {
       return fields;
     }))
   }

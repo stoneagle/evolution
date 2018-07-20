@@ -24,11 +24,6 @@ func NewArea(engine *xorm.Engine, cache *redis.Client, log *logger.Logger) *Area
 	return &ret
 }
 
-func (s *Area) UpdateByMap(id int, model map[string]interface{}) (err error) {
-	_, err = s.Engine.Table(new(models.Area)).Id(id).Update(&model)
-	return
-}
-
 func (s *Area) TransferListToTree(areas []models.Area, fieldMap map[int]string) (areaTrees map[int]models.AreaTree, err error) {
 	areaTrees = make(map[int]models.AreaTree)
 buildTreeLoop:

@@ -20,20 +20,14 @@ export class TaskService extends BaseService {
   }
 
   ListByUser(userId: number): Observable<Task[]> {
-    return this.BaseList<Task>(Task, this.uri + `/list/user/${userId}`).pipe(map(tasks => {
+    return this.BaseList<Task>(null, Task, this.uri + `/list/user/${userId}`).pipe(map(tasks => {
       return tasks;
     }))
   }
   
 
-  List(): Observable<Task[]> {
-    return this.BaseList<Task>(Task, this.uri + `/list`).pipe(map(tasks => {
-      return tasks;
-    }))
-  }
-  
-  ListWithCondition(task: Task): Observable<Task[]> {
-    return this.BaseListWithCondition<Task>(task, Task, this.uri + `/list`).pipe(map(tasks => {
+  List(task: Task): Observable<Task[]> {
+    return this.BaseList<Task>(task, Task, this.uri + `/list`).pipe(map(tasks => {
       return tasks;
     }))
   }

@@ -59,7 +59,7 @@ export class TaskListComponent implements OnInit {
     let task = new Task();
     task.UserId = this.shell.currentUser.Id
     task.ResourceId = this.filterResource.Id
-    this.taskService.ListWithCondition(task).subscribe(res => {
+    this.taskService.List(task).subscribe(res => {
       this.totalCount = res.length;
       this.tasks = res.slice(from, to);
     })

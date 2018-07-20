@@ -86,6 +86,13 @@ func (j *ActionJoin) Transfer() es.ModelGeneral {
 	return &ret
 }
 
+func (j *ActionJoin) TransferCopy(modelPtr es.ModelGeneral) {
+	actionPtr := modelPtr.(*Action)
+	(*actionPtr) = (*j).Action
+	(*actionPtr).Task = (*j).Task
+	return
+}
+
 func (j *ActionJoin) TransferSlicePtr(slicePtr interface{}) interface{} {
 	joinSlicePtr := slicePtr.(*[]ActionJoin)
 	joinSlice := *joinSlicePtr

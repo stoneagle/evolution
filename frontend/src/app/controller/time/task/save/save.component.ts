@@ -41,13 +41,13 @@ export class TaskSaveComponent implements OnInit {
     this.projectService.Get(projectId).subscribe(project => {
       let questTeam = new QuestTeam();
       questTeam.QuestId = project.QuestTarget.QuestId;
-      this.questTeamService.ListWithCondition(questTeam).subscribe(teams => {
+      this.questTeamService.List(questTeam).subscribe(teams => {
         let user = new User();
         user.Ids = [];
         teams.forEach((one, k) => {
           user.Ids.push(one.UserId);
         });
-        this.userService.ListWithCondition(user).subscribe(res => {
+        this.userService.List(user).subscribe(res => {
           this.userMaps = new Map();
           res.forEach((u, k) => {
             this.userMaps.set(u.Id, u);
@@ -57,7 +57,7 @@ export class TaskSaveComponent implements OnInit {
 
       let resource = new Resource();
       resource.Area.Id = project.QuestTarget.AreaId;
-      this.resourceService.ListWithCondition(resource).subscribe(resources => {
+      this.resourceService.List(resource).subscribe(resources => {
         this.resourceMaps = new Map();
         resources.forEach((one, k) => {
           this.resourceMaps.set(one.Id, one);

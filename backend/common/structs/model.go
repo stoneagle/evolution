@@ -31,6 +31,7 @@ type JoinGeneral interface {
 	Links() []JoinLinks
 	SlicePtr() interface{}
 	Transfer() ModelGeneral
+	TransferCopy(ModelGeneral)
 	TransferSlicePtr(interface{}) interface{}
 }
 

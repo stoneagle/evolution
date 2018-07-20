@@ -53,7 +53,7 @@ export class TaskKanbanComponent implements OnInit {
       color: "FieldId",
       swimlaneKey: "ProjectName",
     }
-    this.fieldService.List().subscribe(res => {
+    this.fieldService.List(null).subscribe(res => {
       let colorMaps = new Object;
       // this.kanbanFilterSettings = [];
       res.forEach((one, k) => {

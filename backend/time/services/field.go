@@ -21,11 +21,11 @@ func NewField(engine *xorm.Engine, cache *redis.Client, log *logger.Logger) *Fie
 }
 
 func (s *Field) Map() (fieldsMap map[int]string, err error) {
-	fields := make([]models.Field, 0)
-	err = s.Engine.Find(&fields)
+	fieldsPtr, err := s.List(&models.Field{})
 	if err != nil {
 		return
 	}
+	fields := *(fieldsPtr.(*[]models.Field))
 	fieldsMap = map[int]string{}
 	for _, one := range fields {
 		fieldsMap[one.Id] = one.Name

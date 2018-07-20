@@ -25,14 +25,8 @@ export class QuestTargetService extends BaseService {
     }))
   }
 
-  List(): Observable<QuestTarget[]> {
-    return this.BaseList<QuestTarget>(QuestTarget, this.uri + `/list`).pipe(map(questTargets => {
-      return questTargets;
-    }))
-  }
-
-  ListWithCondition(questTarget: QuestTarget): Observable<QuestTarget[]> {
-    return this.BaseListWithCondition<QuestTarget>(questTarget, QuestTarget, this.uri + `/list`).pipe(map(questTargets => {
+  List(questTarget: QuestTarget): Observable<QuestTarget[]> {
+    return this.BaseList<QuestTarget>(questTarget, QuestTarget, this.uri + `/list`).pipe(map(questTargets => {
       return questTargets;
     }))
   }

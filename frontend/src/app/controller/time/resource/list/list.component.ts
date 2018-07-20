@@ -65,7 +65,7 @@ export class ResourceListComponent implements OnInit {
 
   refreshClassify(from: number, to: number): void {
     if ((this.filterAreaId == undefined) && (this.initAllFlag)) {
-      this.resourceService.List().subscribe(res => {
+      this.resourceService.List(null).subscribe(res => {
         this.totalCount = res.length;
         this.resources = res.slice(from, to);
       })
@@ -73,7 +73,7 @@ export class ResourceListComponent implements OnInit {
       let resource = new Resource();
       resource.Area.Id = this.filterAreaId;
       resource.WithSub = true;
-      this.resourceService.ListWithCondition(resource).subscribe(res => {
+      this.resourceService.List(resource).subscribe(res => {
         this.totalCount = res.length;
         this.resources = res.slice(from, to);
       })

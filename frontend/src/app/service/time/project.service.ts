@@ -19,14 +19,8 @@ export class ProjectService extends BaseService {
     this.uri = this.appSettings.apiServer.endpoint + this.appSettings.apiServer.prefix.time + '/project';
   }
 
-  List(): Observable<Project[]> {
-    return this.BaseList<Project>(Project, this.uri + `/list`).pipe(map(projects => {
-      return projects;
-    }))
-  }
-
-  ListWithCondition(project: Project): Observable<Project[]> {
-    return this.BaseListWithCondition<Project>(project, Project, this.uri + `/list`).pipe(map(projects => {
+  List(project: Project): Observable<Project[]> {
+    return this.BaseList<Project>(project, Project, this.uri + `/list`).pipe(map(projects => {
       return projects;
     }))
   }

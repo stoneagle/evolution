@@ -20,8 +20,8 @@ export class AreaService extends BaseService {
     this.uri = this.appSettings.apiServer.endpoint + this.appSettings.apiServer.prefix.time + '/area';
   }
 
-  ListWithCondition(area: Area): Observable<Area[]> {
-    return this.BaseListWithCondition<Area>(area, Area, this.uri + `/list`).pipe(map(areas => {
+  List(area: Area): Observable<Area[]> {
+    return this.BaseList<Area>(area, Area, this.uri + `/list`).pipe(map(areas => {
       return areas;
     }))
   }
@@ -45,20 +45,14 @@ export class AreaService extends BaseService {
   }
 
   ListParent(fieldId: number): Observable<Area[]> {
-    return this.BaseList<Area>(Area, this.uri + `/list/parent/${fieldId}`).pipe(map(areas => {
+    return this.BaseList<Area>(null, Area, this.uri + `/list/parent/${fieldId}`).pipe(map(areas => {
       return areas; 
     }))
   }
 
   ListChildren(parentId: number): Observable<Area[]> {
-    return this.BaseList<Area>(Area, this.uri + `/list/children/${parentId}`).pipe(map(areas => {
+    return this.BaseList<Area>(null, Area, this.uri + `/list/children/${parentId}`).pipe(map(areas => {
       return areas; 
-    }))
-  }
-
-  List(): Observable<Area[]> {
-    return this.BaseList<Area>(Area, this.uri + `/list`).pipe(map(areas => {
-      return areas;
     }))
   }
 

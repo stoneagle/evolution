@@ -14,6 +14,7 @@ type ServiceGeneral interface {
 	List(ModelGeneral) (interface{}, error)
 	Create(ModelGeneral) error
 	Update(int, ModelGeneral) error
+	UpdateByMap(string, int, map[string]interface{}) error
 	Delete(int, ModelGeneral) error
 }
 
@@ -43,21 +44,19 @@ func (s *Service) LogSql(sql string, args interface{}, err error) {
 }
 
 func (s *Service) One(id int, modelPtr ModelGeneral) (err error) {
-	session := s.Engine.Where("id = ?", id)
-	has, err := session.Get(modelPtr)
-	if err != nil {
-		sql, args := session.LastSQL()
-		s.LogSql(sql, args, err)
+	joinPtr := modelPtr.Join()
+	var has bool
+	session := s.Engine.Unscoped().Table(modelPtr.TableName()).Where(fmt.Sprintf("%s.id = ?", modelPtr.TableName()), id)
+	if joinPtr != nil {
+		links := joinPtr.Links()
+		for _, link := range links {
+			session.Join(link.Type.String(), link.Table, fmt.Sprintf("%s.%s = %s.%s", link.LeftTable, link.LeftField, link.RightTable, link.RightField))
+		}
+		has, err = session.Get(joinPtr)
+	} else {
+		has, err = session.Get(modelPtr)
 	}
-	if !has {
-		return errors.New(fmt.Sprintf("%v not exist", s.Logger.Resource))
-	}
-	return
-}
 
-func (s *Service) Delete(id int, modelPtr ModelGeneral) (err error) {
-	session := s.Engine.Id(id)
-	has, err := session.Get(modelPtr)
 	if err != nil {
 		sql, args := session.LastSQL()
 		s.LogSql(sql, args, err)
@@ -65,10 +64,9 @@ func (s *Service) Delete(id int, modelPtr ModelGeneral) (err error) {
 	if !has {
 		return errors.New(fmt.Sprintf("%v not exist", s.Logger.Resource))
 	}
-	_, err = s.Engine.Id(id).Delete(modelPtr)
-	if err != nil {
-		sql, args := session.LastSQL()
-		s.LogSql(sql, args, err)
+
+	if joinPtr != nil {
+		joinPtr.TransferCopy(modelPtr)
 	}
 	return
 }
@@ -116,6 +114,29 @@ func (s *Service) Create(modelPtr ModelGeneral) (err error) {
 func (s *Service) Update(id int, modelPtr ModelGeneral) (err error) {
 	session := s.Engine.Id(id)
 	_, err = session.Update(modelPtr)
+	if err != nil {
+		sql, args := session.LastSQL()
+		s.LogSql(sql, args, err)
+	}
+	return
+}
+
+func (s *Service) UpdateByMap(table string, id int, params map[string]interface{}) (err error) {
+	_, err = s.Engine.Table(table).Id(id).Update(&params)
+	return
+}
+
+func (s *Service) Delete(id int, modelPtr ModelGeneral) (err error) {
+	session := s.Engine.Id(id)
+	has, err := session.Get(modelPtr)
+	if err != nil {
+		sql, args := session.LastSQL()
+		s.LogSql(sql, args, err)
+	}
+	if !has {
+		return errors.New(fmt.Sprintf("%v not exist", s.Logger.Resource))
+	}
+	_, err = s.Engine.Id(id).Delete(modelPtr)
 	if err != nil {
 		sql, args := session.LastSQL()
 		s.LogSql(sql, args, err)

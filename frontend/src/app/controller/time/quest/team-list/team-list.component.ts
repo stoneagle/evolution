@@ -36,7 +36,7 @@ export class QuestTeamListComponent implements OnInit {
     this.questId = questId;
     let questTeam = new QuestTeam();
     questTeam.QuestId = this.questId;
-    this.questTeamService.ListWithCondition(questTeam).subscribe(res => {
+    this.questTeamService.List(questTeam).subscribe(res => {
       this.totalCount = res.length;
       this.questTeams = res.slice(0, this.pageSize);
       let user = new User();
@@ -44,7 +44,7 @@ export class QuestTeamListComponent implements OnInit {
       res.forEach((one, k) => {
         user.Ids.push(one.UserId);
       });
-      this.userService.ListWithCondition(user).subscribe(res => {
+      this.userService.List(user).subscribe(res => {
         this.userNameMap = new Map();
         res.forEach((u, k) => {
           this.userNameMap.set(u.Id, u.Name);
@@ -81,7 +81,7 @@ export class QuestTeamListComponent implements OnInit {
     if (this.questId != undefined) {
       let questTeam = new QuestTeam();
       questTeam.QuestId = this.questId;
-      this.questTeamService.ListWithCondition(questTeam).subscribe(res => {
+      this.questTeamService.List(questTeam).subscribe(res => {
         this.totalCount = res.length;
         this.questTeams = res.slice(from, to);
         let user = new User();
@@ -89,7 +89,7 @@ export class QuestTeamListComponent implements OnInit {
         res.forEach((one, k) => {
           user.Ids.push(one.UserId);
         });
-        this.userService.ListWithCondition(user).subscribe(res => {
+        this.userService.List(user).subscribe(res => {
           this.userNameMap = new Map();
           res.forEach((u, k) => {
             this.userNameMap.set(u.Id, u.Name);

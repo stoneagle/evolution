@@ -60,7 +60,7 @@ export class PhaseComponent implements OnInit {
   refreshClassify(from: number, to: number): void {
     let phase = new Phase();
     phase.FieldId = this.currentField.Id;
-    this.phaseService.ListWithCondition(phase).subscribe(res => {
+    this.phaseService.List(phase).subscribe(res => {
       this.totalCount = res.length;
       this.phases = res.slice(from, to);
     })

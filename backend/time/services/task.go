@@ -36,7 +36,7 @@ func (s *Task) Update(id int, modelPtr structs.ModelGeneral) (err error) {
 	}
 	_, err = s.Engine.Id(id).Update(taskPtr)
 	if taskPtr.StartDateReset {
-		err = s.UpdateByMap(id, map[string]interface{}{
+		err = s.UpdateByMap(taskPtr.TableName(), id, map[string]interface{}{
 			"start_date": nil,
 		})
 		if err != nil {
@@ -44,7 +44,7 @@ func (s *Task) Update(id int, modelPtr structs.ModelGeneral) (err error) {
 		}
 	}
 	if taskPtr.EndDateReset {
-		err = s.UpdateByMap(id, map[string]interface{}{
+		err = s.UpdateByMap(taskPtr.TableName(), id, map[string]interface{}{
 			"end_date": nil,
 			"duration": 0,
 		})
@@ -52,10 +52,5 @@ func (s *Task) Update(id int, modelPtr structs.ModelGeneral) (err error) {
 			return
 		}
 	}
-	return
-}
-
-func (s *Task) UpdateByMap(id int, model map[string]interface{}) (err error) {
-	_, err = s.Engine.Table(new(models.Task)).Id(id).Update(&model)
 	return
 }

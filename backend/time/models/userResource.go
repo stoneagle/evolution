@@ -95,6 +95,14 @@ func (j *UserResourceJoin) Transfer() es.ModelGeneral {
 	return &ret
 }
 
+func (j *UserResourceJoin) TransferCopy(modelPtr es.ModelGeneral) {
+	userResourcePtr := modelPtr.(*UserResource)
+	(*userResourcePtr) = (*j).UserResource
+	(*userResourcePtr).Resource = (*j).Resource
+	(*userResourcePtr).Resource.Area = (*j).Area
+	return
+}
+
 func (j *UserResourceJoin) TransferSlicePtr(slicePtr interface{}) interface{} {
 	joinSlicePtr := slicePtr.(*[]UserResourceJoin)
 	joinSlice := *joinSlicePtr

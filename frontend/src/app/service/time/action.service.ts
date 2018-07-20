@@ -19,14 +19,8 @@ export class ActionService extends BaseService {
     this.uri = this.appSettings.apiServer.endpoint + this.appSettings.apiServer.prefix.time + '/action';
   }
 
-  List(): Observable<Action[]> {
-    return this.BaseList<Action>(Action, this.uri + `/list`).pipe(map(actions => {
-      return actions;
-    }))
-  }
-
-  ListWithCondition(action: Action): Observable<Action[]> {
-    return this.BaseListWithCondition<Action>(action, Action, this.uri + `/list`).pipe(map(actions => {
+  List(action: Action): Observable<Action[]> {
+    return this.BaseList<Action>(action, Action, this.uri + `/list`).pipe(map(actions => {
       return actions;
     }))
   }

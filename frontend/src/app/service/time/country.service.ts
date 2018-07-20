@@ -19,14 +19,8 @@ export class CountryService extends BaseService {
     this.uri = this.appSettings.apiServer.endpoint + this.appSettings.apiServer.prefix.time + '/country';
   }
 
-  List(): Observable<Country[]> {
-    return this.BaseList<Country>(Country, this.uri + `/list`).pipe(map(countries => {
-      return countries;
-    }))
-  }
-
-  ListWithCondition(country: Country): Observable<Country[]> {
-    return this.BaseListWithCondition<Country>(country, Country, this.uri + `/list`).pipe(map(countries => {
+  List(country: Country): Observable<Country[]> {
+    return this.BaseList<Country>(country, Country, this.uri + `/list`).pipe(map(countries => {
       return countries;
     }))
   }

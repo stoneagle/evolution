@@ -72,7 +72,7 @@ export class ClassifyComponent implements OnInit {
   }
 
   refreshClassify(from: number, to: number): void {
-    this.classifyService.List().subscribe(res => {
+    this.classifyService.List(null).subscribe(res => {
       this.totalCount = res.length;
       this.classifys = res.slice(from, to);
     })

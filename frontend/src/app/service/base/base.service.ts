@@ -44,27 +44,7 @@ export class BaseService {
     )
   }
 
-  protected BaseList<T extends Serializable >(c: new (any) => T, url: string): Observable<T[]> {
-    this.operation = this.shareSettings.System.Process.List;
-    return this.http.get<Resp>(url).pipe(
-      catchError(this.handleError<Resp>()),
-      map(res => {
-        if (res && res.code == 0) {
-          let ret: T[] = []; 
-          res.data.map(
-            one => {
-              ret.push(new c(one));
-            }
-          )
-          return ret
-        } else {
-          this.handleResponse(res);
-        }
-      }),
-    )
-  }
-
-  protected BaseListWithCondition<T extends Serializable >(params: any, c: new (any) => T, url: string): Observable<T[]> {
+  protected BaseList<T extends Serializable >(params: any, c: new (any) => T, url: string): Observable<T[]> {
     this.operation = this.shareSettings.System.Process.List;
     return this.http.post<Resp>(url, JSON.stringify(params)).pipe(
       catchError(this.handleError<Resp>()),

@@ -55,7 +55,7 @@ export class UserComponent implements OnInit {
   }
 
   refreshClassify(from: number, to: number): void {
-    this.userService.List().subscribe(res => {
+    this.userService.List(null).subscribe(res => {
       this.totalCount = res.length;
       this.users = res.slice(from, to);
     })

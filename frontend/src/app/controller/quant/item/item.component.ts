@@ -78,7 +78,7 @@ export class ItemComponent implements OnInit {
   }
 
   refreshItem(from: number, to: number): void {
-    this.itemService.List().subscribe(res => {
+    this.itemService.List(null).subscribe(res => {
       this.totalCount = res.length;
       this.allItems = res;
       this.items = res.slice(from, to);

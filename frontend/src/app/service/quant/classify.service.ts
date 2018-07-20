@@ -53,14 +53,8 @@ export class ClassifyService extends BaseService {
     );
   }
 
-  List(): Observable<Classify[]> {
-    return this.BaseList<Classify>(Classify, this.uri + `/list`).pipe(map(classifies => {
-      return classifies;
-    }))
-  }
-  
-  ListWithCondition(classify: Classify): Observable<Classify[]> {
-    return this.BaseListWithCondition<Classify>(classify, Classify, this.uri + `/list`).pipe(map(classifies => {
+  List(classify: Classify): Observable<Classify[]> {
+    return this.BaseList<Classify>(classify, Classify, this.uri + `/list`).pipe(map(classifies => {
       return classifies;
     }))
   }

@@ -87,7 +87,7 @@ export class PoolAddItemComponent implements OnInit {
     classify.AssetString = this.pool.Asset
     classify.Type = this.pool.Type
     item.Classify.push(classify)
-    this.itemService.ListWithCondition(item).subscribe(res => {
+    this.itemService.List(item).subscribe(res => {
       this.showTotalCount = res.length;
       this.showAllItems = res;
       this.showItems = res.slice(0, this.showPageSize);

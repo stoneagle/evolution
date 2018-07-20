@@ -19,14 +19,8 @@ export class PhaseService extends BaseService {
     this.uri = this.appSettings.apiServer.endpoint + this.appSettings.apiServer.prefix.time + '/phase';
   }
 
-  List(): Observable<Phase[]> {
-    return this.BaseList<Phase>(Phase, this.uri + `/list`).pipe(map(phases => {
-      return phases;
-    }))
-  }
-
-  ListWithCondition(phase: Phase): Observable<Phase[]> {
-    return this.BaseListWithCondition<Phase>(phase, Phase, this.uri + `/list`).pipe(map(phases => {
+  List(phase: Phase): Observable<Phase[]> {
+    return this.BaseList<Phase>(phase, Phase, this.uri + `/list`).pipe(map(phases => {
       return phases;
     }))
   }

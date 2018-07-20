@@ -39,7 +39,7 @@ export class ProjectSaveComponent implements OnInit {
     this.questService.Get(questId).subscribe(quest => {
       let questTarget = new QuestTarget();
       questTarget.QuestId = questId;
-      this.questTargetService.ListWithCondition(questTarget).subscribe(targets => {
+      this.questTargetService.List(questTarget).subscribe(targets => {
         targets.forEach((one, k) => {
           this.areaMaps.set(one.Area.Id, one.Area);
         })
@@ -48,7 +48,7 @@ export class ProjectSaveComponent implements OnInit {
       if (id) {
         let task = new Task();
         task.ProjectId = id;
-        this.taskService.ListWithCondition(task).subscribe(tasks => {
+        this.taskService.List(task).subscribe(tasks => {
           this.tasks = tasks;
         });
         this.projectService.Get(id).subscribe(res => {

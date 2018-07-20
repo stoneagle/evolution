@@ -74,7 +74,7 @@ export class QuestSaveComponent implements OnInit {
         let questTarget = new QuestTarget();
         questTarget.QuestId = this.quest.Id;
         this.questTargets = []; 
-        this.questTargetService.ListWithCondition(questTarget).subscribe(res => {
+        this.questTargetService.List(questTarget).subscribe(res => {
           res.forEach((target, k) => {
             this.questTargets.push(target);
           });

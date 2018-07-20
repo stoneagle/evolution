@@ -56,7 +56,7 @@ export class CountryComponent implements OnInit {
   }
 
   refreshClassify(from: number, to: number): void {
-    this.countryService.List().subscribe(res => {
+    this.countryService.List(null).subscribe(res => {
       this.totalCount = res.length;
       this.countries = res.slice(from, to);
     })

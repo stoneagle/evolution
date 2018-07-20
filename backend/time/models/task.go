@@ -103,6 +103,14 @@ func (j *TaskJoin) Transfer() es.ModelGeneral {
 	return &ret
 }
 
+func (j *TaskJoin) TransferCopy(modelPtr es.ModelGeneral) {
+	taskPtr := modelPtr.(*Task)
+	(*taskPtr) = (*j).Task
+	(*taskPtr).Resource = (*j).Resource
+	(*taskPtr).Resource.Area.Id = (*j).MapAreaResource.AreaId
+	return
+}
+
 func (j *TaskJoin) TransferSlicePtr(slicePtr interface{}) interface{} {
 	joinSlicePtr := slicePtr.(*[]TaskJoin)
 	joinSlice := *joinSlicePtr
