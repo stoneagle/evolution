@@ -47,6 +47,8 @@ type GinBaseController interface {
 	Create(ctx *gin.Context)
 	Update(ctx *gin.Context)
 	Delete(ctx *gin.Context)
+	ChangeSvc(ResourceType)
+	ChangeModel(ResourceType)
 }
 
 func (b *Controller) Prepare(ptype ProjectType) {

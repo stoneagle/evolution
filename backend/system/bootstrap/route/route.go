@@ -7,6 +7,7 @@ import (
 	"evolution/backend/common/resp"
 	"evolution/backend/system/bootstrap"
 	"evolution/backend/system/controllers"
+	"evolution/backend/system/models"
 	"evolution/backend/system/services"
 
 	"github.com/gin-gonic/contrib/sessions"
@@ -52,12 +53,13 @@ func Configure(b *bootstrap.Bootstrapper) {
 }
 
 func GetBAList(userSvc *services.User) map[string]string {
-	UserSlice, err := userSvc.List()
+	userSlice := make([]models.User, 0)
+	err := userSvc.List(&userSlice)
 	if err != nil {
 		panic(err)
 	}
 	BAConf := make(map[string]string)
-	for _, one := range UserSlice {
+	for _, one := range userSlice {
 		BAConf[one.Name] = one.Password
 	}
 	return BAConf

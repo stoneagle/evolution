@@ -34,6 +34,7 @@ func (b *Bootstrapper) Bootstrap() *Bootstrapper {
 	gin.SetMode(b.Config.App.Mode)
 	b.App.Use(gin.Logger())
 	b.App.Use(gin.Recovery())
+	b.App.Use(middles.Recovery(middles.RecoveryHandler))
 
 	// cors must set in bootstrap
 	if b.Config.App.Mode == "debug" {

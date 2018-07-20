@@ -27,22 +27,6 @@ func (s *User) OneByCondition(user *models.User) (models.User, error) {
 	return model, err
 }
 
-func (s *User) Add(model models.User) (err error) {
-	_, err = s.Engine.Insert(&model)
-	return
-}
-
-func (s *User) Update(id int, model models.User) (err error) {
-	_, err = s.Engine.Id(id).Update(&model)
-	return
-}
-
-func (s *User) List() (users []models.User, err error) {
-	users = make([]models.User, 0)
-	err = s.Engine.Find(&users)
-	return
-}
-
 func (s *User) ListWithCondition(user *models.User) (users []models.User, err error) {
 	users = make([]models.User, 0)
 	condition := user.BuildCondition()
