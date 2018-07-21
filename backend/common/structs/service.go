@@ -46,14 +46,19 @@ func (s *Service) LogSql(sql string, args interface{}, err error) {
 func (s *Service) One(id int, modelPtr ModelGeneral) (err error) {
 	joinPtr := modelPtr.Join()
 	var has bool
-	session := s.Engine.Unscoped().Table(modelPtr.TableName()).Where(fmt.Sprintf("%s.id = ?", modelPtr.TableName()), id)
+	session := s.Engine.Unscoped().Table(modelPtr.TableName())
+	if id != 0 {
+		session.Where(fmt.Sprintf("%s.id = ?", modelPtr.TableName()), id)
+	}
 	if joinPtr != nil {
 		links := joinPtr.Links()
 		for _, link := range links {
 			session.Join(link.Type.String(), link.Table, fmt.Sprintf("%s.%s = %s.%s", link.LeftTable, link.LeftField, link.RightTable, link.RightField))
 		}
+		modelPtr.BuildCondition(session)
 		has, err = session.Get(joinPtr)
 	} else {
+		modelPtr.BuildCondition(session)
 		has, err = session.Get(modelPtr)
 	}
 

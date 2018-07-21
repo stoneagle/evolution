@@ -53,13 +53,15 @@ func Configure(b *bootstrap.Bootstrapper) {
 }
 
 func GetBAList(userSvc *services.User) map[string]string {
-	userSlice := make([]models.User, 0)
-	err := userSvc.List(&userSlice)
+	user := models.NewUser()
+	usersGeneralPtr := user.SlicePtr()
+	err := userSvc.List(user, usersGeneralPtr)
 	if err != nil {
 		panic(err)
 	}
+	usersPtr := user.Transfer(usersGeneralPtr)
 	BAConf := make(map[string]string)
-	for _, one := range userSlice {
+	for _, one := range *usersPtr {
 		BAConf[one.Name] = one.Password
 	}
 	return BAConf

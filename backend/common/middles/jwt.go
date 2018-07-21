@@ -37,10 +37,9 @@ type UserInfo struct {
 func JWTAuthLogin(userSvc *services.User) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		username := c.MustGet(gin.AuthUserKey).(string)
-		condition := systemModel.User{
-			Name: username,
-		}
-		user, err := userSvc.OneByCondition(&condition)
+		user := systemModel.NewUser()
+		user.Name = username
+		err := userSvc.One(0, user)
 		if err != nil {
 			resp.ErrorBusiness(c, resp.ErrorSign, fmt.Sprintf("get user %s error", username), err)
 			return

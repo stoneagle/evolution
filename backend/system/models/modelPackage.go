@@ -5,5 +5,5 @@ type ModelPackage struct {
 }
 
 func (m *ModelPackage) PrepareModel() {
-	m.UserModel = &User{}
+	m.UserModel = NewUser()
 }

@@ -26,10 +26,9 @@ func BasicAuthLogin(userSvc *services.User) gin.HandlerFunc {
 		if err != nil {
 			resp.ErrorBusiness(c, resp.ErrorSign, "session save error", err)
 		} else {
-			condition := systemModel.User{
-				Name: username,
-			}
-			user, err := userSvc.OneByCondition(&condition)
+			user := systemModel.NewUser()
+			user.Name = username
+			err := userSvc.One(0, user)
 			if err != nil {
 				resp.ErrorBusiness(c, resp.ErrorApi, fmt.Sprintf("get user %s error", username), err)
 				return
@@ -62,10 +61,9 @@ func BasicAuthCurrent(userSvc *services.User) gin.HandlerFunc {
 			resp.ErrorBusiness(c, resp.ErrorSign, "invalid session token", nil)
 		} else {
 			name := username.(string)
-			condition := systemModel.User{
-				Name: name,
-			}
-			user, err := userSvc.OneByCondition(&condition)
+			user := systemModel.NewUser()
+			user.Name = name
+			err := userSvc.One(0, user)
 			if err != nil {
 				resp.ErrorBusiness(c, resp.ErrorApi, fmt.Sprintf("get user %s error", name), err)
 				return
