@@ -22,7 +22,7 @@ type Task struct {
 
 	Resource       *Resource    `xorm:"-" structs:"-" json:"Resource,omitempty"`
 	Project        *Project     `xorm:"-" structs:"-" json:"Project,omitempty"`
-	QuestTarget    *QuestTarget `xorm:"-" structs:"-" json:"Project,omitempty"`
+	QuestTarget    *QuestTarget `xorm:"-" structs:"-" json:"QuestTarget,omitempty"`
 	Area           *Area        `xorm:"-" structs:"-" json:"Area,omitempty"`
 	StartDateReset bool         `xorm:"-" structs:"-"`
 	EndDateReset   bool         `xorm:"-" structs:"-"`
@@ -42,8 +42,8 @@ var (
 )
 
 type TaskJoin struct {
-	Resource    `xorm:"extends" json:"-"`
 	Task        `xorm:"extends" json:"-"`
+	Resource    `xorm:"extends" json:"-"`
 	Project     `xorm:"extends" json:"-"`
 	QuestTarget `xorm:"extends" json:"-"`
 	Area        `xorm:"extends" json:"-"`

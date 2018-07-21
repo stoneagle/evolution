@@ -2,8 +2,9 @@ import { InternationalConfig as N18 } from '../../service/base/international.ser
 
 import { Basic }    from '../base/basic';
 import { Project }  from './project';
+import { Area }  from './area';
 import { Resource } from './resource';
-
+import { QuestTarget } from './quest';
 
 export class Task extends Basic {
   ProjectId: number;
@@ -17,12 +18,16 @@ export class Task extends Basic {
   Status: number;
   Project: Project;
   Resource: Resource;
+  QuestTarget: QuestTarget;
+  Area: Area;
   constructor (json?: any) {
     if (json != undefined) {
       super(json)
     } else {
       this.Project = new Project();
       this.Resource = new Resource();
+      this.Area = new Area();
+      this.QuestTarget = new QuestTarget();
     }
   }
 

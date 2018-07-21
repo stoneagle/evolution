@@ -149,6 +149,7 @@ export class TaskKanbanComponent implements OnInit {
     let processDelete = N18.settings.SYSTEM.PROCESS.DELETE;
     switch ($event.text) {
       case processUpdate + taskName:
+        console.log($event);
         this.taskSaveComponent.New($event.cardData.ProjectId, $event.cardData.Id);
         this.updateBeforeTag = $event.cardData.Tags;
         break;

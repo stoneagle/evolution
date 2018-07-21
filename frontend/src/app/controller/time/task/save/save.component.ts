@@ -38,46 +38,65 @@ export class TaskSaveComponent implements OnInit {
   }
 
   New(projectId: number, id?: number): void {
-    this.projectService.Get(projectId).subscribe(project => {
-      let questTeam = new QuestTeam();
-      questTeam.QuestId = project.QuestTarget.QuestId;
-      this.questTeamService.List(questTeam).subscribe(teams => {
-        let user = new User();
-        user.Ids = [];
-        teams.forEach((one, k) => {
-          user.Ids.push(one.UserId);
+    if (id) {
+      this.taskService.Get(id).subscribe(res => {
+        this.task = res;
+        this.modelOpened = true;
+        let questTeam = new QuestTeam();
+        questTeam.QuestId = this.task.QuestTarget.QuestId;
+        this.questTeamService.List(questTeam).subscribe(teams => {
+          let user = new User();
+          user.Ids = [];
+          teams.forEach((one, k) => {
+            user.Ids.push(one.UserId);
+          });
+          this.userService.List(user).subscribe(res => {
+            this.userMaps = new Map();
+            res.forEach((u, k) => {
+              this.userMaps.set(u.Id, u);
+            }) 
+          });
         });
-        this.userService.List(user).subscribe(res => {
-          this.userMaps = new Map();
-          res.forEach((u, k) => {
-            this.userMaps.set(u.Id, u);
-          }) 
+        let resource = new Resource();
+        resource.Area.Id = this.task.QuestTarget.AreaId;
+        this.resourceService.List(resource).subscribe(resources => {
+          this.resourceMaps = new Map();
+          resources.forEach((one, k) => {
+            this.resourceMaps.set(one.Id, one);
+          })
         });
-      });
-
-      let resource = new Resource();
-      resource.Area.Id = project.QuestTarget.AreaId;
-      this.resourceService.List(resource).subscribe(resources => {
-        this.resourceMaps = new Map();
-        resources.forEach((one, k) => {
-          this.resourceMaps.set(one.Id, one);
-        })
-      });
-
-      if (id) {
-        this.taskService.Get(id).subscribe(res => {
-          this.task = res;
-          this.task.Project = project;
-          this.task.ProjectId = this.task.Project.Id;
-          this.modelOpened = true;
-        })
-      } else {
+      })
+    } else {
+      this.projectService.Get(projectId).subscribe(project => {
+        let questTeam = new QuestTeam();
+        questTeam.QuestId = project.QuestTarget.QuestId;
+        this.questTeamService.List(questTeam).subscribe(teams => {
+          let user = new User();
+          user.Ids = [];
+          teams.forEach((one, k) => {
+            user.Ids.push(one.UserId);
+          });
+          this.userService.List(user).subscribe(res => {
+            this.userMaps = new Map();
+            res.forEach((u, k) => {
+              this.userMaps.set(u.Id, u);
+            }) 
+          });
+        });
+        let resource = new Resource();
+        resource.Area.Id = project.QuestTarget.AreaId;
+        this.resourceService.List(resource).subscribe(resources => {
+          this.resourceMaps = new Map();
+          resources.forEach((one, k) => {
+            this.resourceMaps.set(one.Id, one);
+          })
+        });
         this.task = new Task();
         this.task.Project = project;
         this.task.ProjectId = this.task.Project.Id;
         this.modelOpened = true;
-      }
-    })
+      })
+    }
   }            
 
   Submit(): void {
