@@ -24,11 +24,11 @@ func NewArea(engine *xorm.Engine, cache *redis.Client, log *logger.Logger) *Area
 	return &ret
 }
 
-func (s *Area) TransferListToTree(areas []models.Area, fieldMap map[int]string) (areaTrees map[int]models.AreaTree, err error) {
+func (s *Area) TransferListToTree(areasPtr *[]models.Area, fieldMap map[int]string) (areaTrees map[int]models.AreaTree, err error) {
 	areaTrees = make(map[int]models.AreaTree)
 buildTreeLoop:
 	leftArea := make([]models.Area, 0)
-	for _, one := range areas {
+	for _, one := range *areasPtr {
 		node := models.AreaNode{
 			Id:       one.Id,
 			Value:    one.Name,
@@ -63,7 +63,7 @@ buildTreeLoop:
 	}
 
 	if len(leftArea) > 0 {
-		areas = leftArea
+		*areasPtr = leftArea
 		goto buildTreeLoop
 	}
 	return

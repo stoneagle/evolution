@@ -20,13 +20,20 @@ type Action struct {
 	UserId         int       `xorm:"not null default 0 comment('执行人') INT(11)" structs:"user_id,omitempty"`
 	Time           int       `xorm:"not null default 0 comment('花费时间:单位分钟') INT(11)" structs:"time,omitempty"`
 
-	TaskIds []int `xorm:"-" structs:"task_id,omitempty"`
-	Task    Task  `xorm:"-" structs:"-" json:"Task,omitempty"`
+	TaskIds []int `xorm:"-" structs:"task_id,omitempty" json:"TaskIds,omitempty"`
+	Task    *Task `xorm:"-" structs:"-" json:"Task,omitempty"`
 }
 
 type ActionJoin struct {
 	Action `xorm:"extends" json:"-"`
 	Task   `xorm:"extends" json:"-"`
+}
+
+func NewAction() *Action {
+	ret := Action{
+		Task: NewTask(),
+	}
+	return &ret
 }
 
 func (m *Action) TableName() string {
@@ -53,6 +60,11 @@ func (m *Action) BuildCondition(session *xorm.Session) {
 func (m *Action) SlicePtr() interface{} {
 	ret := make([]Action, 0)
 	return &ret
+}
+
+func (m *Action) Transfer(slicePtr interface{}) *[]Action {
+	ret := slicePtr.(*[]Action)
+	return ret
 }
 
 func (m *Action) Join() es.JoinGeneral {
@@ -82,18 +94,18 @@ func (j *ActionJoin) SlicePtr() interface{} {
 func (j *ActionJoin) Transfer() es.ModelGeneral {
 	join := *j
 	ret := join.Action
-	ret.Task = join.Task
+	ret.Task = &join.Task
 	return &ret
 }
 
 func (j *ActionJoin) TransferCopy(modelPtr es.ModelGeneral) {
 	actionPtr := modelPtr.(*Action)
 	(*actionPtr) = (*j).Action
-	(*actionPtr).Task = (*j).Task
+	(*actionPtr).Task = &(*j).Task
 	return
 }
 
-func (j *ActionJoin) TransferSlicePtr(slicePtr interface{}) interface{} {
+func (j *ActionJoin) TransferCopySlice(slicePtr interface{}, targetPtr interface{}) {
 	joinSlicePtr := slicePtr.(*[]ActionJoin)
 	joinSlice := *joinSlicePtr
 	actions := make([]Action, 0)
@@ -101,5 +113,7 @@ func (j *ActionJoin) TransferSlicePtr(slicePtr interface{}) interface{} {
 		actionPtr := (&one).Transfer().(*Action)
 		actions = append(actions, *actionPtr)
 	}
-	return &actions
+	actionsPtr := targetPtr.(*[]Action)
+	(*actionsPtr) = actions
+	return
 }

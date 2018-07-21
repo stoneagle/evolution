@@ -26,15 +26,20 @@ func (s *Task) Update(id int, modelPtr structs.ModelGeneral) (err error) {
 	taskPtr := modelPtr.(*models.Task)
 	emptyTime := time.Time{}
 	if taskPtr.EndDate != emptyTime {
-		task := models.Task{}
-		err := s.One(id, &task)
+		task := models.NewTask()
+		err := s.One(id, task)
 		if err != nil {
 			return err
 		}
 		diffHours := taskPtr.EndDate.Sub(task.StartDate).Hours()
 		taskPtr.Duration = int(math.Ceil(diffHours / 24))
 	}
-	_, err = s.Engine.Id(id).Update(taskPtr)
+
+	err = s.Update(id, taskPtr)
+	if err != nil {
+		return
+	}
+
 	if taskPtr.StartDateReset {
 		err = s.UpdateByMap(taskPtr.TableName(), id, map[string]interface{}{
 			"start_date": nil,
@@ -43,6 +48,7 @@ func (s *Task) Update(id int, modelPtr structs.ModelGeneral) (err error) {
 			return
 		}
 	}
+
 	if taskPtr.EndDateReset {
 		err = s.UpdateByMap(taskPtr.TableName(), id, map[string]interface{}{
 			"end_date": nil,

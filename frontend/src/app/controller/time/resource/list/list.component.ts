@@ -71,11 +71,13 @@ export class ResourceListComponent implements OnInit {
       })
     } else if (this.filterAreaId != undefined) {
       let resource = new Resource();
-      resource.Area.Id = this.filterAreaId;
-      resource.WithSub = true;
-      this.resourceService.List(resource).subscribe(res => {
-        this.totalCount = res.length;
-        this.resources = res.slice(from, to);
+      this.areaService.ListAllLeaf(this.filterAreaId).subscribe(areaIds => {
+        areaIds.push(this.filterAreaId);
+        resource.Area.Ids = areaIds;
+        this.resourceService.List(resource).subscribe(res => {
+          this.totalCount = res.length;
+          this.resources = res.slice(from, to);
+        })
       })
     }
   }

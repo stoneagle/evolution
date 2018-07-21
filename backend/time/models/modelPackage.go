@@ -18,18 +18,18 @@ type ModelPackage struct {
 }
 
 func (m *ModelPackage) PrepareModel() {
-	m.ActionModel = &Action{}
-	m.AreaModel = &Area{}
-	m.CountryModel = &Country{}
-	m.FieldModel = &Field{}
-	m.PhaseModel = &Phase{}
-	m.ProjectModel = &Project{}
-	m.QuestModel = &Quest{}
-	m.QuestResourceModel = &QuestResource{}
-	m.QuestTargetModel = &QuestTarget{}
-	m.QuestTeamModel = &QuestTeam{}
-	m.QuestTimeTableModel = &QuestTimeTable{}
-	m.ResourceModel = &Resource{}
-	m.TaskModel = &Task{}
-	m.UserResourceModel = &UserResource{}
+	m.ActionModel = NewAction()
+	m.AreaModel = NewArea()
+	m.CountryModel = NewCountry()
+	m.FieldModel = NewField()
+	m.PhaseModel = NewPhase()
+	m.ProjectModel = NewProject()
+	m.QuestModel = NewQuest()
+	m.QuestResourceModel = NewQuestResource()
+	m.QuestTargetModel = NewQuestTarget()
+	m.QuestTeamModel = NewQuestTeam()
+	m.QuestTimeTableModel = NewQuestTimeTable()
+	m.ResourceModel = NewResource()
+	m.TaskModel = NewTask()
+	m.UserResourceModel = NewUserResource()
 }

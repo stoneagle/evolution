@@ -14,8 +14,8 @@ type QuestTarget struct {
 	Desc           string `xorm:"not null default '' comment('描述') VARCHAR(255)" structs:"desc,omitempty"`
 	Status         int    `xorm:"not null default 1 comment('当前状态:1未完成2已完成') INT(11)" structs:"status,omitempty"`
 
-	QuestIds []int `xorm:"-" structs:"quest_id,omitempty"`
-	Area     Area  `xorm:"-" structs:"-"`
+	QuestIds []int `xorm:"-" structs:"quest_id,omitempty" json:"QuestIds,omitempty"`
+	Area     *Area `xorm:"-" structs:"-" json:"Area,omitempty"`
 }
 
 type QuestTargetJoin struct {
@@ -27,6 +27,13 @@ var (
 	QuestTargetStatusWait   = 1
 	QuestTargetStatusFinish = 2
 )
+
+func NewQuestTarget() *QuestTarget {
+	ret := QuestTarget{
+		Area: NewArea(),
+	}
+	return &ret
+}
 
 func (m *QuestTarget) TableName() string {
 	return "quest_target"
@@ -44,6 +51,11 @@ func (m *QuestTarget) BuildCondition(session *xorm.Session) {
 func (m *QuestTarget) SlicePtr() interface{} {
 	ret := make([]QuestTarget, 0)
 	return &ret
+}
+
+func (m *QuestTarget) Transfer(slicePtr interface{}) *[]QuestTarget {
+	ret := slicePtr.(*[]QuestTarget)
+	return ret
 }
 
 func (m *QuestTarget) Join() es.JoinGeneral {
@@ -73,18 +85,18 @@ func (j *QuestTargetJoin) SlicePtr() interface{} {
 func (j *QuestTargetJoin) Transfer() es.ModelGeneral {
 	join := *j
 	ret := join.QuestTarget
-	ret.Area = join.Area
+	ret.Area = &join.Area
 	return &ret
 }
 
 func (j *QuestTargetJoin) TransferCopy(modelPtr es.ModelGeneral) {
 	questTargetPtr := modelPtr.(*QuestTarget)
 	(*questTargetPtr) = (*j).QuestTarget
-	(*questTargetPtr).Area = (*j).Area
+	(*questTargetPtr).Area = &(*j).Area
 	return
 }
 
-func (j *QuestTargetJoin) TransferSlicePtr(slicePtr interface{}) interface{} {
+func (j *QuestTargetJoin) TransferCopySlice(slicePtr interface{}, targetPtr interface{}) {
 	joinSlicePtr := slicePtr.(*[]QuestTargetJoin)
 	joinSlice := *joinSlicePtr
 	questTargets := make([]QuestTarget, 0)
@@ -92,5 +104,7 @@ func (j *QuestTargetJoin) TransferSlicePtr(slicePtr interface{}) interface{} {
 		questTargetPtr := (&one).Transfer().(*QuestTarget)
 		questTargets = append(questTargets, *questTargetPtr)
 	}
-	return &questTargets
+	questTargetsPtr := targetPtr.(*[]QuestTarget)
+	(*questTargetsPtr) = questTargets
+	return
 }

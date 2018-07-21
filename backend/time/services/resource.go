@@ -36,10 +36,10 @@ func (s *Resource) Create(modelPtr structs.ModelGeneral) (err error) {
 		return
 	}
 	if resourcePtr.Area.Id != 0 {
-		mapAreaResource := models.MapAreaResource{}
+		mapAreaResource := models.NewMapAreaResource()
 		mapAreaResource.AreaId = resourcePtr.Area.Id
 		mapAreaResource.ResourceId = resourcePtr.Id
-		_, err = session.Insert(&mapAreaResource)
+		_, err = session.Insert(mapAreaResource)
 		if err != nil {
 			session.Rollback()
 			return
@@ -47,10 +47,10 @@ func (s *Resource) Create(modelPtr structs.ModelGeneral) (err error) {
 	}
 	if len(resourcePtr.Area.Ids) > 0 {
 		for _, areaId := range resourcePtr.Area.Ids {
-			mapAreaResource := models.MapAreaResource{}
+			mapAreaResource := models.NewMapAreaResource()
 			mapAreaResource.AreaId = areaId
 			mapAreaResource.ResourceId = resourcePtr.Id
-			_, err = session.Insert(&mapAreaResource)
+			_, err = session.Insert(mapAreaResource)
 			if err != nil {
 				session.Rollback()
 				return
@@ -99,7 +99,7 @@ func (s *Resource) Update(id int, modelPtr structs.ModelGeneral) (err error) {
 		needDeleteSlice := utils.SliceDiff(oldAreaIdsSlice, newAreaIdsSlice)
 
 		for _, areaId := range needAddSlice {
-			mapAreaResource := models.MapAreaResource{}
+			mapAreaResource := models.NewMapAreaResource()
 			mapAreaResource.AreaId = areaId.(int)
 			mapAreaResource.ResourceId = id
 			_, err = session.Insert(&mapAreaResource)
@@ -110,7 +110,7 @@ func (s *Resource) Update(id int, modelPtr structs.ModelGeneral) (err error) {
 		}
 
 		for _, areaId := range needDeleteSlice {
-			mapAreaResource := models.MapAreaResource{}
+			mapAreaResource := models.NewMapAreaResource()
 			mapAreaResource.AreaId = areaId.(int)
 			mapAreaResource.ResourceId = id
 			_, err = session.Delete(&mapAreaResource)
@@ -189,9 +189,9 @@ func (s *Resource) ListAreas(id int) (areas []models.Area, err error) {
 	return
 }
 
-func (s *Resource) GroupByArea(resources []models.Resource) (areas []models.Area) {
-	areasMap := map[int]models.Area{}
-	for _, one := range resources {
+func (s *Resource) GroupByArea(resourcesPtr *[]models.Resource) (areas []models.Area) {
+	areasMap := map[int]*models.Area{}
+	for _, one := range *resourcesPtr {
 		if _, ok := areasMap[one.Area.Id]; !ok {
 			one.Area.Resources = make([]models.Resource, 0)
 			areasMap[one.Area.Id] = one.Area
@@ -203,7 +203,7 @@ func (s *Resource) GroupByArea(resources []models.Resource) (areas []models.Area
 
 	areas = make([]models.Area, 0)
 	for _, one := range areasMap {
-		areas = append(areas, one)
+		areas = append(areas, *one)
 	}
 	return areas
 }

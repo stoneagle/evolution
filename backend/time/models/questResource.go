@@ -21,6 +21,11 @@ var (
 	QuestResourceStatusMatched = 2
 )
 
+func NewQuestResource() *QuestResource {
+	ret := QuestResource{}
+	return &ret
+}
+
 func (m *QuestResource) TableName() string {
 	return "quest_resource"
 }
@@ -36,4 +41,9 @@ func (m *QuestResource) BuildCondition(session *xorm.Session) {
 func (m *QuestResource) SlicePtr() interface{} {
 	ret := make([]QuestResource, 0)
 	return &ret
+}
+
+func (m *QuestResource) Transfer(slicePtr interface{}) *[]QuestResource {
+	ret := slicePtr.(*[]QuestResource)
+	return ret
 }

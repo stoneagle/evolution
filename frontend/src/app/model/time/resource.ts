@@ -6,7 +6,6 @@ export class Resource extends Basic {
   Desc: string;
   Year: number;
   Area: Area;
-  WithSub: boolean;
   constructor (json?: any) {
     if (json != undefined) {
       super(json)

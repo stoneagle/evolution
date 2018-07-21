@@ -13,6 +13,11 @@ type Country struct {
 	EnName         string `xorm:"not null default '' comment('英文名称') VARCHAR(255)"`
 }
 
+func NewCountry() *Country {
+	ret := Country{}
+	return &ret
+}
+
 func (m *Country) TableName() string {
 	return "country"
 }
@@ -28,4 +33,9 @@ func (m *Country) BuildCondition(session *xorm.Session) {
 func (m *Country) SlicePtr() interface{} {
 	ret := make([]Country, 0)
 	return &ret
+}
+
+func (m *Country) Transfer(slicePtr interface{}) *[]Country {
+	ret := slicePtr.(*[]Country)
+	return ret
 }

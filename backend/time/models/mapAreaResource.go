@@ -13,6 +13,11 @@ type MapAreaResource struct {
 	ResourceId int `xorm:"unique(area_id) not null default 0 comment('隶属资源') INT(11)" structs:"resource_id,omitempty"`
 }
 
+func NewMapAreaResource() *MapAreaResource {
+	ret := MapAreaResource{}
+	return &ret
+}
+
 func (m *MapAreaResource) TableName() string {
 	return "map_area_resource"
 }

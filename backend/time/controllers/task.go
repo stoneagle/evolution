@@ -4,7 +4,6 @@ import (
 	"evolution/backend/common/middles"
 	"evolution/backend/common/resp"
 
-	"evolution/backend/time/models"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -32,48 +31,46 @@ func (c *Task) Router(router *gin.RouterGroup) {
 
 func (c *Task) ListByUser(ctx *gin.Context) {
 	userIdStr := ctx.Param("uid")
-	questTeam := models.QuestTeam{}
 	if userIdStr != "" {
 		userId, err := strconv.Atoi(userIdStr)
 		if err != nil {
 			resp.ErrorBusiness(ctx, resp.ErrorParams, "user id params error", err)
 			return
 		}
-		questTeam.UserId = userId
+		c.QuestTeamModel.UserId = userId
 	}
 
-	teamsPtr, err := c.QuestTeamSvc.List(&questTeam)
+	questTeamsGeneralPtr := c.QuestTeamModel.SlicePtr()
+	err := c.QuestTeamSvc.List(c.QuestTeamModel, questTeamsGeneralPtr)
 	if err != nil {
 		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "team get error", err)
 		return
 	}
-	teams := *(teamsPtr.(*[]models.QuestTeam))
-
+	questTeamsPtr := c.QuestTeamModel.Transfer(questTeamsGeneralPtr)
 	questIds := make([]int, 0)
-	for _, one := range teams {
+	for _, one := range *questTeamsPtr {
 		questIds = append(questIds, one.QuestId)
 	}
 
-	project := models.Project{}
-	project.QuestTarget.QuestIds = questIds
-	projectsPtr, err := c.ProjectSvc.List(&project)
+	c.ProjectModel.QuestTarget.QuestIds = questIds
+	projectsGeneralPtr := c.ProjectModel.SlicePtr()
+	err = c.ProjectSvc.List(c.ProjectModel, projectsGeneralPtr)
 	if err != nil {
 		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "project get error", err)
 		return
 	}
-	projects := *(projectsPtr.(*[]models.Project))
-
+	projectsPtr := c.ProjectModel.Transfer(projectsGeneralPtr)
 	projectIds := make([]int, 0)
-	for _, one := range projects {
+	for _, one := range *projectsPtr {
 		projectIds = append(projectIds, one.Id)
 	}
 
-	task := models.Task{}
-	task.ProjectIds = projectIds
-	tasks, err := c.TaskSvc.List(&task)
+	c.TaskModel.ProjectIds = projectIds
+	tasksPtr := c.TaskModel.SlicePtr()
+	err = c.TaskSvc.List(c.TaskModel, tasksPtr)
 	if err != nil {
 		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "task get error", err)
 		return
 	}
-	resp.Success(ctx, tasks)
+	resp.Success(ctx, tasksPtr)
 }

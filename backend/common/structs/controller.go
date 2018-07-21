@@ -93,7 +93,8 @@ func (c *Controller) List(ctx *gin.Context) {
 		resp.ErrorBusiness(ctx, resp.ErrorParams, fmt.Sprintf("%v resource json bind error", c.Resource), err)
 		return
 	}
-	resourcesPtr, err := c.Service.List(c.Model)
+	resourcesPtr := c.Model.SlicePtr()
+	err := c.Service.List(c.Model, resourcesPtr)
 	if err != nil {
 		resp.ErrorBusiness(ctx, resp.ErrorDatabase, fmt.Sprintf("%v list fail", c.Resource), err)
 		return

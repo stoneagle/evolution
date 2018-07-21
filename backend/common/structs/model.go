@@ -32,7 +32,7 @@ type JoinGeneral interface {
 	SlicePtr() interface{}
 	Transfer() ModelGeneral
 	TransferCopy(ModelGeneral)
-	TransferSlicePtr(interface{}) interface{}
+	TransferCopySlice(interface{}, interface{})
 }
 
 type JoinLinks struct {
@@ -51,7 +51,7 @@ type Model struct {
 
 type ModelWithId struct {
 	Id    int   `xorm:"pk autoincr" structs:"id,omitempty"`
-	Ids   []int `xorm:"-" structs:"id,omitempty"`
+	Ids   []int `xorm:"-" structs:"id,omitempty" json:"Ids,omitempty"`
 	Model `xorm:"extends"`
 }
 

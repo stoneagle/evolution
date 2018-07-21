@@ -11,7 +11,7 @@ import (
 
 type ServiceGeneral interface {
 	One(int, ModelGeneral) error
-	List(ModelGeneral) (interface{}, error)
+	List(ModelGeneral, interface{}) error
 	Create(ModelGeneral) error
 	Update(int, ModelGeneral) error
 	UpdateByMap(string, int, map[string]interface{}) error
@@ -71,7 +71,7 @@ func (s *Service) One(id int, modelPtr ModelGeneral) (err error) {
 	return
 }
 
-func (s *Service) List(modelPtr ModelGeneral) (modelsPtr interface{}, err error) {
+func (s *Service) List(modelPtr ModelGeneral, modelsPtr interface{}) (err error) {
 	join := modelPtr.Join()
 	if join != nil {
 		joinsPtr := join.SlicePtr()
@@ -87,11 +87,10 @@ func (s *Service) List(modelPtr ModelGeneral) (modelsPtr interface{}, err error)
 			s.LogSql(sql, args, err)
 			return
 		}
-		modelsPtr = join.TransferSlicePtr(joinsPtr)
+		join.TransferCopySlice(joinsPtr, modelsPtr)
 	} else {
 		session := s.Engine.Unscoped().Table(modelPtr.TableName())
 		modelPtr.BuildCondition(session)
-		modelsPtr = modelPtr.SlicePtr()
 		err = session.Limit(10).Find(modelsPtr)
 		if err != nil {
 			sql, args := session.LastSQL()

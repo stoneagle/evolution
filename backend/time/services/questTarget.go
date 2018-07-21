@@ -80,10 +80,10 @@ func (s *QuestTarget) BatchSave(targets []models.QuestTarget) (err error) {
 
 		for _, areaId := range needDeleteSlice {
 			// TODO relate project check and deny delete
-			questTarget := models.QuestTarget{}
+			questTarget := models.NewQuestTarget()
 			questTarget.AreaId = areaId.(int)
 			questTarget.QuestId = questId
-			_, err = session.Delete(&questTarget)
+			_, err = session.Delete(questTarget)
 			if err != nil {
 				session.Rollback()
 				return

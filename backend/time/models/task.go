@@ -20,10 +20,10 @@ type Task struct {
 	Duration            int       `xorm:"not null comment('持续时间') INT(11)" structs:"duration,omitempty"`
 	Status              int       `xorm:"not null default 0 comment('当前状态:1未分配2准备做3执行中4已完成') INT(11)" structs:"status,omitempty"`
 
-	ProjectIds     []int    `xorm:"-" structs:"project_id,omitempty"`
-	Resource       Resource `xorm:"-" structs:"-"`
-	StartDateReset bool     `xorm:"-" structs:"-"`
-	EndDateReset   bool     `xorm:"-" structs:"-"`
+	ProjectIds     []int     `xorm:"-" structs:"project_id,omitempty" json:"ProjectIds,omitempty"`
+	Resource       *Resource `xorm:"-" structs:"-" json:"Resource,omitempty"`
+	StartDateReset bool      `xorm:"-" structs:"-"`
+	EndDateReset   bool      `xorm:"-" structs:"-"`
 }
 
 var (
@@ -45,6 +45,13 @@ type TaskJoin struct {
 	MapAreaResource `xorm:"extends" json:"-"`
 }
 
+func NewTask() *Task {
+	ret := Task{
+		Resource: NewResource(),
+	}
+	return &ret
+}
+
 func (m *Task) TableName() string {
 	return "task"
 }
@@ -60,6 +67,11 @@ func (m *Task) BuildCondition(session *xorm.Session) {
 func (m *Task) SlicePtr() interface{} {
 	ret := make([]Task, 0)
 	return &ret
+}
+
+func (m *Task) Transfer(slicePtr interface{}) *[]Task {
+	ret := slicePtr.(*[]Task)
+	return ret
 }
 
 func (m *Task) Join() es.JoinGeneral {
@@ -98,7 +110,8 @@ func (j *TaskJoin) SlicePtr() interface{} {
 func (j *TaskJoin) Transfer() es.ModelGeneral {
 	join := *j
 	ret := join.Task
-	ret.Resource = join.Resource
+	ret.Resource = &join.Resource
+	ret.Resource.Area = NewArea()
 	ret.Resource.Area.Id = join.MapAreaResource.AreaId
 	return &ret
 }
@@ -106,12 +119,13 @@ func (j *TaskJoin) Transfer() es.ModelGeneral {
 func (j *TaskJoin) TransferCopy(modelPtr es.ModelGeneral) {
 	taskPtr := modelPtr.(*Task)
 	(*taskPtr) = (*j).Task
-	(*taskPtr).Resource = (*j).Resource
+	(*taskPtr).Resource = &(*j).Resource
+	(*taskPtr).Resource.Area = NewArea()
 	(*taskPtr).Resource.Area.Id = (*j).MapAreaResource.AreaId
 	return
 }
 
-func (j *TaskJoin) TransferSlicePtr(slicePtr interface{}) interface{} {
+func (j *TaskJoin) TransferCopySlice(slicePtr interface{}, targetPtr interface{}) {
 	joinSlicePtr := slicePtr.(*[]TaskJoin)
 	joinSlice := *joinSlicePtr
 	tasks := make([]Task, 0)
@@ -119,5 +133,7 @@ func (j *TaskJoin) TransferSlicePtr(slicePtr interface{}) interface{} {
 		taskPtr := (&one).Transfer().(*Task)
 		tasks = append(tasks, *taskPtr)
 	}
-	return &tasks
+	tasksPtr := targetPtr.(*[]Task)
+	(*tasksPtr) = tasks
+	return
 }

@@ -9,10 +9,10 @@ import (
 
 type UserResource struct {
 	es.ModelWithId `xorm:"extends"`
-	UserId         int      `xorm:"unique not null default 0 comment('隶属用户') INT(11)" structs:"user_id,omitempty"`
-	ResourceId     int      `xorm:"unique(user_id) not null default 0 comment('隶属实体') INT(11)" structs:"resource_id,omitempty"`
-	Time           int      `xorm:"not null default 0 comment('总投入时间') INT(11)" structs:"time,omitempty"`
-	Resource       Resource `xorm:"-"`
+	UserId         int       `xorm:"unique not null default 0 comment('隶属用户') INT(11)" structs:"user_id,omitempty"`
+	ResourceId     int       `xorm:"unique(user_id) not null default 0 comment('隶属实体') INT(11)" structs:"resource_id,omitempty"`
+	Time           int       `xorm:"not null default 0 comment('总投入时间') INT(11)" structs:"time,omitempty"`
+	Resource       *Resource `xorm:"-" structs:"-" json:"Resource,omitempty"`
 }
 
 type UserResourceJoin struct {
@@ -26,6 +26,13 @@ var (
 	UserResourceStatusRelax = 1
 	UserResourceStatusExec  = 2
 )
+
+func NewUserResource() *UserResource {
+	ret := UserResource{
+		Resource: NewResource(),
+	}
+	return &ret
+}
 
 func (m *UserResource) TableName() string {
 	return "user_resource"
@@ -43,6 +50,11 @@ func (m *UserResource) BuildCondition(session *xorm.Session) {
 func (m *UserResource) SlicePtr() interface{} {
 	ret := make([]UserResource, 0)
 	return &ret
+}
+
+func (m *UserResource) Transfer(slicePtr interface{}) *[]UserResource {
+	ret := slicePtr.(*[]UserResource)
+	return ret
 }
 
 func (m *UserResource) Join() es.JoinGeneral {
@@ -90,20 +102,20 @@ func (j *UserResourceJoin) SlicePtr() interface{} {
 func (j *UserResourceJoin) Transfer() es.ModelGeneral {
 	join := *j
 	ret := join.UserResource
-	ret.Resource = join.Resource
-	ret.Resource.Area = join.Area
+	ret.Resource = &join.Resource
+	ret.Resource.Area = &join.Area
 	return &ret
 }
 
 func (j *UserResourceJoin) TransferCopy(modelPtr es.ModelGeneral) {
 	userResourcePtr := modelPtr.(*UserResource)
 	(*userResourcePtr) = (*j).UserResource
-	(*userResourcePtr).Resource = (*j).Resource
-	(*userResourcePtr).Resource.Area = (*j).Area
+	(*userResourcePtr).Resource = &(*j).Resource
+	(*userResourcePtr).Resource.Area = &(*j).Area
 	return
 }
 
-func (j *UserResourceJoin) TransferSlicePtr(slicePtr interface{}) interface{} {
+func (j *UserResourceJoin) TransferCopySlice(slicePtr interface{}, targetPtr interface{}) {
 	joinSlicePtr := slicePtr.(*[]UserResourceJoin)
 	joinSlice := *joinSlicePtr
 	userResources := make([]UserResource, 0)
@@ -111,5 +123,7 @@ func (j *UserResourceJoin) TransferSlicePtr(slicePtr interface{}) interface{} {
 		userResourcePtr := (&one).Transfer().(*UserResource)
 		userResources = append(userResources, *userResourcePtr)
 	}
-	return &userResources
+	userResourcesPtr := targetPtr.(*[]UserResource)
+	(*userResourcesPtr) = userResources
+	return
 }

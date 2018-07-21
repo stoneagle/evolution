@@ -44,6 +44,20 @@ export class BaseService {
     )
   }
 
+  protected BaseResp(url: string): Observable<Resp> {
+    this.operation = this.shareSettings.System.Process.Get;
+    return this.http.get<Resp>(url).pipe(
+      catchError(this.handleError<Resp>()),
+      map(res => {
+        if (res && res.code == 0) {
+          return res;
+        } else {
+          this.handleResponse(res);
+        }
+      }),
+    )
+  }
+
   protected BaseList<T extends Serializable >(params: any, c: new (any) => T, url: string): Observable<T[]> {
     this.operation = this.shareSettings.System.Process.List;
     return this.http.post<Resp>(url, JSON.stringify(params)).pipe(

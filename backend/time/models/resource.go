@@ -13,14 +13,20 @@ type Resource struct {
 	Desc                string `xorm:"not null default '' comment('描述') VARCHAR(255)" structs:"desc,omitempty"`
 	Year                int    `xorm:"not null default 0 comment('年份') INT(11)" structs:"year,omitempty"`
 
-	Area    Area `xorm:"-"`
-	WithSub bool `xorm:"-" structs:"-"`
+	Area *Area `xorm:"-" structs:"-" json:"Area,omitempty"`
 }
 
 type ResourceJoin struct {
 	MapAreaResource `xorm:"extends" json:"-"`
 	Resource        `xorm:"extends" json:"-"`
 	Area            `xorm:"extends" json:"-"`
+}
+
+func NewResource() *Resource {
+	ret := Resource{
+		Area: NewArea(),
+	}
+	return &ret
 }
 
 func (m *Resource) TableName() string {
@@ -39,6 +45,11 @@ func (m *Resource) BuildCondition(session *xorm.Session) {
 func (m *Resource) SlicePtr() interface{} {
 	ret := make([]Resource, 0)
 	return &ret
+}
+
+func (m *Resource) Transfer(slicePtr interface{}) *[]Resource {
+	ret := slicePtr.(*[]Resource)
+	return ret
 }
 
 func (m *Resource) Join() es.JoinGeneral {
@@ -77,18 +88,18 @@ func (j *ResourceJoin) SlicePtr() interface{} {
 func (j *ResourceJoin) Transfer() es.ModelGeneral {
 	join := *j
 	ret := join.Resource
-	ret.Area = join.Area
+	ret.Area = &join.Area
 	return &ret
 }
 
 func (j *ResourceJoin) TransferCopy(modelPtr es.ModelGeneral) {
 	resourcePtr := modelPtr.(*Resource)
 	(*resourcePtr) = (*j).Resource
-	(*resourcePtr).Area = (*j).Area
+	(*resourcePtr).Area = &(*j).Area
 	return
 }
 
-func (j *ResourceJoin) TransferSlicePtr(slicePtr interface{}) interface{} {
+func (j *ResourceJoin) TransferCopySlice(slicePtr interface{}, targetPtr interface{}) {
 	joinSlicePtr := slicePtr.(*[]ResourceJoin)
 	joinSlice := *joinSlicePtr
 	resources := make([]Resource, 0)
@@ -96,5 +107,7 @@ func (j *ResourceJoin) TransferSlicePtr(slicePtr interface{}) interface{} {
 		resourcePtr := (&one).Transfer().(*Resource)
 		resources = append(resources, *resourcePtr)
 	}
-	return &resources
+	resourcesPtr := targetPtr.(*[]Resource)
+	(*resourcesPtr) = resources
+	return
 }

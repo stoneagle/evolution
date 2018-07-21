@@ -31,6 +31,11 @@ var (
 	QuestConstraintNormal           int = 4
 )
 
+func NewQuest() *Quest {
+	ret := Quest{}
+	return &ret
+}
+
 func (m *Quest) TableName() string {
 	return "quest"
 }
@@ -46,4 +51,9 @@ func (m *Quest) BuildCondition(session *xorm.Session) {
 func (m *Quest) SlicePtr() interface{} {
 	ret := make([]Quest, 0)
 	return &ret
+}
+
+func (m *Quest) Transfer(slicePtr interface{}) *[]Quest {
+	ret := slicePtr.(*[]Quest)
+	return ret
 }

@@ -91,34 +91,36 @@ export class UserResourceListComponent implements OnInit {
       let userResource = new UserResource();
       userResource.UserId = this.shell.currentUser.Id;
       userResource.Resource.Area = new Area();
-      userResource.Resource.Area.Id = this.filterArea.Id;
-      userResource.Resource.WithSub = true;
-      this.userResourceService.List(userResource).subscribe(res => {
-        this.filterAreaSumTime = 0;
-        res.forEach((one, k) => {
-          this.filterAreaSumTime += one.Time;
+      this.areaService.ListAllLeaf(this.filterArea.Id).subscribe(areaIds => {
+        areaIds.push(this.filterArea.Id);
+        userResource.Resource.Area.Ids = areaIds;
+        this.userResourceService.List(userResource).subscribe(res => {
+          this.filterAreaSumTime = 0;
+          res.forEach((one, k) => {
+            this.filterAreaSumTime += one.Time;
+          })
+          this.filterAreaSumTime = this.filterAreaSumTime / 60;
+          let relateFieldPhaseArray = this.fieldPhasesMap.get(this.filterArea.FieldId);
+          let tmpPhase = new Phase();
+          for (let k in relateFieldPhaseArray) {
+            if (relateFieldPhaseArray[k].Threshold < this.filterAreaSumTime) {
+              continue
+            }
+            if (tmpPhase.Id == undefined) {
+              tmpPhase = relateFieldPhaseArray[k];
+              continue;
+            }
+            if (relateFieldPhaseArray[k].Threshold <= tmpPhase.Threshold) {
+              tmpPhase = relateFieldPhaseArray[k];
+            }
+          }
+          this.filterAreaPhase = tmpPhase;
+          this.totalCount = res.length;
+          if (this.currentState && this.currentState.sort) {
+            res = doSorting<UserResource>(res, this.currentState);
+          }
+          this.userResources = res.slice(from, to);
         })
-        this.filterAreaSumTime = this.filterAreaSumTime / 60;
-        let relateFieldPhaseArray = this.fieldPhasesMap.get(this.filterArea.FieldId);
-        let tmpPhase = new Phase();
-        for (let k in relateFieldPhaseArray) {
-          if (relateFieldPhaseArray[k].Threshold < this.filterAreaSumTime) {
-            continue
-          }
-          if (tmpPhase.Id == undefined) {
-            tmpPhase = relateFieldPhaseArray[k];
-            continue;
-          }
-          if (relateFieldPhaseArray[k].Threshold <= tmpPhase.Threshold) {
-            tmpPhase = relateFieldPhaseArray[k];
-          }
-        }
-        this.filterAreaPhase = tmpPhase;
-        this.totalCount = res.length;
-        if (this.currentState && this.currentState.sort) {
-          res = doSorting<UserResource>(res, this.currentState);
-        }
-        this.userResources = res.slice(from, to);
       })
     }
   }

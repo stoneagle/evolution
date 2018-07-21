@@ -26,10 +26,10 @@ func NewSyncfusion() *Syncfusion {
 
 func (c *Syncfusion) Router(router *gin.RouterGroup) {
 	syncfusion := router.Group(c.Resource.String()).Use(middles.OnInit(c))
-	syncfusion.POST("/list/kanban", c.ListKanban)
-	syncfusion.POST("/list/gantt", c.ListGantt)
-	syncfusion.POST("/list/schedule/", c.ListSchedule)
-	syncfusion.POST("/list/treegrid/:fieldId/", c.ListTreeGrid)
+	syncfusion.GET("/list/kanban", c.ListKanban)
+	syncfusion.GET("/list/gantt", c.ListGantt)
+	syncfusion.GET("/list/schedule/", c.ListSchedule)
+	syncfusion.GET("/list/treegrid/:fieldId/", c.ListTreeGrid)
 }
 
 func (c *Syncfusion) ListKanban(ctx *gin.Context) {

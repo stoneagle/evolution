@@ -3,6 +3,7 @@ package controllers
 import (
 	"evolution/backend/common/middles"
 	"evolution/backend/common/resp"
+	"fmt"
 
 	"evolution/backend/time/models"
 	"strconv"
@@ -23,6 +24,7 @@ func NewArea() *Area {
 func (c *Area) Router(router *gin.RouterGroup) {
 	area := router.Group(c.Resource.String()).Use(middles.OnInit(c))
 	area.GET("/get/:id", c.One)
+	area.GET("/leaf/:id", c.ListAllLeaf)
 	area.POST("/list/children/:id", c.ListChildren)
 	area.POST("/list/tree/one/:fieldId", c.ListOneTree)
 	area.POST("/list/tree/all", c.ListAllTree)
@@ -33,13 +35,29 @@ func (c *Area) Router(router *gin.RouterGroup) {
 	area.DELETE("/:id", c.Delete)
 }
 
+func (c *Area) ListAllLeaf(ctx *gin.Context) {
+	idStr := ctx.Param("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		resp.ErrorBusiness(ctx, resp.ErrorParams, "id params error", err)
+		return
+	}
+	areaSlice, err := c.AreaSvc.GetAllLeafId(id)
+	if err != nil {
+		resp.ErrorBusiness(ctx, resp.ErrorDatabase, fmt.Sprintf("%v list fail", c.Resource), err)
+		return
+	}
+	resp.Success(ctx, areaSlice)
+}
+
 func (c *Area) ListAllTree(ctx *gin.Context) {
-	areasPtr, err := c.AreaSvc.List(&models.Area{})
+	areasGeneralPtr := c.AreaModel.SlicePtr()
+	err := c.AreaSvc.List(c.AreaModel, areasGeneralPtr)
 	if err != nil {
 		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "area get error", err)
 		return
 	}
-	areas := *(areasPtr.(*[]models.Area))
+	areasPtr := c.AreaModel.Transfer(areasGeneralPtr)
 
 	fieldMap, err := c.FieldSvc.Map()
 	if err != nil {
@@ -47,7 +65,7 @@ func (c *Area) ListAllTree(ctx *gin.Context) {
 		return
 	}
 
-	areaTrees, err := c.AreaSvc.TransferListToTree(areas, fieldMap)
+	areaTrees, err := c.AreaSvc.TransferListToTree(areasPtr, fieldMap)
 	if err != nil {
 		resp.ErrorBusiness(ctx, resp.ErrorDataTransfer, "area tree transfer error", err)
 		return
@@ -67,12 +85,13 @@ func (c *Area) ListParent(ctx *gin.Context) {
 		FieldId: fieldId,
 		Type:    models.AreaTypeRoot,
 	}
-	areas, err := c.AreaSvc.List(&area)
+	areasPtr := area.SlicePtr()
+	err = c.AreaSvc.List(&area, areasPtr)
 	if err != nil {
 		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "area get error", err)
 		return
 	}
-	resp.Success(ctx, areas)
+	resp.Success(ctx, areasPtr)
 }
 
 func (c *Area) ListChildren(ctx *gin.Context) {
@@ -86,12 +105,13 @@ func (c *Area) ListChildren(ctx *gin.Context) {
 	area := models.Area{
 		Parent: id,
 	}
-	areas, err := c.AreaSvc.List(&area)
+	areasPtr := area.SlicePtr()
+	err = c.AreaSvc.List(&area, areasPtr)
 	if err != nil {
 		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "area get error", err)
 		return
 	}
-	resp.Success(ctx, areas)
+	resp.Success(ctx, areasPtr)
 }
 
 func (c *Area) ListOneTree(ctx *gin.Context) {
@@ -105,12 +125,13 @@ func (c *Area) ListOneTree(ctx *gin.Context) {
 	area := models.Area{
 		FieldId: fieldId,
 	}
-	areasPtr, err := c.AreaSvc.List(&area)
+	areasPtr := area.SlicePtr()
+	err = c.AreaSvc.List(&area, areasPtr)
 	if err != nil {
 		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "area get error", err)
 		return
 	}
-	areas := *(areasPtr.(*[]models.Area))
+	areas := area.Transfer(areasPtr)
 
 	fieldMap, err := c.FieldSvc.Map()
 	if err != nil {

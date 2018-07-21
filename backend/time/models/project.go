@@ -15,15 +15,24 @@ type Project struct {
 	StartDate           time.Time `xorm:"not null comment('开始日期') DATETIME"`
 	Duration            int       `xorm:"not null default 0 comment('持续时间') INT(11)" structs:"duration,omitempty"`
 
-	QuestTarget QuestTarget `xorm:"-" structs:"-"`
-	Area        Area        `xorm:"-" structs:"-"`
-	Quest       Quest       `xorm:"-" structs:"-"`
+	QuestTarget *QuestTarget `xorm:"-" structs:"-" json:"QuestTarget,omitempty"`
+	Area        *Area        `xorm:"-" structs:"-" json:"Area,omitempty"`
+	Quest       *Quest       `xorm:"-" structs:"-" json:"Quest,omitempty"`
 }
 
 type ProjectJoin struct {
 	Project     Project `xorm:"extends" json:"-"`
 	QuestTarget `xorm:"extends" json:"-"`
 	Area        `xorm:"extends" json:"-"`
+}
+
+func NewProject() *Project {
+	ret := Project{
+		QuestTarget: NewQuestTarget(),
+		Area:        NewArea(),
+		Quest:       NewQuest(),
+	}
+	return &ret
 }
 
 func (m *Project) TableName() string {
@@ -42,6 +51,11 @@ func (m *Project) BuildCondition(session *xorm.Session) {
 func (m *Project) SlicePtr() interface{} {
 	ret := make([]Project, 0)
 	return &ret
+}
+
+func (m *Project) Transfer(slicePtr interface{}) *[]Project {
+	ret := slicePtr.(*[]Project)
+	return ret
 }
 
 func (m *Project) Join() es.JoinGeneral {
@@ -80,20 +94,20 @@ func (j *ProjectJoin) SlicePtr() interface{} {
 func (j *ProjectJoin) Transfer() es.ModelGeneral {
 	join := *j
 	ret := join.Project
-	ret.Area = join.Area
-	ret.QuestTarget = join.QuestTarget
+	ret.Area = &join.Area
+	ret.QuestTarget = &join.QuestTarget
 	return &ret
 }
 
 func (j *ProjectJoin) TransferCopy(modelPtr es.ModelGeneral) {
 	projectPtr := modelPtr.(*Project)
 	(*projectPtr) = (*j).Project
-	(*projectPtr).Area = (*j).Area
-	(*projectPtr).QuestTarget = (*j).QuestTarget
+	(*projectPtr).Area = &(*j).Area
+	(*projectPtr).QuestTarget = &(*j).QuestTarget
 	return
 }
 
-func (j *ProjectJoin) TransferSlicePtr(slicePtr interface{}) interface{} {
+func (j *ProjectJoin) TransferCopySlice(slicePtr interface{}, targetPtr interface{}) {
 	joinSlicePtr := slicePtr.(*[]ProjectJoin)
 	joinSlice := *joinSlicePtr
 	projects := make([]Project, 0)
@@ -101,5 +115,7 @@ func (j *ProjectJoin) TransferSlicePtr(slicePtr interface{}) interface{} {
 		projectPtr := (&one).Transfer().(*Project)
 		projects = append(projects, *projectPtr)
 	}
-	return &projects
+	projectsPtr := targetPtr.(*[]Project)
+	(*projectsPtr) = projects
+	return
 }

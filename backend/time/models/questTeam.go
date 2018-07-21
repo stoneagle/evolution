@@ -14,12 +14,19 @@ type QuestTeam struct {
 	StartDate      time.Time `xorm:"not null comment('开始日期') DATETIME" structs:"start_date,omitempty"`
 	EndDate        time.Time `xorm:"not null comment('开始日期') DATETIME" structs:"end_date,omitempty"`
 	UserId         int       `xorm:"unique(quest_id) not null default 0 comment('成员id') INT(11)" structs:"user_id,omitempty"`
-	Quest          Quest     `xorm:"-"`
+	Quest          *Quest    `xorm:"-" structs:"-" json:"Quest,omitempty"`
 }
 
 type QuestTeamJoin struct {
 	QuestTeam `xorm:"extends" json:"-"`
 	Quest     `xorm:"extends" json:"-"`
+}
+
+func NewQuestTeam() *QuestTeam {
+	ret := QuestTeam{
+		Quest: NewQuest(),
+	}
+	return &ret
 }
 
 func (m *QuestTeam) TableName() string {
@@ -45,6 +52,11 @@ func (m *QuestTeam) Join() es.JoinGeneral {
 	return &ret
 }
 
+func (m *QuestTeam) Transfer(slicePtr interface{}) *[]QuestTeam {
+	ret := slicePtr.(*[]QuestTeam)
+	return ret
+}
+
 func (j *QuestTeamJoin) Links() []es.JoinLinks {
 	links := make([]es.JoinLinks, 0)
 	questLink := es.JoinLinks{
@@ -67,18 +79,18 @@ func (j *QuestTeamJoin) SlicePtr() interface{} {
 func (j *QuestTeamJoin) Transfer() es.ModelGeneral {
 	join := *j
 	ret := join.QuestTeam
-	ret.Quest = join.Quest
+	ret.Quest = &join.Quest
 	return &ret
 }
 
 func (j *QuestTeamJoin) TransferCopy(modelPtr es.ModelGeneral) {
 	questTeamPtr := modelPtr.(*QuestTeam)
 	(*questTeamPtr) = (*j).QuestTeam
-	(*questTeamPtr).Quest = (*j).Quest
+	(*questTeamPtr).Quest = &(*j).Quest
 	return
 }
 
-func (j *QuestTeamJoin) TransferSlicePtr(slicePtr interface{}) interface{} {
+func (j *QuestTeamJoin) TransferCopySlice(slicePtr interface{}, targetPtr interface{}) {
 	joinSlicePtr := slicePtr.(*[]QuestTeamJoin)
 	joinSlice := *joinSlicePtr
 	questTeams := make([]QuestTeam, 0)
@@ -86,5 +98,7 @@ func (j *QuestTeamJoin) TransferSlicePtr(slicePtr interface{}) interface{} {
 		questTeamPtr := (&one).Transfer().(*QuestTeam)
 		questTeams = append(questTeams, *questTeamPtr)
 	}
-	return &questTeams
+	questTeamsPtr := targetPtr.(*[]QuestTeam)
+	(*questTeamsPtr) = questTeams
+	return
 }

@@ -16,6 +16,11 @@ type Phase struct {
 	FieldId             int    `xorm:"unique(name) not null default 0 comment('隶属方向') INT(11)" structs:"field_id,omitempty"`
 }
 
+func NewPhase() *Phase {
+	ret := Phase{}
+	return &ret
+}
+
 func (m *Phase) TableName() string {
 	return "phase"
 }
@@ -32,4 +37,9 @@ func (m *Phase) BuildCondition(session *xorm.Session) {
 func (m *Phase) SlicePtr() interface{} {
 	ret := make([]Phase, 0)
 	return &ret
+}
+
+func (m *Phase) Transfer(slicePtr interface{}) *[]Phase {
+	ret := slicePtr.(*[]Phase)
+	return ret
 }

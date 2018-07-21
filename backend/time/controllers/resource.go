@@ -41,18 +41,18 @@ func (c *Resource) ListAreas(ctx *gin.Context) {
 }
 
 func (c *Resource) ListGroupByLeaf(ctx *gin.Context) {
-	var resource models.Resource
-	if err := ctx.ShouldBindJSON(&resource); err != nil {
+	if err := ctx.ShouldBindJSON(c.Model); err != nil {
 		resp.ErrorBusiness(ctx, resp.ErrorParams, "params error: ", err)
 		return
 	}
 
-	resourcesPtr, err := c.ResourceSvc.List(&resource)
+	resourcesGeneralPtr := c.Model.SlicePtr()
+	err := c.ResourceSvc.List(c.Model, resourcesGeneralPtr)
 	if err != nil {
 		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "resource get error", err)
 		return
 	}
-	resources := *(resourcesPtr.(*[]models.Resource))
-	areas := c.ResourceSvc.GroupByArea(resources)
+	resourcesPtr := c.ResourceModel.Transfer(resourcesGeneralPtr)
+	areas := c.ResourceSvc.GroupByArea(resourcesPtr)
 	resp.Success(ctx, areas)
 }

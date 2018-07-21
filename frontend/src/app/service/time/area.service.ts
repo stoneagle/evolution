@@ -26,8 +26,16 @@ export class AreaService extends BaseService {
     }))
   }
 
+  ListAllLeaf(id: number): Observable<number[]> {
+    return this.BaseResp(this.uri + `/leaf/${id}`).pipe(map(res => {
+      let ret: number[] = []; 
+      ret = res.data;
+      return ret; 
+    }))
+  }
+
   ListAllTree(): Observable<Map<number, TreeModel>> {
-    return this.BaseGet<Resp>(Resp, this.uri + `/list/tree/all`).pipe(map(res => {
+    return this.BaseResp(this.uri + `/list/tree/all`).pipe(map(res => {
       let ret:Map<number, TreeModel> = new Map(); 
       for (let key in res.data) {
         ret.set(+key, res.data[key]);
@@ -37,7 +45,7 @@ export class AreaService extends BaseService {
   }
 
   ListOneTree(fieldId: number): Observable<TreeModel> {
-    return this.BaseGet<Resp>(Resp, this.uri + `/list/tree/one/${fieldId}`).pipe(map(res => {
+    return this.BaseResp(this.uri + `/list/tree/one/${fieldId}`).pipe(map(res => {
       let ret:TreeModel; 
       ret = res.data;
       return ret; 

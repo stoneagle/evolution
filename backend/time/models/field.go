@@ -14,6 +14,11 @@ type Field struct {
 	Color               string `xorm:"not null default '' comment('颜色') VARCHAR(255)"`
 }
 
+func NewField() *Field {
+	ret := Field{}
+	return &ret
+}
+
 func (m *Field) TableName() string {
 	return "field"
 }
@@ -29,4 +34,9 @@ func (m *Field) BuildCondition(session *xorm.Session) {
 func (m *Field) SlicePtr() interface{} {
 	ret := make([]Field, 0)
 	return &ret
+}
+
+func (m *Field) Transfer(slicePtr interface{}) *[]Field {
+	ret := slicePtr.(*[]Field)
+	return ret
 }

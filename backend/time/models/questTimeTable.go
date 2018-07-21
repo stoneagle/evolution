@@ -21,6 +21,11 @@ var (
 	QuestTimeTableTypeHoliday = 2
 )
 
+func NewQuestTimeTable() *QuestTimeTable {
+	ret := QuestTimeTable{}
+	return &ret
+}
+
 func (m *QuestTimeTable) TableName() string {
 	return "quest_time_table"
 }
@@ -36,4 +41,9 @@ func (m *QuestTimeTable) BuildCondition(session *xorm.Session) {
 func (m *QuestTimeTable) SlicePtr() interface{} {
 	ret := make([]QuestTimeTable, 0)
 	return &ret
+}
+
+func (m *QuestTimeTable) Transfer(slicePtr interface{}) *[]QuestTimeTable {
+	ret := slicePtr.(*[]QuestTimeTable)
+	return ret
 }
