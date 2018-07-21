@@ -53,6 +53,7 @@ func (s *Syncfusion) ListKanban(userId int) (kanbans []models.SyncfusionKanban, 
 
 	kanbans = make([]models.SyncfusionKanban, 0)
 	task := models.NewTask()
+	task.QuestTarget.Status = models.QuestTargetStatusWait
 	task.QuestTarget.QuestIds = questIds
 	tasksGeneralPtr := task.SlicePtr()
 	err = s.Pack.TaskSvc.List(task, tasksGeneralPtr)
@@ -186,6 +187,7 @@ func (s *Syncfusion) ListGantt(userId int) (gantts []models.SyncfusionGantt, err
 	}
 	tasksPtr := task.Transfer(tasksGeneralPtr)
 
+	projectFilterMap := map[int]bool{}
 	projects := make([]models.Project, 0)
 	for k, _ := range *tasksPtr {
 		task := (*tasksPtr)[k]
@@ -195,6 +197,11 @@ func (s *Syncfusion) ListGantt(userId int) (gantts []models.SyncfusionGantt, err
 		project.Area = models.NewArea()
 		*(project.QuestTarget) = *(task.QuestTarget)
 		*(project.Area) = *(task.Area)
+		_, ok := projectFilterMap[project.Id]
+		if ok {
+			continue
+		}
+		projectFilterMap[project.Id] = true
 		projects = append(projects, *project)
 	}
 
@@ -239,14 +246,21 @@ func (s *Syncfusion) buildProjectMap(projectsPtr *[]models.Project, tasksMap map
 		gantt.Relate = one.Area.Name
 		gantt.Name = one.Name
 		gantt.StartDate = one.StartDate
-		gantt.EndDate = one.StartDate
 		gantt.Progress = 0
 		gantt.Duration = 0
 		gantt.Expanded = false
 		if children, ok := tasksMap[one.Id]; ok {
 			gantt.Children = children
+			var maxEndDate time.Time
+			for _, task := range children {
+				if task.EndDate.After(maxEndDate) {
+					maxEndDate = task.EndDate
+				}
+			}
+			gantt.EndDate = maxEndDate
 		} else {
 			child := make([]models.SyncfusionGantt, 0)
+			gantt.EndDate = one.StartDate
 			gantt.Children = child
 		}
 		result[one.QuestTarget.QuestId] = append(result[one.QuestTarget.QuestId], gantt)
