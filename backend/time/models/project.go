@@ -15,9 +15,9 @@ type Project struct {
 	StartDate           time.Time `xorm:"not null comment('开始日期') DATETIME"`
 	Duration            int       `xorm:"not null default 0 comment('持续时间') INT(11)" structs:"duration,omitempty"`
 
+	Quest       *Quest       `xorm:"-" structs:"-" json:"Quest,omitempty"`
 	QuestTarget *QuestTarget `xorm:"-" structs:"-" json:"QuestTarget,omitempty"`
 	Area        *Area        `xorm:"-" structs:"-" json:"Area,omitempty"`
-	Quest       *Quest       `xorm:"-" structs:"-" json:"Quest,omitempty"`
 }
 
 type ProjectJoin struct {

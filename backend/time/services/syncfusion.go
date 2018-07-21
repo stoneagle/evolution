@@ -34,38 +34,9 @@ func (s *Syncfusion) ListKanban(userId int) (kanbans []models.SyncfusionKanban, 
 		return
 	}
 	questTeamsPtr := questTeam.Transfer(questTeamsGeneralPtr)
-
 	questIds := make([]int, 0)
 	for _, one := range *questTeamsPtr {
 		questIds = append(questIds, one.QuestId)
-	}
-	project := models.NewProject()
-	project.QuestTarget.QuestIds = questIds
-	projectsGeneralPtr := project.SlicePtr()
-	err = s.Pack.ProjectSvc.List(project, projectsGeneralPtr)
-	if err != nil {
-		return
-	}
-	projectsPtr := project.Transfer(projectsGeneralPtr)
-
-	questTarget := models.NewQuestTarget()
-	questTarget.QuestIds = questIds
-	questTargetsGeneralPtr := questTarget.SlicePtr()
-	err = s.Pack.QuestTargetSvc.List(questTarget, questTargetsGeneralPtr)
-	if err != nil {
-		return
-	}
-	questTargetsPtr := questTarget.Transfer(questTargetsGeneralPtr)
-	areasMap := make(map[int]models.Area)
-	for _, one := range *questTargetsPtr {
-		areasMap[one.AreaId] = *one.Area
-	}
-
-	projectIds := make([]int, 0)
-	projectsMap := make(map[int]models.Project)
-	for _, one := range *projectsPtr {
-		projectIds = append(projectIds, one.Id)
-		projectsMap[one.Id] = one
 	}
 
 	field := models.NewField()
@@ -82,7 +53,7 @@ func (s *Syncfusion) ListKanban(userId int) (kanbans []models.SyncfusionKanban, 
 
 	kanbans = make([]models.SyncfusionKanban, 0)
 	task := models.NewTask()
-	task.ProjectIds = projectIds
+	task.QuestTarget.QuestIds = questIds
 	tasksGeneralPtr := task.SlicePtr()
 	err = s.Pack.TaskSvc.List(task, tasksGeneralPtr)
 	if err != nil {
@@ -90,22 +61,10 @@ func (s *Syncfusion) ListKanban(userId int) (kanbans []models.SyncfusionKanban, 
 	}
 	tasksPtr := task.Transfer(tasksGeneralPtr)
 	for _, one := range *tasksPtr {
-		project, ok := projectsMap[one.ProjectId]
-		if !ok {
-			err = errors.New(fmt.Sprintf("task %s not find its project", one.Name))
-			s.Logger.Log(logger.WarnLevel, one, err)
-			return
-		}
-		area, ok := areasMap[one.Resource.Area.Id]
-		if !ok {
-			err = errors.New(fmt.Sprintf("task %s not find its area", one.Name))
-			s.Logger.Log(logger.WarnLevel, one, err)
-			return
-		}
-		field, ok := fieldsMap[area.FieldId]
+		field, ok := fieldsMap[one.Area.FieldId]
 		if !ok {
 			err = errors.New(fmt.Sprintf("task %s not find its field", one.Name))
-			s.Logger.Log(logger.WarnLevel, area, err)
+			s.Logger.Log(logger.WarnLevel, one, err)
 			return
 		}
 		kanban := models.SyncfusionKanban{}
@@ -118,15 +77,16 @@ func (s *Syncfusion) ListKanban(userId int) (kanbans []models.SyncfusionKanban, 
 			err = errors.New(fmt.Sprintf("task %s not find its status name", one.Name))
 			return
 		}
-		kanban.Tags = field.Name + "," + area.Name + "," + one.Resource.Name
+		kanban.Tags = field.Name + "," + one.Area.Name + "," + one.Resource.Name
 		kanban.ResourceId = one.Resource.Id
 		kanban.ResourceName = one.Resource.Name
-		kanban.ProjectId = project.Id
-		kanban.ProjectName = project.Name
+		kanban.ProjectId = one.Project.Id
+		kanban.ProjectName = one.Project.Name
 		kanban.FieldId = field.Id
 		kanban.FieldName = field.Name
 		kanbans = append(kanbans, kanban)
 	}
+
 	return kanbans, err
 }
 
@@ -217,21 +177,8 @@ func (s *Syncfusion) ListGantt(userId int) (gantts []models.SyncfusionGantt, err
 		quests = append(quests, *one.Quest)
 	}
 
-	project := models.NewProject()
-	project.QuestTarget.QuestIds = questIds
-	projectsGeneralPtr := project.SlicePtr()
-	err = s.Pack.ProjectSvc.List(project, projectsGeneralPtr)
-	if err != nil {
-		return
-	}
-	projectsPtr := project.Transfer(projectsGeneralPtr)
-
-	projectIds := make([]int, 0)
-	for _, one := range *projectsPtr {
-		projectIds = append(projectIds, one.Id)
-	}
 	task := models.NewTask()
-	task.ProjectIds = projectIds
+	task.QuestTarget.Ids = questIds
 	tasksGeneralPtr := task.SlicePtr()
 	err = s.Pack.TaskSvc.List(task, tasksGeneralPtr)
 	if err != nil {
@@ -239,8 +186,20 @@ func (s *Syncfusion) ListGantt(userId int) (gantts []models.SyncfusionGantt, err
 	}
 	tasksPtr := task.Transfer(tasksGeneralPtr)
 
+	projects := make([]models.Project, 0)
+	for k, _ := range *tasksPtr {
+		task := (*tasksPtr)[k]
+		project := models.NewProject()
+		*(project) = *(task.Project)
+		project.QuestTarget = models.NewQuestTarget()
+		project.Area = models.NewArea()
+		*(project.QuestTarget) = *(task.QuestTarget)
+		*(project.Area) = *(task.Area)
+		projects = append(projects, *project)
+	}
+
 	tasksMap := s.buildTaskMap(tasksPtr)
-	projectsMap := s.buildProjectMap(projectsPtr, tasksMap)
+	projectsMap := s.buildProjectMap(&projects, tasksMap)
 	gantts = s.buildQuestSlice(quests, projectsMap)
 	return
 }

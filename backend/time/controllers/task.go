@@ -52,20 +52,7 @@ func (c *Task) ListByUser(ctx *gin.Context) {
 		questIds = append(questIds, one.QuestId)
 	}
 
-	c.ProjectModel.QuestTarget.QuestIds = questIds
-	projectsGeneralPtr := c.ProjectModel.SlicePtr()
-	err = c.ProjectSvc.List(c.ProjectModel, projectsGeneralPtr)
-	if err != nil {
-		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "project get error", err)
-		return
-	}
-	projectsPtr := c.ProjectModel.Transfer(projectsGeneralPtr)
-	projectIds := make([]int, 0)
-	for _, one := range *projectsPtr {
-		projectIds = append(projectIds, one.Id)
-	}
-
-	c.TaskModel.ProjectIds = projectIds
+	c.TaskModel.QuestTarget.QuestIds = questIds
 	tasksPtr := c.TaskModel.SlicePtr()
 	err = c.TaskSvc.List(c.TaskModel, tasksPtr)
 	if err != nil {

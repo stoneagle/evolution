@@ -20,10 +20,12 @@ type Task struct {
 	Duration            int       `xorm:"not null comment('持续时间') INT(11)" structs:"duration,omitempty"`
 	Status              int       `xorm:"not null default 0 comment('当前状态:1未分配2准备做3执行中4已完成') INT(11)" structs:"status,omitempty"`
 
-	ProjectIds     []int     `xorm:"-" structs:"project_id,omitempty" json:"ProjectIds,omitempty"`
-	Resource       *Resource `xorm:"-" structs:"-" json:"Resource,omitempty"`
-	StartDateReset bool      `xorm:"-" structs:"-"`
-	EndDateReset   bool      `xorm:"-" structs:"-"`
+	Resource       *Resource    `xorm:"-" structs:"-" json:"Resource,omitempty"`
+	Project        *Project     `xorm:"-" structs:"-" json:"Project,omitempty"`
+	QuestTarget    *QuestTarget `xorm:"-" structs:"-" json:"Project,omitempty"`
+	Area           *Area        `xorm:"-" structs:"-" json:"Area,omitempty"`
+	StartDateReset bool         `xorm:"-" structs:"-"`
+	EndDateReset   bool         `xorm:"-" structs:"-"`
 }
 
 var (
@@ -40,14 +42,19 @@ var (
 )
 
 type TaskJoin struct {
-	Task            `xorm:"extends" json:"-"`
-	Resource        `xorm:"extends" json:"-"`
-	MapAreaResource `xorm:"extends" json:"-"`
+	Resource    `xorm:"extends" json:"-"`
+	Task        `xorm:"extends" json:"-"`
+	Project     `xorm:"extends" json:"-"`
+	QuestTarget `xorm:"extends" json:"-"`
+	Area        `xorm:"extends" json:"-"`
 }
 
 func NewTask() *Task {
 	ret := Task{
-		Resource: NewResource(),
+		Resource:    NewResource(),
+		Area:        NewArea(),
+		Project:     NewProject(),
+		QuestTarget: NewQuestTarget(),
 	}
 	return &ret
 }
@@ -61,6 +68,10 @@ func (m *Task) BuildCondition(session *xorm.Session) {
 	params := structs.Map(m)
 	condition := m.Model.BuildCondition(params, keyPrefix)
 	session.Where(condition)
+	m.QuestTarget.BuildCondition(session)
+	m.Project.BuildCondition(session)
+	m.Area.BuildCondition(session)
+	m.Resource.BuildCondition(session)
 	return
 }
 
@@ -89,16 +100,34 @@ func (j *TaskJoin) Links() []es.JoinLinks {
 		RightTable: j.Task.TableName(),
 		RightField: "resource_id",
 	}
-	mapAreaResourceLink := es.JoinLinks{
+	projectLink := es.JoinLinks{
 		Type:       es.InnerJoin,
-		Table:      j.MapAreaResource.TableName(),
-		LeftTable:  j.MapAreaResource.TableName(),
-		LeftField:  "resource_id",
-		RightTable: j.Resource.TableName(),
-		RightField: "id",
+		Table:      j.Project.TableName(),
+		LeftTable:  j.Project.TableName(),
+		LeftField:  "id",
+		RightTable: j.Task.TableName(),
+		RightField: "project_id",
+	}
+	questTargetLink := es.JoinLinks{
+		Type:       es.InnerJoin,
+		Table:      j.QuestTarget.TableName(),
+		LeftTable:  j.QuestTarget.TableName(),
+		LeftField:  "id",
+		RightTable: j.Project.TableName(),
+		RightField: "quest_target_id",
+	}
+	areaLink := es.JoinLinks{
+		Type:       es.InnerJoin,
+		Table:      j.Area.TableName(),
+		LeftTable:  j.Area.TableName(),
+		LeftField:  "id",
+		RightTable: j.QuestTarget.TableName(),
+		RightField: "area_id",
 	}
 	links = append(links, resourceLink)
-	links = append(links, mapAreaResourceLink)
+	links = append(links, projectLink)
+	links = append(links, questTargetLink)
+	links = append(links, areaLink)
 	return links
 }
 
@@ -111,8 +140,9 @@ func (j *TaskJoin) Transfer() es.ModelGeneral {
 	join := *j
 	ret := join.Task
 	ret.Resource = &join.Resource
-	ret.Resource.Area = NewArea()
-	ret.Resource.Area.Id = join.MapAreaResource.AreaId
+	ret.Project = &join.Project
+	ret.QuestTarget = &join.QuestTarget
+	ret.Area = &join.Area
 	return &ret
 }
 
@@ -120,8 +150,9 @@ func (j *TaskJoin) TransferCopy(modelPtr es.ModelGeneral) {
 	taskPtr := modelPtr.(*Task)
 	(*taskPtr) = (*j).Task
 	(*taskPtr).Resource = &(*j).Resource
-	(*taskPtr).Resource.Area = NewArea()
-	(*taskPtr).Resource.Area.Id = (*j).MapAreaResource.AreaId
+	(*taskPtr).Project = &(*j).Project
+	(*taskPtr).QuestTarget = &(*j).QuestTarget
+	(*taskPtr).Area = &(*j).Area
 	return
 }
 

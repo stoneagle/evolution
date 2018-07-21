@@ -64,7 +64,19 @@ func (m *Model) BuildCondition(params map[string]interface{}, keyPrefix string) 
 	condition = builder.Eq{}
 	for key, value := range params {
 		keyType := reflect.ValueOf(value).Kind()
-		if keyType == reflect.Map || keyType == reflect.Struct {
+		if keyType == reflect.Map {
+			if key == "ModelWithDeleted" {
+				idMap, ok := value.(map[string]interface{})["ModelWithId"]
+				if ok {
+					id, ok := idMap.(map[string]interface{})["id"]
+					if ok {
+						condition[keyPrefix+"id"] = id
+					}
+				}
+			}
+			continue
+		}
+		if keyType == reflect.Struct {
 			continue
 		}
 		if keyType == reflect.String && value == "" {
