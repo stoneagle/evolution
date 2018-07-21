@@ -1,6 +1,7 @@
 app:
-  mode: debug 
+  mode: debug
   log: /go/src/evolution/backend/logs
+  level: 3
 quant:
   system:
     name: quant

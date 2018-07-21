@@ -11,7 +11,11 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-type Level int8
+type Level int
+
+func (level Level) Number() int {
+	return int(level)
+}
 
 const (
 	DebugLevel Level = iota + 1
@@ -73,16 +77,19 @@ func (l *Logger) Log(level Level, msg interface{}, err error) {
 		message.err = err.Error()
 	}
 
+	conf := config.Get()
 	res := spew.Sdump(message)
-	switch level {
-	case DebugLevel:
-		l.logger.Debug(res)
-	case InfoLevel:
-		l.logger.Info(res)
-	case WarnLevel:
-		l.logger.Warn(res)
-	case ErrorLevel:
-		l.logger.Error(res)
+	if level.Number() >= conf.App.Level {
+		switch level {
+		case DebugLevel:
+			l.logger.Debug(res)
+		case InfoLevel:
+			l.logger.Info(res)
+		case WarnLevel:
+			l.logger.Warn(res)
+		case ErrorLevel:
+			l.logger.Error(res)
+		}
 	}
 }
 

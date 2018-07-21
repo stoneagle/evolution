@@ -7,6 +7,17 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
+type ModeType string
+
+func (mtype ModeType) String() string {
+	return string(mtype)
+}
+
+const (
+	ModeDebug   ModeType = "debug"
+	ModeRelease ModeType = "release"
+)
+
 type RedisConf struct {
 	Host     string
 	Port     string
@@ -38,8 +49,9 @@ type System struct {
 
 type Conf struct {
 	App struct {
-		Mode string
-		Log  string
+		Mode  string
+		Log   string
+		Level int
 	}
 	Quant struct {
 		System   System
