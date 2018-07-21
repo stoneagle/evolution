@@ -46,9 +46,9 @@ func (c *Project) Transfer(src, des *xorm.Engine, userId int) {
 	taskNum := 0
 	actionNum := 0
 	for _, oldProject := range oldProjectJoins {
-		newProject := models.Project{}
-		quest := models.Quest{}
-		_, err = session.Where("name = ?", oldProject.Target.Name).Get(&quest)
+		newProject := models.NewProject()
+		quest := models.NewQuest()
+		_, err = session.Where("name = ?", oldProject.Target.Name).Get(quest)
 		if err != nil {
 			session.Rollback()
 			fmt.Printf("new quest get error:%v\r\n", err.Error())
@@ -65,7 +65,7 @@ func (c *Project) Transfer(src, des *xorm.Engine, userId int) {
 				session.Rollback()
 				return
 			}
-			newTask := models.Task{}
+			newTask := models.NewTask()
 			newTask.ResourceId = newResourceJoin.Resource.Id
 			newTask.UserId = userId
 			newTask.StartDate = oldTask.StartDate
@@ -84,7 +84,7 @@ func (c *Project) Transfer(src, des *xorm.Engine, userId int) {
 			if !ok {
 				newAreaTasksMap[newResourceJoin.Area.Id] = make([]models.Task, 0)
 			}
-			tasksSlice = append(tasksSlice, newTask)
+			tasksSlice = append(tasksSlice, *newTask)
 			newAreaTasksMap[newResourceJoin.Area.Id] = tasksSlice
 		}
 		newProject.QuestTarget.QuestId = quest.Id
@@ -101,8 +101,8 @@ func (c *Project) Transfer(src, des *xorm.Engine, userId int) {
 			newProject.Id = 0
 			newProject.QuestTarget.AreaId = areaId
 			// get relate quest target
-			relateQuestTarget := models.QuestTarget{}
-			has, err := des.Where("quest_id = ?", newProject.QuestTarget.QuestId).And("area_id = ?", newProject.QuestTarget.AreaId).Get(&relateQuestTarget)
+			relateQuestTarget := models.NewQuestTarget()
+			has, err := des.Where("quest_id = ?", newProject.QuestTarget.QuestId).And("area_id = ?", newProject.QuestTarget.AreaId).Get(relateQuestTarget)
 			if !has {
 				fmt.Printf("quest target not exist quest_id:%v, area_id:%v\r\n", newProject.QuestTarget.QuestId, newProject.QuestTarget.AreaId)
 				session.Rollback()
@@ -115,15 +115,15 @@ func (c *Project) Transfer(src, des *xorm.Engine, userId int) {
 			}
 			newProject.QuestTargetId = relateQuestTarget.Id
 
-			newArea := models.Area{}
-			_, err = session.Id(areaId).Get(&newArea)
+			newArea := models.NewArea()
+			_, err = session.Id(areaId).Get(newArea)
 			if err != nil {
 				fmt.Printf("new area get error %v\r\n", err.Error())
 				session.Rollback()
 				return
 			}
 			newProject.Name = oldProject.Project.Text + ":" + newArea.Name
-			_, err = session.Insert(&newProject)
+			_, err = session.Insert(newProject)
 			if err != nil {
 				fmt.Printf("new project insert error %v\r\n", err.Error())
 				session.Rollback()
@@ -150,7 +150,7 @@ func (c *Project) Transfer(src, des *xorm.Engine, userId int) {
 				oldActions := make([]Action, 0)
 				src.Where("task_id = ?", needOldTask.Id).Find(&oldActions)
 				for _, oldAction := range oldActions {
-					newAction := models.Action{}
+					newAction := models.NewAction()
 					newAction.TaskId = newTask.Id
 					newAction.UserId = userId
 					newAction.Name = oldAction.Text
@@ -159,7 +159,7 @@ func (c *Project) Transfer(src, des *xorm.Engine, userId int) {
 					newAction.EndDate = oldAction.EndDate
 					newAction.CreatedAt = oldAction.Ctime
 					newAction.UpdatedAt = oldAction.Utime
-					_, err = session.Insert(&newAction)
+					_, err = session.Insert(newAction)
 					if err != nil {
 						fmt.Printf("new action insert error %v\r\n", err.Error())
 						session.Rollback()
