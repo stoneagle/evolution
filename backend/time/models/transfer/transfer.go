@@ -6,8 +6,10 @@ import (
 	"evolution/backend/time/models/php"
 	"fmt"
 	"io/ioutil"
+	"strconv"
 	"time"
 
+	"github.com/araddon/dateparse"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/go-xorm/xorm"
 	yaml "gopkg.in/yaml.v2"
@@ -101,6 +103,123 @@ func main() {
 	new(php.Target).Transfer(srcEng, destEng, userId)
 	new(php.Project).Transfer(srcEng, destEng, userId)
 	initUserResourceTime(destEng, userId)
+	initTaskEndDate(destEng)
+	initQuestAndTargetStatus(destEng)
+}
+
+func initQuestAndTargetStatus(des *xorm.Engine) {
+	questTargets := make([]models.QuestTarget, 0)
+	sql := des.Table("quest_target")
+	err := sql.Find(&questTargets)
+	if err != nil {
+		fmt.Printf("quest target get error:%v\r\n", err.Error())
+		return
+	}
+	updateNum := 0
+	for _, questTarget := range questTargets {
+		tasks := make([]models.Task, 0)
+		sql := des.Table("task").Join("INNER", "project", "project.id = task.project_id").Where("project.quest_target_id = ?", questTarget.Id).And("task.status != ?", models.TaskStatusDone)
+		err := sql.Find(&tasks)
+		if err != nil {
+			fmt.Printf("quest_target relate task get error:%v\r\n", err.Error())
+			return
+		}
+		if len(tasks) == 0 {
+			questTargetUpdate := models.QuestTarget{}
+			questTargetUpdate.Status = models.QuestTargetStatusFinish
+			_, err = des.Where("id = ?", questTarget.Id).Update(questTargetUpdate)
+			if err != nil {
+				fmt.Printf("quest target status update error:%v\r\n", err.Error())
+				return
+			}
+			updateNum++
+		}
+	}
+	fmt.Printf("quest target status init success:%v\r\n", updateNum)
+
+	quests := make([]models.Quest, 0)
+	sql = des.Table("quest")
+	err = sql.Find(&quests)
+	if err != nil {
+		fmt.Printf("quest get error:%v\r\n", err.Error())
+		return
+	}
+	updateNum = 0
+	for _, quest := range quests {
+		targets := make([]models.QuestTarget, 0)
+		sql := des.Table("quest_target").Where("status != ?", models.QuestTargetStatusFinish).And("quest_id = ?", quest.Id)
+		err := sql.Find(&targets)
+		if err != nil {
+			fmt.Printf("quest relate target get error:%v\r\n", err.Error())
+			return
+		}
+		if len(targets) == 0 {
+			questUpdate := models.Quest{}
+			questUpdate.Status = models.QuestStatusFinish
+			_, err = des.Where("id = ?", quest.Id).Update(questUpdate)
+			if err != nil {
+				fmt.Printf("quest status update error:%v\r\n", err.Error())
+				return
+			}
+			updateNum++
+		}
+	}
+	fmt.Printf("quest status init success:%v\r\n", updateNum)
+}
+
+func initTaskEndDate(des *xorm.Engine) {
+	sql := fmt.Sprintf("SELECT task_id,end_date FROM " +
+		" (" +
+		" SELECT " +
+		" task_id, end_date," +
+		" rank() over (PARTITION BY task_id ORDER BY end_date DESC) r " +
+		" FROM `action`" +
+		" ) a" +
+		" WHERE a.r=1")
+	results, err := des.Query(sql)
+	if err != nil {
+		fmt.Printf("action end_date get error:%v\r\n", err.Error())
+		return
+	}
+	taskEndTimeMap := map[int]time.Time{}
+	for _, one := range results {
+		taskId, err := strconv.Atoi(string(one["task_id"]))
+		endDateStr := string(one["end_date"])
+		if err != nil {
+			fmt.Printf("action end_date sql result transfer error:%v\r\n", err.Error())
+			return
+		}
+		endTime, err := dateparse.ParseLocal(endDateStr)
+		if err != nil {
+			fmt.Printf("action end_date string transfer error:%v\r\n", err.Error())
+			return
+		}
+		taskEndTimeMap[taskId] = endTime
+	}
+	tasks := make([]models.Task, 0)
+	session := des.Table("task").Where("task.status = ?", models.TaskStatusDone)
+	err = session.Find(&tasks)
+	if err != nil {
+		fmt.Printf("already done task get failed:%v\r\n", err.Error())
+		return
+	}
+	updateNum := 0
+	for _, task := range tasks {
+		taskUpdate := models.Task{}
+		endTime, ok := taskEndTimeMap[task.Id]
+		if !ok {
+			fmt.Printf("task %s relate action end time not exist\r\n", task.Name)
+		}
+		taskUpdate.EndDate = endTime
+		_, err = des.Where("id = ?", task.Id).Update(taskUpdate)
+		if err != nil {
+			fmt.Printf("task end date update error:%v\r\n", err.Error())
+			return
+		}
+		updateNum++
+	}
+	fmt.Printf("task end date init success:%v\r\n", updateNum)
+	return
 }
 
 func initUserResourceTime(des *xorm.Engine, userId int) {
