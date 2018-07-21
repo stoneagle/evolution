@@ -13,12 +13,17 @@ type Project struct {
 	Name                string    `xorm:"not null default '' comment('名称') VARCHAR(255)" structs:"name,omitempty"`
 	QuestTargetId       int       `xorm:"not null default 0 comment('所属target') INT(11)" structs:"quest_target_id,omitempty"`
 	StartDate           time.Time `xorm:"not null comment('开始日期') DATETIME"`
-	Duration            int       `xorm:"not null default 0 comment('持续时间') INT(11)" structs:"duration,omitempty"`
+	Status              int       `xorm:"not null default 1 comment('当前状态:1未完成2已完成') INT(11)" structs:"status,omitempty"`
 
 	Quest       *Quest       `xorm:"-" structs:"-" json:"Quest,omitempty"`
 	QuestTarget *QuestTarget `xorm:"-" structs:"-" json:"QuestTarget,omitempty"`
 	Area        *Area        `xorm:"-" structs:"-" json:"Area,omitempty"`
 }
+
+var (
+	ProjectStatusWait   = 1
+	ProjectStatusFinish = 2
+)
 
 type ProjectJoin struct {
 	Project     Project `xorm:"extends" json:"-"`

@@ -4,8 +4,6 @@ import (
 	"evolution/backend/common/logger"
 	"evolution/backend/common/structs"
 	"evolution/backend/time/models"
-	"math"
-	"time"
 
 	"github.com/go-redis/redis"
 	"github.com/go-xorm/xorm"
@@ -24,17 +22,6 @@ func NewTask(engine *xorm.Engine, cache *redis.Client, log *logger.Logger) *Task
 
 func (s *Task) Update(id int, modelPtr structs.ModelGeneral) (err error) {
 	taskPtr := modelPtr.(*models.Task)
-	emptyTime := time.Time{}
-	if taskPtr.EndDate != emptyTime {
-		task := models.NewTask()
-		err := s.One(id, task)
-		if err != nil {
-			return err
-		}
-		diffHours := taskPtr.EndDate.Sub(task.StartDate).Hours()
-		taskPtr.Duration = int(math.Ceil(diffHours / 24))
-	}
-
 	err = s.Update(id, taskPtr)
 	if err != nil {
 		return

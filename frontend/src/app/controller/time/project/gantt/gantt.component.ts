@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { EJ_GANTT_COMPONENTS }          from 'ej-angular2/src/ej/gantt.component';
-import { TranslateService }             from '@ngx-translate/core';
+import { InternationalConfig as N18 }   from '../../../../service/base/international.service';
 
 import { Quest }             from '../../../../model/time/quest';
 import { Project }           from '../../../../model/time/project';
@@ -36,7 +36,6 @@ export class ProjectGanttComponent implements OnInit {
     private resourceService: ResourceService,
     private syncfusionService: SyncfusionService,
     private signService: SignService,
-    private translateService: TranslateService
   ) { }
 
   data: Gantt[] = [];
@@ -50,14 +49,26 @@ export class ProjectGanttComponent implements OnInit {
   ganttHeaderSettings: any;
 
   ngOnInit() {
-    this.ganttStartDate = new Date(new Date().setMonth(new Date().getMonth() - 3));
-    this.ganttEndDate = new Date(new Date().setMonth(new Date().getMonth() + 3));
     this.ganttHeaderSettings = {
         scheduleHeaderType: ej.Gantt.ScheduleHeaderType.Month,
         monthHeaderFormat: "yyyy MMM",
         weekHeaderFormat: "M/dd",
     }
     this.syncfusionService.ListGantt().subscribe(gantts => {
+      let tmpEarlyDate: Date = new Date();
+      let tmpLateDate: Date = new Date();
+      gantts.forEach((one, k) => {
+        let startDate = new Date(one.StartDate)
+        if (startDate < tmpEarlyDate) {
+          tmpEarlyDate = startDate;
+        }
+        let endDate = new Date(one.EndDate)
+        if (endDate > tmpLateDate) {
+          tmpLateDate = endDate;
+        }
+      })
+      this.ganttStartDate = tmpEarlyDate;
+      this.ganttEndDate = new Date(tmpLateDate.setMonth(tmpLateDate.getMonth() + 1));
       this.data = gantts;
     })
 		this.editSettings = {
@@ -90,10 +101,9 @@ export class ProjectGanttComponent implements OnInit {
           columns[k].visible = false;
           break;
         case "Name":
-          this.translateService.get('TIME.RESOURCE.PROJECT.NAME').subscribe(result => {
-            columns[k].headerText = result;
-          });
-          columns[k].width = "300";
+          let projectName       = N18.settings.TIME.RESOURCE.PROJECT.CONCEPT;
+          columns[k].headerText = projectName;
+          columns[k].width      = "300";
           break;
       }
     });
@@ -113,17 +123,25 @@ export class ProjectGanttComponent implements OnInit {
       visible: false,
       headerText: "Color",
     };
+    var statusColumn = {
+      field: "Color",
+      mappingName: "Color",
+      allowEditing: false,
+      visible: false,
+      headerText: "Color",
+    };
     columns.push(relateColumn);
     columns.push(colorColumn);
   }
 
   onGanttContextMenuOpen($event): void {
-    let questName = this.translateService.instant('TIME.RESOURCE.QUEST.CONCEPT');
-    let projectName = this.translateService.instant('TIME.RESOURCE.PROJECT.CONCEPT');
-    let taskName = this.translateService.instant('TIME.RESOURCE.TASK.CONCEPT');
-    let processCreate = this.translateService.instant('SYSTEM.PROCESS.CREATE');
-    let processUpdate = this.translateService.instant('SYSTEM.PROCESS.UPDATE');
-    let processDelete = this.translateService.instant('SYSTEM.PROCESS.DELETE');
+    let questName     = N18.settings.TIME.RESOURCE.QUEST.CONCEPT;
+    let projectName   = N18.settings.TIME.RESOURCE.PROJECT.CONCEPT;
+    let taskName      = N18.settings.TIME.RESOURCE.TASK.CONCEPT;
+    let processCreate = N18.settings.SYSTEM.PROCESS.CREATE;
+    let processUpdate = N18.settings.SYSTEM.PROCESS.UPDATE;
+    let processDelete = N18.settings.SYSTEM.PROCESS.DELETE;
+
     let self = this;
     $event.contextMenuItems = [];
     let questUpdateItem = {
@@ -258,11 +276,14 @@ export class ProjectGanttComponent implements OnInit {
   onGanttQueryTaskbarInfo($event): void {
     if (($event.data.Color != undefined) && ($event.data.Color != "")) {
       let color = $event.data.Color;
-      $event.parentTaskbarBackground = color;
+      // $event.parentTaskbarBackground = color;
       $event.parentProgressbarBackground = color;
     }
   }
 
   onGanttRowSelected($event): void {
+  }
+
+  disabled($event) {
   }
 }

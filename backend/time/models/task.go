@@ -17,8 +17,7 @@ type Task struct {
 	Desc                string    `xorm:"comment('描述') TEXT" structs:"desc,omitempty"`
 	StartDate           time.Time `xorm:"comment('开始日期') DATETIME"`
 	EndDate             time.Time `xorm:"comment('结束日期') DATETIME"`
-	Duration            int       `xorm:"not null comment('持续时间') INT(11)" structs:"duration,omitempty"`
-	Status              int       `xorm:"not null default 0 comment('当前状态:1未分配2准备做3执行中4已完成') INT(11)" structs:"status,omitempty"`
+	Status              int       `xorm:"not null default 1 comment('当前状态:1未分配2准备做3执行中4已完成') INT(11)" structs:"status,omitempty"`
 
 	Resource       *Resource    `xorm:"-" structs:"-" json:"Resource,omitempty"`
 	Project        *Project     `xorm:"-" structs:"-" json:"Project,omitempty"`

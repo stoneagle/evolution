@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, Output, ViewChild } from '@angular/core';
 import { EJ_SCHEDULE_COMPONENTS }                      from 'ej-angular2/src/ej/schedule.component';
-import { TranslateService }                            from '@ngx-translate/core';
+import { InternationalConfig as N18 }   from '../../../../service/base/international.service';
 
 import { Action }              from '../../../../model/time/action';
 import { Schedule }            from '../../../../model/time/syncfusion';
@@ -28,7 +28,6 @@ export class ActionScheduleComponent implements OnInit {
     private actionService: ActionService,
     private syncfusionService: SyncfusionService,
     private signService: SignService,
-    private translateService: TranslateService,
   ) { }
 
   ngOnInit() {
@@ -41,31 +40,29 @@ export class ActionScheduleComponent implements OnInit {
       recurrence:"Recurrence",
       recurrenceRule:"RecurrenceRule",
     }
-    let dataManager = this.syncfusionService.GetScheduleManager();
-    this.scheduleData = dataManager;
-    this.translateService.get('TIME.RESOURCE.ACTION.CONCEPT').subscribe(actionName => {
-      let processCreate = this.translateService.instant('SYSTEM.PROCESS.CREATE');
-      let processUpdate = this.translateService.instant('SYSTEM.PROCESS.UPDATE');
-      let processDelete = this.translateService.instant('SYSTEM.PROCESS.DELETE');
-      this.scheduleMenuItems = {
-        appointment: [
-          {
-              id: "update-action",
-              text: processUpdate + actionName
-          },
-          {
-              id: "delete-action",
-              text: processDelete + actionName
-          },
-        ],
-        cells: [
-          {
-            id: "add-action",
-            text: processCreate + actionName,
-          }
-        ]
-      };
-    });
+    this.scheduleData      = this.syncfusionService.GetScheduleManager();
+    let actionName    = N18.settings.TIME.RESOURCE.ACTION.CONCEPT;
+    let processCreate = N18.settings.SYSTEM.PROCESS.CREATE;
+    let processUpdate = N18.settings.SYSTEM.PROCESS.UPDATE;
+    let processDelete = N18.settings.SYSTEM.PROCESS.DELETE;
+    this.scheduleMenuItems = {
+      appointment: [
+        {
+            id: "update-action",
+            text: processUpdate + actionName
+        },
+        {
+            id: "delete-action",
+            text: processDelete + actionName
+        },
+      ],
+      cells: [
+        {
+          id: "add-action",
+          text: processCreate + actionName,
+        }
+      ]
+    };
   }
   
   onMenuItemClick($event) {

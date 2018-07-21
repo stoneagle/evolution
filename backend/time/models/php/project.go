@@ -89,12 +89,12 @@ func (c *Project) Transfer(src, des *xorm.Engine, userId int) {
 		}
 		newProject.QuestTarget.QuestId = quest.Id
 		newProject.StartDate = oldProject.Project.StartDate
-		newProject.Duration = oldProject.Project.Duration
 		if oldProject.Project.Del != 0 {
 			newProject.DeletedAt = oldProject.Project.Utime
 		}
 		newProject.CreatedAt = oldProject.Project.Ctime
 		newProject.UpdatedAt = oldProject.Project.Utime
+		newProject.Status = models.ProjectStatusWait
 
 		// base on merge area to insert project and task
 		for areaId, tasksSlice := range newAreaTasksMap {

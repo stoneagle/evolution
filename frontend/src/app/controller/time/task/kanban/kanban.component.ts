@@ -197,7 +197,6 @@ export class TaskKanbanComponent implements OnInit {
         }
         if ($event.data[0].Status == this.taskSettings.Status.Done) {
           task.EndDateReset = true;
-          task.Duration = 0;
         }
 
         // target status

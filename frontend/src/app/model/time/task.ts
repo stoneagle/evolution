@@ -14,7 +14,6 @@ export class Task extends Basic {
   Desc: string;
   StartDate: Date;
   EndDate: Date;
-  Duration: number;
   Status: number;
   Project: Project;
   Resource: Resource;

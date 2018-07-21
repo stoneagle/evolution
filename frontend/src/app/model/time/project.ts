@@ -5,7 +5,7 @@ import { Area }               from './area';
 export class Project extends Basic {
   Name: string;
   StartDate: Date;
-  Duration: number;
+  Status: number;
   QuestTarget: QuestTarget;
   Quest: Quest;
   Area: Area;

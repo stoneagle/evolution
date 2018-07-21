@@ -42,7 +42,7 @@ func (s *Syncfusion) ListKanban(userId int) (kanbans []models.SyncfusionKanban, 
 
 	kanbans = make([]models.SyncfusionKanban, 0)
 	task := models.NewTask()
-	task.QuestTarget.Status = models.QuestTargetStatusWait
+	task.Project.Status = models.ProjectStatusWait
 	task.QuestTarget.QuestIds = questIds
 	tasksGeneralPtr := task.SlicePtr()
 	err = s.Pack.TaskSvc.List(task, tasksGeneralPtr)
@@ -160,7 +160,8 @@ func (s *Syncfusion) ListGantt(userId int) (gantts []models.SyncfusionGantt, err
 	}
 
 	task := models.NewTask()
-	task.QuestTarget.Ids = questIds
+	task.Project.Status = models.ProjectStatusWait
+	task.QuestTarget.QuestIds = questIds
 	tasksGeneralPtr := task.SlicePtr()
 	err = s.Pack.TaskSvc.List(task, tasksGeneralPtr)
 	if err != nil {
@@ -190,7 +191,6 @@ func (s *Syncfusion) ListGantt(userId int) (gantts []models.SyncfusionGantt, err
 	if err != nil {
 		return
 	}
-
 	tasksMap := s.buildTaskMap(tasksPtr)
 	projectsMap := s.buildProjectMap(&projects, tasksMap, fieldsMap)
 	gantts = s.buildQuestSlice(questsPtr, projectsMap)
@@ -210,9 +210,14 @@ func (s *Syncfusion) buildTaskMap(tasksPtr *[]models.Task) map[int][]models.Sync
 		gantt.Name = one.Name
 		gantt.StartDate = one.StartDate
 		gantt.EndDate = one.EndDate
-		gantt.Progress = 0
+		if one.Status == models.TaskStatusDone {
+			gantt.Progress = 100
+		} else {
+			gantt.Progress = 0
+		}
 		diffHours := gantt.EndDate.Sub(gantt.StartDate).Hours()
 		gantt.Duration = int(math.Ceil(diffHours / 24))
+		gantt.Status = one.Status
 		gantt.Expanded = false
 		child := make([]models.SyncfusionGantt, 0)
 		gantt.Children = child
@@ -237,8 +242,9 @@ func (s *Syncfusion) buildProjectMap(projectsPtr *[]models.Project, tasksMap map
 		gantt.Relate = one.Area.Name
 		gantt.Name = one.Name
 		gantt.StartDate = one.StartDate
-		gantt.Progress = 0
+		gantt.Status = one.Status
 		gantt.Expanded = false
+		gantt.Progress = 0
 		if children, ok := tasksMap[one.Id]; ok {
 			gantt.Children = children
 			var maxEndDate time.Time
@@ -252,8 +258,8 @@ func (s *Syncfusion) buildProjectMap(projectsPtr *[]models.Project, tasksMap map
 			gantt.Duration = int(math.Ceil(diffHours / 24))
 		} else {
 			child := make([]models.SyncfusionGantt, 0)
-			gantt.EndDate = one.StartDate
 			gantt.Children = child
+			gantt.EndDate = one.StartDate
 			gantt.Duration = 0
 		}
 		result[one.QuestTarget.QuestId] = append(result[one.QuestTarget.QuestId], gantt)
@@ -268,13 +274,30 @@ func (s *Syncfusion) buildQuestSlice(questsPtr *[]models.Quest, projectsMap map[
 		gantt.Id = one.Id
 		gantt.Parent = 0
 		gantt.Name = one.Name
-		gantt.StartDate = one.StartDate
-		gantt.EndDate = one.EndDate
 		gantt.Progress = 0
-		gantt.Duration = 0
 		gantt.Expanded = false
 		if children, ok := projectsMap[one.Id]; ok {
 			gantt.Children = children
+			minStartDate := time.Now()
+			var maxEndDate time.Time
+			for _, project := range children {
+				if project.StartDate.Before(minStartDate) {
+					minStartDate = project.StartDate
+				}
+				if project.EndDate.After(maxEndDate) {
+					maxEndDate = project.EndDate
+				}
+			}
+			gantt.StartDate = minStartDate
+			gantt.EndDate = maxEndDate
+			diffHours := gantt.EndDate.Sub(gantt.StartDate).Hours()
+			gantt.Duration = int(math.Ceil(diffHours / 24))
+		} else {
+			child := make([]models.SyncfusionGantt, 0)
+			gantt.Children = child
+			gantt.StartDate = one.StartDate
+			gantt.EndDate = one.EndDate
+			gantt.Duration = 0
 		}
 		result = append(result, gantt)
 	}

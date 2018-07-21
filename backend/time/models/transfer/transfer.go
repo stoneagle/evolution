@@ -3,6 +3,7 @@ package main
 import (
 	"evolution/backend/common/config"
 	"evolution/backend/time/models"
+	"evolution/backend/time/models/php"
 	"fmt"
 	"io/ioutil"
 	"strconv"
@@ -86,24 +87,25 @@ func main() {
 	srcEng.Charset("utf8")
 	// srcEng.ShowSQL(true)
 
-	// userId := 1
-	// new(php.Area).Transfer(srcEng, destEng)
-	// initAreaType(destEng)
-	// new(php.Country).Transfer(srcEng, destEng)
-	// initField(destEng)
-	// initPhase(destEng)
-	// new(php.EntityAsset).Transfer(srcEng, destEng)
-	// new(php.EntityCircle).Transfer(srcEng, destEng)
-	// new(php.EntityQuest).Transfer(srcEng, destEng)
-	// new(php.EntityLife).Transfer(srcEng, destEng)
-	// new(php.EntityWork).Transfer(srcEng, destEng)
-	// new(php.EntitySkill).Transfer(srcEng, destEng)
-	// new(php.TargetEntityLink).Transfer(srcEng, destEng, userId)
-	// new(php.Target).Transfer(srcEng, destEng, userId)
-	// new(php.Project).Transfer(srcEng, destEng, userId)
-	// initUserResourceTime(destEng, userId)
+	userId := 1
+	new(php.Area).Transfer(srcEng, destEng)
+	initAreaType(destEng)
+	new(php.Country).Transfer(srcEng, destEng)
+	initField(destEng)
+	initPhase(destEng)
+	new(php.EntityAsset).Transfer(srcEng, destEng)
+	new(php.EntityCircle).Transfer(srcEng, destEng)
+	new(php.EntityQuest).Transfer(srcEng, destEng)
+	new(php.EntityLife).Transfer(srcEng, destEng)
+	new(php.EntityWork).Transfer(srcEng, destEng)
+	new(php.EntitySkill).Transfer(srcEng, destEng)
+	new(php.TargetEntityLink).Transfer(srcEng, destEng, userId)
+	new(php.Target).Transfer(srcEng, destEng, userId)
+	new(php.Project).Transfer(srcEng, destEng, userId)
+	initUserResourceTime(destEng, userId)
 	initTaskEndDate(destEng)
-	// initQuestAndTargetStatus(destEng)
+	initProjectStatus(destEng)
+	initQuestAndTargetStatus(destEng)
 }
 
 func initQuestAndTargetStatus(des *xorm.Engine) {
@@ -164,6 +166,36 @@ func initQuestAndTargetStatus(des *xorm.Engine) {
 		}
 	}
 	fmt.Printf("quest status init success:%v\r\n", updateNum)
+}
+
+func initProjectStatus(des *xorm.Engine) {
+	projects := make([]models.Project, 0)
+	sql := des.Table("project")
+	err := sql.Find(&projects)
+	if err != nil {
+		fmt.Printf("project list get failed:%v\r\n", err.Error())
+	}
+	updateNum := 0
+	for _, project := range projects {
+		tasks := make([]models.Task, 0)
+		sql := des.Table("task").Where("status != ?", models.TaskStatusDone).And("project_id = ?", project.Id)
+		err := sql.Find(&tasks)
+		if err != nil {
+			fmt.Printf("project relate task get error:%v\r\n", err.Error())
+			return
+		}
+		if len(tasks) == 0 {
+			projectUpdate := models.Project{}
+			projectUpdate.Status = models.ProjectStatusFinish
+			_, err = des.Where("id = ?", project.Id).Update(projectUpdate)
+			if err != nil {
+				fmt.Printf("project status update error:%v\r\n", err.Error())
+				return
+			}
+			updateNum++
+		}
+	}
+	fmt.Printf("project status init success:%v\r\n", updateNum)
 }
 
 func initTaskEndDate(des *xorm.Engine) {

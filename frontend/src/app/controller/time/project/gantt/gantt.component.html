@@ -4,6 +4,10 @@
   [scheduleEndDate]="ganttEndDate"
   [dataSource]="data"
   [allowColumnResize]="true"
+  [enableProgressBarResizing]="false"
+  [enableResize]="false"
+  [enableTaskbarDragTooltip]="false"
+  [allowDragAndDrop]="false"
   taskIdMapping= "Id"
   taskNameMapping= "Name"
   childMapping="Children" 
@@ -31,8 +35,6 @@
   (load)="onGanttLoad($event)">
 >
 </ej-gantt>
-  <!-- [allowGanttChartEditing]="true" -->
-  <!-- [allowMultiSorting]="true" -->
 
 <time-project-save (save)="projectSaved($event)"></time-project-save>
 <time-task-save (save)="taskSaved($event)"></time-task-save>
