@@ -45,7 +45,18 @@ export class ProjectGanttComponent implements OnInit {
   treeColumnIndex: number;
   selectGanttData: any;
 
+  ganttStartDate: Date;
+  ganttEndDate: Date;
+  ganttHeaderSettings: any;
+
   ngOnInit() {
+    this.ganttStartDate = new Date(new Date().setMonth(new Date().getMonth() - 3));
+    this.ganttEndDate = new Date(new Date().setMonth(new Date().getMonth() + 3));
+    this.ganttHeaderSettings = {
+        scheduleHeaderType: ej.Gantt.ScheduleHeaderType.Month,
+        monthHeaderFormat: "yyyy MMM",
+        weekHeaderFormat: "M/dd",
+    }
     this.syncfusionService.ListGantt().subscribe(gantts => {
       this.data = gantts;
     })
@@ -86,7 +97,7 @@ export class ProjectGanttComponent implements OnInit {
           break;
       }
     });
-    var customColumn = {
+    var relateColumn = {
       field: "Relate",
       mappingName: "Relate",
       allowEditing: true,
@@ -95,7 +106,15 @@ export class ProjectGanttComponent implements OnInit {
       // isTemplateColumn: true,
       // template: "{{if eResourceTaskType=='resourceTask'}} <span style='padding:10px;'> {{if eOverlapped}} Yes {{else}} No {{/if}} </span> {{/if}}"
     };
-    columns.push(customColumn);
+    var colorColumn = {
+      field: "Color",
+      mappingName: "Color",
+      allowEditing: false,
+      visible: false,
+      headerText: "Color",
+    };
+    columns.push(relateColumn);
+    columns.push(colorColumn);
   }
 
   onGanttContextMenuOpen($event): void {
@@ -234,5 +253,16 @@ export class ProjectGanttComponent implements OnInit {
   }
 
   questSaved($event): void {
+  }
+
+  onGanttQueryTaskbarInfo($event): void {
+    if (($event.data.Color != undefined) && ($event.data.Color != "")) {
+      let color = $event.data.Color;
+      $event.parentTaskbarBackground = color;
+      $event.parentProgressbarBackground = color;
+    }
+  }
+
+  onGanttRowSelected($event): void {
   }
 }

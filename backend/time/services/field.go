@@ -20,17 +20,17 @@ func NewField(engine *xorm.Engine, cache *redis.Client, log *logger.Logger) *Fie
 	return &ret
 }
 
-func (s *Field) Map() (fieldsMap map[int]string, err error) {
+func (s *Field) Map() (fieldsMap map[int]models.Field, err error) {
 	field := models.NewField()
 	fieldsGeneralPtr := field.SlicePtr()
 	err = s.List(field, fieldsGeneralPtr)
 	if err != nil {
 		return
 	}
-	fieldsMap = map[int]string{}
+	fieldsMap = map[int]models.Field{}
 	fieldsPtr := field.Transfer(fieldsGeneralPtr)
 	for _, one := range *fieldsPtr {
-		fieldsMap[one.Id] = one.Name
+		fieldsMap[one.Id] = one
 	}
 	return
 }

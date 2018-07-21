@@ -59,13 +59,13 @@ func (c *Area) ListAllTree(ctx *gin.Context) {
 	}
 	areasPtr := c.AreaModel.Transfer(areasGeneralPtr)
 
-	fieldMap, err := c.FieldSvc.Map()
+	fieldsMap, err := c.FieldSvc.Map()
 	if err != nil {
 		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "field Id Map get faield", err)
 		return
 	}
 
-	areaTrees, err := c.AreaSvc.TransferListToTree(areasPtr, fieldMap)
+	areaTrees, err := c.AreaSvc.TransferListToTree(areasPtr, fieldsMap)
 	if err != nil {
 		resp.ErrorBusiness(ctx, resp.ErrorDataTransfer, "area tree transfer error", err)
 		return
@@ -133,12 +133,12 @@ func (c *Area) ListOneTree(ctx *gin.Context) {
 	}
 	areas := area.Transfer(areasPtr)
 
-	fieldMap, err := c.FieldSvc.Map()
+	fieldsMap, err := c.FieldSvc.Map()
 	if err != nil {
 		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "field Id Map get faield", err)
 		return
 	}
-	areaTrees, err := c.AreaSvc.TransferListToTree(areas, fieldMap)
+	areaTrees, err := c.AreaSvc.TransferListToTree(areas, fieldsMap)
 	if err != nil {
 		resp.ErrorBusiness(ctx, resp.ErrorDataTransfer, "area tree transfer error", err)
 		return
@@ -146,13 +146,13 @@ func (c *Area) ListOneTree(ctx *gin.Context) {
 
 	_, ok := areaTrees[fieldId]
 	if !ok {
-		fieldName, exist := fieldMap[fieldId]
+		field, exist := fieldsMap[fieldId]
 		if !exist {
 			resp.ErrorBusiness(ctx, resp.ErrorDataTransfer, "area tree transfer error:field id not exist", nil)
 			return
 		}
 		areaTrees[fieldId] = models.AreaTree{
-			Value:    fieldName,
+			Value:    field.Name,
 			Children: make([]models.AreaNode, 0),
 		}
 	}

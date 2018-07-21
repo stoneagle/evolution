@@ -3,7 +3,6 @@ package main
 import (
 	"evolution/backend/common/config"
 	"evolution/backend/time/models"
-	"evolution/backend/time/models/php"
 	"fmt"
 	"io/ioutil"
 	"strconv"
@@ -87,24 +86,24 @@ func main() {
 	srcEng.Charset("utf8")
 	// srcEng.ShowSQL(true)
 
-	userId := 1
-	new(php.Area).Transfer(srcEng, destEng)
-	initAreaType(destEng)
-	new(php.Country).Transfer(srcEng, destEng)
-	initField(destEng)
-	initPhase(destEng)
-	new(php.EntityAsset).Transfer(srcEng, destEng)
-	new(php.EntityCircle).Transfer(srcEng, destEng)
-	new(php.EntityQuest).Transfer(srcEng, destEng)
-	new(php.EntityLife).Transfer(srcEng, destEng)
-	new(php.EntityWork).Transfer(srcEng, destEng)
-	new(php.EntitySkill).Transfer(srcEng, destEng)
-	new(php.TargetEntityLink).Transfer(srcEng, destEng, userId)
-	new(php.Target).Transfer(srcEng, destEng, userId)
-	new(php.Project).Transfer(srcEng, destEng, userId)
-	initUserResourceTime(destEng, userId)
+	// userId := 1
+	// new(php.Area).Transfer(srcEng, destEng)
+	// initAreaType(destEng)
+	// new(php.Country).Transfer(srcEng, destEng)
+	// initField(destEng)
+	// initPhase(destEng)
+	// new(php.EntityAsset).Transfer(srcEng, destEng)
+	// new(php.EntityCircle).Transfer(srcEng, destEng)
+	// new(php.EntityQuest).Transfer(srcEng, destEng)
+	// new(php.EntityLife).Transfer(srcEng, destEng)
+	// new(php.EntityWork).Transfer(srcEng, destEng)
+	// new(php.EntitySkill).Transfer(srcEng, destEng)
+	// new(php.TargetEntityLink).Transfer(srcEng, destEng, userId)
+	// new(php.Target).Transfer(srcEng, destEng, userId)
+	// new(php.Project).Transfer(srcEng, destEng, userId)
+	// initUserResourceTime(destEng, userId)
 	initTaskEndDate(destEng)
-	initQuestAndTargetStatus(destEng)
+	// initQuestAndTargetStatus(destEng)
 }
 
 func initQuestAndTargetStatus(des *xorm.Engine) {
@@ -197,7 +196,7 @@ func initTaskEndDate(des *xorm.Engine) {
 		taskEndTimeMap[taskId] = endTime
 	}
 	tasks := make([]models.Task, 0)
-	session := des.Table("task").Where("task.status = ?", models.TaskStatusDone)
+	session := des.Table("task")
 	err = session.Find(&tasks)
 	if err != nil {
 		fmt.Printf("already done task get failed:%v\r\n", err.Error())

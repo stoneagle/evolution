@@ -2,6 +2,7 @@ package services
 
 import (
 	"errors"
+	"math"
 
 	"github.com/go-redis/redis"
 	"github.com/go-xorm/xorm"
@@ -25,30 +26,18 @@ func NewSyncfusion(engine *xorm.Engine, cache *redis.Client, log *logger.Logger)
 }
 
 func (s *Syncfusion) ListKanban(userId int) (kanbans []models.SyncfusionKanban, err error) {
-	questTeam := models.NewQuestTeam()
-	questTeam.UserId = userId
-	questTeam.Quest.Status = models.QuestStatusExec
-	questTeamsGeneralPtr := questTeam.SlicePtr()
-	err = s.Pack.QuestTeamSvc.List(questTeam, questTeamsGeneralPtr)
+	questsPtr, err := s.Pack.QuestTeamSvc.GetQuestsByUser(userId, models.QuestStatusExec)
 	if err != nil {
 		return
 	}
-	questTeamsPtr := questTeam.Transfer(questTeamsGeneralPtr)
 	questIds := make([]int, 0)
-	for _, one := range *questTeamsPtr {
-		questIds = append(questIds, one.QuestId)
+	for _, one := range *questsPtr {
+		questIds = append(questIds, one.Id)
 	}
 
-	field := models.NewField()
-	fieldsGeneralPtr := field.SlicePtr()
-	err = s.Pack.FieldSvc.List(field, fieldsGeneralPtr)
+	fieldsMap, err := s.Pack.FieldSvc.Map()
 	if err != nil {
 		return
-	}
-	fieldsPtr := field.Transfer(fieldsGeneralPtr)
-	fieldsMap := make(map[int]models.Field)
-	for _, one := range *fieldsPtr {
-		fieldsMap[one.Id] = one
 	}
 
 	kanbans = make([]models.SyncfusionKanban, 0)
@@ -161,21 +150,13 @@ func (s *Syncfusion) ListTreeGrid(fieldId, parentId int) (treeGrids []models.Syn
 }
 
 func (s *Syncfusion) ListGantt(userId int) (gantts []models.SyncfusionGantt, err error) {
-	questTeam := models.NewQuestTeam()
-	questTeam.UserId = userId
-	questTeam.Quest.Status = models.QuestStatusExec
-	questTeamsGeneralPtr := questTeam.SlicePtr()
-	err = s.Pack.QuestTeamSvc.List(questTeam, questTeamsGeneralPtr)
+	questsPtr, err := s.Pack.QuestTeamSvc.GetQuestsByUser(userId, models.QuestStatusExec)
 	if err != nil {
 		return
 	}
-	questTeamsPtr := questTeam.Transfer(questTeamsGeneralPtr)
-
 	questIds := make([]int, 0)
-	quests := make([]models.Quest, 0)
-	for _, one := range *questTeamsPtr {
-		questIds = append(questIds, one.QuestId)
-		quests = append(quests, *one.Quest)
+	for _, one := range *questsPtr {
+		questIds = append(questIds, one.Id)
 	}
 
 	task := models.NewTask()
@@ -205,9 +186,14 @@ func (s *Syncfusion) ListGantt(userId int) (gantts []models.SyncfusionGantt, err
 		projects = append(projects, *project)
 	}
 
+	fieldsMap, err := s.Pack.FieldSvc.Map()
+	if err != nil {
+		return
+	}
+
 	tasksMap := s.buildTaskMap(tasksPtr)
-	projectsMap := s.buildProjectMap(&projects, tasksMap)
-	gantts = s.buildQuestSlice(quests, projectsMap)
+	projectsMap := s.buildProjectMap(&projects, tasksMap, fieldsMap)
+	gantts = s.buildQuestSlice(questsPtr, projectsMap)
 	return
 }
 
@@ -225,7 +211,8 @@ func (s *Syncfusion) buildTaskMap(tasksPtr *[]models.Task) map[int][]models.Sync
 		gantt.StartDate = one.StartDate
 		gantt.EndDate = one.EndDate
 		gantt.Progress = 0
-		gantt.Duration = 0
+		diffHours := gantt.EndDate.Sub(gantt.StartDate).Hours()
+		gantt.Duration = int(math.Ceil(diffHours / 24))
 		gantt.Expanded = false
 		child := make([]models.SyncfusionGantt, 0)
 		gantt.Children = child
@@ -234,20 +221,23 @@ func (s *Syncfusion) buildTaskMap(tasksPtr *[]models.Task) map[int][]models.Sync
 	return result
 }
 
-func (s *Syncfusion) buildProjectMap(projectsPtr *[]models.Project, tasksMap map[int][]models.SyncfusionGantt) map[int][]models.SyncfusionGantt {
+func (s *Syncfusion) buildProjectMap(projectsPtr *[]models.Project, tasksMap map[int][]models.SyncfusionGantt, fieldsMap map[int]models.Field) map[int][]models.SyncfusionGantt {
 	result := make(map[int][]models.SyncfusionGantt)
 	for _, one := range *projectsPtr {
 		if _, ok := result[one.QuestTarget.QuestId]; !ok {
 			result[one.QuestTarget.QuestId] = make([]models.SyncfusionGantt, 0)
 		}
 		gantt := models.SyncfusionGantt{}
+		field, ok := fieldsMap[one.Area.FieldId]
+		if ok {
+			gantt.Color = field.Color
+		}
 		gantt.Id = one.Id
 		gantt.Parent = one.QuestTarget.QuestId
 		gantt.Relate = one.Area.Name
 		gantt.Name = one.Name
 		gantt.StartDate = one.StartDate
 		gantt.Progress = 0
-		gantt.Duration = 0
 		gantt.Expanded = false
 		if children, ok := tasksMap[one.Id]; ok {
 			gantt.Children = children
@@ -258,19 +248,22 @@ func (s *Syncfusion) buildProjectMap(projectsPtr *[]models.Project, tasksMap map
 				}
 			}
 			gantt.EndDate = maxEndDate
+			diffHours := gantt.EndDate.Sub(gantt.StartDate).Hours()
+			gantt.Duration = int(math.Ceil(diffHours / 24))
 		} else {
 			child := make([]models.SyncfusionGantt, 0)
 			gantt.EndDate = one.StartDate
 			gantt.Children = child
+			gantt.Duration = 0
 		}
 		result[one.QuestTarget.QuestId] = append(result[one.QuestTarget.QuestId], gantt)
 	}
 	return result
 }
 
-func (s *Syncfusion) buildQuestSlice(quests []models.Quest, projectsMap map[int][]models.SyncfusionGantt) []models.SyncfusionGantt {
+func (s *Syncfusion) buildQuestSlice(questsPtr *[]models.Quest, projectsMap map[int][]models.SyncfusionGantt) []models.SyncfusionGantt {
 	result := make([]models.SyncfusionGantt, 0)
-	for _, one := range quests {
+	for _, one := range *questsPtr {
 		gantt := models.SyncfusionGantt{}
 		gantt.Id = one.Id
 		gantt.Parent = 0

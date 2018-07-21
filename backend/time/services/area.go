@@ -24,7 +24,7 @@ func NewArea(engine *xorm.Engine, cache *redis.Client, log *logger.Logger) *Area
 	return &ret
 }
 
-func (s *Area) TransferListToTree(areasPtr *[]models.Area, fieldMap map[int]string) (areaTrees map[int]models.AreaTree, err error) {
+func (s *Area) TransferListToTree(areasPtr *[]models.Area, fieldsMap map[int]models.Field) (areaTrees map[int]models.AreaTree, err error) {
 	areaTrees = make(map[int]models.AreaTree)
 buildTreeLoop:
 	leftArea := make([]models.Area, 0)
@@ -35,16 +35,16 @@ buildTreeLoop:
 			Children: make([]models.AreaNode, 0),
 		}
 
-		fieldName, exist := fieldMap[one.FieldId]
+		field, exist := fieldsMap[one.FieldId]
 		if !exist {
-			err = errors.New("field Id not exist")
+			err = errors.New("field not exist")
 			return
 		}
 
 		_, ok := areaTrees[one.FieldId]
 		if !ok {
 			areaTrees[one.FieldId] = models.AreaTree{
-				Value:    fieldName,
+				Value:    field.Name,
 				Children: make([]models.AreaNode, 0),
 			}
 		}

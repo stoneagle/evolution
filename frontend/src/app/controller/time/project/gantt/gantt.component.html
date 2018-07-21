@@ -1,5 +1,7 @@
 <ej-gantt 
   id="GanttPanel" 
+  [scheduleStartDate]="ganttStartDate" 
+  [scheduleEndDate]="ganttEndDate"
   [dataSource]="data"
   [allowColumnResize]="true"
   taskIdMapping= "Id"
@@ -12,20 +14,23 @@
   parentTaskIdMapping="Parent"
   startDateMapping= "StartDate"
   endDateMapping="EndDate"
+  [allowSelection]="true"
+  selectionMode="row"
   rightTaskLabelMapping="Relate"
+  [scheduleHeaderSettings]="ganttHeaderSettings"
   [enableVirtualization]="true"
   [treeColumnIndex]=treeColumnIndex  
-  sizeSettings.height="450px" 
+  sizeSettings.height="600px" 
   sizeSettings.width="100%"
   [enableContextMenu]="true"
   [toolbarSettings]="toolbarSettings" 
   [editSettings]="editSettings"
   (contextMenuOpen)="onGanttContextMenuOpen($event)"
+  (queryTaskbarInfo)="onGanttQueryTaskbarInfo($event)"
+  (rowSelected)="onGanttRowSelected($event)"
   (load)="onGanttLoad($event)">
 >
 </ej-gantt>
-  <!-- scheduleStartDate="02/01/2014" --> 
-  <!-- scheduleEndDate="04/09/2014" -->
   <!-- [allowGanttChartEditing]="true" -->
   <!-- [allowMultiSorting]="true" -->
 

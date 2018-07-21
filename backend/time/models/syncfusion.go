@@ -12,6 +12,7 @@ type SyncfusionGantt struct {
 	Progress  int
 	Duration  int
 	Expanded  bool
+	Color     string
 	StartDate time.Time
 	EndDate   time.Time
 	Children  []SyncfusionGantt
