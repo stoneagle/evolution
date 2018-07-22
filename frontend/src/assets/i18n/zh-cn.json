@@ -12,7 +12,8 @@
       }
     },
     "ERROR": {
-      "TARGET_NOT_FINISH": "目标未完成"
+      "TARGET_NOT_FINISH": "目标未完成",
+      "PROJECT_NOT_FINISH": "项目未完成"
     },
     "RESOURCE": {
       "COUNTRY": {
@@ -45,7 +46,11 @@
         "QUEST": "所属探索",
         "AREA": "所属领域",
         "STARTDATE": "开始时间",
-        "DURATION": "持续时间"
+        "DURATION": "持续时间",
+        "STATUS_NAME": {
+          "WAIT": "未完成",
+          "FINISH": "已完成"
+        }
       },
       "TASK": {
         "CONCEPT": "任务",

@@ -1,14 +1,14 @@
 import { Component, OnInit, Output, Input, EventEmitter } from '@angular/core'; 
 
-import { Project }             from '../../../../model/time/project';
-import { Quest, QuestTarget }  from '../../../../model/time/quest';
-import { Area }                from '../../../../model/time/area';
-import { Task }                from '../../../../model/time/task';
-import { Resource }            from '../../../../model/time/resource';
-import { TaskService  }        from '../../../../service/time/task.service';
-import { ProjectService  }     from '../../../../service/time/project.service';
-import { QuestService  }       from '../../../../service/time/quest.service';
-import { QuestTargetService  } from '../../../../service/time/quest-target.service';
+import { Project, ProjectSettings } from '../../../../model/time/project';
+import { Quest, QuestTarget }       from '../../../../model/time/quest';
+import { Area }                     from '../../../../model/time/area';
+import { Task }                     from '../../../../model/time/task';
+import { Resource }                 from '../../../../model/time/resource';
+import { TaskService  }             from '../../../../service/time/task.service';
+import { ProjectService  }          from '../../../../service/time/project.service';
+import { QuestService  }            from '../../../../service/time/quest.service';
+import { QuestTargetService  }      from '../../../../service/time/quest-target.service';
 
 @Component({
   selector: 'time-project-save',
@@ -19,7 +19,7 @@ import { QuestTargetService  } from '../../../../service/time/quest-target.servi
 export class ProjectSaveComponent implements OnInit {
   project: Project;
   modelOpened: boolean = false;
-  areaMaps: Map<number, Area> = new Map();
+  questTargetMaps: Map<number, QuestTarget> = new Map();
   tasks: Task[] = [];
 
   @Output() save = new EventEmitter<Project>();
@@ -29,6 +29,7 @@ export class ProjectSaveComponent implements OnInit {
     private projectService: ProjectService,
     private questService: QuestService,
     private questTargetService: QuestTargetService,
+    private projectSettings: ProjectSettings,
   ) { }
 
   ngOnInit() {
@@ -41,7 +42,7 @@ export class ProjectSaveComponent implements OnInit {
       questTarget.QuestId = questId;
       this.questTargetService.List(questTarget).subscribe(targets => {
         targets.forEach((one, k) => {
-          this.areaMaps.set(one.Area.Id, one.Area);
+          this.questTargetMaps.set(one.Id, one);
         })
       })
 
@@ -53,14 +54,12 @@ export class ProjectSaveComponent implements OnInit {
         });
         this.projectService.Get(id).subscribe(res => {
           this.project = res;
-          this.project.Quest = quest;
-          this.project.QuestTarget.QuestId = this.project.Quest.Id;
           this.modelOpened = true;
         })
       } else {
         this.project = new Project();
         this.project.Quest = quest;
-        this.project.QuestTarget.QuestId = this.project.Quest.Id;
+        this.tasks = [];
         this.modelOpened = true;
       }
     })
@@ -69,12 +68,17 @@ export class ProjectSaveComponent implements OnInit {
   Submit(): void {
     this.project.StartDate = new Date(this.project.StartDate);
     if (this.project.Id == null) {
+      this.project.Status = this.projectSettings.Status.Wait;
       this.projectService.Add(this.project).subscribe(res => {
+        this.project.NewFlag = true;
+        this.project.Id = res.Id;
+        this.project.QuestTarget = this.questTargetMaps.get(this.project.QuestTargetId)
         this.save.emit(this.project);
         this.modelOpened = false;
       })
     } else {
       this.projectService.Update(this.project).subscribe(res => {
+        res.NewFlag = false;
         this.save.emit(this.project);
         this.modelOpened = false;
       })

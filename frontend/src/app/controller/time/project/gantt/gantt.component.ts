@@ -1,6 +1,6 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { EJ_GANTT_COMPONENTS }          from 'ej-angular2/src/ej/gantt.component';
-import { InternationalConfig as N18 }   from '../../../../service/base/international.service';
+import { Component, OnInit, ViewChild, Output, Inject, forwardRef  } from '@angular/core';
+import { EJ_GANTT_COMPONENTS }                                       from 'ej-angular2/src/ej/gantt.component';
+import { InternationalConfig as N18 }                                from '../../../../service/base/international.service';
 
 import { Quest }             from '../../../../model/time/quest';
 import { Project }           from '../../../../model/time/project';
@@ -15,6 +15,7 @@ import { SignService }       from '../../../../service/system/sign.service';
 import { ProjectSaveComponent } from '../save/save.component';
 import { QuestSaveComponent }   from '../../quest/save/save.component';
 import { TaskSaveComponent }    from '../../task/save/save.component';
+import { ShellComponent }       from '../../../../base/shell/shell.component';
 
 @Component({
   selector: 'time-project-gantt',
@@ -36,9 +37,11 @@ export class ProjectGanttComponent implements OnInit {
     private resourceService: ResourceService,
     private syncfusionService: SyncfusionService,
     private signService: SignService,
+    @Inject(forwardRef(() => ShellComponent))
+    private shell: ShellComponent,
   ) { }
 
-  data: Gantt[] = [];
+  data: any;
 	editSettings
   toolbarSettings: any;
   treeColumnIndex: number;
@@ -49,11 +52,14 @@ export class ProjectGanttComponent implements OnInit {
   ganttHeaderSettings: any;
 
   ngOnInit() {
+    this.ganttStartDate = new Date(new Date().setMonth(new Date().getMonth() - 12));
+    this.ganttEndDate = new Date(new Date().setMonth(new Date().getMonth() + 1));
     this.ganttHeaderSettings = {
         scheduleHeaderType: ej.Gantt.ScheduleHeaderType.Month,
         monthHeaderFormat: "yyyy MMM",
         weekHeaderFormat: "M/dd",
     }
+    this.data = this.syncfusionService.GetGanttManager();
     this.syncfusionService.ListGantt().subscribe(gantts => {
       let tmpEarlyDate: Date = new Date();
       let tmpLateDate: Date = new Date();
@@ -69,7 +75,6 @@ export class ProjectGanttComponent implements OnInit {
       })
       this.ganttStartDate = tmpEarlyDate;
       this.ganttEndDate = new Date(tmpLateDate.setMonth(tmpLateDate.getMonth() + 1));
-      this.data = gantts;
     })
 		this.editSettings = {
 				allowDeleting: true,
@@ -88,7 +93,7 @@ export class ProjectGanttComponent implements OnInit {
     }
   }
 
-  onGanttLoad():void {
+  onGanttLoad($event):void {
 		var gantt = $("#GanttPanel").ejGantt("instance");
 		var columns = gantt.getColumns();
     columns.forEach((one, k) => {
@@ -124,14 +129,15 @@ export class ProjectGanttComponent implements OnInit {
       headerText: "Color",
     };
     var statusColumn = {
-      field: "Color",
-      mappingName: "Color",
+      field: "Status",
+      mappingName: "Status",
       allowEditing: false,
       visible: false,
-      headerText: "Color",
+      headerText: "Status",
     };
     columns.push(relateColumn);
     columns.push(colorColumn);
+    columns.push(statusColumn);
   }
 
   onGanttContextMenuOpen($event): void {
@@ -148,7 +154,7 @@ export class ProjectGanttComponent implements OnInit {
       headerText: processUpdate + questName,
       menuId: "quest-update",
       eventHandler: function(args) {
-        self.questSaveComponent.New(args.data.item.Id);
+        self.questSaveComponent.New(self.shell.currentUser.Id, args.data.item.Id);
       },
     }
     let projectAddItem = {
@@ -162,6 +168,7 @@ export class ProjectGanttComponent implements OnInit {
       headerText: processUpdate + projectName,
       menuId: "project-update",
       eventHandler: function(args) {
+        console.log(args);
         self.selectGanttData = args.data;
         self.projectSaveComponent.New(args.data.parentItem.taskId, args.data.taskId);
       },
@@ -212,32 +219,32 @@ export class ProjectGanttComponent implements OnInit {
     }
   }
 
-  projectSaved($event): void {
+  projectSaved($event: Project): void {
     if ($event == undefined) {
       return
     }
-
+    // need ensure index and id unique
     let gantt = $("#GanttPanel").ejGantt("instance");
-    if ($event.Id == null) {
+    if ($event.NewFlag) {
       let newRecord = new Gantt;
       newRecord.Id = $event.Id;
       newRecord.Name = $event.Name;
+      newRecord.Relate = $event.QuestTarget.Area.Name;
       newRecord.StartDate = $event.StartDate;
       newRecord.EndDate = null;
       newRecord.Parent = $event.Quest.Id
       newRecord.Progress = 0;
       newRecord.Duration = 0;
       let rowPosition: any;
-      rowPosition = ej.TreeGrid.RowPosition.Child;
+      rowPosition = ej.Gantt.RowPosition.Child;
       gantt.addRecord(newRecord, rowPosition);
     } else {
-      this.areaService.Get($event.AreaId).subscribe(area => {
-        let newRecord = new Gantt;
-        newRecord.Name = $event.Name;
-        this.selectGanttData.Relate = area.Name;
-        this.selectGanttData.item.Relate = area.Name;
-        gantt.updateRecordByIndex(this.selectGanttData.index, newRecord);
-      })
+      let newRecord = new Gantt;
+      newRecord.Name = $event.Name;
+      this.selectGanttData.Relate = $event.Area.Name;
+      this.selectGanttData.item.Relate = $event.Area.Name;
+      console.log(this.selectGanttData);
+      gantt.updateRecordByIndex(this.selectGanttData.index, newRecord);
     }
   }
 
@@ -245,7 +252,6 @@ export class ProjectGanttComponent implements OnInit {
     if ($event == undefined) {
       return
     }
-
     let gantt = $("#GanttPanel").ejGantt("instance");
     if ($event.Id == null) {
       let newRecord = new Gantt;
@@ -256,8 +262,11 @@ export class ProjectGanttComponent implements OnInit {
       newRecord.Parent = $event.Project.Id
       newRecord.Progress = 0;
       newRecord.Duration = 0;
+      newRecord.Status = 1;
+      newRecord.Relate = "test";
+      newRecord.Color = "green";
       let rowPosition: any;
-      rowPosition = ej.TreeGrid.RowPosition.Child;
+      rowPosition = ej.Gantt.RowPosition.Child;
       gantt.addRecord(newRecord, rowPosition);
     } else {
       this.resourceService.Get($event.ResourceId).subscribe(resource => {

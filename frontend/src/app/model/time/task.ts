@@ -19,6 +19,8 @@ export class Task extends Basic {
   Resource: Resource;
   QuestTarget: QuestTarget;
   Area: Area;
+  StartDateReset: boolean;
+  EndDateReset: boolean;
   constructor (json?: any) {
     if (json != undefined) {
       super(json)
@@ -29,9 +31,6 @@ export class Task extends Basic {
       this.QuestTarget = new QuestTarget();
     }
   }
-
-  StartDateReset: boolean;
-  EndDateReset: boolean;
 }
 
 export class TaskSettings {

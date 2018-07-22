@@ -96,7 +96,7 @@ func (s *Service) List(modelPtr ModelGeneral, modelsPtr interface{}) (err error)
 	} else {
 		session := s.Engine.Unscoped().Table(modelPtr.TableName())
 		modelPtr.BuildCondition(session)
-		err = session.Limit(10).Find(modelsPtr)
+		err = session.Find(modelsPtr)
 		if err != nil {
 			sql, args := session.LastSQL()
 			s.LogSql(sql, args, err)

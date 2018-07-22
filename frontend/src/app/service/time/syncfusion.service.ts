@@ -42,6 +42,28 @@ export class SyncfusionService extends BaseService {
     });
   }
 
+  GetGanttManager(): any {
+    return new ej.DataManager({
+      url: this.uri + `/list/gantt`,
+      crossDomain: true,
+      adaptor: new ej.WebApiAdaptor(),
+      headers: [{
+        "Authorization": this.signService.getAuthToken(),
+      }],
+    });
+  }
+
+  GetKanbanManager(): any {
+    return new ej.DataManager({
+      url: this.uri + `/list/kanban`,
+      crossDomain: true,
+      adaptor: new ej.WebApiAdaptor(),
+      headers: [{
+        "Authorization": this.signService.getAuthToken(),
+      }],
+    });
+  }
+
   ListKanban(): Observable<Kanban[]> {
     this.resource = this.shareSettings.Time.Resource.Task;
     this.operation = this.shareSettings.System.Process.List;
@@ -64,7 +86,6 @@ export class SyncfusionService extends BaseService {
     this.resource = this.shareSettings.Time.Resource.Quest;
     this.operation = this.shareSettings.System.Process.List;
     return this.BaseResp(this.uri + `/list/gantt`).pipe(
-      catchError(this.handleError<Resp>()),
       map(res => {
         let ret:Gantt[] = []; 
         if (res && res.code == 0) {

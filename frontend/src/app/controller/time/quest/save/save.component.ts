@@ -4,10 +4,10 @@ import * as _                                                         from 'loda
 import { NgForm  }                                                    from '@angular/forms';
 import { EJ_SCHEDULE_COMPONENTS }       from 'ej-angular2/src/ej/schedule.component';
 
-import { User }                                        from '../../../../model/system/user';
-import { Quest, QuestTarget, QuestTeam, QuestSettings} from '../../../../model/time/quest';
-import { Area }                                        from '../../../../model/time/area';
-import { Project }                                     from '../../../../model/time/project';
+import { User }                                         from '../../../../model/system/user';
+import { Quest, QuestTarget, QuestTeam, QuestSettings } from '../../../../model/time/quest';
+import { Area }                                         from '../../../../model/time/area';
+import { Project }                                      from '../../../../model/time/project';
 
 import { QuestService  }              from '../../../../service/time/quest.service';
 import { ProjectService  }            from '../../../../service/time/project.service';
@@ -110,16 +110,25 @@ export class QuestSaveComponent implements OnInit {
   deleteQuestTarget(questTarget: QuestTarget) {
     this.questTargets.forEach((one, k) => {
       if (one.AreaId === questTarget.AreaId) {
-        if ((one.QuestId != undefined) && (one.Status == this.questSettings.TargetStatus.Wait)) {
-          this.messageHandlerService.showWarning(
-            this.shareSettings.Time.Resource.Quest,
-            this.shareSettings.System.Process.Update,
-            this.errorInfo.Time.TargetNotFinish
-          );
+        if (one.Id != undefined) {
+          let project = new Project();
+          project.QuestTarget.Id = one.Id;
+          this.projectService.List(project).subscribe(projects => {
+            if (projects.length > 0) {
+              this.messageHandlerService.showWarning(
+                this.shareSettings.Time.Resource.Quest,
+                this.shareSettings.System.Process.Update,
+                this.errorInfo.Time.TargetNotFinish
+              );
+            } else {
+              this.questTargets.splice(k, 1); 
+            } 
+            return;
+          })
+        } else {
+          this.questTargets.splice(k, 1); 
           return;
         }
-        this.questTargets.splice(k, 1); 
-        return;
       }
     });
   }
@@ -159,18 +168,24 @@ export class QuestSaveComponent implements OnInit {
   }
 
   saveQuestTarget(questId: number): void {
-    let questTargets: QuestTarget[] = [];
+    let batchQuestTargets: QuestTarget[] = [];
     for (let k in this.questTargets) {
-      this.questTargets[k].QuestId = questId;
+      let tmpQuestTarget: QuestTarget = this.questTargets[k];
+      tmpQuestTarget.QuestId = questId;
+      if ((tmpQuestTarget.Status == 0) || (tmpQuestTarget.Status == undefined)) {
+        tmpQuestTarget.Status = this.questSettings.TargetStatus.Wait; 
+      }
+      batchQuestTargets.push(tmpQuestTarget);
     }
-    this.questTargetService.BatchSave(questTargets).subscribe(res => {
+    this.questTargetService.BatchSave(batchQuestTargets).subscribe(res => {
     })
   }
 
   saveQuestTeamFounder(questId: number, endDate: Date): void {
     let questTeam: QuestTeam = new QuestTeam();
     questTeam.QuestId = questId;
-    questTeam.EndDate = endDate; 
+    questTeam.StartDate = new Date();
+    questTeam.EndDate = endDate;
     questTeam.UserId = this.founderUser.Id; 
     this.questTeamService.Add(questTeam).subscribe(res => {
     });

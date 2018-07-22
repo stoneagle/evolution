@@ -1,7 +1,9 @@
 import { Component, OnInit, ViewChild, Inject, forwardRef } from '@angular/core';
 
 import { Quest, QuestTarget, QuestSettings } from '../../../model/time/quest';
+import { Project }                           from '../../../model/time/project';
 import { QuestService }                      from '../../../service/time/quest.service';
+import { ProjectService }                    from '../../../service/time/project.service';
 import { QuestSaveComponent }                from './save/save.component';
 import { QuestTeamListComponent }            from './team-list/team-list.component';
 import { ShellComponent }                    from '../../../base/shell/shell.component';
@@ -32,6 +34,7 @@ export class QuestComponent implements OnInit {
     private questSettings: QuestSettings,
     private questTargetService: QuestTargetService,
     private questService: QuestService,
+    private projectService: ProjectService,
     private messageHandlerService: MessageHandlerService,
     @Inject(forwardRef(() => ShellComponent))
     private shell: ShellComponent,
@@ -61,12 +64,6 @@ export class QuestComponent implements OnInit {
     this.questTeamListComponent.New(id);
   }
 
-  delete(quest: Quest): void {
-    this.questService.Delete(quest.Id).subscribe(res => {
-      this.refresh();
-    })
-  }
-
   load(state: any): void {
     if (state && state.page) {
       this.refreshClassify(state.page.from, state.page.to + 1);
@@ -87,6 +84,7 @@ export class QuestComponent implements OnInit {
 
   exec(quest: Quest): void {
     quest.Status = this.questSettings.Status.Exec;
+    quest.StartDate = new Date();
     this.questService.Update(quest).subscribe(res => {
       this.refresh();
     })
@@ -119,9 +117,39 @@ export class QuestComponent implements OnInit {
   }
 
   fail(quest: Quest): void {
-    quest.Status = this.questSettings.Status.Fail;
-    this.questService.Update(quest).subscribe(res => {
-      this.refresh();
+    let project = new Project();
+    project.QuestTarget.QuestId = quest.Id;
+    this.projectService.List(project).subscribe(projects => {
+      if (projects.length > 0) {
+        this.messageHandlerService.showWarning(
+          this.shareSettings.Time.Resource.Quest,
+          this.shareSettings.System.Process.Update,
+          this.errorInfo.Time.ProjectNotFinish
+        );
+      } else {
+        quest.Status = this.questSettings.Status.Fail;
+        this.questService.Update(quest).subscribe(res => {
+          this.refresh();
+        })
+      }
+    })
+  }
+
+  delete(quest: Quest): void {
+    let project = new Project();
+    project.QuestTarget.QuestId = quest.Id;
+    this.projectService.List(project).subscribe(projects => {
+      if (projects.length > 0) {
+        this.messageHandlerService.showWarning(
+          this.shareSettings.Time.Resource.Quest,
+          this.shareSettings.System.Process.Update,
+          this.errorInfo.Time.ProjectNotFinish
+        );
+      } else {
+        this.questService.Delete(quest.Id).subscribe(res => {
+          this.refresh();
+        })
+      }
     })
   }
 }

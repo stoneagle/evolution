@@ -4,13 +4,8 @@
   [scheduleEndDate]="ganttEndDate"
   [dataSource]="data"
   [allowColumnResize]="true"
-  [enableProgressBarResizing]="false"
-  [enableResize]="false"
-  [enableTaskbarDragTooltip]="false"
-  [allowDragAndDrop]="false"
-  taskIdMapping= "Id"
-  taskNameMapping= "Name"
-  childMapping="Children" 
+  taskIdMapping="Id"
+  taskNameMapping="Name"
   progressMapping="Progress" 
   durationMapping="Duration"
   resourceNameMappin="ResourceName"
@@ -18,8 +13,7 @@
   parentTaskIdMapping="Parent"
   startDateMapping= "StartDate"
   endDateMapping="EndDate"
-  [allowSelection]="true"
-  selectionMode="row"
+  childMapping="Children" 
   rightTaskLabelMapping="Relate"
   [scheduleHeaderSettings]="ganttHeaderSettings"
   [enableVirtualization]="true"
@@ -32,7 +26,14 @@
   (contextMenuOpen)="onGanttContextMenuOpen($event)"
   (queryTaskbarInfo)="onGanttQueryTaskbarInfo($event)"
   (rowSelected)="onGanttRowSelected($event)"
-  (load)="onGanttLoad($event)">
+  (load)="onGanttLoad($event)"
+
+  [enableProgressBarResizing]="false"
+  [enableResize]="false"
+  [enableTaskbarDragTooltip]="false"
+  [allowDragAndDrop]="false"
+  [allowSelection]="true"
+  selectionMode="row"
 >
 </ej-gantt>
 

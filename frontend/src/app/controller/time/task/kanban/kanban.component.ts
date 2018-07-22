@@ -20,6 +20,7 @@ export class TaskKanbanComponent implements OnInit {
   taskSaveComponent: TaskSaveComponent;
 
   kanbanId: string = "TaskKanban";
+  // kanbanData: any;
   kanbanData: Kanban[] = [];
   kanbanColumns: any;
   kanbanFields: any;

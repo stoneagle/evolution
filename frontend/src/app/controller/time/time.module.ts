@@ -61,9 +61,10 @@ import { UserResourceService }    from '../../service/time/user-resource.service
 import { SyncfusionService }      from '../../service/time/syncfusion.service';
 import { MessageHandlerService  } from '../../service/base/message-handler.service';
 
-import { QuestSettings  } from '../../model/time/quest';
-import { TaskSettings  }  from '../../model/time/task';
-import { AreaSettings  }  from '../../model/time/area';
+import { QuestSettings  }   from '../../model/time/quest';
+import { TaskSettings  }    from '../../model/time/task';
+import { ProjectSettings  } from '../../model/time/project';
+import { AreaSettings  }    from '../../model/time/area';
 
 import { ShareSettings  } from '../../shared/settings';
 import { ErrorInfo  }     from '../../shared/error';
@@ -134,6 +135,7 @@ import { ErrorInfo  }     from '../../shared/error';
 
     QuestSettings,
     TaskSettings,
+    ProjectSettings,
     AreaSettings,
 
     ShareSettings,

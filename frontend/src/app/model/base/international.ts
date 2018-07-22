@@ -13,6 +13,7 @@ export interface International {
     }
     ERROR: {
       TARGET_NOT_FINISH: string 
+      PROJECT_NOT_FINISH: string 
     }
     RESOURCE: {
       COUNTRY: {
@@ -46,6 +47,10 @@ export interface International {
         AREA: string
         STARTDATE: string
         DURATION: string
+        STATUS_NAME: {
+          WAIT: string
+          FINISH: string
+        }
       }
       TASK: {
         CONCEPT: string

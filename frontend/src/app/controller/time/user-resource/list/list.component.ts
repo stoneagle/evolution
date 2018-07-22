@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, Input, Inject, forwardRef  } from '@angular/core';
+import { Component, OnInit, ViewChild, Input, Inject, forwardRef } from '@angular/core';
 import { Comparator, State }                                        from "clarity-angular";
 
 import { Area }                        from '../../../../model/time/area';

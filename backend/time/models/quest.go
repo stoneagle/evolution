@@ -17,6 +17,9 @@ type Quest struct {
 	Members             int       `xorm:"not null default 0 comment('团队人数') INT(11)" structs:"members,omitempty"`
 	Constraint          int       `xorm:"not null default 0 comment('限制:1重要紧急2重要不紧急3紧急不重要4不重要不紧急') INT(11)" structs:"constraint,omitempty"`
 	Status              int       `xorm:"not null default 1 comment('当前状态:1招募中2执行中3已完成4未完成') INT(11)" structs:"status,omitempty"`
+
+	StartDateReset bool `xorm:"-" structs:"-"`
+	EndDateReset   bool `xorm:"-" structs:"-"`
 }
 
 var (

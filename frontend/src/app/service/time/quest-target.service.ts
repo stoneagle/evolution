@@ -20,7 +20,7 @@ export class QuestTargetService extends BaseService {
   }
 
   BatchSave(questTargets: QuestTarget[]): Observable<Boolean> {
-    return this.BaseAdd<Resp>(questTargets, Resp, this.uri).pipe(map(res => {
+    return this.BaseAdd<Resp>(questTargets, Resp, this.uri + `/batch`).pipe(map(res => {
       return true;
     }))
   }

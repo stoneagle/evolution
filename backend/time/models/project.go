@@ -29,6 +29,7 @@ type ProjectJoin struct {
 	Project     Project `xorm:"extends" json:"-"`
 	QuestTarget `xorm:"extends" json:"-"`
 	Area        `xorm:"extends" json:"-"`
+	Quest       `xorm:"extends" json:"-"`
 }
 
 func NewProject() *Project {
@@ -86,8 +87,17 @@ func (j *ProjectJoin) Links() []es.JoinLinks {
 		RightTable: j.QuestTarget.TableName(),
 		RightField: "area_id",
 	}
+	questLink := es.JoinLinks{
+		Type:       es.InnerJoin,
+		Table:      j.Quest.TableName(),
+		LeftTable:  j.Quest.TableName(),
+		LeftField:  "id",
+		RightTable: j.QuestTarget.TableName(),
+		RightField: "quest_id",
+	}
 	links = append(links, questTargetLink)
 	links = append(links, areaLink)
+	links = append(links, questLink)
 	return links
 }
 
@@ -100,6 +110,7 @@ func (j *ProjectJoin) Transfer() es.ModelGeneral {
 	join := *j
 	ret := join.Project
 	ret.Area = &join.Area
+	ret.Quest = &join.Quest
 	ret.QuestTarget = &join.QuestTarget
 	return &ret
 }
@@ -108,6 +119,7 @@ func (j *ProjectJoin) TransferCopy(modelPtr es.ModelGeneral) {
 	projectPtr := modelPtr.(*Project)
 	(*projectPtr) = (*j).Project
 	(*projectPtr).Area = &(*j).Area
+	(*projectPtr).Quest = &(*j).Quest
 	(*projectPtr).QuestTarget = &(*j).QuestTarget
 	return
 }

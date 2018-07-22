@@ -27,9 +27,11 @@ func NewSyncfusion() *Syncfusion {
 func (c *Syncfusion) Router(router *gin.RouterGroup) {
 	syncfusion := router.Group(c.Resource.String()).Use(middles.OnInit(c))
 	syncfusion.GET("/list/kanban", c.ListKanban)
+	syncfusion.GET("/list/kanban/", c.ListKanbanCustom)
 	syncfusion.GET("/list/gantt", c.ListGantt)
-	syncfusion.GET("/list/schedule/", c.ListSchedule)
-	syncfusion.GET("/list/treegrid/:fieldId/", c.ListTreeGrid)
+	syncfusion.GET("/list/gantt/", c.ListGanttCustom)
+	syncfusion.GET("/list/schedule/", c.ListScheduleCustom)
+	syncfusion.GET("/list/treegrid/:fieldId/", c.ListTreeGridCustom)
 }
 
 func (c *Syncfusion) ListKanban(ctx *gin.Context) {
@@ -42,7 +44,17 @@ func (c *Syncfusion) ListKanban(ctx *gin.Context) {
 	resp.Success(ctx, kanbans)
 }
 
-func (c *Syncfusion) ListSchedule(ctx *gin.Context) {
+func (c *Syncfusion) ListKanbanCustom(ctx *gin.Context) {
+	user := ctx.MustGet(middles.UserKey).(middles.UserInfo)
+	kanbans, err := c.SyncfusionSvc.ListKanban(user.Id)
+	if err != nil {
+		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "task kanban get error", err)
+		return
+	}
+	resp.CustomSuccess(ctx, kanbans)
+}
+
+func (c *Syncfusion) ListScheduleCustom(ctx *gin.Context) {
 	currentDate := ctx.Query("CurrentDate")
 	if len(currentDate) == 0 {
 		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "current date not exist", nil)
@@ -91,7 +103,7 @@ func (c *Syncfusion) ListSchedule(ctx *gin.Context) {
 	resp.CustomSuccess(ctx, schedules)
 }
 
-func (c *Syncfusion) ListTreeGrid(ctx *gin.Context) {
+func (c *Syncfusion) ListTreeGridCustom(ctx *gin.Context) {
 	fieldIdStr := ctx.Param("fieldId")
 	var fieldId int
 	var err error
@@ -140,4 +152,14 @@ func (c *Syncfusion) ListGantt(ctx *gin.Context) {
 		return
 	}
 	resp.Success(ctx, gantts)
+}
+
+func (c *Syncfusion) ListGanttCustom(ctx *gin.Context) {
+	user := ctx.MustGet(middles.UserKey).(middles.UserInfo)
+	gantts, err := c.SyncfusionSvc.ListGantt(user.Id)
+	if err != nil {
+		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "quest to task gantt get error", err)
+		return
+	}
+	resp.CustomSuccess(ctx, gantts)
 }

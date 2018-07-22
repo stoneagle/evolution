@@ -22,13 +22,13 @@ func NewTask(engine *xorm.Engine, cache *redis.Client, log *logger.Logger) *Task
 
 func (s *Task) Update(id int, modelPtr structs.ModelGeneral) (err error) {
 	taskPtr := modelPtr.(*models.Task)
-	err = s.Update(id, taskPtr)
+	err = s.Service.Update(id, taskPtr)
 	if err != nil {
 		return
 	}
 
 	if taskPtr.StartDateReset {
-		err = s.UpdateByMap(taskPtr.TableName(), id, map[string]interface{}{
+		err = s.Service.UpdateByMap(taskPtr.TableName(), id, map[string]interface{}{
 			"start_date": nil,
 		})
 		if err != nil {
@@ -37,9 +37,8 @@ func (s *Task) Update(id int, modelPtr structs.ModelGeneral) (err error) {
 	}
 
 	if taskPtr.EndDateReset {
-		err = s.UpdateByMap(taskPtr.TableName(), id, map[string]interface{}{
+		err = s.Service.UpdateByMap(taskPtr.TableName(), id, map[string]interface{}{
 			"end_date": nil,
-			"duration": 0,
 		})
 		if err != nil {
 			return

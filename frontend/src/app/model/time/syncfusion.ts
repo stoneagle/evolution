@@ -26,6 +26,8 @@ export class Gantt extends Basic {
   Duration: number;
   Expended: boolean;
   Parent: number;
+  Status: number;
+  Color: string;
   Children: Gantt[];
   constructor (json?: any) {
     if (json != undefined) {
