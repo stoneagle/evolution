@@ -69,3 +69,7 @@ func (m *Area) Transfer(slicePtr interface{}) *[]Area {
 	ret := slicePtr.(*[]Area)
 	return ret
 }
+
+func (m *Area) WithDeleted() bool {
+	return true
+}

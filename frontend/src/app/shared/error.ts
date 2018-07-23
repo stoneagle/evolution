@@ -21,5 +21,7 @@ export class ErrorInfo {
   public Time = {
     TargetNotFinish: N18.settings.TIME.ERROR.TARGET_NOT_FINISH,
     ProjectNotFinish: N18.settings.TIME.ERROR.PROJECT_NOT_FINISH,
+    TaskNotExec: N18.settings.TIME.ERROR.TASK_NOT_EXEC,
+    TaskNotFinish: N18.settings.TIME.ERROR.TASK_NOT_FINISH,
   }
 }

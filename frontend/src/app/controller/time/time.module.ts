@@ -22,6 +22,7 @@ import { QuestTeamListComponent }    from './quest/team-list/team-list.component
 import { ProjectComponent }          from './project/project.component';
 import { ProjectGanttComponent }     from './project/gantt/gantt.component';
 import { ProjectSaveComponent }      from './project/save/save.component';
+import { ProjectFinishComponent }      from './project/finish/finish.component';
 import { TaskComponent }             from './task/task.component';
 import { TaskSaveComponent }         from './task/save/save.component';
 import { TaskListComponent }         from './task/list/list.component';
@@ -61,10 +62,11 @@ import { UserResourceService }    from '../../service/time/user-resource.service
 import { SyncfusionService }      from '../../service/time/syncfusion.service';
 import { MessageHandlerService  } from '../../service/base/message-handler.service';
 
-import { QuestSettings  }   from '../../model/time/quest';
-import { TaskSettings  }    from '../../model/time/task';
-import { ProjectSettings  } from '../../model/time/project';
-import { AreaSettings  }    from '../../model/time/area';
+import { QuestSettings  }      from '../../model/time/quest';
+import { TaskSettings  }       from '../../model/time/task';
+import { ProjectSettings  }    from '../../model/time/project';
+import { AreaSettings  }       from '../../model/time/area';
+import { SyncfusionSettings  } from '../../model/time/syncfusion';
 
 import { ShareSettings  } from '../../shared/settings';
 import { ErrorInfo  }     from '../../shared/error';
@@ -77,6 +79,7 @@ import { ErrorInfo  }     from '../../shared/error';
     ProjectComponent,
     ProjectGanttComponent,
     ProjectSaveComponent,
+    ProjectFinishComponent,
     TaskComponent,
     TaskSaveComponent,
     TaskListComponent,
@@ -137,6 +140,7 @@ import { ErrorInfo  }     from '../../shared/error';
     TaskSettings,
     ProjectSettings,
     AreaSettings,
+    SyncfusionSettings,
 
     ShareSettings,
     ErrorInfo,

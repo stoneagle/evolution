@@ -43,6 +43,7 @@ export class ShareSettings {
       Create: N18.settings.SYSTEM.PROCESS.CREATE,
       Update: N18.settings.SYSTEM.PROCESS.UPDATE,
       Delete: N18.settings.SYSTEM.PROCESS.DELETE,
+      Finish: N18.settings.SYSTEM.PROCESS.FINISH,
       Back: N18.settings.SYSTEM.PROCESS.BACK,
       Next: N18.settings.SYSTEM.PROCESS.NEXT,
       Submit: N18.settings.SYSTEM.PROCESS.SUBMIT,

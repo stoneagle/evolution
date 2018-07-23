@@ -1,11 +1,13 @@
 package models
 
 import (
+	"encoding/binary"
 	es "evolution/backend/common/structs"
 	"time"
 
 	"github.com/fatih/structs"
 	"github.com/go-xorm/xorm"
+	uuid "github.com/satori/go.uuid"
 )
 
 type Project struct {
@@ -14,6 +16,8 @@ type Project struct {
 	QuestTargetId       int       `xorm:"not null default 0 comment('所属target') INT(11)" structs:"quest_target_id,omitempty"`
 	StartDate           time.Time `xorm:"not null comment('开始日期') DATETIME"`
 	Status              int       `xorm:"not null default 1 comment('当前状态:1未完成2已完成') INT(11)" structs:"status,omitempty"`
+	Uuid                string    `xorm:"not null default '' comment('唯一ID') VARCHAR(255)" structs:"uuid,omitempty"`
+	UuidNumber          uint32    `xorm:"-" structs:"-"`
 
 	Quest       *Quest       `xorm:"-" structs:"-" json:"Quest,omitempty"`
 	QuestTarget *QuestTarget `xorm:"-" structs:"-" json:"QuestTarget,omitempty"`
@@ -64,9 +68,28 @@ func (m *Project) Transfer(slicePtr interface{}) *[]Project {
 	return ret
 }
 
+func (m *Project) Hook() (err error) {
+	if len(m.Uuid) == 0 {
+		u := uuid.NewV4()
+		m.Uuid = u.String()
+		m.UuidNumber = binary.BigEndian.Uint32(u[0:4])
+	} else {
+		u, err := uuid.FromString(m.Uuid)
+		if err != nil {
+			return err
+		}
+		m.UuidNumber = binary.BigEndian.Uint32(u[0:4])
+	}
+	return nil
+}
+
 func (m *Project) Join() es.JoinGeneral {
 	ret := ProjectJoin{}
 	return &ret
+}
+
+func (m *Project) WithDeleted() bool {
+	return true
 }
 
 func (j *ProjectJoin) Links() []es.JoinLinks {

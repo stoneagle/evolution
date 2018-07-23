@@ -55,7 +55,7 @@ func ErrorBusiness(ctx *gin.Context, code ErrorCode, desc string, err error) {
 	ctx.AbortWithStatusJSON(http.StatusOK, res)
 	log := logger.Get()
 	log.Caller = 3
-	log.Log(logger.InfoLevel, res, err)
+	log.Log(logger.WarnLevel, res, err)
 }
 
 func ExceptionServer(ctx *gin.Context, err error) {

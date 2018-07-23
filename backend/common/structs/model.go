@@ -25,6 +25,8 @@ type ModelGeneral interface {
 	Join() JoinGeneral
 	BuildCondition(*xorm.Session)
 	SlicePtr() interface{}
+	Hook() error
+	WithDeleted() bool
 }
 
 type JoinGeneral interface {
@@ -66,7 +68,15 @@ func (m *Model) BuildCondition(params map[string]interface{}, keyPrefix string) 
 		keyType := reflect.ValueOf(value).Kind()
 		if keyType == reflect.Map {
 			if key == "ModelWithDeleted" {
-				idMap, ok := value.(map[string]interface{})["ModelWithId"]
+				valueMap := value.(map[string]interface{})
+				// deletedAt, ok := valueMap["deleted_at"]
+				// emptyTime := time.Time{}
+				// if ok {
+				// 	if deletedAt != emptyTime {
+				// 		condition[keyPrefix+"deletedAt"] = id
+				// 	}
+				// }
+				idMap, ok := valueMap["ModelWithId"]
 				if ok {
 					id, ok := idMap.(map[string]interface{})["id"]
 					if ok {
@@ -92,4 +102,12 @@ func (m *Model) BuildCondition(params map[string]interface{}, keyPrefix string) 
 
 func (m *Model) Join() JoinGeneral {
 	return nil
+}
+
+func (m *Model) Hook() error {
+	return nil
+}
+
+func (m *Model) WithDeleted() bool {
+	return false
 }

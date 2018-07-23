@@ -13,6 +13,8 @@ export class Quest extends Basic {
   Members: number;
   Constraint: number;
   Status: number;
+  Uuid: string;
+  UuidNumber: number;
   StartDateReset: boolean;
   EndDateReset: boolean;
   constructor (json?: any) {

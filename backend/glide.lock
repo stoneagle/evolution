@@ -1,5 +1,5 @@
-hash: df9aff5a0fcf6ce1178f48a9d61ff62b06aa119719eba0f624bc860d9611624a
-updated: 2018-07-17T16:35:29.25989146+08:00
+hash: 3a370f467a5349ac82d098c14be2340f9f4f873e4e2cd83b0bf77d4e4fd3ab57
+updated: 2018-07-22T17:45:14.967556804+08:00
 imports:
 - name: git.apache.org/thrift.git
   version: 327ebb6c2b6df8bf075da02ef45a2a034e9b79ba
@@ -7,7 +7,7 @@ imports:
   - lib/go/thrift
   - lib/go/thrift/...
 - name: github.com/araddon/dateparse
-  version: 089f77b1d92b615cc77fde0d2fa528b5e85e832d
+  version: a95177ee19eb48201ec253a68c4d7dd21008536d
 - name: github.com/boj/redistore
   version: 0cd55584b172cefd31c4cb84e2904585d898c7b2
 - name: github.com/davecgh/go-spew
@@ -32,7 +32,7 @@ imports:
   subpackages:
   - sessions
 - name: github.com/gin-gonic/gin
-  version: 85221af84cf6ee99dc900bc41912abc09acfc1b5
+  version: 220e8d34538f5dfdcc299dda79bf83cf52e633f6
   subpackages:
   - binding
   - json
@@ -56,7 +56,7 @@ imports:
 - name: github.com/go-xorm/xorm
   version: d85bb4911c725a53b135fc12862748a41b6c07da
 - name: github.com/golang/protobuf
-  version: 14aad3d5ea4c323bcd7a2137e735da24a76e814c
+  version: 427e165155e0a4ff5993a36657c1f733f5b0f782
   subpackages:
   - proto
 - name: github.com/gorilla/context
@@ -74,7 +74,7 @@ imports:
 - name: github.com/jinzhu/now
   version: ed742868f2aebdb1c0c437bf4f7257f88834b66f
 - name: github.com/json-iterator/go
-  version: ab8a2e0c74be9d3be70b3184d9acc634935ded82
+  version: 10a568c51178f31e41456cedaac7838e0f4f7360
 - name: github.com/mattn/go-isatty
   version: 6ca4dbf54d38eea1a992b3c722a76a5d1c4cb25c
 - name: github.com/mitchellh/mapstructure
@@ -82,7 +82,9 @@ imports:
 - name: github.com/modern-go/concurrent
   version: bacd9c7ef1dd9b15be4a9909b8ac7a4e313eec94
 - name: github.com/modern-go/reflect2
-  version: 4b7aa43c6742a2c18fdef89dd197aaae7dac7ccd
+  version: 94122c33edd36123c84d5368cfb2b69df93a0ec8
+- name: github.com/satori/go.uuid
+  version: f58768cc1a7a7e77a3bd49e98cdd21419399b6a3
 - name: github.com/ugorji/go
   version: 2e1067cd04ec91c6fdf491ac8028c9d3aea73ab4
   subpackages:
@@ -92,7 +94,7 @@ imports:
 - name: go.uber.org/multierr
   version: 3c4937480c32f4c13a875a1829af76c98ca3d40a
 - name: go.uber.org/zap
-  version: eeedf312bc6c57391d84767a4cd413f02a917974
+  version: 4d45f9617f7d90f7a663ff21c7a4321dbe78098b
   subpackages:
   - atomic
   - buffer
@@ -101,7 +103,7 @@ imports:
   - internal/exit
   - zapcore
 - name: golang.org/x/net
-  version: d0887baf81f4598189d4e12a37c6da86f0bba4d0
+  version: a680a1efc54dd51c040b3b5ce4939ea3cf2ea0d1
   subpackages:
   - context
 - name: golang.org/x/sys

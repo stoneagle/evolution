@@ -28,8 +28,8 @@ func (c *Syncfusion) Router(router *gin.RouterGroup) {
 	syncfusion := router.Group(c.Resource.String()).Use(middles.OnInit(c))
 	syncfusion.GET("/list/kanban", c.ListKanban)
 	syncfusion.GET("/list/kanban/", c.ListKanbanCustom)
-	syncfusion.GET("/list/gantt", c.ListGantt)
-	syncfusion.GET("/list/gantt/", c.ListGanttCustom)
+	syncfusion.GET("/list/gantt/:level/:status", c.ListGantt)
+	syncfusion.GET("/list/gantt/:level/:status/", c.ListGanttCustom)
 	syncfusion.GET("/list/schedule/", c.ListScheduleCustom)
 	syncfusion.GET("/list/treegrid/:fieldId/", c.ListTreeGridCustom)
 }
@@ -145,8 +145,10 @@ func (c *Syncfusion) ListTreeGridCustom(ctx *gin.Context) {
 }
 
 func (c *Syncfusion) ListGantt(ctx *gin.Context) {
+	level := ctx.Param("level")
+	status := ctx.Param("status")
 	user := ctx.MustGet(middles.UserKey).(middles.UserInfo)
-	gantts, err := c.SyncfusionSvc.ListGantt(user.Id)
+	gantts, err := c.SyncfusionSvc.ListGantt(user.Id, level, status)
 	if err != nil {
 		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "quest to task gantt get error", err)
 		return
@@ -155,8 +157,10 @@ func (c *Syncfusion) ListGantt(ctx *gin.Context) {
 }
 
 func (c *Syncfusion) ListGanttCustom(ctx *gin.Context) {
+	level := ctx.Param("level")
+	status := ctx.Param("status")
 	user := ctx.MustGet(middles.UserKey).(middles.UserInfo)
-	gantts, err := c.SyncfusionSvc.ListGantt(user.Id)
+	gantts, err := c.SyncfusionSvc.ListGantt(user.Id, level, status)
 	if err != nil {
 		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "quest to task gantt get error", err)
 		return

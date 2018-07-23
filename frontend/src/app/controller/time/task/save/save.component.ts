@@ -1,15 +1,15 @@
 import { Component, OnInit, Output, Input, EventEmitter } from '@angular/core'; 
 
-import { QuestTeam }         from '../../../../model/time/quest';
-import { Task }              from '../../../../model/time/task';
-import { Project }           from '../../../../model/time/project';
-import { Resource }          from '../../../../model/time/resource';
-import { User }              from '../../../../model/system/user';
-import { TaskService  }      from '../../../../service/time/task.service';
-import { ProjectService  }   from '../../../../service/time/project.service';
-import { ResourceService  }  from '../../../../service/time/resource.service';
-import { QuestTeamService  } from '../../../../service/time/quest-team.service';
-import { UserService  }      from '../../../../service/system/user.service';
+import { QuestTeam }          from '../../../../model/time/quest';
+import { Task, TaskSettings } from '../../../../model/time/task';
+import { Project }            from '../../../../model/time/project';
+import { Resource }           from '../../../../model/time/resource';
+import { User }               from '../../../../model/system/user';
+import { TaskService  }       from '../../../../service/time/task.service';
+import { ProjectService  }    from '../../../../service/time/project.service';
+import { ResourceService  }   from '../../../../service/time/resource.service';
+import { QuestTeamService  }  from '../../../../service/time/quest-team.service';
+import { UserService  }       from '../../../../service/system/user.service';
 
 @Component({
   selector: 'time-task-save',
@@ -27,6 +27,7 @@ export class TaskSaveComponent implements OnInit {
 
   constructor(
     private taskService: TaskService,
+    private taskSettings: TaskSettings,
     private projectService: ProjectService,
     private resourceService: ResourceService,
     private questTeamService: QuestTeamService,
@@ -100,16 +101,22 @@ export class TaskSaveComponent implements OnInit {
   }            
 
   Submit(): void {
-    // this.task.StartDate = new Date(this.task.StartDate);
     if (this.task.Id == null) {
+      this.task.StartDate = new Date();
+      this.task.Status = this.taskSettings.Status.Backlog;
       this.taskService.Add(this.task).subscribe(res => {
         this.task.Resource = this.resourceMaps.get(this.task.ResourceId);
+        this.task.Id = res.Id;
+        this.task.UuidNumber = res.UuidNumber;
+        this.task.NewFlag = true;
         this.save.emit(this.task);
         this.modelOpened = false;
       })
     } else {
       this.taskService.Update(this.task).subscribe(res => {
         this.task.Resource = this.resourceMaps.get(this.task.ResourceId);
+        this.task.UuidNumber = res.UuidNumber;
+        this.task.NewFlag = false;
         this.save.emit(this.task);
         this.modelOpened = false;
       })

@@ -40,3 +40,7 @@ func (m *Field) Transfer(slicePtr interface{}) *[]Field {
 	ret := slicePtr.(*[]Field)
 	return ret
 }
+
+func (m *Field) WithDeleted() bool {
+	return true
+}

@@ -1,11 +1,13 @@
 package models
 
 import (
+	"encoding/binary"
 	es "evolution/backend/common/structs"
 	"time"
 
 	"github.com/fatih/structs"
 	"github.com/go-xorm/xorm"
+	uuid "github.com/satori/go.uuid"
 )
 
 type Quest struct {
@@ -17,6 +19,8 @@ type Quest struct {
 	Members             int       `xorm:"not null default 0 comment('团队人数') INT(11)" structs:"members,omitempty"`
 	Constraint          int       `xorm:"not null default 0 comment('限制:1重要紧急2重要不紧急3紧急不重要4不重要不紧急') INT(11)" structs:"constraint,omitempty"`
 	Status              int       `xorm:"not null default 1 comment('当前状态:1招募中2执行中3已完成4未完成') INT(11)" structs:"status,omitempty"`
+	Uuid                string    `xorm:"not null default '' comment('唯一ID') VARCHAR(255)" structs:"uuid,omitempty"`
+	UuidNumber          uint32    `xorm:"-" structs:"-"`
 
 	StartDateReset bool `xorm:"-" structs:"-"`
 	EndDateReset   bool `xorm:"-" structs:"-"`
@@ -59,4 +63,23 @@ func (m *Quest) SlicePtr() interface{} {
 func (m *Quest) Transfer(slicePtr interface{}) *[]Quest {
 	ret := slicePtr.(*[]Quest)
 	return ret
+}
+
+func (m *Quest) Hook() (err error) {
+	if len(m.Uuid) == 0 {
+		u := uuid.NewV4()
+		m.Uuid = u.String()
+		m.UuidNumber = binary.BigEndian.Uint32(u[0:4])
+	} else {
+		u, err := uuid.FromString(m.Uuid)
+		if err != nil {
+			return err
+		}
+		m.UuidNumber = binary.BigEndian.Uint32(u[0:4])
+	}
+	return nil
+}
+
+func (m *Quest) WithDeleted() bool {
+	return true
 }

@@ -14,6 +14,8 @@ export interface International {
     ERROR: {
       TARGET_NOT_FINISH: string 
       PROJECT_NOT_FINISH: string 
+      TASK_NOT_EXEC: string 
+      TASK_NOT_FINISH: string 
     }
     RESOURCE: {
       COUNTRY: {
@@ -266,6 +268,7 @@ export interface International {
       CREATE: string 
       UPDATE: string
       DELETE: string
+      FINISH: string
       BACK: string
       NEXT: string
       SUBMIT: string

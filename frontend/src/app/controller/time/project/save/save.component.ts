@@ -54,6 +54,7 @@ export class ProjectSaveComponent implements OnInit {
         });
         this.projectService.Get(id).subscribe(res => {
           this.project = res;
+          this.project.Quest.UuidNumber = quest.UuidNumber;
           this.modelOpened = true;
         })
       } else {
@@ -73,12 +74,15 @@ export class ProjectSaveComponent implements OnInit {
         this.project.NewFlag = true;
         this.project.Id = res.Id;
         this.project.QuestTarget = this.questTargetMaps.get(this.project.QuestTargetId)
+        this.project.UuidNumber = res.UuidNumber
         this.save.emit(this.project);
         this.modelOpened = false;
       })
     } else {
       this.projectService.Update(this.project).subscribe(res => {
-        res.NewFlag = false;
+        this.project.NewFlag = false;
+        this.project.UuidNumber = res.UuidNumber
+        this.project.QuestTarget = this.questTargetMaps.get(this.project.QuestTargetId)
         this.save.emit(this.project);
         this.modelOpened = false;
       })

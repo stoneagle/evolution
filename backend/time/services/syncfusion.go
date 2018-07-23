@@ -149,7 +149,7 @@ func (s *Syncfusion) ListTreeGrid(fieldId, parentId int) (treeGrids []models.Syn
 	return
 }
 
-func (s *Syncfusion) ListGantt(userId int) (gantts []models.SyncfusionGantt, err error) {
+func (s *Syncfusion) ListGantt(userId int, ganttLevel, ganttStatus string) (gantts []models.SyncfusionGantt, err error) {
 	questsPtr, err := s.Pack.QuestTeamSvc.GetQuestsByUser(userId, models.QuestStatusExec)
 	if err != nil {
 		return
@@ -159,8 +159,34 @@ func (s *Syncfusion) ListGantt(userId int) (gantts []models.SyncfusionGantt, err
 		questIds = append(questIds, one.Id)
 	}
 
+	project := models.NewProject()
+	switch ganttStatus {
+	case models.SyncfusionGanttStatusFinish:
+		project.Status = models.ProjectStatusFinish
+	case models.SyncfusionGanttStatusWait:
+		project.Status = models.ProjectStatusWait
+	default:
+		err = errors.New(fmt.Sprintf("gantt status not match:%v", ganttStatus))
+		return
+	}
+	project.QuestTarget.QuestIds = questIds
+	projectsGeneralPtr := project.SlicePtr()
+	err = s.Pack.ProjectSvc.List(project, projectsGeneralPtr)
+	if err != nil {
+		return
+	}
+	projectsPtr := project.Transfer(projectsGeneralPtr)
+
 	task := models.NewTask()
-	task.Project.Status = models.ProjectStatusWait
+	switch ganttStatus {
+	case models.SyncfusionGanttStatusFinish:
+		project.Status = models.ProjectStatusFinish
+	case models.SyncfusionGanttStatusWait:
+		project.Status = models.ProjectStatusWait
+	default:
+		err = errors.New(fmt.Sprintf("gantt status not match:%v", ganttStatus))
+		return
+	}
 	task.QuestTarget.QuestIds = questIds
 	tasksGeneralPtr := task.SlicePtr()
 	err = s.Pack.TaskSvc.List(task, tasksGeneralPtr)
@@ -169,44 +195,67 @@ func (s *Syncfusion) ListGantt(userId int) (gantts []models.SyncfusionGantt, err
 	}
 	tasksPtr := task.Transfer(tasksGeneralPtr)
 
-	projectFilterMap := map[int]bool{}
-	projects := make([]models.Project, 0)
-	for k, _ := range *tasksPtr {
-		task := (*tasksPtr)[k]
-		project := models.NewProject()
-		*(project) = *(task.Project)
-		project.QuestTarget = models.NewQuestTarget()
-		project.Area = models.NewArea()
-		*(project.QuestTarget) = *(task.QuestTarget)
-		*(project.Area) = *(task.Area)
-		_, ok := projectFilterMap[project.Id]
-		if ok {
-			continue
-		}
-		projectFilterMap[project.Id] = true
-		projects = append(projects, *project)
-	}
-
 	fieldsMap, err := s.Pack.FieldSvc.Map()
 	if err != nil {
 		return
 	}
-	tasksMap := s.buildTaskMap(tasksPtr)
-	projectsMap := s.buildProjectMap(&projects, tasksMap, fieldsMap)
-	gantts = s.buildQuestSlice(questsPtr, projectsMap)
+
+	switch ganttLevel {
+	case models.SyncfusionGanttLevelQuest:
+		projectsMap := map[int][]models.SyncfusionGantt{}
+		gantts, err = s.buildQuestSlice(questsPtr, projectsMap)
+		if err != nil {
+			return gantts, err
+		}
+	case models.SyncfusionGanttLevelProject:
+		tasksMap := map[int][]models.SyncfusionGantt{}
+		projectsMap, err := s.buildProjectMap(projectsPtr, tasksMap, fieldsMap)
+		if err != nil {
+			return gantts, err
+		}
+		gantts, err = s.buildQuestSlice(questsPtr, projectsMap)
+		if err != nil {
+			return gantts, err
+		}
+	case models.SyncfusionGanttLevelTask:
+		tasksMap, err := s.buildTaskMap(tasksPtr)
+		if err != nil {
+			return gantts, err
+		}
+		projectsMap, err := s.buildProjectMap(projectsPtr, tasksMap, fieldsMap)
+		if err != nil {
+			return gantts, err
+		}
+		gantts, err = s.buildQuestSlice(questsPtr, projectsMap)
+		if err != nil {
+			return gantts, err
+		}
+	default:
+		err = errors.New(fmt.Sprintf("gantt level not match: %v", ganttLevel))
+		return
+	}
 	return
 }
 
-func (s *Syncfusion) buildTaskMap(tasksPtr *[]models.Task) map[int][]models.SyncfusionGantt {
-	result := make(map[int][]models.SyncfusionGantt)
+func (s *Syncfusion) buildTaskMap(tasksPtr *[]models.Task) (result map[int][]models.SyncfusionGantt, err error) {
+	result = make(map[int][]models.SyncfusionGantt)
 	for _, one := range *tasksPtr {
 		if _, ok := result[one.ProjectId]; !ok {
 			result[one.ProjectId] = make([]models.SyncfusionGantt, 0)
 		}
+		err = one.Hook()
+		if err != nil {
+			return
+		}
+		err = one.Project.Hook()
+		if err != nil {
+			return
+		}
 		gantt := models.SyncfusionGantt{}
-		gantt.Id = one.Id
-		gantt.Parent = one.ProjectId
+		gantt.Id = one.UuidNumber
+		gantt.Parent = one.Project.UuidNumber
 		gantt.Relate = one.Resource.Name
+		gantt.RelateId = one.Id
 		gantt.Name = one.Name
 		gantt.StartDate = one.StartDate
 		gantt.EndDate = one.EndDate
@@ -223,23 +272,28 @@ func (s *Syncfusion) buildTaskMap(tasksPtr *[]models.Task) map[int][]models.Sync
 		gantt.Children = child
 		result[one.ProjectId] = append(result[one.ProjectId], gantt)
 	}
-	return result
+	return
 }
 
-func (s *Syncfusion) buildProjectMap(projectsPtr *[]models.Project, tasksMap map[int][]models.SyncfusionGantt, fieldsMap map[int]models.Field) map[int][]models.SyncfusionGantt {
-	result := make(map[int][]models.SyncfusionGantt)
+func (s *Syncfusion) buildProjectMap(projectsPtr *[]models.Project, tasksMap map[int][]models.SyncfusionGantt, fieldsMap map[int]models.Field) (result map[int][]models.SyncfusionGantt, err error) {
+	result = make(map[int][]models.SyncfusionGantt)
 	for _, one := range *projectsPtr {
 		if _, ok := result[one.QuestTarget.QuestId]; !ok {
 			result[one.QuestTarget.QuestId] = make([]models.SyncfusionGantt, 0)
+		}
+		err = one.Hook()
+		if err != nil {
+			return
 		}
 		gantt := models.SyncfusionGantt{}
 		field, ok := fieldsMap[one.Area.FieldId]
 		if ok {
 			gantt.Color = field.Color
 		}
-		gantt.Id = one.Id
-		gantt.Parent = one.QuestTarget.QuestId
+		gantt.Id = one.UuidNumber
+		// still not set Parent, need set in Quest levetl
 		gantt.Relate = one.Area.Name
+		gantt.RelateId = one.Id
 		gantt.Name = one.Name
 		gantt.StartDate = one.StartDate
 		gantt.Status = one.Status
@@ -264,30 +318,36 @@ func (s *Syncfusion) buildProjectMap(projectsPtr *[]models.Project, tasksMap map
 		}
 		result[one.QuestTarget.QuestId] = append(result[one.QuestTarget.QuestId], gantt)
 	}
-	return result
+	return
 }
 
-func (s *Syncfusion) buildQuestSlice(questsPtr *[]models.Quest, projectsMap map[int][]models.SyncfusionGantt) []models.SyncfusionGantt {
-	result := make([]models.SyncfusionGantt, 0)
+func (s *Syncfusion) buildQuestSlice(questsPtr *[]models.Quest, projectsMap map[int][]models.SyncfusionGantt) (result []models.SyncfusionGantt, err error) {
+	result = make([]models.SyncfusionGantt, 0)
 	for _, one := range *questsPtr {
+		err = one.Hook()
+		if err != nil {
+			return
+		}
 		gantt := models.SyncfusionGantt{}
-		gantt.Id = one.Id
+		gantt.Id = one.UuidNumber
 		gantt.Parent = 0
+		gantt.RelateId = one.Id
 		gantt.Name = one.Name
 		gantt.Progress = 0
 		gantt.Expanded = false
 		if children, ok := projectsMap[one.Id]; ok {
-			gantt.Children = children
 			minStartDate := time.Now()
 			var maxEndDate time.Time
-			for _, project := range children {
+			for k, project := range children {
 				if project.StartDate.Before(minStartDate) {
 					minStartDate = project.StartDate
 				}
 				if project.EndDate.After(maxEndDate) {
 					maxEndDate = project.EndDate
 				}
+				children[k].Parent = one.UuidNumber
 			}
+			gantt.Children = children
 			gantt.StartDate = minStartDate
 			gantt.EndDate = maxEndDate
 			diffHours := gantt.EndDate.Sub(gantt.StartDate).Hours()
@@ -301,5 +361,5 @@ func (s *Syncfusion) buildQuestSlice(questsPtr *[]models.Quest, projectsMap map[
 		}
 		result = append(result, gantt)
 	}
-	return result
+	return
 }

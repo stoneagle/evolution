@@ -7,6 +7,7 @@ import (
 
 	"github.com/go-xorm/xorm"
 	"github.com/jinzhu/now"
+	uuid "github.com/satori/go.uuid"
 )
 
 type Target struct {
@@ -46,7 +47,7 @@ func (c *Target) Transfer(src, des *xorm.Engine, userId int) {
 	src.Find(&oldTargets)
 	insertNum := 0
 	for _, target := range oldTargets {
-		quest := models.Quest{}
+		quest := models.NewQuest()
 		quest.Name = target.Name
 		quest.FounderId = userId
 		quest.Members = 1
@@ -62,7 +63,9 @@ func (c *Target) Transfer(src, des *xorm.Engine, userId int) {
 		quest.EndDate = now.New(time.Now()).EndOfYear()
 		quest.CreatedAt = target.Ctime
 		quest.UpdatedAt = target.Utime
-		_, err = session.Insert(&quest)
+		u := uuid.NewV4()
+		quest.Uuid = u.String()
+		_, err = session.Insert(quest)
 		if err != nil {
 			session.Rollback()
 			fmt.Printf("quest insert error:%v\r\n", err.Error())

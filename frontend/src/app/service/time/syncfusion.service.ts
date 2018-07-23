@@ -42,9 +42,9 @@ export class SyncfusionService extends BaseService {
     });
   }
 
-  GetGanttManager(): any {
+  GetGanttManager(level: string, status: string): any {
     return new ej.DataManager({
-      url: this.uri + `/list/gantt`,
+      url: this.uri + `/list/gantt/${level}/${status}`,
       crossDomain: true,
       adaptor: new ej.WebApiAdaptor(),
       headers: [{
@@ -82,10 +82,10 @@ export class SyncfusionService extends BaseService {
     )
   }
 
-  ListGantt(): Observable<Gantt[]> {
+  ListGantt(level: string, status: string): Observable<Gantt[]> {
     this.resource = this.shareSettings.Time.Resource.Quest;
     this.operation = this.shareSettings.System.Process.List;
-    return this.BaseResp(this.uri + `/list/gantt`).pipe(
+    return this.BaseResp(this.uri + `/list/gantt/${level}/${status}`).pipe(
       map(res => {
         let ret:Gantt[] = []; 
         if (res && res.code == 0) {

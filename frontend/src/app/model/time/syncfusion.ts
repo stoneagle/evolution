@@ -20,6 +20,7 @@ export class Gantt extends Basic {
   Id: number;
   Name: string;
   Relate: string;
+  RelateId: number;
   StartDate: Date;
   EndDate: Date;
   Progress: number;
@@ -60,3 +61,17 @@ export class Kanban extends Basic {
 	ProjectId   :number
 	FieldId     :number
 }
+
+export class SyncfusionSettings {
+  public GanttStatus = {
+    Wait: "wait",
+    Finish: "finish",
+  };
+  public GanttLevel = {
+    Quest: "quest",
+    Project: "project",
+    Task: "task",
+  };
+}
+
+

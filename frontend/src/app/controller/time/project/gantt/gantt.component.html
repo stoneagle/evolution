@@ -26,7 +26,9 @@
   (contextMenuOpen)="onGanttContextMenuOpen($event)"
   (queryTaskbarInfo)="onGanttQueryTaskbarInfo($event)"
   (rowSelected)="onGanttRowSelected($event)"
+  (toolbarClick)="onGanttToolbarClick($event)"
   (load)="onGanttLoad($event)"
+  (actionComplete)="onGanttAction($event)"
 
   [enableProgressBarResizing]="false"
   [enableResize]="false"
@@ -38,5 +40,6 @@
 </ej-gantt>
 
 <time-project-save (save)="projectSaved($event)"></time-project-save>
+<time-project-finish (finish)="projectFinished($event)"></time-project-finish>
 <time-task-save (save)="taskSaved($event)"></time-task-save>
 <time-quest-save (save)="questSaved($event)"></time-quest-save>

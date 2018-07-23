@@ -12,6 +12,8 @@ export class Project extends Basic {
   QuestTarget: QuestTarget;
   Quest: Quest;
   Area: Area;
+  Uuid: string;
+  UuidNumber: number;
   NewFlag: boolean;
   constructor (json?: any) {
     if (json != undefined) {

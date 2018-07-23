@@ -43,3 +43,7 @@ func (m *Phase) Transfer(slicePtr interface{}) *[]Phase {
 	ret := slicePtr.(*[]Phase)
 	return ret
 }
+
+func (m *Phase) WithDeleted() bool {
+	return true
+}

@@ -14,8 +14,6 @@ export class Action extends Basic {
       super(json)
     } else {
       this.Task = new Task();
-      this.StartDate = new Date();
-      this.EndDate = new Date();
     }
   }
 }

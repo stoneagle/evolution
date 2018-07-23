@@ -85,6 +85,11 @@ func (b *Controller) SetModel(model ModelGeneral) {
 }
 
 func (c *Controller) One(ctx *gin.Context) {
+	err := c.Model.Hook()
+	if err != nil {
+		resp.ErrorBusiness(ctx, resp.ErrorDataTransfer, fmt.Sprintf("%v resource hook transfer error", c.Resource), err)
+		return
+	}
 	resp.Success(ctx, c.Model)
 }
 
@@ -117,8 +122,12 @@ func (c *Controller) Create(ctx *gin.Context) {
 		resp.ErrorBusiness(ctx, resp.ErrorParams, fmt.Sprintf("%v resource json bind error", c.Resource), err)
 		return
 	}
-
-	err := c.Service.Create(c.Model)
+	err := c.Model.Hook()
+	if err != nil {
+		resp.ErrorBusiness(ctx, resp.ErrorDataTransfer, fmt.Sprintf("%v resource hook transfer error", c.Resource), err)
+		return
+	}
+	err = c.Service.Create(c.Model)
 	if err != nil {
 		resp.ErrorBusiness(ctx, resp.ErrorDatabase, fmt.Sprintf("%v create error", c.Resource), err)
 		return
@@ -132,7 +141,12 @@ func (c *Controller) Update(ctx *gin.Context) {
 		resp.ErrorBusiness(ctx, resp.ErrorParams, fmt.Sprintf("%v resource json bind error", c.Resource), err)
 		return
 	}
-	err := c.Service.Update(id, c.Model)
+	err := c.Model.Hook()
+	if err != nil {
+		resp.ErrorBusiness(ctx, resp.ErrorDataTransfer, fmt.Sprintf("%v resource hook transfer error", c.Resource), err)
+		return
+	}
+	err = c.Service.Update(id, c.Model)
 	if err != nil {
 		resp.ErrorBusiness(ctx, resp.ErrorDatabase, fmt.Sprintf("%v update error", c.Resource), err)
 		return

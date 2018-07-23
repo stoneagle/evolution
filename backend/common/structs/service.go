@@ -78,9 +78,12 @@ func (s *Service) One(id int, modelPtr ModelGeneral) (err error) {
 
 func (s *Service) List(modelPtr ModelGeneral, modelsPtr interface{}) (err error) {
 	join := modelPtr.Join()
+	session := s.Engine.Table(modelPtr.TableName())
+	if !modelPtr.WithDeleted() {
+		session = session.Unscoped()
+	}
 	if join != nil {
 		joinsPtr := join.SlicePtr()
-		session := s.Engine.Unscoped().Table(modelPtr.TableName())
 		links := join.Links()
 		for _, link := range links {
 			session.Join(link.Type.String(), link.Table, fmt.Sprintf("%s.%s = %s.%s", link.LeftTable, link.LeftField, link.RightTable, link.RightField))
@@ -94,7 +97,6 @@ func (s *Service) List(modelPtr ModelGeneral, modelsPtr interface{}) (err error)
 		}
 		join.TransferCopySlice(joinsPtr, modelsPtr)
 	} else {
-		session := s.Engine.Unscoped().Table(modelPtr.TableName())
 		modelPtr.BuildCondition(session)
 		err = session.Find(modelsPtr)
 		if err != nil {

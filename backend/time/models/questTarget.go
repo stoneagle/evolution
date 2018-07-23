@@ -8,11 +8,11 @@ import (
 )
 
 type QuestTarget struct {
-	es.ModelWithId `xorm:"extends"`
-	QuestId        int    `xorm:"unique not null default 0 comment('所属quest') INT(11)" structs:"quest_id,omitempty"`
-	AreaId         int    `xorm:"unique(quest_id) not null default 0 comment('目标资源id') INT(11)" structs:"area_id,omitempty"`
-	Desc           string `xorm:"not null default '' comment('描述') VARCHAR(255)" structs:"desc,omitempty"`
-	Status         int    `xorm:"not null default 1 comment('当前状态:1未完成2已完成') INT(11)" structs:"status,omitempty"`
+	es.ModelWithDeleted `xorm:"extends"`
+	QuestId             int    `xorm:"unique not null default 0 comment('所属quest') INT(11)" structs:"quest_id,omitempty"`
+	AreaId              int    `xorm:"unique(quest_id) not null default 0 comment('目标资源id') INT(11)" structs:"area_id,omitempty"`
+	Desc                string `xorm:"not null default '' comment('描述') VARCHAR(255)" structs:"desc,omitempty"`
+	Status              int    `xorm:"not null default 1 comment('当前状态:1未完成2已完成') INT(11)" structs:"status,omitempty"`
 
 	QuestIds []int `xorm:"-" structs:"quest_id,omitempty" json:"QuestIds,omitempty"`
 	Area     *Area `xorm:"-" structs:"-" json:"Area,omitempty"`
@@ -107,4 +107,8 @@ func (j *QuestTargetJoin) TransferCopySlice(slicePtr interface{}, targetPtr inte
 	questTargetsPtr := targetPtr.(*[]QuestTarget)
 	(*questTargetsPtr) = questTargets
 	return
+}
+
+func (m *QuestTarget) WithDeleted() bool {
+	return true
 }

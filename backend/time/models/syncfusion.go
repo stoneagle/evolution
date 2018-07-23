@@ -5,10 +5,11 @@ import (
 )
 
 type SyncfusionGantt struct {
-	Id        int
+	Id        uint32
 	Name      string
 	Relate    string
-	Parent    int
+	RelateId  int
+	Parent    uint32
 	Progress  int
 	Duration  int
 	Expanded  bool
@@ -18,6 +19,14 @@ type SyncfusionGantt struct {
 	EndDate   time.Time
 	Children  []SyncfusionGantt
 }
+
+var (
+	SyncfusionGanttLevelQuest   = "quest"
+	SyncfusionGanttLevelProject = "project"
+	SyncfusionGanttLevelTask    = "task"
+	SyncfusionGanttStatusWait   = "wait"
+	SyncfusionGanttStatusFinish = "finish"
+)
 
 type SyncfusionTreeGrid struct {
 	Id         int

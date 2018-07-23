@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/go-xorm/xorm"
+	uuid "github.com/satori/go.uuid"
 )
 
 type Project struct {
@@ -123,6 +124,8 @@ func (c *Project) Transfer(src, des *xorm.Engine, userId int) {
 				return
 			}
 			newProject.Name = oldProject.Project.Text + ":" + newArea.Name
+			u := uuid.NewV4()
+			newProject.Uuid = u.String()
 			_, err = session.Insert(newProject)
 			if err != nil {
 				fmt.Printf("new project insert error %v\r\n", err.Error())
@@ -131,6 +134,8 @@ func (c *Project) Transfer(src, des *xorm.Engine, userId int) {
 			}
 			for _, newTask := range tasksSlice {
 				newTask.ProjectId = newProject.Id
+				u := uuid.NewV4()
+				newTask.Uuid = u.String()
 				_, err = session.Insert(&newTask)
 				if err != nil {
 					fmt.Printf("new task insert error %v\r\n", err.Error())

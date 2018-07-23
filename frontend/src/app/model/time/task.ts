@@ -19,8 +19,11 @@ export class Task extends Basic {
   Resource: Resource;
   QuestTarget: QuestTarget;
   Area: Area;
+  Uuid: string;
+  UuidNumber: number;
   StartDateReset: boolean;
   EndDateReset: boolean;
+  NewFlag: boolean;
   constructor (json?: any) {
     if (json != undefined) {
       super(json)

@@ -13,7 +13,9 @@
     },
     "ERROR": {
       "TARGET_NOT_FINISH": "目标未完成",
-      "PROJECT_NOT_FINISH": "项目未完成"
+      "PROJECT_NOT_FINISH": "项目未完成",
+      "TASK_NOT_EXEC": "任务未执行",
+      "TASK_NOT_FINISH": "任务未完成"
     },
     "RESOURCE": {
       "COUNTRY": {
@@ -266,6 +268,7 @@
       "CREATE": "添加", 
       "UPDATE": "更新",
       "DELETE": "删除",
+      "FINISH": "完成",
       "BACK": "上一步",
       "NEXT": "下一步",
       "SUBMIT": "提交",

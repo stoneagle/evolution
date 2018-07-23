@@ -1,11 +1,13 @@
 package models
 
 import (
+	"encoding/binary"
 	es "evolution/backend/common/structs"
 	"time"
 
 	"github.com/fatih/structs"
 	"github.com/go-xorm/xorm"
+	uuid "github.com/satori/go.uuid"
 )
 
 type Task struct {
@@ -18,6 +20,8 @@ type Task struct {
 	StartDate           time.Time `xorm:"comment('开始日期') DATETIME"`
 	EndDate             time.Time `xorm:"comment('结束日期') DATETIME"`
 	Status              int       `xorm:"not null default 1 comment('当前状态:1未分配2准备做3执行中4已完成') INT(11)" structs:"status,omitempty"`
+	Uuid                string    `xorm:"not null default '' comment('唯一ID') VARCHAR(255)" structs:"uuid,omitempty"`
+	UuidNumber          uint32    `xorm:"-" structs:"-"`
 
 	Resource       *Resource    `xorm:"-" structs:"-" json:"Resource,omitempty"`
 	Project        *Project     `xorm:"-" structs:"-" json:"Project,omitempty"`
@@ -84,9 +88,28 @@ func (m *Task) Transfer(slicePtr interface{}) *[]Task {
 	return ret
 }
 
+func (m *Task) Hook() (err error) {
+	if len(m.Uuid) == 0 {
+		u := uuid.NewV4()
+		m.Uuid = u.String()
+		m.UuidNumber = binary.BigEndian.Uint32(u[0:4])
+	} else {
+		u, err := uuid.FromString(m.Uuid)
+		if err != nil {
+			return err
+		}
+		m.UuidNumber = binary.BigEndian.Uint32(u[0:4])
+	}
+	return nil
+}
+
 func (m *Task) Join() es.JoinGeneral {
 	ret := TaskJoin{}
 	return &ret
+}
+
+func (m *Task) WithDeleted() bool {
+	return true
 }
 
 func (j *TaskJoin) Links() []es.JoinLinks {

@@ -57,6 +57,10 @@ func (m *Resource) Join() es.JoinGeneral {
 	return &ret
 }
 
+func (m *Resource) WithDeleted() bool {
+	return true
+}
+
 func (j *ResourceJoin) Links() []es.JoinLinks {
 	links := make([]es.JoinLinks, 0)
 	mapAreaResourceLink := es.JoinLinks{
