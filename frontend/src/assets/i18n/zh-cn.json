@@ -12,10 +12,10 @@
       }
     },
     "ERROR": {
-      "TARGET_NOT_FINISH": "目标未完成",
-      "PROJECT_NOT_FINISH": "项目未完成",
-      "TASK_NOT_EXEC": "任务未执行",
-      "TASK_NOT_FINISH": "任务未完成"
+      "EXECING": "执行中",
+      "FINISHED": "已完成",
+      "NOT_EXEC": "未执行",
+      "NOT_FINISH": "未完成"
     },
     "RESOURCE": {
       "COUNTRY": {

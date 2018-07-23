@@ -118,7 +118,7 @@ export class QuestSaveComponent implements OnInit {
               this.messageHandlerService.showWarning(
                 this.shareSettings.Time.Resource.Quest,
                 this.shareSettings.System.Process.Update,
-                this.errorInfo.Time.TargetNotFinish
+                this.shareSettings.Time.Resource.QuestTarget + this.errorInfo.Time.NotFinish
               );
             } else {
               this.questTargets.splice(k, 1); 

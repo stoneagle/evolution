@@ -12,10 +12,10 @@ export interface International {
       }
     }
     ERROR: {
-      TARGET_NOT_FINISH: string 
-      PROJECT_NOT_FINISH: string 
-      TASK_NOT_EXEC: string 
-      TASK_NOT_FINISH: string 
+      EXECING: string 
+      FINISHED: string 
+      NOT_EXEC: string 
+      NOT_FINISH: string 
     }
     RESOURCE: {
       COUNTRY: {

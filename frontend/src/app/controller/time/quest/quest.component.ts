@@ -110,7 +110,7 @@ export class QuestComponent implements OnInit {
         this.messageHandlerService.showWarning(
           this.shareSettings.Time.Resource.Quest,
           this.shareSettings.System.Process.Update,
-          this.errorInfo.Time.TargetNotFinish
+          this.errorInfo.Time.NotFinish
         );
       }
     })
@@ -124,7 +124,7 @@ export class QuestComponent implements OnInit {
         this.messageHandlerService.showWarning(
           this.shareSettings.Time.Resource.Quest,
           this.shareSettings.System.Process.Update,
-          this.errorInfo.Time.ProjectNotFinish
+          this.shareSettings.Time.Resource.Project + this.errorInfo.Time.NotFinish
         );
       } else {
         quest.Status = this.questSettings.Status.Fail;
@@ -143,7 +143,7 @@ export class QuestComponent implements OnInit {
         this.messageHandlerService.showWarning(
           this.shareSettings.Time.Resource.Quest,
           this.shareSettings.System.Process.Update,
-          this.errorInfo.Time.ProjectNotFinish
+         this.shareSettings.Time.Resource.Project + this.errorInfo.Time.Execing
         );
       } else {
         this.questService.Delete(quest.Id).subscribe(res => {

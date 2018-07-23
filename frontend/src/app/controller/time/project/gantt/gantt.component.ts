@@ -44,8 +44,6 @@ export class ProjectGanttComponent implements OnInit {
   taskSaveComponent: TaskSaveComponent;
 
   constructor(
-    private errorInfo: ErrorInfo,
-    private shareSettings: ShareSettings,
     private questService: QuestService,
     private projectService: ProjectService,
     private projectSettings: ProjectSettings,
@@ -61,6 +59,8 @@ export class ProjectGanttComponent implements OnInit {
     private syncfusionService: SyncfusionService,
     private signService: SignService,
     private messageHandlerService: MessageHandlerService,
+    private errorInfo: ErrorInfo,
+    private shareSettings: ShareSettings,
     @Inject(forwardRef(() => ShellComponent))
     private shell: ShellComponent,
   ) { }
@@ -78,6 +78,9 @@ export class ProjectGanttComponent implements OnInit {
   ganttStartDate: Date;
   ganttEndDate: Date;
   ganttHeaderSettings: any;
+
+  ganttInitFlag: boolean = false;
+  ganttSaveFlag: boolean = false;
 
   ngOnInit() {
     this.fieldService.List(null).subscribe(res => {
@@ -134,8 +137,6 @@ export class ProjectGanttComponent implements OnInit {
           tmpLateDate = endDate;
         }
       })
-      console.log(tmpEarlyDate);
-      console.log(tmpLateDate);
       this.ganttStartDate = tmpEarlyDate;
       this.ganttEndDate = new Date(tmpLateDate.setMonth(tmpLateDate.getMonth() + 1));
     })
@@ -145,8 +146,17 @@ export class ProjectGanttComponent implements OnInit {
     let gantt = $("#GanttPanel").ejGantt("instance");
     switch ($event.requestType) {
       case "create" :
+        if (!this.ganttInitFlag) {
+          this.ganttInitFlag = true;
+          gantt.collapseAllItems(); 
+        }
+        break;
       case "refresh" :
-        gantt.collapseAllItems(); 
+        if (this.ganttSaveFlag) {
+          this.ganttSaveFlag = false;
+        } else {
+          gantt.collapseAllItems(); 
+        }
         break;
     }
   }
@@ -194,7 +204,7 @@ export class ProjectGanttComponent implements OnInit {
       field: "Relate",
       mappingName: "Relate",
       allowEditing: true,
-      visible: false,
+      visible: true,
       headerText: "Relate",
       // isTemplateColumn: true,
       // template: "{{if eResourceTaskType=='resourceTask'}} <span style='padding:10px;'> {{if eOverlapped}} Yes {{else}} No {{/if}} </span> {{/if}}"
@@ -203,7 +213,7 @@ export class ProjectGanttComponent implements OnInit {
       field: "Color",
       mappingName: "Color",
       allowEditing: false,
-      visible: true,
+      visible: false,
       headerText: "Color",
     };
     var statusColumn = {
@@ -282,7 +292,7 @@ export class ProjectGanttComponent implements OnInit {
           self.messageHandlerService.showWarning(
             self.shareSettings.Time.Resource.Project,
             self.shareSettings.System.Process.Rollback,
-            self.errorInfo.Time.ProjectNotFinish,
+            self.errorInfo.Time.NotFinish,
           );
           return;
         }
@@ -316,7 +326,7 @@ export class ProjectGanttComponent implements OnInit {
             self.messageHandlerService.showWarning(
               self.shareSettings.Time.Resource.Project,
               self.shareSettings.System.Process.Delete,
-              self.errorInfo.Time.ProjectNotFinish
+              self.errorInfo.Time.Execing
             );
             return;
           } else {
@@ -338,7 +348,7 @@ export class ProjectGanttComponent implements OnInit {
     }
     let taskUpdateItem = {
       headerText: processUpdate + taskName,
-      menuId: "task-delete",
+      menuId: "task-update",
       eventHandler: function(args) {
         self.selectGanttData = args.data;
         self.taskSaveComponent.New(args.data.parentItem.RelateId, args.data.RelateId);
@@ -352,7 +362,7 @@ export class ProjectGanttComponent implements OnInit {
           self.messageHandlerService.showWarning(
             self.shareSettings.Time.Resource.Task,
             self.shareSettings.System.Process.Finish,
-            self.errorInfo.Time.TaskNotExec
+            self.errorInfo.Time.NotExec
           );
           return;
         }
@@ -363,7 +373,7 @@ export class ProjectGanttComponent implements OnInit {
             self.messageHandlerService.showWarning(
               self.shareSettings.Time.Resource.Task,
               self.shareSettings.System.Process.Finish,
-              self.errorInfo.Time.TaskNotExec
+              self.errorInfo.Time.NotExec
             );
             return;
           }
@@ -393,7 +403,7 @@ export class ProjectGanttComponent implements OnInit {
           self.messageHandlerService.showWarning(
             self.shareSettings.Time.Resource.Task,
             self.shareSettings.System.Process.Finish,
-            self.errorInfo.Time.TaskNotFinish,
+            self.errorInfo.Time.NotFinish,
           );
           return;
         }
@@ -416,7 +426,7 @@ export class ProjectGanttComponent implements OnInit {
     }
     let taskDeleteItem = {
       headerText: processDelete + taskName,
-      menuId: "task-close",
+      menuId: "task-delete",
       eventHandler: function(args) {
         let action = new Action();
         action.TaskId = args.data.RelateId;
@@ -425,7 +435,7 @@ export class ProjectGanttComponent implements OnInit {
             self.messageHandlerService.showWarning(
               self.shareSettings.Time.Resource.Task,
               self.shareSettings.System.Process.Delete,
-              self.errorInfo.Time.TaskNotFinish
+              self.errorInfo.Time.Execing
             );
             return;
           } else {
@@ -492,6 +502,7 @@ export class ProjectGanttComponent implements OnInit {
       newRecord.Color = this.fieldMaps.get($event.QuestTarget.Area.FieldId).Color;
       let rowPosition: any;
       rowPosition = ej.Gantt.RowPosition.Child;
+      this.ganttSaveFlag = true;
       gantt.addRecord(newRecord, rowPosition);
     } else {
       let newRecord = new Gantt;
@@ -500,6 +511,7 @@ export class ProjectGanttComponent implements OnInit {
       newRecord.Relate = $event.QuestTarget.Area.Name;
       this.selectGanttData.Relate = $event.QuestTarget.Area.Name;
       this.selectGanttData.item.Relate = $event.QuestTarget.Area.Name;
+      this.ganttSaveFlag = true;
       gantt.updateRecordByTaskId(newRecord);
     }
   }
@@ -536,6 +548,7 @@ export class ProjectGanttComponent implements OnInit {
       newRecord.Status = this.taskSettings.Status.Backlog;
       let rowPosition: any;
       rowPosition = ej.Gantt.RowPosition.Child;
+      this.ganttSaveFlag = true;
       gantt.addRecord(newRecord, rowPosition);
     } else {
       let newRecord = new Gantt;
@@ -544,6 +557,7 @@ export class ProjectGanttComponent implements OnInit {
       newRecord.Relate = $event.Resource.Name;
       this.selectGanttData.Relate = $event.Resource.Name;
       this.selectGanttData.item.Relate = $event.Resource.Name;
+      this.ganttSaveFlag = true;
       gantt.updateRecordByTaskId(newRecord);
     }
   }

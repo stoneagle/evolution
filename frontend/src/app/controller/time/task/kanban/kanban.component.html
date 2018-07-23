@@ -3,7 +3,7 @@
   [dataSource]="kanbanData" 
   [columns]="kanbanColumns"
   [fields]="kanbanFields"
-  [swimlaneSettings]="kanbanSwinlaneSettings"
+  [swimlaneSettings]="kanbanSwimlaneSettings"
   [cardSettings]="kanbanCardSettings"
   [contextMenuSettings.enable]="true"
   [contextMenuSettings.menuItems]="kanbanMenuItems"
@@ -12,12 +12,13 @@
   [allowToggleColumn]="true"
   [allowExternalDragAndDrop]="true"
   [allowTitle]="true"
+  keyField="StatusName"
   (cardDrop)="onTaskDrop($event)"
   [workflows]="kanbanWorkflow"
-  keyField="StatusName"
   (contextOpen)="onContextOpen($event)"
   (contextClick)="onContextClick($event)"
   (cardDoubleClick)="disable($event)"
+  (actionComplete)="onActionComplete($event)"
 
   editSettings.allowEditing="true"
 >

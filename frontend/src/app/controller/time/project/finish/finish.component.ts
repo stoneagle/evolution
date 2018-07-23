@@ -60,7 +60,7 @@ export class ProjectFinishComponent implements OnInit {
               this.messageHandlerService.showWarning(
                 this.shareSettings.Time.Resource.Project,
                 this.shareSettings.System.Process.Finish,
-                this.errorInfo.Time.ProjectNotFinish
+                this.errorInfo.Time.NotFinish
               );
               this.modelOpened = false;
               return;
@@ -84,7 +84,7 @@ export class ProjectFinishComponent implements OnInit {
           this.messageHandlerService.showWarning(
             this.shareSettings.Time.Resource.Project,
             this.shareSettings.System.Process.Finish,
-            this.errorInfo.Time.TaskNotFinish
+            this.errorInfo.Time.NotFinish
           );
           this.modelOpened = false;
           return;
