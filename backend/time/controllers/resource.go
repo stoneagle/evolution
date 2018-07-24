@@ -3,7 +3,6 @@ package controllers
 import (
 	"evolution/backend/common/middles"
 	"evolution/backend/common/resp"
-
 	"evolution/backend/time/models"
 
 	"github.com/gin-gonic/gin"
@@ -31,8 +30,8 @@ func (c *Resource) Router(router *gin.RouterGroup) {
 }
 
 func (c *Resource) ListAreas(ctx *gin.Context) {
-	resource := ctx.MustGet(c.Resource.String()).(*models.Resource)
-	areas, err := c.ResourceSvc.ListAreas(resource.Id)
+	resourcePtr := c.Model.(*models.Resource)
+	areas, err := c.ResourceSvc.ListAreas(resourcePtr.Id)
 	if err != nil {
 		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "area get error", err)
 		return

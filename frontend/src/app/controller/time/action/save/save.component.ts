@@ -1,5 +1,6 @@
 import { Component, OnInit, Output, Input, EventEmitter, Inject, forwardRef } from '@angular/core';
 import { EJ_DATETIMEPICKER_COMPONENTS }                                       from 'ej-angular2/src/ej/datetimepicker.component';
+import { EJ_DROPDOWNLIST_COMPONENTS }                                         from 'ej-angular2/src/ej/dropdownlist.component';
 import { EJ_SCHEDULE_COMPONENTS }                                             from 'ej-angular2/src/ej/schedule.component';
 
 import { QuestTeam }       from '../../../../model/time/quest';
@@ -20,9 +21,13 @@ import { ShellComponent }  from '../../../../base/shell/shell.component';
 })
 
 export class ActionSaveComponent implements OnInit {
-  action: Action;
+  action: Action = new Action();
   modelOpened: boolean = false;
-  taskMaps: Map<number, Task> = new Map();
+  tasks: Task[] = [];
+  selectField: any;
+  selectType: any;
+  // ng-select not working
+  taskGroupBy = (item) => item.Project.Name;
 
   @Output() save = new EventEmitter<Action>();
 
@@ -37,44 +42,58 @@ export class ActionSaveComponent implements OnInit {
 
   ngOnInit() {
     this.action = new Action();
+    this.action.StartDate = new Date();
+    this.action.EndDate = new Date();
+  }
+
+  initTasks(userId: number): void {
+    this.taskService.ListByUser(userId).subscribe(tasks => {
+      this.tasks = tasks;
+      this.selectField = { 
+        dataSource: this.tasks, 
+        text: "Name", 
+        value: "Id",
+        groupBy:"Project.Name",
+      };
+    })
   }
 
   NewWithDate(startDate: Date, endDate: Date): void {
-    this.taskService.ListByUser(this.shell.currentUser.Id).subscribe(tasks => {
-      tasks.forEach((one, k) => {
-        this.taskMaps.set(one.Id, one)
-      })
-      this.action = new Action();
-      this.action.UserId = this.shell.currentUser.Id;
-      this.modelOpened = true;
-    })
+    this.initTasks(this.shell.currentUser.Id);
+    this.selectType = "Contains"
+    this.action = new Action();
+    this.action.StartDate = startDate;
+    this.action.EndDate = endDate;
+    this.action.UserId = this.shell.currentUser.Id;
+    this.modelOpened = true;
   }
 
   New(id?: number): void {
-    this.taskService.ListByUser(this.shell.currentUser.Id).subscribe(tasks => {
-      tasks.forEach((one, k) => {
-        this.taskMaps.set(one.Id, one)
-      })
-
-      if (id) {
-        this.actionService.Get(id).subscribe(res => {
-          this.action = res;
-          this.action.UserId = this.shell.currentUser.Id;
-          this.action.StartDate = new Date(this.action.StartDate);
-          this.action.EndDate = new Date(this.action.EndDate);
-          this.modelOpened = true;
-        })
-      } else {
-        this.action = new Action();
-        this.action.StartDate = new Date();
-        this.action.EndDate = new Date();
+    this.initTasks(this.shell.currentUser.Id);
+    if (id) {
+      this.actionService.Get(id).subscribe(res => {
+        console.log(res);
+        this.action = res;
+        this.action.Task.Ids = [this.action.TaskId];
         this.action.UserId = this.shell.currentUser.Id;
+        this.action.StartDate = new Date(this.action.StartDate);
+        this.action.EndDate = new Date(this.action.EndDate);
         this.modelOpened = true;
-      }
-    })
+      })
+    } else {
+      this.action = new Action();
+      this.action.StartDate = new Date();
+      this.action.EndDate = new Date();
+      this.action.UserId = this.shell.currentUser.Id;
+      this.modelOpened = true;
+    }
   }            
 
   Submit(): void {
+    if (this.action.Task.Ids.length != 1) {
+      return;
+    }
+    this.action.TaskId = this.action.Task.Ids[0];
     let time = this.action.EndDate.getTime() - this.action.StartDate.getTime();
     this.action.Time = time / 1000 / 60;
     if (this.action.Id == null) {
@@ -89,9 +108,5 @@ export class ActionSaveComponent implements OnInit {
         this.modelOpened = false;
       })
     }
-  }
-
-  getKeys(map) {
-    return Array.from(map.keys());
   }
 }

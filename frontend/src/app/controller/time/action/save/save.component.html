@@ -1,47 +1,57 @@
 <clr-modal [(clrModalOpen)]="modelOpened">
-    <h3 class="modal-title" *ngIf="(action.Id)">
-      {{ 'SYSTEM.PROCESS.UPDATE' | translate }}{{ 'TIME.RESOURCE.ACTION.CONCEPT' | translate }}
-    </h3>
-    <h3 class="modal-title" *ngIf="!(action.Id)">
-      {{ 'SYSTEM.PROCESS.CREATE' | translate }}{{ 'TIME.RESOURCE.ACTION.CONCEPT' | translate }}
-    </h3>
-    <div class="modal-body">
-      <form #addForm="ngForm" (ngSubmit)="Submit()">
-        <div class="form-group">
-          <label>{{ 'TIME.RESOURCE.ACTION.TASK' | translate }}</label>
-          <div class="select">
-            <label 
-              for="TaskId" aria-haspopup="true" role="tooltip" 
-              [class.invalid]="TaskId.invalid && (TaskId.dirty || TaskId.touched)"
-              class="tooltip tooltip-validation tooltip-md tooltip-bottom-right"
-            >
-              <select id="TaskId" #TaskId="ngModel" [(ngModel)]="action.TaskId" name="TaskId" required>
-                <option *ngFor="let key of getKeys(taskMaps)" [ngValue]="taskMaps.get(key).Id">
-                  {{ taskMaps.get(key).Name  }}
-                </option>
-              </select>
-              <span class="tooltip-content">{{ 'TIME.RESOURCE.PROJECT.AREA' | translate }}{{ 'SYSTEM.TOOLTIP.EMPTY' | translate }}</span>
-            </label>
-          </div>
-        </div>
-        <div class="form-group">
-          <label for="Name">{{ 'TIME.RESOURCE.ACTION.NAME' | translate }}</label>
-          <input type="text" class="form-control" id="Name" required [(ngModel)]="action.Name" name="Name" >
-        </div> 
-        <div class="form-group">
-          <label for="UserName">{{ 'TIME.RESOURCE.ACTION.USER' | translate }}</label>
-          <input type="text" class="form-control" id="UserName" readonly name="UserName" value="{{shell.currentUser.Name}}" />
-        </div> 
-        <div class="form-group">
-          <label for="StartDateInfo">{{ 'TIME.RESOURCE.ACTION.STARTDATE' | translate }}</label>
-          <input type="text" class="form-control" id="StartDateInfo" readonly name="StartDateInfo" value="{{action.StartDate.toLocaleString()}}" />
-        </div>
-        <div class="form-group">
-          <label for="EndDateInfo">{{ 'TIME.RESOURCE.ACTION.ENDDATE' | translate }}</label>
-          <input type="text" class="form-control" id="EndDateInfo" readonly name="EndDateInfo" value="{{action.EndDate.toLocaleString()}}" />
-        </div>
-        <button type="submit" class="btn btn-success">{{ 'SYSTEM.PROCESS.SUBMIT' | translate }}</button>
-        <button type="button" class="btn btn-primary" (click)="modelOpened = false">{{ 'SYSTEM.PROCESS.CANCEL' | translate }}</button>
-      </form>
-    </div>     
+  <h3 class="modal-title" *ngIf="(action.Id)">
+    {{ 'SYSTEM.PROCESS.UPDATE' | translate }}{{ 'TIME.RESOURCE.ACTION.CONCEPT' | translate }}
+  </h3>
+  <h3 class="modal-title" *ngIf="!(action.Id)">
+    {{ 'SYSTEM.PROCESS.CREATE' | translate }}{{ 'TIME.RESOURCE.ACTION.CONCEPT' | translate }}
+  </h3>
+  <div class="modal-body">
+    <form #addForm="ngForm" (ngSubmit)="Submit()">
+      <div class="form-group">
+        <label>{{ 'TIME.RESOURCE.ACTION.TASK' | translate }}</label>
+        <!-- ng-select conflict with syncfuison -->
+        <ng-select 
+          [(ngModel)]="action.Task.Ids"
+          [maxSelectedItems]="2"
+          [items]="tasks"
+          bindLabel="Name"
+          bindValue="Id"
+          [multiple]="true"
+          id="TaskId"
+          name="TaskId"
+          [groupBy]="taskGroupBy"
+        >
+        </ng-select>
+        <!-- <input --> 
+        <!--   id="TaskId" --> 
+        <!--   ej-dropdownlist --> 
+        <!--   [dataSource]="tasks" --> 
+        <!--   [fields]="selectField" --> 
+        <!--   [enableFilterSearch]="true" --> 
+        <!--   [filterType]="selectType" -->
+        <!--   [(value)]="action.TaskId" -->
+        <!--   [width]="200" --> 
+        <!--   [popupHeight]="300" --> 
+        <!-- /> -->
+      </div>
+      <div class="form-group">
+        <label for="Name">{{ 'TIME.RESOURCE.ACTION.NAME' | translate }}</label>
+        <input type="text" class="form-control" id="Name" required [(ngModel)]="action.Name" name="Name" >
+      </div> 
+      <div class="form-group">
+        <label for="UserName">{{ 'TIME.RESOURCE.ACTION.USER' | translate }}</label>
+        <input type="text" class="form-control" id="UserName" readonly name="UserName" value="{{shell.currentUser.Name}}" />
+      </div> 
+      <div class="form-group">
+        <label for="StartDateInfo">{{ 'TIME.RESOURCE.ACTION.STARTDATE' | translate }}</label>
+        <input type="text" class="form-control" id="StartDateInfo" readonly name="StartDateInfo" value="{{action.StartDate.toLocaleString()}}" />
+      </div>
+      <div class="form-group">
+        <label for="EndDateInfo">{{ 'TIME.RESOURCE.ACTION.ENDDATE' | translate }}</label>
+        <input type="text" class="form-control" id="EndDateInfo" readonly name="EndDateInfo" value="{{action.EndDate.toLocaleString()}}" />
+      </div>
+      <button type="submit" class="btn btn-success">{{ 'SYSTEM.PROCESS.SUBMIT' | translate }}</button>
+      <button type="button" class="btn btn-primary" (click)="modelOpened = false">{{ 'SYSTEM.PROCESS.CANCEL' | translate }}</button>
+    </form>
+  </div>     
 </clr-modal>   

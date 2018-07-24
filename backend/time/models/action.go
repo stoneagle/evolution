@@ -20,18 +20,25 @@ type Action struct {
 	UserId         int       `xorm:"not null default 0 comment('执行人') INT(11)" structs:"user_id,omitempty"`
 	Time           int       `xorm:"not null default 0 comment('花费时间:单位分钟') INT(11)" structs:"time,omitempty"`
 
-	TaskIds []int `xorm:"-" structs:"task_id,omitempty" json:"TaskIds,omitempty"`
-	Task    *Task `xorm:"-" structs:"-" json:"Task,omitempty"`
+	TaskIds  []int     `xorm:"-" structs:"task_id,omitempty" json:"TaskIds,omitempty"`
+	Task     *Task     `xorm:"-" structs:"-" json:"Task,omitempty"`
+	Resource *Resource `xorm:"-" structs:"-" json:"Resource,omitempty"`
+	Area     *Area     `xorm:"-" structs:"-" json:"Area,omitempty"`
 }
 
 type ActionJoin struct {
-	Action `xorm:"extends" json:"-"`
-	Task   `xorm:"extends" json:"-"`
+	Action          `xorm:"extends" json:"-"`
+	Task            `xorm:"extends" json:"-"`
+	Resource        `xorm:"extends" json:"-"`
+	MapAreaResource `xorm:"extends" json:"-"`
+	Area            `xorm:"extends" json:"-"`
 }
 
 func NewAction() *Action {
 	ret := Action{
-		Task: NewTask(),
+		Task:     NewTask(),
+		Resource: NewResource(),
+		Area:     NewArea(),
 	}
 	return &ret
 }
@@ -45,7 +52,9 @@ func (m *Action) BuildCondition(session *xorm.Session) {
 	params := structs.Map(m)
 	condition := m.Model.BuildCondition(params, keyPrefix)
 	session.Where(condition)
-
+	m.Area.BuildCondition(session)
+	m.Task.BuildCondition(session)
+	m.Resource.BuildCondition(session)
 	emptyTime := time.Time{}
 	if m.StartDate != emptyTime {
 		session.And(builder.Gte{fmt.Sprintf("%s.start_date", m.TableName()): m.StartDate})
@@ -53,7 +62,6 @@ func (m *Action) BuildCondition(session *xorm.Session) {
 	if m.EndDate != emptyTime {
 		session.And(builder.Lte{fmt.Sprintf("%s.start_date", m.TableName()): m.EndDate})
 	}
-
 	return
 }
 
@@ -74,7 +82,7 @@ func (m *Action) Join() es.JoinGeneral {
 
 func (j *ActionJoin) Links() []es.JoinLinks {
 	links := make([]es.JoinLinks, 0)
-	actionLink := es.JoinLinks{
+	taskLink := es.JoinLinks{
 		Type:       es.InnerJoin,
 		Table:      j.Task.TableName(),
 		LeftTable:  j.Task.TableName(),
@@ -82,7 +90,34 @@ func (j *ActionJoin) Links() []es.JoinLinks {
 		RightTable: j.Action.TableName(),
 		RightField: "task_id",
 	}
-	links = append(links, actionLink)
+	resourceLink := es.JoinLinks{
+		Type:       es.InnerJoin,
+		Table:      j.Resource.TableName(),
+		LeftTable:  j.Resource.TableName(),
+		LeftField:  "id",
+		RightTable: j.Task.TableName(),
+		RightField: "resource_id",
+	}
+	mapAreaResourceLink := es.JoinLinks{
+		Type:       es.InnerJoin,
+		Table:      j.MapAreaResource.TableName(),
+		LeftTable:  j.MapAreaResource.TableName(),
+		LeftField:  "resource_id",
+		RightTable: j.Resource.TableName(),
+		RightField: "id",
+	}
+	areaLink := es.JoinLinks{
+		Type:       es.InnerJoin,
+		Table:      j.Area.TableName(),
+		LeftTable:  j.Area.TableName(),
+		LeftField:  "id",
+		RightTable: j.MapAreaResource.TableName(),
+		RightField: "area_id",
+	}
+	links = append(links, taskLink)
+	links = append(links, resourceLink)
+	links = append(links, mapAreaResourceLink)
+	links = append(links, areaLink)
 	return links
 }
 
@@ -95,6 +130,8 @@ func (j *ActionJoin) Transfer() es.ModelGeneral {
 	join := *j
 	ret := join.Action
 	ret.Task = &join.Task
+	ret.Resource = &join.Resource
+	ret.Area = &join.Area
 	return &ret
 }
 
@@ -102,6 +139,8 @@ func (j *ActionJoin) TransferCopy(modelPtr es.ModelGeneral) {
 	actionPtr := modelPtr.(*Action)
 	(*actionPtr) = (*j).Action
 	(*actionPtr).Task = &(*j).Task
+	(*actionPtr).Resource = &(*j).Resource
+	(*actionPtr).Area = &(*j).Area
 	return
 }
 

@@ -9,12 +9,14 @@ import { TranslateModule  }          from "@ngx-translate/core";
 import { NgSelectModule  }           from '@ng-select/ng-select';
 import { TreeModule }                from 'ng2-tree';
 
-import { EJ_GANTT_COMPONENTS }          from 'ej-angular2/src/ej/gantt.component';
-import { EJ_TREEGRID_COMPONENTS }       from 'ej-angular2/src/ej/treegrid.component';
-import { EJ_SCHEDULE_COMPONENTS }       from 'ej-angular2/src/ej/schedule.component';
-import { EJ_DATEPICKER_COMPONENTS }     from 'ej-angular2/src/ej/datepicker.component';
-import { EJ_DATETIMEPICKER_COMPONENTS } from 'ej-angular2/src/ej/datetimepicker.component';
-import { EJ_KANBAN_COMPONENTS }         from 'ej-angular2/src/ej/kanban.component';
+// import { EJAngular2Module, EJTemplateDirective } from 'ej-angular2';
+import { EJ_GANTT_COMPONENTS }                      from 'ej-angular2/src/ej/gantt.component';
+import { EJ_TREEGRID_COMPONENTS }                   from 'ej-angular2/src/ej/treegrid.component';
+import { EJ_SCHEDULE_COMPONENTS }                   from 'ej-angular2/src/ej/schedule.component';
+import { EJ_DATEPICKER_COMPONENTS }                 from 'ej-angular2/src/ej/datepicker.component';
+import { EJ_DATETIMEPICKER_COMPONENTS }             from 'ej-angular2/src/ej/datetimepicker.component';
+import { EJ_DROPDOWNLIST_COMPONENTS }               from 'ej-angular2/src/ej/dropdownlist.component';
+import { EJ_KANBAN_COMPONENTS }                     from 'ej-angular2/src/ej/kanban.component';
 
 import { QuestComponent }            from './quest/quest.component';
 import { QuestSaveComponent }        from './quest/save/save.component';
@@ -29,6 +31,7 @@ import { TaskListComponent }         from './task/list/list.component';
 import { TaskKanbanComponent }       from './task/kanban/kanban.component';
 import { ActionComponent }           from './action/action.component';
 import { ActionSaveComponent }       from './action/save/save.component';
+import { ActionListComponent }       from './action/list/list.component';
 import { ActionScheduleComponent }   from './action/schedule/schedule.component';
 import { CountryComponent }          from './country/country.component';
 import { CountrySaveComponent }      from './country/save/save.component';
@@ -86,6 +89,7 @@ import { ErrorInfo  }     from '../../shared/error';
     TaskKanbanComponent,
     ActionComponent,
     ActionSaveComponent,
+    ActionListComponent,
     ActionScheduleComponent,
     CountryComponent,
     CountrySaveComponent,
@@ -106,6 +110,8 @@ import { ErrorInfo  }     from '../../shared/error';
     EJ_SCHEDULE_COMPONENTS,
     EJ_DATEPICKER_COMPONENTS,
     EJ_KANBAN_COMPONENTS,
+    EJ_DROPDOWNLIST_COMPONENTS,
+    // EJTemplateDirective,
   ],
   imports: [   
     BrowserModule,
@@ -117,6 +123,7 @@ import { ErrorInfo  }     from '../../shared/error';
     TranslateModule,
     TreeModule,
     NgSelectModule,
+    // EJAngular2Module.forRoot(),
   ],
   providers: [ 
     AreaService,

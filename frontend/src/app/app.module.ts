@@ -6,15 +6,15 @@ import { TranslateHttpLoader  }              from '@ngx-translate/http-loader';
 import { ClarityModule  }                    from "@clr/angular";
 import { CookieModule }                      from 'ngx-cookie';
 
-import { AppComponent }         from './app.component';
-import { AppRouteModule }       from './route/app-route.module';
-import { AppConfig  }           from './service/base/config.service';
-import { InternationalConfig  } from './service/base/international.service';
-import { CustomInterceptor  }   from './service/base/custom.interceptor';
-import { BaseModule }           from './base/base.module';
-import { QuantModule }          from './controller/quant/quant.module';
-import { TimeModule }           from './controller/time/time.module';
-import { SystemModule }         from './controller/system/system.module';
+import { AppComponent }                          from './app.component';
+import { AppRouteModule }                        from './route/app-route.module';
+import { AppConfig  }                            from './service/base/config.service';
+import { InternationalConfig  }                  from './service/base/international.service';
+import { CustomInterceptor  }                    from './service/base/custom.interceptor';
+import { BaseModule }                            from './base/base.module';
+import { QuantModule }                           from './controller/quant/quant.module';
+import { TimeModule }                            from './controller/time/time.module';
+import { SystemModule }                          from './controller/system/system.module';
 
 import { ShareSettings }         from './shared/settings';
 

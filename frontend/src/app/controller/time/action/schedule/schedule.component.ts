@@ -1,13 +1,18 @@
 import { Component, OnInit, Input, Output, ViewChild } from '@angular/core';
 import { EJ_SCHEDULE_COMPONENTS }                      from 'ej-angular2/src/ej/schedule.component';
 import { InternationalConfig as N18 }   from '../../../../service/base/international.service';
+import * as jsrender from 'jsrender'; 
 
 import { Action }              from '../../../../model/time/action';
+import { Field }              from '../../../../model/time/field';
 import { Schedule }            from '../../../../model/time/syncfusion';
 import { ActionService }       from '../../../../service/time/action.service';
 import { SyncfusionService }   from '../../../../service/time/syncfusion.service';
+import { FieldService }        from '../../../../service/time/field.service';
 import { SignService }         from '../../../../service/system/sign.service';
+
 import { ActionSaveComponent } from '../save/save.component';
+import { ActionListComponent } from '../list/list.component';
 
 @Component({
   selector: 'time-action-schedule',
@@ -17,18 +22,62 @@ import { ActionSaveComponent } from '../save/save.component';
 export class ActionScheduleComponent implements OnInit {
   @ViewChild(ActionSaveComponent)
   actionSaveComponent: ActionSaveComponent;
+  @ViewChild(ActionListComponent)
+  actionListComponent: ActionListComponent;
 
   currentDate: Date = new Date();
   scheduleId: string = "ActionSchedule";
   scheduleSettings: any;
-  scheduleData: any;
+  scheduleCategorySettings: any;
+  scheduleTooltipSettings: any;
   scheduleMenuItems: any;
+  currentView: string = "week";
+  scheduleView: string[] = ["Day", "Agenda", "Week", "Month"];
+  scheduleAppointmentTemplate: string = "#appTemplate";
+  fieldsMap: Map<number, Field> = new Map();
+  modelListOpened: boolean = false;
 
   constructor(
     private actionService: ActionService,
+    private fieldService: FieldService,
     private syncfusionService: SyncfusionService,
     private signService: SignService,
-  ) { }
+  ) { 
+    jsrender.views.helpers({ 
+      minuteFormat: this.minuteFormat,
+      conceptFormat: this.conceptFormat,
+    });
+  }
+
+  minuteFormat(date: Date) {
+    var dFormat = ej.format(new Date(date), "hh:mm");
+    return dFormat;
+  }
+
+  conceptFormat(concept: string): string {
+    let taskName     = N18.settings.TIME.RESOURCE.TASK.CONCEPT;
+    let areaName     = N18.settings.TIME.RESOURCE.AREA.CONCEPT;
+    let resourceName = N18.settings.TIME.RESOURCE.RESOURCE.CONCEPT;
+    let actionName   = N18.settings.TIME.RESOURCE.ACTION.CONCEPT;
+    let startDate    = N18.settings.TIME.RESOURCE.ACTION.STARTDATE;
+    let endDate      = N18.settings.TIME.RESOURCE.ACTION.ENDDATE;
+    switch (concept) {
+      case "task":
+        return taskName;
+      case "area":
+        return areaName;
+      case "resource":
+        return resourceName;
+      case "action":
+        return actionName;
+      case "startDate":
+        return startDate;
+      case "endDate":
+        return endDate;
+      default:
+        return "";
+    }
+  }
 
   ngOnInit() {
     this.scheduleSettings = {
@@ -39,27 +88,60 @@ export class ActionScheduleComponent implements OnInit {
       allDay:"AllDay",
       recurrence:"Recurrence",
       recurrenceRule:"RecurrenceRule",
+      categorize: "FieldId",
+      dataSource: this.syncfusionService.GetScheduleManager()
     }
-    this.scheduleData      = this.syncfusionService.GetScheduleManager();
+
+    this.scheduleTooltipSettings = {
+      enable: true,
+      templateId: "#time-schedule-tooltip-template",
+    }
+
+    this.fieldService.List(null).subscribe(fields => {
+      let categories = [];
+      fields.forEach((one, k) => {
+        this.fieldsMap.set(one.Id, one);
+        let tmp = {
+          Name: one.Name,
+          Id: one.Id,
+          Color: one.Color,
+          FontColor: "#ffffff",
+        }
+        categories.push(tmp);
+      })
+      this.scheduleCategorySettings = {
+        enable: true,
+        allowMultiple: false,
+        dataSource: categories,
+        text: "Name", id: "Id", color: "Color", fontColor: "FontColor",
+      }
+    })
+
     let actionName    = N18.settings.TIME.RESOURCE.ACTION.CONCEPT;
     let processCreate = N18.settings.SYSTEM.PROCESS.CREATE;
     let processUpdate = N18.settings.SYSTEM.PROCESS.UPDATE;
     let processDelete = N18.settings.SYSTEM.PROCESS.DELETE;
+    let processList   = N18.settings.SYSTEM.PROCESS.LIST;
+
     this.scheduleMenuItems = {
       appointment: [
         {
-            id: "update-action",
-            text: processUpdate + actionName
+          id: "list-action",
+          text: actionName + processList
         },
         {
-            id: "delete-action",
-            text: processDelete + actionName
+          id: "update-action",
+          text: actionName + processUpdate
+        },
+        {
+          id: "delete-action",
+          text: actionName + processDelete
         },
       ],
       cells: [
         {
           id: "add-action",
-          text: processCreate + actionName,
+          text: actionName + processCreate,
         }
       ]
     };
@@ -67,6 +149,12 @@ export class ActionScheduleComponent implements OnInit {
   
   onMenuItemClick($event) {
     switch($event.events.ID) {
+      case "list-action":
+        let action = new Action();
+        action.TaskId = $event.targetInfo.Task.Id;
+        this.actionListComponent.NewWithFilter(action)
+        this.modelListOpened = true;
+        break;
       case "add-action":
         let startDate = $event.targetInfo.startTime;
         let endDate = $event.targetInfo.endTime;
@@ -76,18 +164,30 @@ export class ActionScheduleComponent implements OnInit {
         this.actionSaveComponent.New($event.targetInfo.Id);
         break;
       case "delete-action":
-        this.actionService.Delete($event.targetInfo.Id).subscribe(res => {
-          let schObj = $("#" + this.scheduleId).data("ejSchedule");
-          schObj.deleteAppointment($event.targetInfo.Guid); 
-        });
+        let schObj = $("#" + this.scheduleId).data("ejSchedule");
+        schObj.deleteAppointment($event.targetInfo.Guid); 
+        // exec in actionComplete
         break;
     }
   }
 
+  actionComplete($event): void {
+    switch ($event.requestType) {
+      case "appointmentDelete":
+        if ($event.data != undefined) {
+          this.actionService.Delete($event.data.Id).subscribe(res => {
+            if (res) {
+              $event.cancel = false;
+            } else {
+              $event.cancel = true;
+            }
+          });
+        }
+    }
+  }
+
   actionDelete($event) {
-    this.actionService.Delete($event.appointment.Id).subscribe(res => {
-      $event.cancel = false;
-    });
+    $event.cancel = false;
   }
 
   onContextMenuOpen($event) {
@@ -115,18 +215,32 @@ export class ActionScheduleComponent implements OnInit {
   }
 
   actionShow($event) {
+    var schObj = $("#" + this.scheduleId).data("ejSchedule");
+    let currentView = schObj["ob.values"].currentView;
+    switch (currentView) {
+      case "agenda":
+        this.actionSaveComponent.New($event.appointment.Id);
+        break;
+    }
     $event.cancel = true;
   }
 
   actionSaved($event): void {
-    let schedule = new Schedule();
-    schedule.Id = $event.Id;
-    schedule.Name = $event.Name;
-    schedule.StartDate = $event.StartDate;
-    schedule.EndDate = $event.EndDate;
-    schedule.AllDay = false;
-    schedule.Recurrence = false;
-		var schObj = $("#" + this.scheduleId).data("ejSchedule");
-		schObj.saveAppointment(schedule); 
+    this.actionService.Get($event.Id).subscribe(res => {
+      let schedule = new Schedule();
+      schedule.Id = res.Id;
+      schedule.Name = res.Name;
+      schedule.StartDate = res.StartDate;
+      schedule.EndDate = res.EndDate;
+      schedule.Field = this.fieldsMap.get(res.Area.FieldId);
+      schedule.FieldId = res.Area.FieldId.toString();
+      schedule.Area = res.Area;
+      schedule.Task = res.Task;
+      schedule.Resource = res.Resource;
+      schedule.AllDay = false;
+      schedule.Recurrence = false;
+      var schObj = $("#" + this.scheduleId).data("ejSchedule");
+      schObj.saveAppointment(schedule); 
+    })
   }
 }

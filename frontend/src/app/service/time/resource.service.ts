@@ -21,8 +21,14 @@ export class ResourceService extends BaseService {
   }
 
   ListAreas(id: number): Observable<Area[]> {
-    return this.BaseList<Area>(null, Area, this.uri + `/list/areas/${id}`).pipe(map(areas => {
-      return areas;
+    return this.BaseResp(this.uri + `/list/areas/${id}`).pipe(map(res => {
+      let ret: Area[] = []; 
+      res.data.map(
+        one => {
+          ret.push(new Area(one));
+        }
+      )
+      return ret;
     }))
   }
 

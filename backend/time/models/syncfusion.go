@@ -42,8 +42,13 @@ type SyncfusionSchedule struct {
 	Name       string
 	StartDate  time.Time
 	EndDate    time.Time
+	FieldId    string
 	AllDay     bool
 	Recurrence bool
+	Area       Area
+	Task       Task
+	Resource   Resource
+	Field      Field
 }
 
 type SyncfusionKanban struct {

@@ -20,8 +20,14 @@ export class TaskService extends BaseService {
   }
 
   ListByUser(userId: number): Observable<Task[]> {
-    return this.BaseList<Task>(null, Task, this.uri + `/list/user/${userId}`).pipe(map(tasks => {
-      return tasks;
+    return this.BaseResp(this.uri + `/list/user/${userId}`).pipe(map(res => {
+      let ret: Task[] = []; 
+      res.data.map(
+        one => {
+          ret.push(new Task(one));
+        }
+      )
+      return ret;
     }))
   }
   

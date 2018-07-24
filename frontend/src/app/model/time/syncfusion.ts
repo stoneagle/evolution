@@ -1,4 +1,8 @@
-import { Basic }  from '../base/basic';
+import { Basic }    from '../base/basic';
+import { Area }     from './area';
+import { Resource } from './resource';
+import { Task }     from './task';
+import { Field }    from './field';
 
 export class TreeGrid extends Basic {
   Id: number;
@@ -44,8 +48,13 @@ export class Schedule extends Basic {
   Name: string;
   StartDate: Date;
   EndDate: Date;
+  FieldId: string;
   AllDay: boolean;
   Recurrence: boolean;
+  Field: Field;
+  Area: Area;
+  Resource: Resource;
+  Task: Task;
 }
 
 export class Kanban extends Basic {

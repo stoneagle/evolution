@@ -3,6 +3,7 @@ package services
 import (
 	"errors"
 	"math"
+	"strconv"
 
 	"github.com/go-redis/redis"
 	"github.com/go-xorm/xorm"
@@ -93,15 +94,31 @@ func (s *Syncfusion) ListSchedule(userId int, startDate, endDate time.Time) (sch
 	actionsPtr := action.Transfer(actionsGeneralPtr)
 
 	schedules = make([]models.SyncfusionSchedule, 0)
+	fieldsMap, err := s.Pack.FieldSvc.Map()
+	if err != nil {
+		return
+	}
+
 	hour, _ := time.ParseDuration("-4h")
 	for _, one := range *actionsPtr {
 		schedule := models.SyncfusionSchedule{}
 		schedule.Id = one.Id
 		schedule.Name = one.Name
+		fieldIdStr := strconv.Itoa(one.Area.FieldId)
+		schedule.FieldId = fieldIdStr
+		field, ok := fieldsMap[one.Area.FieldId]
+		if !ok {
+			err = errors.New("field not exist")
+			return
+		}
+		schedule.Field = field
 		schedule.StartDate = one.StartDate.Add(hour)
 		schedule.EndDate = one.EndDate.Add(hour)
 		schedule.AllDay = false
 		schedule.Recurrence = false
+		schedule.Area = *one.Area
+		schedule.Resource = *one.Resource
+		schedule.Task = *one.Task
 		schedules = append(schedules, schedule)
 	}
 	return
