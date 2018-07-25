@@ -22,7 +22,7 @@ type Base struct {
 func (b *Base) Prepare() {
 	b.Config = *config.Get()
 	b.Cache = database.GetRedis()
-	b.Engine = database.GetXorm(b.Config.Quant.Database.Name)
+	b.Engine = database.GetXorm(b.Config.Quant.System.Name)
 	b.Rpc = rpc.NewRpc(b.Config.Quant.Rpc.Host, b.Config.Quant.Rpc.Port)
 	b.Logger = logger.Get()
 }

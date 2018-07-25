@@ -1,0 +1,48 @@
+<clr-modal [(clrModalOpen)]="modelOpened">
+  <h3 class="modal-title" *ngIf="(action.Id)">
+    {{ 'SYSTEM.PROCESS.UPDATE' | translate }}{{ 'TIME.RESOURCE.ACTION.CONCEPT' | translate }}
+  </h3>
+  <h3 class="modal-title" *ngIf="!(action.Id)">
+    {{ 'SYSTEM.PROCESS.CREATE' | translate }}{{ 'TIME.RESOURCE.ACTION.CONCEPT' | translate }}
+  </h3>
+  <div class="modal-body">
+    <form #addForm="ngForm" (ngSubmit)="Submit()">
+      <div class="form-group">
+        <label>{{ 'TIME.RESOURCE.ACTION.TASK' | translate }}</label>
+        <!-- ng-select conflict with syncfuison -->
+        <ng-select 
+          [(ngModel)]="action.Task.Ids"
+          [maxSelectedItems]="2"
+          [items]="tasks"
+          bindLabel="Name"
+          bindValue="Id"
+          [multiple]="true"
+          id="TaskId"
+          name="TaskId"
+          [groupBy]="taskGroupBy"
+        >
+        </ng-select>
+      </div>
+      <div class="form-group">
+        <label for="Name">{{ 'TIME.RESOURCE.ACTION.NAME' | translate }}</label>
+        <input type="text" class="form-control" id="Name" required [(ngModel)]="action.Name" name="Name" >
+      </div> 
+      <div class="form-group">
+        <label for="UserName">{{ 'TIME.RESOURCE.ACTION.USER' | translate }}</label>
+        <input type="text" class="form-control" id="UserName" readonly name="UserName" value="{{shell.currentUser.Name}}" />
+      </div> 
+      <div class="form-group">
+        <label for="StartDate">{{ 'TIME.RESOURCE.ACTION.STARTDATE' | translate }}</label>
+        <input id="StartDate" name="StartDate" [(ngModel)]="action.StartDate" [owlDateTimeTrigger]="StartDate" [owlDateTime]="StartDate" />
+        <owl-date-time #StartDate></owl-date-time>
+      </div>
+      <div class="form-group">
+        <label for="EndDate">{{ 'TIME.RESOURCE.ACTION.ENDDATE' | translate }}</label>
+        <input id="EndDate" name="EndDate" [(ngModel)]="action.EndDate" [owlDateTimeTrigger]="EndDate" [owlDateTime]="EndDate" />
+        <owl-date-time #EndDate></owl-date-time>
+      </div>
+      <button type="submit" class="btn btn-success">{{ 'SYSTEM.PROCESS.SUBMIT' | translate }}</button>
+      <button type="button" class="btn btn-primary" (click)="modelOpened = false">{{ 'SYSTEM.PROCESS.CANCEL' | translate }}</button>
+    </form>
+  </div>     
+</clr-modal>   

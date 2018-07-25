@@ -1,4 +1,4 @@
-import { Serializable } from '../base/serializable.model';
+import { Serializable } from '../base/serializable';
 import { Item } from './item'
 
 export class Pool extends Serializable {
@@ -13,4 +13,11 @@ export class Pool extends Serializable {
   UpdatedAt: string;
   DeletedAt: string;
   Item: Item[];
+  constructor (json?: any) {
+    if (json != undefined) {
+      super(json)
+    } else {
+      this.Item = [];
+    }
+  }
 }

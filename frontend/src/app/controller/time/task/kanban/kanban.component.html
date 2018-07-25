@@ -1,0 +1,34 @@
+<ej-kanban 
+  id="TaskKanban"
+  [dataSource]="kanbanData" 
+  [columns]="kanbanColumns"
+  [fields]="kanbanFields"
+  [swimlaneSettings]="kanbanSwimlaneSettings"
+  [cardSettings]="kanbanCardSettings"
+  [contextMenuSettings.enable]="true"
+  [contextMenuSettings.menuItems]="kanbanMenuItems"
+  [contextMenuSettings.customMenuItems]="kanbanCustomMenuItems"
+  [enableTotalCount]="true"
+  [allowToggleColumn]="true"
+  [allowExternalDragAndDrop]="true"
+  [allowTitle]="true"
+  keyField="StatusName"
+  (cardDrop)="onTaskDrop($event)"
+  [workflows]="kanbanWorkflow"
+  (contextOpen)="onContextOpen($event)"
+  (contextClick)="onContextClick($event)"
+  (cardDoubleClick)="disable($event)"
+  (actionComplete)="onActionComplete($event)"
+
+  editSettings.allowEditing="true"
+>
+</ej-kanban>
+<!-- scroll setting doesn't need right now -->
+<!-- [allowScrolling]="true" -->
+<!-- [scrollSettings.height]="600" -->
+<!--filter need json data-->
+<!-- [filterSettings]="kanbanFilterSettings" -->
+<!-- [allowFiltering]="true" --> 
+<!-- [allowSearching]="true" --> 
+<time-task-save (save)="taskSaved($event)"></time-task-save>
+<time-action-save (save)="actionSaved($event)"></time-action-save>

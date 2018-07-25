@@ -2,16 +2,16 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router, ActivatedRoute }       from "@angular/router";
 import { Pool }                         from '../../../model/quant/pool';
 import { PoolService }                  from '../../../service/quant/pool.service';
-import { SavePoolComponent }            from './save/save.component';
+import { PoolSaveComponent }            from './save/save.component';
 
 @Component({
-  selector: 'app-pool',
+  selector: 'quant-pool',
   templateUrl: './pool.component.html',
   styleUrls: ['./pool.component.css']
 })
 export class PoolComponent implements OnInit {
-  @ViewChild(SavePoolComponent)
-  savePool: SavePoolComponent;
+  @ViewChild(PoolSaveComponent)
+  saveComponent: PoolSaveComponent;
 
   pools: Pool[];
 
@@ -40,7 +40,7 @@ export class PoolComponent implements OnInit {
   openSaveModel(id?: number): void {
     switch(this.route.parent.snapshot.routeConfig.path) {
       case 'stock':
-        this.savePool.New("Stock", id);
+        this.saveComponent.New("Stock", id);
         break;
     }
   }
@@ -64,7 +64,7 @@ export class PoolComponent implements OnInit {
   }
 
   refreshPools(from: number, to: number): void {
-    this.poolService.List().subscribe(res => {
+    this.poolService.List(null).subscribe(res => {
       this.totalCount = res.length;
       this.pools = res.slice(from, to);
     })

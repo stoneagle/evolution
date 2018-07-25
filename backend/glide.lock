@@ -1,19 +1,38 @@
-hash: 1f45c3a8dca6a50f5a4b937062e418c5c7c85ad8613c7202cb42cc449c66b9e4
-updated: 2018-06-30T09:12:44.651572329+08:00
+hash: 3a370f467a5349ac82d098c14be2340f9f4f873e4e2cd83b0bf77d4e4fd3ab57
+updated: 2018-07-22T17:45:14.967556804+08:00
 imports:
 - name: git.apache.org/thrift.git
   version: 327ebb6c2b6df8bf075da02ef45a2a034e9b79ba
   subpackages:
   - lib/go/thrift
   - lib/go/thrift/...
+- name: github.com/araddon/dateparse
+  version: a95177ee19eb48201ec253a68c4d7dd21008536d
+- name: github.com/boj/redistore
+  version: 0cd55584b172cefd31c4cb84e2904585d898c7b2
+- name: github.com/davecgh/go-spew
+  version: 346938d642f2ec3594ed81d874461961cd0faa76
+  subpackages:
+  - spew
+- name: github.com/dgrijalva/jwt-go
+  version: 06ea1031745cb8b3dab3f6a236daf2b0aa468b7e
 - name: github.com/fatih/structs
   version: a720dfa8df582c51dee1b36feabb906bde1588bd
+- name: github.com/garyburd/redigo
+  version: 569eae59ada904ea8db7a225c2b47165af08735a
+  subpackages:
+  - internal
+  - redis
 - name: github.com/gin-contrib/cors
   version: cf4846e6a636a76237a28d9286f163c132e841bc
 - name: github.com/gin-contrib/sse
   version: 22d885f9ecc78bf4ee5d72b937e4bbcdc58e8cae
+- name: github.com/gin-gonic/contrib
+  version: 39cfb9727134fef3120d2458fce5fab14265a46c
+  subpackages:
+  - sessions
 - name: github.com/gin-gonic/gin
-  version: eb9f313144e6768d91421855810ed5937ce348c5
+  version: 220e8d34538f5dfdcc299dda79bf83cf52e633f6
   subpackages:
   - binding
   - json
@@ -31,31 +50,43 @@ imports:
 - name: github.com/go-sql-driver/mysql
   version: d523deb1b23d913de5bdada721a6071e71283618
 - name: github.com/go-xorm/builder
-  version: bad0a612f0d6277b953910822ab5dfb30dd18237
+  version: dc8bf48f58fab2b4da338ffd25191905fd741b8f
 - name: github.com/go-xorm/core
   version: c10e21e7e1cec20e09398f2dfae385e58c8df555
 - name: github.com/go-xorm/xorm
   version: d85bb4911c725a53b135fc12862748a41b6c07da
 - name: github.com/golang/protobuf
-  version: 9eb2c01ac278a5d89ce4b2be68fe4500955d8179
+  version: 427e165155e0a4ff5993a36657c1f733f5b0f782
   subpackages:
   - proto
+- name: github.com/gorilla/context
+  version: 08b5f424b9271eedf6f9f0ce86cb9396ed337a42
+- name: github.com/gorilla/securecookie
+  version: 78f3d318a8bf316cda921f25e96fd0b441c5173d
+- name: github.com/gorilla/sessions
+  version: f61c3ec2cf65d69e7efedfd4d060fe128882c951
 - name: github.com/gorilla/websocket
   version: ea4d1f681babbce9545c9c5f3d5194a789c89f5b
 - name: github.com/influxdata/influxdb
   version: 62ab18a0f43ee342b84debaaae5486b8b2d8682c
   subpackages:
   - client/v2
+- name: github.com/jinzhu/now
+  version: ed742868f2aebdb1c0c437bf4f7257f88834b66f
 - name: github.com/json-iterator/go
-  version: f2b4162afba35581b6d4a50d3b8f34e33c144682
+  version: 10a568c51178f31e41456cedaac7838e0f4f7360
 - name: github.com/mattn/go-isatty
   version: 6ca4dbf54d38eea1a992b3c722a76a5d1c4cb25c
+- name: github.com/mitchellh/mapstructure
+  version: f15292f7a699fcc1a38a80977f80a046874ba8ac
 - name: github.com/modern-go/concurrent
   version: bacd9c7ef1dd9b15be4a9909b8ac7a4e313eec94
 - name: github.com/modern-go/reflect2
-  version: 58118c1ea9161250907268a484af4dd6ed314280
+  version: 94122c33edd36123c84d5368cfb2b69df93a0ec8
+- name: github.com/satori/go.uuid
+  version: f58768cc1a7a7e77a3bd49e98cdd21419399b6a3
 - name: github.com/ugorji/go
-  version: 7d51bbe6161dcb8f32a1252c27668ce36e3ef16b
+  version: 2e1067cd04ec91c6fdf491ac8028c9d3aea73ab4
   subpackages:
   - codec
 - name: go.uber.org/atomic
@@ -63,7 +94,7 @@ imports:
 - name: go.uber.org/multierr
   version: 3c4937480c32f4c13a875a1829af76c98ca3d40a
 - name: go.uber.org/zap
-  version: eeedf312bc6c57391d84767a4cd413f02a917974
+  version: 4d45f9617f7d90f7a663ff21c7a4321dbe78098b
   subpackages:
   - atomic
   - buffer
@@ -72,11 +103,11 @@ imports:
   - internal/exit
   - zapcore
 - name: golang.org/x/net
-  version: 4cb1c02c05b0e749b0365f61ae859a8e0cfceed9
+  version: a680a1efc54dd51c040b3b5ce4939ea3cf2ea0d1
   subpackages:
   - context
 - name: golang.org/x/sys
-  version: 7138fd3d9dc8335c567ca206f4333fb75eb05d56
+  version: ac767d655b305d4e9612f5f6e33120b9176c4ad4
   subpackages:
   - unix
 - name: google.golang.org/appengine

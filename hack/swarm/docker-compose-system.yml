@@ -1,0 +1,20 @@
+version: '2'
+services:
+  system-backend:
+    image: ${REGISTRY_PREFIX}:golang-beego-1.10 
+    container_name: ${PROJECT_NAME}-${DEV_USER}-system-backend
+    volumes:
+      # 挂载项目代码目录
+      - ../../backend:/go/src/evolution/backend
+    working_dir: /go/src/evolution/backend/system
+    entrypoint: 
+      - bee 
+      - run 
+    expose:
+      - "${SYSTEM_PORT}"
+    networks:
+      - default
+networks:
+  default:
+    external:
+      name: ${DEV_USER}

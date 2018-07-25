@@ -19,9 +19,13 @@
       "testTsconfig": "tsconfig.spec.json",
       "prefix": "app",
       "styles": [
+        "../node_modules/@ng-select/ng-select/themes/default.theme.css",
+        "../node_modules/ng-pick-datetime/assets/style/picker.min.css",
         "../node_modules/@clr/ui/clr-ui.min.css",
         "../node_modules/@clr/icons/clr-icons.min.css",
-        "styles.css"
+        "styles.css",
+        "../node_modules/ng2-tree/styles.css",
+        "../node_modules/syncfusion-javascript/Content/ej/web/material/ej.web.all.min.css"
       ],
       "scripts": [
         "../node_modules/@webcomponents/custom-elements/custom-elements.min.js", 

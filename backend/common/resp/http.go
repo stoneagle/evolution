@@ -1,12 +1,9 @@
 package resp
 
 import (
-	"encoding/json"
-	"net/http"
-	"runtime"
-	"strconv"
-
 	"evolution/backend/common/logger"
+	"fmt"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
@@ -28,31 +25,53 @@ func Success(ctx *gin.Context, data interface{}) {
 		Desc: "success",
 	}
 	ctx.JSON(http.StatusOK, res)
-	FormatResponseLog(ctx, res)
+	log := logger.Get()
+	log.Caller = 3
+	log.Log(logger.InfoLevel, res, nil)
+}
+
+func CustomSuccess(ctx *gin.Context, res interface{}) {
+	ctx.JSON(http.StatusOK, res)
+	log := logger.Get()
+	log.Caller = 3
+	log.Log(logger.InfoLevel, res, nil)
 }
 
 func ErrorBusiness(ctx *gin.Context, code ErrorCode, desc string, err error) {
+	message, ok := ErrorMessages[code]
+	if !ok {
+		logger.Get().Log(logger.WarnLevel, "code message not exist", nil)
+		message = "unknown code message"
+	}
+	desc = fmt.Sprintf("%s:%s", message, desc)
+	if err != nil {
+		desc += "[" + err.Error() + "]"
+	}
 	res := Response{
 		Code: code,
 		Data: struct{}{},
 		Desc: desc,
 	}
-	FormatResponseLog(ctx, res)
-	FormatErrorLog(err)
-	ctx.JSON(http.StatusOK, res)
-	ctx.Abort()
+	ctx.AbortWithStatusJSON(http.StatusOK, res)
+	log := logger.Get()
+	log.Caller = 3
+	log.Log(logger.WarnLevel, res, err)
 }
 
-func FormatResponseLog(ctx *gin.Context, response Response) {
-	logResponse, _ := json.Marshal(response)
-	if string(logResponse) != "" {
-		logger.Get().Infow("response:【" + string(logResponse) + "】")
+func ExceptionServer(ctx *gin.Context, err error) {
+	code := ErrorServer
+	message, ok := ErrorMessages[code]
+	if !ok {
+		logger.Get().Log(logger.WarnLevel, "code message not exist", nil)
+		message = "unknown code message"
 	}
-}
-
-func FormatErrorLog(err error) {
-	if err != nil {
-		_, fn, line, _ := runtime.Caller(1)
-		logger.Get().Infow("response-error:【" + fn + ":" + strconv.Itoa(line) + ":" + err.Error() + "】")
+	res := Response{
+		Code: code,
+		Data: struct{}{},
+		Desc: message,
 	}
+	ctx.AbortWithStatusJSON(http.StatusOK, res)
+	log := logger.Get()
+	log.Caller = 10
+	log.Log(logger.ErrorLevel, res, err)
 }

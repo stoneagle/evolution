@@ -1,0 +1,64 @@
+<clr-modal [(clrModalOpen)]="modelOpened">
+    <h3 class="modal-title" *ngIf="(task.Id)">
+      {{ 'SYSTEM.PROCESS.UPDATE' | translate }}{{ 'TIME.RESOURCE.TASK.CONCEPT' | translate }}
+    </h3>
+    <h3 class="modal-title" *ngIf="!(task.Id)">
+      {{ 'SYSTEM.PROCESS.CREATE' | translate }}{{ 'TIME.RESOURCE.TASK.CONCEPT' | translate }}
+    </h3>
+    <div class="modal-body">
+      <form #addForm="ngForm" (ngSubmit)="Submit()">
+        <div class="form-group">
+          <label for="ProjectName">{{ 'TIME.RESOURCE.PROJECT.CONCEPT' | translate }}</label>
+          <input type="text" class="form-control" id="ProjectName" readonly name="ProjectName" value="{{task.Project.Name}}" />
+        </div> 
+        <div class="form-group">
+          <label for="Name">{{ 'TIME.RESOURCE.TASK.NAME' | translate }}</label>
+          <input type="text" class="form-control" id="Name" required [(ngModel)]="task.Name" name="Name" >
+        </div> 
+        <div class="form-group">
+          <label>{{ 'TIME.RESOURCE.TASK.RESOURCE' | translate }}</label>
+          <div class="select">
+            <label 
+              for="ResourceId" aria-haspopup="true" role="tooltip" 
+              [class.invalid]="ResourceId.invalid && (ResourceId.dirty || ResourceId.touched)"
+              class="tooltip tooltip-validation tooltip-md tooltip-bottom-right"
+            >
+              <select id="ResourceId" #ResourceId="ngModel" [(ngModel)]="task.ResourceId" name="ResourceId" required >
+                <option *ngFor="let key of getKeys(resourceMaps)" [ngValue]="resourceMaps.get(key).Id">
+                  {{ resourceMaps.get(key).Name  }}
+                </option>
+              </select>
+              <span class="tooltip-content">{{ 'TIME.RESOURCE.TASK.PROJECT' | translate }}{{ 'SYSTEM.TOOLTIP.EMPTY' | translate }}</span>
+            </label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>{{ 'TIME.RESOURCE.TASK.USER' | translate }}</label>
+          <div class="select">
+            <label 
+              for="UserId" aria-haspopup="true" role="tooltip" 
+              [class.invalid]="UserId.invalid && (UserId.dirty || UserId.touched)"
+              class="tooltip tooltip-validation tooltip-md tooltip-bottom-right"
+            >
+              <select id="UserId" #UserId="ngModel" [(ngModel)]="task.UserId" name="UserId" required >
+                <option *ngFor="let key of getKeys(userMaps)" [ngValue]="userMaps.get(key).Id">
+                  {{ userMaps.get(key).Name  }}
+                </option>
+              </select>
+              <span class="tooltip-content">{{ 'TIME.RESOURCE.TASK.USER' | translate }}{{ 'SYSTEM.TOOLTIP.EMPTY' | translate }}</span>
+            </label>
+          </div>
+        </div>
+        <div class="form-group">
+            <label for="Desc">{{ 'TIME.RESOURCE.TASK.DESC' | translate }}</label>
+            <textarea id="Desc" name="Desc" [(ngModel)]="task.Desc" rows="3"></textarea>
+        </div>
+        <!-- <div class="form-group"> -->
+        <!--   <label for="StartDate">{{ 'TIME.RESOURCE.TASK.STARTDATE' | translate }}</label> -->
+        <!--   <input type="text" ej-datepicker dateFormat="yyyy/MM/dd" id="StartDate" name="StartDate" [readonly]="task.Id" required [(ngModel)]="task.StartDate" /> -->
+        <!-- </div> -->
+        <button type="submit" class="btn btn-success">{{ 'SYSTEM.PROCESS.SUBMIT' | translate }}</button>
+        <button type="button" class="btn btn-primary" (click)="modelOpened = false">{{ 'SYSTEM.PROCESS.CANCEL' | translate }}</button>
+      </form>
+    </div>     
+</clr-modal>   

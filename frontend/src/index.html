@@ -12,3 +12,50 @@
   <app-root></app-root>
 </body>
 </html>
+
+<script id="time-schedule-app-template" type="text/x-jsrender">
+  {{if View !== "agenda"}}
+    <div style="height:100%; margin-left: 5px;font-size:8px">
+      <div style="margin-left: 2px;">{{:Name}}</div>
+      <div style="margin-left: 2px;">{{:~minuteFormat(StartDate)}} - {{:~minuteFormat(EndDate)}}</div>
+    </div>
+  {{else}}
+    <div>
+      <span style="margin-left: 4px;color: {{:Field.Color}}">{{:Field.Name}}</span>
+      <span sylte="margin-left: 4px">{{:Task.Name}}</span>
+      <span sylte="margin-left: 4px">{{:Resource.Name}}</span>
+      <span sylte="margin-left: 4px">【{{:Name}}】</span>
+    </div>
+  {{/if}}
+</script>
+
+<script id="time-schedule-tooltip-template" type="text/x-jsrender">
+  <div style="width:275px;">
+    <div>
+      <div>
+        <div class="temphead" style="float:left;">{{:~conceptFormat("task")}}:&nbsp;</div>
+        <div class="temp">{{:Task.Name}}</div>
+      </div>
+      <div>
+        <div class="temphead" style="float:left;">{{:~conceptFormat("area")}}:&nbsp;</div>
+        <div class="temp">{{:Area.Name}}</div>
+      </div>
+      <div>
+        <div class="temphead" style="float:left;">{{:~conceptFormat("resource")}}:&nbsp;</div>
+        <div class="temp">{{:Resource.Name}}</div>
+      </div>
+      <div style="padding-top:3px;">
+        <div class="temphead" style="float:left;">{{:~conceptFormat("action")}}:&nbsp;</div>
+        <div class="temp">{{:Name}}</div>
+      </div>
+      <div style="padding-top:3px">
+        <div class="temphead" style="float:left;">{{:~conceptFormat("startDate")}}:&nbsp;</div>
+        <div class="temp">{{:StartDate.toLocaleString()}}</div>
+      </div>
+      <div style="padding-top:3px;padding-bottom:2px">
+        <div class="temphead" style="float:left;">{{:~conceptFormat("endDate")}}:&nbsp;</div>
+        <div class="temp">{{:EndDate.toLocaleString()}}</div>
+      </div>
+    </div>
+  </div>
+</script>

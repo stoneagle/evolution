@@ -1,16 +1,18 @@
 package database
 
 import (
+	"evolution/backend/common/config"
+
 	"github.com/go-redis/redis"
 )
 
 var onceRedis *redis.Client
 
-func SetRedis(host, port, password string, db int) {
+func SetRedis(redisConf config.RedisConf) {
 	client := redis.NewClient(&redis.Options{
-		Addr:     host + ":" + port,
-		Password: password,
-		DB:       db,
+		Addr:     redisConf.Host + ":" + redisConf.Port,
+		Password: redisConf.Password,
+		DB:       redisConf.Db,
 	})
 	_, err := client.Ping().Result()
 	if err != nil {

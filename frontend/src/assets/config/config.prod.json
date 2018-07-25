@@ -1,9 +1,21 @@
 {
   "app": {     
+    "name": "evolution",
     "language": "zh-cn"
   },
   "apiServer": {
     "endpoint": "http://192.168.0.119:8000/evolution/quant/v1",
-    "websocket": "ws://192.168.0.119:8000/evolution/quant/v1"
+    "websocket": "ws://192.168.0.119:8000/evolution/quant/v1",
+    "auth": {
+      "type": "basic-auth-jwt",
+      "session": "auth-session",
+      "token": "auth-token",
+      "jwt": "JwtToken"
+    },
+    "prefix": {
+      "quant": "/quant/v1",
+      "time": "/time/v1",
+      "system": "/system/v1"
+    }
   }
 }

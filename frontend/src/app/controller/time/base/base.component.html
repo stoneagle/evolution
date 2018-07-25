@@ -1,0 +1,52 @@
+<button class="btn btn-primary" (click)="openSaveModel()">
+  {{ "SYSTEM.PROCESS.CREATE" | translate }}
+</button>
+<span class="refresh-btn" (click)="refresh()">
+  <clr-icon shape="refresh"></clr-icon>
+</span>
+<clr-datagrid  (clrDgRefresh)="load($event)">
+  <clr-dg-column>{{ 'TIME.RESOURCE.GENERAL.ID' | translate }}</clr-dg-column>
+  <clr-dg-column [clrDgField]="'Name'">
+    {{ 'TIME.RESOURCE.FIELD.NAME' | translate }}
+  </clr-dg-column>
+  <clr-dg-column>{{ 'TIME.RESOURCE.FIELD.DESC' | translate }}</clr-dg-column>
+  <clr-dg-column>{{ 'TIME.RESOURCE.FIELD.COLOR' | translate }}</clr-dg-column>
+  <clr-dg-column>{{ 'TIME.RESOURCE.GENERAL.CREATED' | translate }}</clr-dg-column>
+  <clr-dg-column>{{ 'TIME.RESOURCE.GENERAL.UPDATED' | translate }}</clr-dg-column>
+	<clr-dg-column>{{ 'TIME.RESOURCE.GENERAL.OPERATION' | translate }}</clr-dg-column>
+
+  <clr-dg-row *ngFor="let field of fields">
+    <clr-dg-cell>{{field.Id}}</clr-dg-cell>
+    <clr-dg-cell>{{field.Name}}</clr-dg-cell>
+    <clr-dg-cell>{{field.Desc}}</clr-dg-cell>
+    <clr-dg-cell>{{field.Color}}</clr-dg-cell>
+    <clr-dg-cell>{{field.CreatedAt | date: 'yy-MM-dd HH:mm:ss'}}</clr-dg-cell>
+    <clr-dg-cell>{{field.UpdatedAt | date: 'yy-MM-dd HH:mm:ss'}}</clr-dg-cell>
+    <clr-dg-cell>
+      <div class="btn-group btn-primary btn-icon">
+        <button (click)="openPhaseSaveModel()" class="btn">
+          <clr-icon shape="add-text"></clr-icon>
+          <span class="clr-icon-title"></span>
+        </button>
+        <button (click)="openSaveModel(field.Id)" class="btn">
+          <clr-icon shape="wrench"></clr-icon>
+          <span class="clr-icon-title"></span>
+        </button>
+        <button (click)="delete(field)" class="btn btn-danger">
+          <clr-icon shape="trash"></clr-icon>
+          <span class="clr-icon-title"></span>
+        </button>
+      </div>
+    </clr-dg-cell>  
+		<time-phase *clrIfExpanded [currentField]="field" ngProjectAs="clr-dg-row-detail"></time-phase>
+  </clr-dg-row>
+
+  <clr-dg-footer>
+    <clr-dg-pagination #pagination [clrDgPageSize]="pageSize" [(clrDgPage)]="currentPage" [clrDgTotalItems]="totalCount">
+      {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
+      / {{pagination.totalItems}} {{ 'TIME.RESOURCE.FIELD.CONCEPT' | translate }}
+    </clr-dg-pagination>
+  </clr-dg-footer>
+</clr-datagrid>
+
+<time-field-save (save)="saved($event)"></time-field-save>

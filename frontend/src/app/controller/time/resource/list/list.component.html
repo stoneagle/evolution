@@ -1,0 +1,84 @@
+<clr-datagrid  (clrDgRefresh)="load($event)">
+  <clr-dg-column
+    [clrDgField]="'resource.Id'"
+    [clrDgSortOrder]="preSorted"
+  >
+    <ng-container *clrDgHideableColumn="{hidden: true}">
+      {{ 'TIME.RESOURCE.GENERAL.ID' | translate }}
+    </ng-container>
+  </clr-dg-column>
+  <clr-dg-column
+    [clrDgField]="'resource.Name'"
+  >
+    <ng-container *clrDgHideableColumn="{hidden: false}">
+      {{ 'TIME.RESOURCE.RESOURCE.NAME' | translate }}
+    </ng-container>
+  </clr-dg-column>
+  <clr-dg-column>
+    <ng-container *clrDgHideableColumn="{hidden: true}">
+      {{ 'TIME.RESOURCE.RESOURCE.DESC' | translate }}
+    </ng-container>
+  </clr-dg-column>
+  <clr-dg-column>
+    <ng-container *clrDgHideableColumn="{hidden: false}">
+      {{ 'TIME.RESOURCE.RESOURCE.YEAR' | translate }}
+    </ng-container>
+  </clr-dg-column>
+  <clr-dg-column>
+    <ng-container *clrDgHideableColumn="{hidden: false}">
+      {{ 'TIME.RESOURCE.RESOURCE.AREA' | translate }}
+    </ng-container>
+  </clr-dg-column>
+  <clr-dg-column>
+    <ng-container *clrDgHideableColumn="{hidden: true}">
+      {{ 'TIME.RESOURCE.GENERAL.CREATED' | translate }}
+    </ng-container>
+  </clr-dg-column>
+  <clr-dg-column>
+    <ng-container *clrDgHideableColumn="{hidden: true}">
+      {{ 'TIME.RESOURCE.GENERAL.UPDATED' | translate }}
+    </ng-container>
+  </clr-dg-column>
+	<clr-dg-column>
+    <ng-container *clrDgHideableColumn="{hidden: false}">
+      {{ 'TIME.RESOURCE.GENERAL.OPERATION' | translate }}
+    </ng-container>
+  </clr-dg-column>
+
+  <clr-dg-row *ngFor="let resource of resources">
+    <clr-dg-cell>{{resource.Id}}</clr-dg-cell>
+    <clr-dg-cell>
+      {{resource.Name}}
+      <a href="..." role="tooltip" aria-haspopup="true" class="tooltip tooltip-sm tooltip-right">
+        <clr-icon shape="info-circle" size="24"></clr-icon>
+        <span class="tooltip-content">{{resource.Desc}}</span>
+      </a>
+    </clr-dg-cell>
+    <clr-dg-cell>{{resource.Desc}}</clr-dg-cell>
+    <clr-dg-cell>{{resource.Year}}</clr-dg-cell>
+    <clr-dg-cell>{{resource.Area.Name}}</clr-dg-cell>
+    <clr-dg-cell>{{resource.UpdatedAt | date: 'yy-MM-dd HH:mm:ss'}}</clr-dg-cell>
+    <clr-dg-cell>{{resource.CreatedAt | date: 'yy-MM-dd HH:mm:ss'}}</clr-dg-cell>
+    <clr-dg-cell>
+      <div class="btn-group btn-primary btn-icon">
+        <button (click)="openSaveModel(resource.Id)" class="btn">
+          <clr-icon shape="wrench"></clr-icon>
+          <span class="clr-icon-title"></span>
+        </button>
+        <button (click)="delete(resource)" class="btn btn-danger">
+          <clr-icon shape="trash"></clr-icon>
+          <span class="clr-icon-title"></span>
+        </button>
+      </div>
+    </clr-dg-cell>  
+  </clr-dg-row>
+
+  <clr-dg-footer>
+    <clr-dg-pagination #pagination [clrDgPageSize]="pageSet.Size" [(clrDgPage)]="pageSet.Current" [clrDgTotalItems]="pageSet.Count">
+      {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
+      / {{pagination.totalItems}} {{ 'TIME.RESOURCE.RESOURCE.CONCEPT' | translate }}
+    </clr-dg-pagination>
+  </clr-dg-footer>
+</clr-datagrid>
+
+<time-resource-save (save)="saved($event)"></time-resource-save>

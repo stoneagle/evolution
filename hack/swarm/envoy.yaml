@@ -22,9 +22,17 @@ static_resources:
                 route:
                   cluster: quant 
               - match:
+                  prefix: "/evolution/time"
+                route:
+                  cluster: time 
+              - match:
                   prefix: "/evolution/engine"
                 route:
                   cluster: engine 
+              - match:
+                  prefix: "/evolution/system"
+                route:
+                  cluster: system 
           http_filters:
           - name: envoy.router
             config: {}
@@ -37,6 +45,14 @@ static_resources:
     - socket_address:
         address: quant-backend
         port_value: 8080
+  - name: time 
+    connect_timeout: 0.5s
+    type: strict_dns
+    lb_policy: round_robin
+    hosts:
+    - socket_address:
+        address: time-backend
+        port_value: 8080
   - name: engine 
     connect_timeout: 0.5s
     type: strict_dns
@@ -45,6 +61,14 @@ static_resources:
     - socket_address:
         address: quant-engine
         port_value: 6666
+  - name: system
+    connect_timeout: 0.5s
+    type: strict_dns
+    lb_policy: round_robin
+    hosts:
+    - socket_address:
+        address: system-backend
+        port_value: 8080
 admin:
   access_log_path: "/dev/null"
   address:

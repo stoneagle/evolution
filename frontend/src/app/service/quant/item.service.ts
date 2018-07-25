@@ -5,69 +5,34 @@ import { of }                       from 'rxjs/observable/of';
 import { catchError, map, tap  }    from 'rxjs/operators';
 import { AppConfig }                from '../base/config.service';
 import { MessageHandlerService  }   from '../base/message-handler.service';
+import { ShareSettings }            from '../../shared/settings';
 import { WebsocketService  }        from '../base/websocket.service';
 import { BaseService  }             from '../base/base.service';
 import { Item }                     from '../../model/quant/item';
-import { Response }                 from '../../model/base/response.model';
+import { Resp }                     from '../../model/base/resp';
 import { Classify }                 from '../../model/quant/classify';
 import { AssetSource }              from '../../model/quant/config';
 import { Event }                    from '../../model/base/socket';
 
 @Injectable()
 export class ItemService extends BaseService {
-  private uri = '/item';
   private connection;
-
   constructor(
     protected http: HttpClient,
     protected messageHandlerService: MessageHandlerService,
+    protected shareSettings: ShareSettings,
     private websocketService: WebsocketService,
   ) { 
     super(http, messageHandlerService);
-    this.resource = 'RESOURCE.ITEM.CONCEPT';
-  }
-
-  List(item?: Item): Observable<Item[]> {
-    this.operation = 'PROCESS.LIST';
-    return this.http.post<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/list`, JSON.stringify(item)).pipe(
-      catchError(this.handleError<Response>()),
-      map(res => {
-        let ret:Item[] = []; 
-        if (res && res.code == 0) {
-          res.data.map(
-            one => {
-              ret.push(new Item(one));
-            }
-          )
-        }
-        return ret; 
-      }),
-    )
-  }
-
-  Get(id: number): Observable<Item> {
-    this.operation = 'PROCESS.GET';
-    return this.http.get<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/get/${id}`).pipe(
-      catchError(this.handleError<Response>()),
-      map(res => {
-        if (res && res.code == 0) {
-          let item = new Item(res.data);
-          if (item.Classify == null) {
-            item.Classify = [];
-          }
-          return item;
-        } else {
-          return new Item();
-        }
-      }),
-    )
+    this.resource = this.shareSettings.Quant.Resource.Item;
+    this.uri = this.appSettings.apiServer.endpoint + this.appSettings.apiServer.prefix.time + '/item';
   }
 
   SyncClassify(classify: Classify): Observable<Boolean> {
-    this.operation = 'PROCESS.SYNC';
-    return this.http.post<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/sync/classify`, JSON.stringify(classify)).pipe(
+    this.operation = this.shareSettings.System.Process.Sync;
+    return this.http.post<Resp>(this.uri + `/sync/classify`, JSON.stringify(classify)).pipe(
       tap(res => this.log(res)),
-      catchError(this.handleError<Response>()),
+      catchError(this.handleError<Resp>()),
       map(res => {
         if (res && res.code == 0) {
           return true;
@@ -79,10 +44,10 @@ export class ItemService extends BaseService {
   }
 
   SyncPoint(id: number): Observable<Boolean> {
-    this.operation = 'PROCESS.SYNC';
-    return this.http.get<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/point/${id}`).pipe(
+    this.operation = this.shareSettings.System.Process.Sync;
+    return this.http.get<Resp>(this.uri + `/point/${id}`).pipe(
       tap(res => this.log(res)),
-      catchError(this.handleError<Response>()),
+      catchError(this.handleError<Resp>()),
       map(res => {
         if (res && res.code == 0) {
           return true;
@@ -94,9 +59,9 @@ export class ItemService extends BaseService {
   }
 
   WsSyncSource(classifyBatch: Classify[]): Observable<Boolean> {
-    this.operation = 'PROCESS.SYNC';
+    this.operation = this.shareSettings.System.Process.Sync;
 
-    let url = AppConfig.settings.apiServer.websocket + this.uri + `/sync/classify/ws`;
+    let url = this.appSettings.apiServer.websocket + this.uri + `/sync/classify/ws`;
     this.connection = this.websocketService.connect(url);
 
     let index = 0;
@@ -122,11 +87,33 @@ export class ItemService extends BaseService {
     return sub;
   }
 
-  Delete(id: number): Observable<Response> {
-    this.operation = 'PROCESS.DELETE';
-    return this.http.delete<Response>(AppConfig.settings.apiServer.endpoint + this.uri + `/${id}`).pipe(
-      tap(res => this.log(res)),
-      catchError(this.handleError<Response>())
-    );
+  List(item: Item): Observable<Item[]> {
+    return this.BaseList<Item>(item, Item, this.uri + `/list`).pipe(map(items => {
+      return items;
+    }))
+  }
+  
+  Get(id: number): Observable<Item> {
+    return this.BaseGet<Item>(Item, this.uri + `/get/${id}`).pipe(map(item => {
+      return item;
+    }))
+  }
+  
+  Add(item: Item): Observable<Item> {
+    return this.BaseAdd<Item>(item, Item, this.uri).pipe(map(item => {
+      return item;
+    }))
+  }
+  
+  Update(item: Item): Observable<Item> {
+    return this.BaseUpdate<Item>(item, Item, this.uri + `/${item.Id}`).pipe(map(item => {
+      return item;
+    }))
+  }
+  
+  Delete(id: number): Observable<Boolean> {
+    return this.BaseDelete<Item>(Item, this.uri + `/${id}`).pipe(map(item => {
+      return item;
+    }))
   }
 }

@@ -2,16 +2,99 @@ package logger
 
 import (
 	"evolution/backend/common/config"
+	"runtime"
 	"time"
+
+	"github.com/davecgh/go-spew/spew"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
 
-var onceLogger *zap.SugaredLogger = &zap.SugaredLogger{}
+type Level int
 
-func Get() *zap.SugaredLogger {
-	if (zap.SugaredLogger{}) == *onceLogger {
+func (level Level) Number() int {
+	return int(level)
+}
+
+const (
+	DebugLevel Level = iota + 1
+	InfoLevel
+	WarnLevel
+	ErrorLevel
+)
+
+type Logger struct {
+	logger   *zap.SugaredLogger
+	Project  string
+	Resource string
+	Caller   int
+}
+
+type detail struct {
+	file     string      `json:"file"`
+	line     int         `json:"line"`
+	project  string      `json:"project"`
+	resource string      `json:"resource"`
+	action   string      `json:"func"`
+	msg      interface{} `json:"msg"`
+	err      string      `json:"err"`
+}
+
+var (
+	onceLogger    *Logger = &Logger{}
+	DefaultCaller int     = 2
+)
+
+func (l *Logger) Log(level Level, msg interface{}, err error) {
+	fpcs := make([]uintptr, 1)
+	n := runtime.Callers(l.Caller, fpcs)
+	if n == 0 {
+		l.logger.Error("there is no logger caller")
+		return
+	}
+
+	caller := runtime.FuncForPC(fpcs[0] - 1)
+	if caller == nil {
+		l.logger.Error("logger caller is nil")
+		return
+	}
+
+	if len(l.Resource) == 0 {
+		l.Resource = "server"
+	}
+
+	file, line := caller.FileLine(fpcs[0] - 1)
+	message := detail{
+		msg:      msg,
+		file:     file,
+		line:     line,
+		project:  l.Project,
+		resource: l.Resource,
+		action:   caller.Name(),
+	}
+	if err != nil {
+		message.err = err.Error()
+	}
+
+	conf := config.Get()
+	res := spew.Sdump(message)
+	if level.Number() >= conf.App.Level {
+		switch level {
+		case DebugLevel:
+			l.logger.Debug(res)
+		case InfoLevel:
+			l.logger.Info(res)
+		case WarnLevel:
+			l.logger.Warn(res)
+		case ErrorLevel:
+			l.logger.Error(res)
+		}
+	}
+}
+
+func Get() *Logger {
+	if (Logger{}) == *onceLogger {
 		encoder_cfg := zapcore.EncoderConfig{
 			// Keys can be anything except the empty string.
 			TimeKey:        "T",
@@ -30,6 +113,7 @@ func Get() *zap.SugaredLogger {
 		currlevel := zap.NewAtomicLevelAt(zap.DebugLevel)
 		customCfg := zap.Config{
 			Level:            currlevel,
+			DisableCaller:    true,
 			Development:      true,
 			Encoding:         "console",
 			EncoderConfig:    encoder_cfg,
@@ -48,9 +132,11 @@ func Get() *zap.SugaredLogger {
 		logger, _ := customCfg.Build()
 		newLogger := logger.Named("evolution")
 		defer newLogger.Sync()
-		onceLogger = newLogger.Sugar()
+		onceLogger = &Logger{
+			Caller: DefaultCaller,
+		}
+		onceLogger.logger = newLogger.Sugar()
 	}
-
 	return onceLogger
 }
 

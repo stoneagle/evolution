@@ -1,0 +1,45 @@
+<ej-gantt 
+  id="ProjectGantt" 
+  sizeSettings.width="100%"
+  [sizeSettings.height]="ganttHeight" 
+  [scheduleStartDate]="ganttStartDate" 
+  [scheduleEndDate]="ganttEndDate"
+  [dataSource]="data"
+  [allowColumnResize]="true"
+  [enableResize]="false"
+  taskIdMapping="Id"
+  taskNameMapping="Name"
+  progressMapping="Progress" 
+  durationMapping="Duration"
+  resourceNameMappin="ResourceName"
+  expandStateMapping="Expanded"
+  parentTaskIdMapping="Parent"
+  startDateMapping= "StartDate"
+  endDateMapping="EndDate"
+  childMapping="Children" 
+  rightTaskLabelMapping="Relate"
+  [scheduleHeaderSettings]="ganttHeaderSettings"
+  [enableVirtualization]="true"
+  [treeColumnIndex]=treeColumnIndex  
+  [enableContextMenu]="true"
+  [toolbarSettings]="toolbarSettings" 
+  [editSettings]="editSettings"
+  (contextMenuOpen)="onGanttContextMenuOpen($event)"
+  (queryTaskbarInfo)="onGanttQueryTaskbarInfo($event)"
+  (rowSelected)="onGanttRowSelected($event)"
+  (toolbarClick)="onGanttToolbarClick($event)"
+  (load)="onGanttLoad($event)"
+  (actionComplete)="onGanttAction($event)"
+
+  [enableProgressBarResizing]="false"
+  [enableTaskbarDragTooltip]="false"
+  [allowDragAndDrop]="false"
+  [allowSelection]="true"
+  selectionMode="row"
+>
+</ej-gantt>
+
+<time-project-save (save)="projectSaved($event)"></time-project-save>
+<time-project-finish (finish)="projectFinished($event)"></time-project-finish>
+<time-task-save (save)="taskSaved($event)"></time-task-save>
+<time-quest-save (save)="questSaved($event)"></time-quest-save>

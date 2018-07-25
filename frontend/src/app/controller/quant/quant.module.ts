@@ -7,13 +7,13 @@ import { FormsModule }               from '@angular/forms';
 import { ClarityModule  }            from "@clr/angular";
 import { TranslateModule  }          from "@ngx-translate/core";
 
-import { PoolComponent }         from './pool/pool.component';
-import { PoolAddItemComponent }  from './pool/add-item/pool-add-item.component';
-import { PoolListItemComponent } from './pool/list-item/pool-list-item.component';
-import { SavePoolComponent }     from './pool/save/save.component';
-import { ClassifyComponent }     from './classify/classify.component';
-import { ItemComponent }         from './item/item.component';
-import { AssetSourceComponent }  from './config/asset-source/asset-source.component';
+import { PoolComponent }              from './pool/pool.component';
+import { PoolAddItemComponent }       from './pool/add-item/add-item.component';
+import { PoolListItemComponent }      from './pool/list-item/list-item.component';
+import { PoolSaveComponent }          from './pool/save/save.component';
+import { ClassifyComponent }          from './classify/classify.component';
+import { ItemComponent }              from './item/item.component';
+import { ConfigAssetSourceComponent } from './config/asset-source/asset-source.component';
 
 import { PoolService }            from '../../service/quant/pool.service';
 import { ConfigService }          from '../../service/quant/config.service';
@@ -29,10 +29,10 @@ import { WebsocketService }       from '../../service/base/websocket.service';
     PoolComponent,
     PoolAddItemComponent,
     PoolListItemComponent,
-    SavePoolComponent,
+    PoolSaveComponent,
     ClassifyComponent,
     ItemComponent,
-    AssetSourceComponent,
+    ConfigAssetSourceComponent,
   ],
   imports: [   
     BrowserModule,
@@ -53,7 +53,6 @@ import { WebsocketService }       from '../../service/base/websocket.service';
     WebsocketService,
   ],
   exports: [
-    PoolComponent,
   ]
 })
 

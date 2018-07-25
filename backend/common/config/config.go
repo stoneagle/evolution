@@ -7,8 +7,18 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
+type ModeType string
+
+func (mtype ModeType) String() string {
+	return string(mtype)
+}
+
+const (
+	ModeDebug   ModeType = "debug"
+	ModeRelease ModeType = "release"
+)
+
 type RedisConf struct {
-	Name     string
 	Host     string
 	Port     string
 	Password string
@@ -16,7 +26,6 @@ type RedisConf struct {
 }
 
 type DBConf struct {
-	Name     string
 	Type     string
 	Host     string
 	Port     string
@@ -29,16 +38,23 @@ type DBConf struct {
 	Location string
 }
 
+type System struct {
+	Name     string
+	Host     string
+	Version  string
+	Prefix   string
+	Cors     []string
+	Location string
+}
+
 type Conf struct {
 	App struct {
-		Mode string
-		Log  string
+		Mode  string
+		Log   string
+		Level int
 	}
 	Quant struct {
-		System struct {
-			Prefix string
-			Cors   []string
-		}
+		System   System
 		Redis    RedisConf
 		Database DBConf
 		Rpc      struct {
@@ -46,13 +62,26 @@ type Conf struct {
 			Port string
 		}
 	}
+	Time struct {
+		System   System
+		Redis    RedisConf
+		Database DBConf
+	}
+	System struct {
+		Auth struct {
+			Type    string
+			Session string
+		}
+		System   System
+		Redis    RedisConf
+		Database DBConf
+	}
 }
 
 var onceConfig *Conf = &Conf{}
 
 func Get() *Conf {
 	if "" == onceConfig.App.Mode {
-		// if (Conf{}) == *onceConfig {
 		configPath := os.Getenv("ConfigPath")
 		if configPath == "" {
 			configPath = "../config/.config.yaml"

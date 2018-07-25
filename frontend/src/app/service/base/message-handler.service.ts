@@ -3,7 +3,7 @@ import { Subject }                   from 'rxjs/Subject';
 import { Router }                    from "@angular/router";
 import { TranslateService }          from '@ngx-translate/core';
 import { MessageService }            from './message.service';
-import { AlertType, httpStatusCode } from '../../shared/shared.const';
+import { AlertType, httpStatusCode } from '../../shared/const';
 
 @Injectable()
 export class MessageHandlerService {
@@ -20,7 +20,7 @@ export class MessageHandlerService {
     let msg = error.message;
     let code = error.statusCode | error.status;
     if (code === httpStatusCode.Unauthorized) {
-      this.router.navigate(['/login']);
+      this.router.navigate(['/sign/login']);
     } else {
       this.SendMessage(resource, operation, AlertType.DANGER, 500, msg);
     }
@@ -76,19 +76,19 @@ export class MessageHandlerService {
     let result: string;
     switch (alertType) {
       case AlertType.INFO:
-        result = "RESULT.EXEC";
+        result = "SYSTEM.RESULT.EXEC";
         break;
       case AlertType.SUCCESS:
-        result = "RESULT.SUCCESS";
+        result = "SYSTEM.RESULT.SUCCESS";
         break;
       case AlertType.WARNING:
-        result = "RESULT.FAIL";
+        result = "SYSTEM.RESULT.FAIL";
         break;
       case AlertType.DANGER:
-        result = "RESULT.EXCEPTION";
+        result = "SYSTEM.RESULT.EXCEPTION";
         break;
       default:
-        result = "RESULT.UNKNOWN";
+        result = "SYSTEM.RESULT.UNKNOWN";
         break;
     }
 
