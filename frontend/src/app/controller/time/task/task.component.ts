@@ -20,5 +20,6 @@ export class TaskComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+    this.taskKanbanComponent.refreshData(0,0);
   }
 }

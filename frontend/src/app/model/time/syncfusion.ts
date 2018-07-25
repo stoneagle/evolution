@@ -61,14 +61,16 @@ export class Kanban extends Basic {
 	Id          :number
 	Name        :string
 	Desc        :string
+	Tags        :string
 	Status      :number
 	StatusName  :string
-	ProjectName :number
-	Tags        :string
-	FieldName   :string
-	ResourceId  :number
 	ProjectId   :number
+	ProjectName :string
+	ResourceId  :number
+	ResourceName:string
 	FieldId     :number
+	FieldName   :string
+  Closed      :boolean
 }
 
 export class SyncfusionSettings {

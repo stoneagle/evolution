@@ -23,21 +23,24 @@ type Action struct {
 	TaskIds  []int     `xorm:"-" structs:"task_id,omitempty" json:"TaskIds,omitempty"`
 	Task     *Task     `xorm:"-" structs:"-" json:"Task,omitempty"`
 	Resource *Resource `xorm:"-" structs:"-" json:"Resource,omitempty"`
+	Project  *Project  `xorm:"-" structs:"-" json:"Project,omitempty"`
 	Area     *Area     `xorm:"-" structs:"-" json:"Area,omitempty"`
 }
 
 type ActionJoin struct {
-	Action          `xorm:"extends" json:"-"`
-	Task            `xorm:"extends" json:"-"`
-	Resource        `xorm:"extends" json:"-"`
-	MapAreaResource `xorm:"extends" json:"-"`
-	Area            `xorm:"extends" json:"-"`
+	Action      `xorm:"extends" json:"-"`
+	Task        `xorm:"extends" json:"-"`
+	Resource    `xorm:"extends" json:"-"`
+	Project     `xorm:"extends" json:"-"`
+	QuestTarget `xorm:"extends" json:"-"`
+	Area        `xorm:"extends" json:"-"`
 }
 
 func NewAction() *Action {
 	ret := Action{
 		Task:     NewTask(),
 		Resource: NewResource(),
+		Project:  NewProject(),
 		Area:     NewArea(),
 	}
 	return &ret
@@ -54,6 +57,7 @@ func (m *Action) BuildCondition(session *xorm.Session) {
 	session.Where(condition)
 	m.Area.BuildCondition(session)
 	m.Task.BuildCondition(session)
+	m.Project.BuildCondition(session)
 	m.Resource.BuildCondition(session)
 	emptyTime := time.Time{}
 	if m.StartDate != emptyTime {
@@ -98,25 +102,34 @@ func (j *ActionJoin) Links() []es.JoinLinks {
 		RightTable: j.Task.TableName(),
 		RightField: "resource_id",
 	}
-	mapAreaResourceLink := es.JoinLinks{
+	projectLink := es.JoinLinks{
 		Type:       es.InnerJoin,
-		Table:      j.MapAreaResource.TableName(),
-		LeftTable:  j.MapAreaResource.TableName(),
-		LeftField:  "resource_id",
-		RightTable: j.Resource.TableName(),
-		RightField: "id",
+		Table:      j.Project.TableName(),
+		LeftTable:  j.Project.TableName(),
+		LeftField:  "id",
+		RightTable: j.Task.TableName(),
+		RightField: "project_id",
+	}
+	questTargetLink := es.JoinLinks{
+		Type:       es.InnerJoin,
+		Table:      j.QuestTarget.TableName(),
+		LeftTable:  j.QuestTarget.TableName(),
+		LeftField:  "id",
+		RightTable: j.Project.TableName(),
+		RightField: "quest_target_id",
 	}
 	areaLink := es.JoinLinks{
 		Type:       es.InnerJoin,
 		Table:      j.Area.TableName(),
 		LeftTable:  j.Area.TableName(),
 		LeftField:  "id",
-		RightTable: j.MapAreaResource.TableName(),
+		RightTable: j.QuestTarget.TableName(),
 		RightField: "area_id",
 	}
 	links = append(links, taskLink)
 	links = append(links, resourceLink)
-	links = append(links, mapAreaResourceLink)
+	links = append(links, projectLink)
+	links = append(links, questTargetLink)
 	links = append(links, areaLink)
 	return links
 }
@@ -131,6 +144,7 @@ func (j *ActionJoin) Transfer() es.ModelGeneral {
 	ret := join.Action
 	ret.Task = &join.Task
 	ret.Resource = &join.Resource
+	ret.Project = &join.Project
 	ret.Area = &join.Area
 	return &ret
 }
@@ -140,6 +154,7 @@ func (j *ActionJoin) TransferCopy(modelPtr es.ModelGeneral) {
 	(*actionPtr) = (*j).Action
 	(*actionPtr).Task = &(*j).Task
 	(*actionPtr).Resource = &(*j).Resource
+	(*actionPtr).Project = &(*j).Project
 	(*actionPtr).Area = &(*j).Area
 	return
 }

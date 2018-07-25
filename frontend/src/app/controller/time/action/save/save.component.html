@@ -22,17 +22,6 @@
           [groupBy]="taskGroupBy"
         >
         </ng-select>
-        <!-- <input --> 
-        <!--   id="TaskId" --> 
-        <!--   ej-dropdownlist --> 
-        <!--   [dataSource]="tasks" --> 
-        <!--   [fields]="selectField" --> 
-        <!--   [enableFilterSearch]="true" --> 
-        <!--   [filterType]="selectType" -->
-        <!--   [(value)]="action.TaskId" -->
-        <!--   [width]="200" --> 
-        <!--   [popupHeight]="300" --> 
-        <!-- /> -->
       </div>
       <div class="form-group">
         <label for="Name">{{ 'TIME.RESOURCE.ACTION.NAME' | translate }}</label>
@@ -43,12 +32,14 @@
         <input type="text" class="form-control" id="UserName" readonly name="UserName" value="{{shell.currentUser.Name}}" />
       </div> 
       <div class="form-group">
-        <label for="StartDateInfo">{{ 'TIME.RESOURCE.ACTION.STARTDATE' | translate }}</label>
-        <input type="text" class="form-control" id="StartDateInfo" readonly name="StartDateInfo" value="{{action.StartDate.toLocaleString()}}" />
+        <label for="StartDate">{{ 'TIME.RESOURCE.ACTION.STARTDATE' | translate }}</label>
+        <input id="StartDate" name="StartDate" [(ngModel)]="action.StartDate" [owlDateTimeTrigger]="StartDate" [owlDateTime]="StartDate" />
+        <owl-date-time #StartDate></owl-date-time>
       </div>
       <div class="form-group">
-        <label for="EndDateInfo">{{ 'TIME.RESOURCE.ACTION.ENDDATE' | translate }}</label>
-        <input type="text" class="form-control" id="EndDateInfo" readonly name="EndDateInfo" value="{{action.EndDate.toLocaleString()}}" />
+        <label for="EndDate">{{ 'TIME.RESOURCE.ACTION.ENDDATE' | translate }}</label>
+        <input id="EndDate" name="EndDate" [(ngModel)]="action.EndDate" [owlDateTimeTrigger]="EndDate" [owlDateTime]="EndDate" />
+        <owl-date-time #EndDate></owl-date-time>
       </div>
       <button type="submit" class="btn btn-success">{{ 'SYSTEM.PROCESS.SUBMIT' | translate }}</button>
       <button type="button" class="btn btn-primary" (click)="modelOpened = false">{{ 'SYSTEM.PROCESS.CANCEL' | translate }}</button>

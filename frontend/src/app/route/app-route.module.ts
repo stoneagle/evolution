@@ -7,6 +7,7 @@ import { PoolListItemComponent as QuantPoolListItem } from '../controller/quant/
 import { ClassifyComponent as QuantClassify }         from '../controller/quant/classify/classify.component';
 import { ItemComponent as QuantItem }                 from '../controller/quant/item/item.component';
 
+import { DashboardComponent as TimeDashboard }       from '../controller/time/dashboard/dashboard.component';
 import { QuestComponent as TimeQuest }               from '../controller/time/quest/quest.component';
 import { ProjectComponent as TimeProject }           from '../controller/time/project/project.component';
 import { TaskComponent as TimeTask }                 from '../controller/time/task/task.component';
@@ -55,6 +56,10 @@ const routes: Routes = [
         path: '', 
         component: DefaultComponent,
       }, 
+      { 
+        path: 'dashboard', 
+        component: TimeDashboard 
+      },
       { 
         path: 'schedule',
         children:[

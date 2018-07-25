@@ -6,6 +6,7 @@
     "TITLE": "萌芽",
     "ASSETS": {
       "TYPE": {
+        "DASHBOARD": "仪表盘",
         "SCHEDULE": "日程",
         "USER": "个人",
         "CONFIG": "配置"

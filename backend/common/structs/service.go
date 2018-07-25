@@ -128,7 +128,12 @@ func (s *Service) Update(id int, modelPtr ModelGeneral) (err error) {
 }
 
 func (s *Service) UpdateByMap(table string, id int, params map[string]interface{}) (err error) {
-	_, err = s.Engine.Table(table).Id(id).Update(&params)
+	session := s.Engine.Table(table).Where("id = ?", id)
+	_, err = session.Update(&params)
+	if err != nil {
+		sql, args := session.LastSQL()
+		s.LogSql(sql, args, err)
+	}
 	return
 }
 

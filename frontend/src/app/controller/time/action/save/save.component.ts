@@ -20,13 +20,11 @@ import { ShellComponent }  from '../../../../base/shell/shell.component';
   styleUrls: ['./save.component.css']
 })
 
+
 export class ActionSaveComponent implements OnInit {
   action: Action = new Action();
   modelOpened: boolean = false;
   tasks: Task[] = [];
-  selectField: any;
-  selectType: any;
-  // ng-select not working
   taskGroupBy = (item) => item.Project.Name;
 
   @Output() save = new EventEmitter<Action>();
@@ -49,21 +47,24 @@ export class ActionSaveComponent implements OnInit {
   initTasks(userId: number): void {
     this.taskService.ListByUser(userId).subscribe(tasks => {
       this.tasks = tasks;
-      this.selectField = { 
-        dataSource: this.tasks, 
-        text: "Name", 
-        value: "Id",
-        groupBy:"Project.Name",
-      };
     })
   }
 
   NewWithDate(startDate: Date, endDate: Date): void {
     this.initTasks(this.shell.currentUser.Id);
-    this.selectType = "Contains"
     this.action = new Action();
     this.action.StartDate = startDate;
     this.action.EndDate = endDate;
+    this.action.UserId = this.shell.currentUser.Id;
+    this.modelOpened = true;
+  }
+
+  NewWithTask(taskId: number): void {
+    this.initTasks(this.shell.currentUser.Id);
+    this.action = new Action();
+    this.action.Task.Ids = [taskId];
+    this.action.StartDate = new Date();
+    this.action.EndDate = new Date();
     this.action.UserId = this.shell.currentUser.Id;
     this.modelOpened = true;
   }
@@ -72,7 +73,6 @@ export class ActionSaveComponent implements OnInit {
     this.initTasks(this.shell.currentUser.Id);
     if (id) {
       this.actionService.Get(id).subscribe(res => {
-        console.log(res);
         this.action = res;
         this.action.Task.Ids = [this.action.TaskId];
         this.action.UserId = this.shell.currentUser.Id;
@@ -90,7 +90,7 @@ export class ActionSaveComponent implements OnInit {
   }            
 
   Submit(): void {
-    if (this.action.Task.Ids.length != 1) {
+    if ((this.action.Task.Ids == undefined) || (this.action.Task.Ids.length != 1)) {
       return;
     }
     this.action.TaskId = this.action.Task.Ids[0];

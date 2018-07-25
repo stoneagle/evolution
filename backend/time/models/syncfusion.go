@@ -64,6 +64,7 @@ type SyncfusionKanban struct {
 	ProjectName  string
 	FieldId      int
 	FieldName    string
+	Closed       bool
 }
 
 var (

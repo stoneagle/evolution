@@ -13,6 +13,7 @@
   "private": true,
   "dependencies": {
     "@angular/animations": "^5.2.0",
+    "@angular/cdk": "^6.4.1",
     "@angular/common": "^5.2.0",
     "@angular/compiler": "^5.2.0",
     "@angular/core": "^5.2.0",
@@ -34,6 +35,7 @@
     "ej-angular2": "^16.2.41",
     "jquery": "^3.3.1",
     "jsrender": "^0.9.90",
+    "ng-pick-datetime": "^5.2.6",
     "ng2-tree": "^2.0.0-rc.11",
     "ngx-cookie": "^4.0.2",
     "rxjs": "^5.5.6",

@@ -30,7 +30,7 @@ func (s *Resource) Create(modelPtr structs.ModelGeneral) (err error) {
 		return
 	}
 
-	_, err = session.Insert(&resourcePtr)
+	_, err = session.Insert(resourcePtr)
 	if err != nil {
 		session.Rollback()
 		return
@@ -102,7 +102,7 @@ func (s *Resource) Update(id int, modelPtr structs.ModelGeneral) (err error) {
 			mapAreaResource := models.NewMapAreaResource()
 			mapAreaResource.AreaId = areaId.(int)
 			mapAreaResource.ResourceId = id
-			_, err = session.Insert(&mapAreaResource)
+			_, err = session.Insert(mapAreaResource)
 			if err != nil {
 				session.Rollback()
 				return
@@ -113,7 +113,7 @@ func (s *Resource) Update(id int, modelPtr structs.ModelGeneral) (err error) {
 			mapAreaResource := models.NewMapAreaResource()
 			mapAreaResource.AreaId = areaId.(int)
 			mapAreaResource.ResourceId = id
-			_, err = session.Delete(&mapAreaResource)
+			_, err = session.Delete(mapAreaResource)
 			if err != nil {
 				session.Rollback()
 				return
@@ -150,9 +150,9 @@ func (s *Resource) Delete(id int, modelPtr structs.ModelGeneral) (err error) {
 			session.Rollback()
 			return
 		}
-		mapAreaResource := models.MapAreaResource{}
+		mapAreaResource := models.NewMapAreaResource()
 		mapAreaResource.ResourceId = id
-		_, err = session.Delete(&mapAreaResource)
+		_, err = session.Delete(mapAreaResource)
 		if err != nil {
 			session.Rollback()
 			return

@@ -1,9 +1,12 @@
 <ej-gantt 
-  id="GanttPanel" 
+  id="ProjectGantt" 
+  sizeSettings.width="100%"
+  [sizeSettings.height]="ganttHeight" 
   [scheduleStartDate]="ganttStartDate" 
   [scheduleEndDate]="ganttEndDate"
   [dataSource]="data"
   [allowColumnResize]="true"
+  [enableResize]="false"
   taskIdMapping="Id"
   taskNameMapping="Name"
   progressMapping="Progress" 
@@ -18,8 +21,6 @@
   [scheduleHeaderSettings]="ganttHeaderSettings"
   [enableVirtualization]="true"
   [treeColumnIndex]=treeColumnIndex  
-  sizeSettings.height="600px" 
-  sizeSettings.width="100%"
   [enableContextMenu]="true"
   [toolbarSettings]="toolbarSettings" 
   [editSettings]="editSettings"
@@ -31,7 +32,6 @@
   (actionComplete)="onGanttAction($event)"
 
   [enableProgressBarResizing]="false"
-  [enableResize]="false"
   [enableTaskbarDragTooltip]="false"
   [allowDragAndDrop]="false"
   [allowSelection]="true"

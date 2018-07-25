@@ -1,0 +1,30 @@
+<div class="row">
+  <div class="col-sm-12 col-md-8">
+    <time-project-gantt
+      [ganttHeight]="ganttHeight"
+      [ganttLevel]="ganttLevel"
+      (selectQuestId)="ganttQuestChange($event)"
+      (selectProjectId)="ganttProjectChange($event)"
+      (ganttTaskSaved)="ganttTaskSaved($event)"
+    >
+    </time-project-gantt>
+  </div>
+  <div class="col-sm-12 col-md-4">
+    <time-action-schedule
+      [scheduleHeight]="scheduleHeight"
+      [scheduleViews]="scheduleViews"
+      [currentView]="scheduleCurrentView"
+    >
+    </time-action-schedule>
+  </div>
+  <div class="col-sm-12 col-md-12">
+    <time-task-kanban
+      [kanbanConstraint]=3
+      (taskActionSaved)="kanbanActionSaved($event)"
+      (taskDeleted)="kanbanTaskDeleted($event)"
+      (taskUpdated)="kanbanTaskUpdated($event)"
+      [kanbanSwimCollapseFlag]="false"
+    >
+    </time-task-kanban>
+  </div>
+</div>

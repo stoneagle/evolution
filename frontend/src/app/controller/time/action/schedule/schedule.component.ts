@@ -24,6 +24,9 @@ export class ActionScheduleComponent implements OnInit {
   actionSaveComponent: ActionSaveComponent;
   @ViewChild(ActionListComponent)
   actionListComponent: ActionListComponent;
+  @Input() scheduleHeight: string = "600px";
+  @Input() currentView: string = "week";
+  @Input() scheduleViews: string[] = ["Day", "Agenda", "Week", "Month"];
 
   currentDate: Date = new Date();
   scheduleId: string = "ActionSchedule";
@@ -31,8 +34,6 @@ export class ActionScheduleComponent implements OnInit {
   scheduleCategorySettings: any;
   scheduleTooltipSettings: any;
   scheduleMenuItems: any;
-  currentView: string = "week";
-  scheduleView: string[] = ["Day", "Agenda", "Week", "Month"];
   scheduleAppointmentTemplate: string = "#appTemplate";
   fieldsMap: Map<number, Field> = new Map();
   modelListOpened: boolean = false;
@@ -164,25 +165,37 @@ export class ActionScheduleComponent implements OnInit {
         this.actionSaveComponent.New($event.targetInfo.Id);
         break;
       case "delete-action":
-        let schObj = $("#" + this.scheduleId).data("ejSchedule");
-        schObj.deleteAppointment($event.targetInfo.Guid); 
-        // exec in actionComplete
+        this.actionService.Delete($event.targetInfo.Id).subscribe(res => {
+          if (res) {
+            let schObj = $("#" + this.scheduleId).data("ejSchedule");
+            schObj.deleteAppointment($event.targetInfo.Guid); 
+            $event.cancel = false;
+          } else {
+            $event.cancel = true;
+          }
+        });
         break;
     }
   }
 
   actionComplete($event): void {
-    switch ($event.requestType) {
-      case "appointmentDelete":
-        if ($event.data != undefined) {
-          this.actionService.Delete($event.data.Id).subscribe(res => {
-            if (res) {
-              $event.cancel = false;
-            } else {
-              $event.cancel = true;
+    var schObj = $("#" + this.scheduleId).data("ejSchedule");
+    let currentView = schObj["ob.values"].currentView;
+    switch (currentView) {
+      case "agenda":
+        switch ($event.requestType) {
+          case "appointmentDelete":
+            if ($event.data != undefined) {
+              this.actionService.Delete($event.data.Id).subscribe(res => {
+                if (res) {
+                  $event.cancel = false;
+                } else {
+                  $event.cancel = true;
+                }
+              });
             }
-          });
         }
+        break;
     }
   }
 

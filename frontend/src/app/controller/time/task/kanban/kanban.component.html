@@ -23,8 +23,12 @@
   editSettings.allowEditing="true"
 >
 </ej-kanban>
+<!-- scroll setting doesn't need right now -->
+<!-- [allowScrolling]="true" -->
+<!-- [scrollSettings.height]="600" -->
 <!--filter need json data-->
 <!-- [filterSettings]="kanbanFilterSettings" -->
 <!-- [allowFiltering]="true" --> 
 <!-- [allowSearching]="true" --> 
 <time-task-save (save)="taskSaved($event)"></time-task-save>
+<time-action-save (save)="actionSaved($event)"></time-action-save>

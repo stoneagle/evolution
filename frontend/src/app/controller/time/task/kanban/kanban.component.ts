@@ -1,8 +1,10 @@
-import { Component, OnInit, Input, ViewChild } from '@angular/core';
-import { EJ_KANBAN_COMPONENTS }                from 'ej-angular2/src/ej/kanban.component';
+import { Component, OnInit, Input, Output } from '@angular/core';
+import { ViewChild, EventEmitter }          from '@angular/core';
+import { EJ_KANBAN_COMPONENTS }             from 'ej-angular2/src/ej/kanban.component';
 
 import { Task, TaskSettings }         from '../../../../model/time/task';
 import { Action }                     from '../../../../model/time/action';
+import { Field }                      from '../../../../model/time/field';
 import { Kanban }                     from '../../../../model/time/syncfusion';
 import { TaskService }                from '../../../../service/time/task.service';
 import { SyncfusionService }          from '../../../../service/time/syncfusion.service';
@@ -14,6 +16,7 @@ import { ErrorInfo }                  from '../../../../shared/error';
 import { InternationalConfig as N18 } from '../../../../service/base/international.service';
 
 import { TaskSaveComponent }   from '../save/save.component';
+import { ActionSaveComponent } from '../../action/save/save.component';
 
 @Component({
   selector: 'time-task-kanban',
@@ -23,6 +26,13 @@ import { TaskSaveComponent }   from '../save/save.component';
 export class TaskKanbanComponent implements OnInit {
   @ViewChild(TaskSaveComponent)
   taskSaveComponent: TaskSaveComponent;
+  @ViewChild(ActionSaveComponent)
+  actionSaveComponent: ActionSaveComponent;
+  @Input() kanbanConstraint: number = 5;
+  @Input() kanbanSwimCollapseFlag: boolean = true;
+  @Output() taskActionSaved = new EventEmitter<Action>();
+  @Output() taskDeleted = new EventEmitter<number>();
+  @Output() taskUpdated = new EventEmitter<Task>();
 
   kanbanId: string = "TaskKanban";
   // kanbanData: any;
@@ -33,12 +43,12 @@ export class TaskKanbanComponent implements OnInit {
   kanbanSwimlaneSettings: any;
   kanbanCardSettings: any;
   kanbanFilterSettings: any;
-  kanbanConstraint: number;
   kanbanMenuItem: any;
   kanbanMenuItems: any = [];
   kanbanCustomMenuItems: any;
   updateBeforeTag: string;
   kanbanInitFlagCount: number = 0;
+  fieldsMap: Map<number, Field> = new Map();
 
   constructor(
     private taskService: TaskService,
@@ -51,11 +61,13 @@ export class TaskKanbanComponent implements OnInit {
     private shareSettings: ShareSettings,
   ) { }
 
-  ngOnInit() {
-    this.syncfusionService.ListKanban().subscribe(res => {
+  refreshData(filterQuestId: number, filterProjectId: number): void {
+    this.syncfusionService.ListKanban(filterQuestId, filterProjectId).subscribe(res => {
       this.kanbanData = res;
     });
-    this.kanbanConstraint = 2;
+  }
+
+  ngOnInit() {
     this.kanbanFields = {
       primaryKey: "Id",
       content: "Desc",
@@ -64,18 +76,19 @@ export class TaskKanbanComponent implements OnInit {
       color: "FieldId",
       swimlaneKey: "ProjectName",
       collapsibleCards: { 
-        field: "StatusName", 
-        key: [
-          // array will conflict
-          // this.taskSettings.StatusName[this.taskSettings.Status.Backlog],
-          this.taskSettings.StatusName[this.taskSettings.Status.Done],
-        ] 
+        // field: "StatusName", 
+        // key: 
+        //   // array will conflict
+        //   this.taskSettings.StatusName[this.taskSettings.Status.Done],
+        field: "Closed", 
+        key: "true" 
       },
     }
     this.fieldService.List(null).subscribe(res => {
       let colorMaps = new Object;
       // this.kanbanFilterSettings = [];
       res.forEach((one, k) => {
+        this.fieldsMap.set(one.Id, one);
         colorMaps[one.Color] = one.Id.toString();
         // let filterItem = {
         //   text: one.Name,
@@ -109,12 +122,13 @@ export class TaskKanbanComponent implements OnInit {
     ]
 
     let taskName = N18.settings.TIME.RESOURCE.TASK.CONCEPT;
+    let actionName = N18.settings.TIME.RESOURCE.ACTION.CONCEPT;
     this.kanbanColumns = [
       { 
         headerText: this.taskSettings.StatusInfo[this.taskSettings.Status.Backlog], 
         key: this.taskSettings.StatusName[this.taskSettings.Status.Backlog],
         totalCount: { text: taskName },
-        isCollapsed: true,
+        // isCollapsed: true,
       },
       { 
         headerText: this.taskSettings.StatusInfo[this.taskSettings.Status.Todo], 
@@ -142,9 +156,9 @@ export class TaskKanbanComponent implements OnInit {
     let processUpdate = N18.settings.SYSTEM.PROCESS.UPDATE;
     let processDelete = N18.settings.SYSTEM.PROCESS.DELETE;
     this.kanbanCustomMenuItems = [
-      // {
-      //   text: processCreate + taskName,
-      // },
+      {
+        text: processCreate + actionName,
+      },
       {
         text: processUpdate + taskName,
       },
@@ -162,10 +176,14 @@ export class TaskKanbanComponent implements OnInit {
 
   onContextClick($event): void {
     let taskName      = N18.settings.TIME.RESOURCE.TASK.CONCEPT;
+    let actionName      = N18.settings.TIME.RESOURCE.ACTION.CONCEPT;
     let processCreate = N18.settings.SYSTEM.PROCESS.CREATE;
     let processUpdate = N18.settings.SYSTEM.PROCESS.UPDATE;
     let processDelete = N18.settings.SYSTEM.PROCESS.DELETE;
     switch ($event.text) {
+      case processCreate + actionName:
+        this.actionSaveComponent.NewWithTask($event.cardData.Id);
+        break;
       case processUpdate + taskName:
         if ($event.cardData.Status == this.taskSettings.Status.Done) {
           this.messageHandlerService.showWarning(
@@ -190,8 +208,9 @@ export class TaskKanbanComponent implements OnInit {
             );
             return;
           } else {
-            this.taskService.Delete($event.cardData.RelateId).subscribe(res => {
+            this.taskService.Delete($event.cardData.Id).subscribe(res => {
               if (res) {
+                this.taskDeleted.emit($event.cardData.Id);
                 let kanbanObj = $("#" + this.kanbanId).data("ejKanban");
                 kanbanObj.KanbanEdit.deleteCard($event.cardData.Id);
               }
@@ -207,22 +226,44 @@ export class TaskKanbanComponent implements OnInit {
   }
 
   taskSaved($event: Task): void {
-    let tagsArray = this.updateBeforeTag.split(",");
-    tagsArray[2] = $event.Resource.Name;
     let kanbanObj = $("#" + this.kanbanId).data("ejKanban"); 
-    kanbanObj.updateCard(this.taskSettings.StatusName[$event.Status], [{
-      Id: $event.Id, 
-      Name: $event.Name, 
-      Desc: $event.Desc, 
-      Status: $event.Status,
-      StatusName: this.taskSettings.StatusName[$event.Status],
-      ProjectName: $event.Project.Name,
-      Tags: tagsArray.join()
-    }])
+    if (!$event.NewFlag) {
+      let tagsArray = this.updateBeforeTag.split(",");
+      tagsArray[2] = $event.Resource.Name;
+      kanbanObj.updateCard(this.taskSettings.StatusName[$event.Status], [{
+        Id: $event.Id, 
+        Name: $event.Name, 
+        Desc: $event.Desc, 
+        Status: $event.Status,
+        StatusName: this.taskSettings.StatusName[$event.Status],
+        ProjectName: $event.Project.Name,
+        Tags: tagsArray.join()
+      }])
+    } else {
+      let field = this.fieldsMap.get($event.Area.FieldId);
+      let tagsArray = [];
+      tagsArray.push(field.Name);
+      tagsArray.push($event.Area.Name);
+      tagsArray.push($event.Resource.Name);
+      let kanban = {
+        Id           : $event.Id,
+        Name         : $event.Name,
+        Desc         : $event.Desc,
+        Tags         : tagsArray.join(),
+        Status       : $event.Status,
+        StatusName   : this.taskSettings.StatusName[$event.Status],
+        ProjectId    : $event.Project.Id,
+        ProjectName  : $event.Project.Name,
+        ResourceId   : $event.Resource.Id,
+        ResourceName : $event.Resource.Name,
+        Closed       : true,
+      } 
+      // TODO addCard not work
+      kanbanObj.KanbanEdit.addCard(this.taskSettings.StatusName[$event.Status], [kanban])
+    }
   }
 
   onTaskDrop($event): void {
-    console.log($event);
     let statusNameMap = this.taskSettings.StatusName
     if ($event.data.length == 0) {
       $event.cancel = true;
@@ -236,24 +277,6 @@ export class TaskKanbanComponent implements OnInit {
         task.Id = $event.data[0].Id;
         task.Status = +key;
 
-        // startDate will set on task create 
-        // endDate will update on action create
-        // source status
-        // if ($event.data[0].Status == this.taskSettings.Status.Backlog) {
-        //   task.StartDate = new Date();
-        // }
-        // if ($event.data[0].Status == this.taskSettings.Status.Done) {
-        //   task.EndDateReset = true;
-        // }
-
-        // target status
-        // if (+key == this.taskSettings.Status.Backlog) {
-        //   task.StartDateReset = true;
-        // }
-        // if (+key == this.taskSettings.Status.Done) {
-        //   task.EndDate = new Date();
-        // }
-
         this.taskService.Update(task).subscribe(res => {
           let kanbanObj = $("#" + this.kanbanId).data("ejKanban"); 
           kanbanObj.updateCard($event.data[0].StatusName, [{
@@ -262,6 +285,7 @@ export class TaskKanbanComponent implements OnInit {
             StatusName: $event.data[0].StatusName,
             ProjectName: res.Project.Name,
           }])
+          this.taskUpdated.emit(res);
         })
         cancelFlag = false;
         break;
@@ -277,12 +301,18 @@ export class TaskKanbanComponent implements OnInit {
     switch ($event.requestType) {
       case "refresh" :
         // the third refresh can collpase swim
-        if (this.kanbanInitFlagCount == 2) {
+        if ((this.kanbanInitFlagCount == 2) && (this.kanbanSwimCollapseFlag)) {
           kanbanObj.KanbanSwimlane.collapseAll();
         } else {
           this.kanbanInitFlagCount++
         }
         break;
+    }
+  }
+
+  actionSaved($event: Action): void {
+    if ($event != undefined) {
+      this.taskActionSaved.emit($event);
     }
   }
 }

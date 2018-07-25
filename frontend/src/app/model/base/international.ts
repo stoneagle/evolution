@@ -6,6 +6,7 @@ export interface International {
     TITLE: string
     ASSETS: {
       TYPE: {
+        DASHBOARD: string
         SCHEDULE: string
         USER: string
         CONFIG: string

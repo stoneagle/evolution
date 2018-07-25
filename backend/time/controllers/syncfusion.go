@@ -26,8 +26,8 @@ func NewSyncfusion() *Syncfusion {
 
 func (c *Syncfusion) Router(router *gin.RouterGroup) {
 	syncfusion := router.Group(c.Resource.String()).Use(middles.OnInit(c))
-	syncfusion.GET("/list/kanban", c.ListKanban)
-	syncfusion.GET("/list/kanban/", c.ListKanbanCustom)
+	syncfusion.GET("/list/kanban/:questId/:projectId", c.ListKanban)
+	syncfusion.GET("/list/kanban/:questId/:projectId/", c.ListKanbanCustom)
 	syncfusion.GET("/list/gantt/:level/:status", c.ListGantt)
 	syncfusion.GET("/list/gantt/:level/:status/", c.ListGanttCustom)
 	syncfusion.GET("/list/schedule/", c.ListScheduleCustom)
@@ -35,8 +35,21 @@ func (c *Syncfusion) Router(router *gin.RouterGroup) {
 }
 
 func (c *Syncfusion) ListKanban(ctx *gin.Context) {
+	questIdStr := ctx.Param("questId")
+	projectIdStr := ctx.Param("projectId")
+	questId, err := strconv.Atoi(questIdStr)
+	if err != nil {
+		resp.ErrorBusiness(ctx, resp.ErrorParams, "quest id get error", err)
+		return
+	}
+	projectId, err := strconv.Atoi(projectIdStr)
+	if err != nil {
+		resp.ErrorBusiness(ctx, resp.ErrorParams, "project id get error", err)
+		return
+	}
+
 	user := ctx.MustGet(middles.UserKey).(middles.UserInfo)
-	kanbans, err := c.SyncfusionSvc.ListKanban(user.Id)
+	kanbans, err := c.SyncfusionSvc.ListKanban(user.Id, questId, projectId)
 	if err != nil {
 		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "task kanban get error", err)
 		return
@@ -45,8 +58,21 @@ func (c *Syncfusion) ListKanban(ctx *gin.Context) {
 }
 
 func (c *Syncfusion) ListKanbanCustom(ctx *gin.Context) {
+	questIdStr := ctx.Param("level")
+	projectIdStr := ctx.Param("status")
+	questId, err := strconv.Atoi(questIdStr)
+	if err != nil {
+		resp.ErrorBusiness(ctx, resp.ErrorParams, "quest id get error", err)
+		return
+	}
+	projectId, err := strconv.Atoi(projectIdStr)
+	if err != nil {
+		resp.ErrorBusiness(ctx, resp.ErrorParams, "project id get error", err)
+		return
+	}
+
 	user := ctx.MustGet(middles.UserKey).(middles.UserInfo)
-	kanbans, err := c.SyncfusionSvc.ListKanban(user.Id)
+	kanbans, err := c.SyncfusionSvc.ListKanban(user.Id, questId, projectId)
 	if err != nil {
 		resp.ErrorBusiness(ctx, resp.ErrorDatabase, "task kanban get error", err)
 		return

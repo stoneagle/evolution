@@ -8,3 +8,7 @@
 .gantt-hide-finish:before {
   content: "\e900";
 }
+
+.cdk-overlay-container {
+  z-index: 1500; 
+}

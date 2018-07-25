@@ -64,10 +64,10 @@ export class SyncfusionService extends BaseService {
     });
   }
 
-  ListKanban(): Observable<Kanban[]> {
+  ListKanban(questId: number, projectId: number): Observable<Kanban[]> {
     this.resource = this.shareSettings.Time.Resource.Task;
     this.operation = this.shareSettings.System.Process.List;
-    return this.BaseResp(this.uri + `/list/kanban`).pipe(
+    return this.BaseResp(this.uri + `/list/kanban/${questId}/${projectId}`).pipe(
       map(res => {
         let ret:Kanban[] = []; 
         if (res && res.code == 0) {

@@ -94,6 +94,7 @@ export class TaskSaveComponent implements OnInit {
         });
         this.task = new Task();
         this.task.Project = project;
+        this.task.Area = project.Area;
         this.task.ProjectId = this.task.Project.Id;
         this.modelOpened = true;
       })

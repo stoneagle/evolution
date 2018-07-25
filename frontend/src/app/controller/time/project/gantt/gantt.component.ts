@@ -1,6 +1,7 @@
-import { Component, OnInit, ViewChild, Output, Inject, forwardRef  } from '@angular/core';
-import { EJ_GANTT_COMPONENTS }                                       from 'ej-angular2/src/ej/gantt.component';
-import { InternationalConfig as N18 }                                from '../../../../service/base/international.service';
+import { Component, OnInit, ViewChild, Input, Output } from '@angular/core';
+import { Inject, forwardRef, EventEmitter }            from '@angular/core';
+import { EJ_GANTT_COMPONENTS }                         from 'ej-angular2/src/ej/gantt.component';
+import { InternationalConfig as N18 }                  from '../../../../service/base/international.service';
 
 import { Quest, QuestTarget, QuestSettings } from '../../../../model/time/quest';
 import { Project, ProjectSettings }          from '../../../../model/time/project';
@@ -43,6 +44,13 @@ export class ProjectGanttComponent implements OnInit {
   @ViewChild(TaskSaveComponent)
   taskSaveComponent: TaskSaveComponent;
 
+  @Input() ganttHeight: string = "600px";
+  @Input() ganttLevel: string  = this.syncfusionSettings.GanttLevel.Task;
+  @Output() selectQuestId      = new EventEmitter<number>();
+  @Output() selectProjectId    = new EventEmitter<number>();
+  @Output() ganttTaskSaved     = new EventEmitter<Task>();
+  @Output() ganttProjectSaved  = new EventEmitter<Project>();
+
   constructor(
     private questService: QuestService,
     private projectService: ProjectService,
@@ -72,13 +80,11 @@ export class ProjectGanttComponent implements OnInit {
   selectGanttData: any;
   fieldMaps: Map<number, Field> = new Map();
 
-  ganttLevel: string;
+  ganttId: string = "ProjectGantt";
   ganttStatus: string;
-
   ganttStartDate: Date;
   ganttEndDate: Date;
   ganttHeaderSettings: any;
-
   ganttInitFlag: boolean = false;
   ganttSaveFlag: boolean = false;
 
@@ -89,7 +95,6 @@ export class ProjectGanttComponent implements OnInit {
         this.fieldMaps.set(one.Id, one);
       })
     });
-    this.ganttLevel = this.syncfusionSettings.GanttLevel.Task;
     this.ganttStatus = this.syncfusionSettings.GanttStatus.Wait;
     this.data = this.syncfusionService.GetGanttManager(this.ganttLevel, this.ganttStatus);
     this.setGanttStartAndEndDate(this.ganttStatus);
@@ -143,7 +148,7 @@ export class ProjectGanttComponent implements OnInit {
   }
 
   onGanttAction($event): void {
-    let gantt = $("#GanttPanel").ejGantt("instance");
+    let gantt = $("#" + this.ganttId).ejGantt("instance");
     switch ($event.requestType) {
       case "create" :
         if (!this.ganttInitFlag) {
@@ -182,7 +187,7 @@ export class ProjectGanttComponent implements OnInit {
   }
 
   onGanttLoad($event): void {
-		var gantt = $("#GanttPanel").ejGantt("instance");
+		var gantt = $("#" + this.ganttId).ejGantt("instance");
 		var columns = gantt.getColumns();
     columns.forEach((one, k) => {
       switch(one["mappingName"]) {
@@ -304,7 +309,7 @@ export class ProjectGanttComponent implements OnInit {
           questTarget.Id = project.QuestTargetId;
           questTarget.Status = self.questSettings.TargetStatus.Wait;
           self.questTargetService.Update(questTarget).subscribe(questTarget => {
-            let gantt = $("#GanttPanel").ejGantt("instance");
+            let gantt = $("#" + this.ganttId).ejGantt("instance");
             let newRecord = new Gantt;
             newRecord.Id = project.UuidNumber;
             newRecord.Status = project.Status;
@@ -381,7 +386,7 @@ export class ProjectGanttComponent implements OnInit {
           task.Id = args.data.RelateId;
           task.Status = self.taskSettings.Status.Done; 
           self.taskService.Update(task).subscribe(task => {
-            let gantt = $("#GanttPanel").ejGantt("instance");
+            let gantt = $("#" + this.ganttId).ejGantt("instance");
             let newRecord = new Gantt;
             newRecord.Id = task.UuidNumber;
             newRecord.Status = task.Status;
@@ -411,7 +416,7 @@ export class ProjectGanttComponent implements OnInit {
         task.Id = args.data.RelateId;
         task.Status = self.taskSettings.Status.Progress; 
         self.taskService.Update(task).subscribe(task => {
-          let gantt = $("#GanttPanel").ejGantt("instance");
+          let gantt = $("#" + this.ganttId).ejGantt("instance");
           let newRecord = new Gantt;
           newRecord.Id = task.UuidNumber;
           newRecord.Status = task.Status;
@@ -482,11 +487,15 @@ export class ProjectGanttComponent implements OnInit {
   }
 
   projectSaved($event: Project): void {
+    this.ganttProjectSaved.emit($event);
+    if (this.ganttLevel == this.syncfusionSettings.GanttLevel.Quest) {
+      return
+    }
     if ($event == undefined) {
       return
     }
     // need ensure index and id unique
-    let gantt = $("#GanttPanel").ejGantt("instance");
+    let gantt = $("#" + this.ganttId).ejGantt("instance");
     if ($event.NewFlag) {
       let newRecord = new Gantt;
       newRecord.Id = $event.UuidNumber;
@@ -516,11 +525,36 @@ export class ProjectGanttComponent implements OnInit {
     }
   }
 
+  projectProgressUpdate(projectId: number): void {
+    this.projectService.Get(projectId).subscribe(project => {
+      let task = new Task();
+      task.ProjectId = projectId;
+      this.taskService.List(task).subscribe(tasks => {
+        let newRecord = new Gantt;
+        newRecord.Id = project.UuidNumber;
+        if (tasks.length == 0) {
+          newRecord.Progress = 0;
+        } else {
+          let finishNum = 0;
+          tasks.forEach((one, k) => {
+            if (one.Status == this.taskSettings.Status.Done) {
+              finishNum++
+            }
+          })
+          newRecord.Progress = Math.round(100 * finishNum / tasks.length);
+        }
+        let gantt = $("#" + this.ganttId).ejGantt("instance");
+        this.ganttSaveFlag = true;
+        gantt.updateRecordByTaskId(newRecord);
+      })
+    })
+  }
+
   projectFinished($event: Project): void {
     if ($event == undefined) {
       return
     }
-    let gantt = $("#GanttPanel").ejGantt("instance");
+    let gantt = $("#" + this.ganttId).ejGantt("instance");
     let newRecord = new Gantt;
     newRecord.Id = $event.UuidNumber;
     newRecord.Status = $event.Status;
@@ -530,10 +564,14 @@ export class ProjectGanttComponent implements OnInit {
   }
 
   taskSaved($event: Task): void {
+    this.ganttTaskSaved.emit($event);
+    if ((this.ganttLevel == this.syncfusionSettings.GanttLevel.Quest) || (this.ganttLevel == this.syncfusionSettings.GanttLevel.Project)) {
+      return
+    }
     if ($event == undefined) {
       return
     }
-    let gantt = $("#GanttPanel").ejGantt("instance");
+    let gantt = $("#" + this.ganttId).ejGantt("instance");
     if ($event.NewFlag) {
       let newRecord = new Gantt;
       newRecord.Id = $event.UuidNumber;
@@ -574,6 +612,14 @@ export class ProjectGanttComponent implements OnInit {
   }
 
   onGanttRowSelected($event): void {
+    switch($event.data.level) {
+      case 0:
+        this.selectQuestId.emit($event.data.RelateId);
+        break;
+      case 1:
+        this.selectProjectId.emit($event.data.RelateId);
+        break;
+    }
   }
 
   disabled($event) {

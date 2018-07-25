@@ -1,15 +1,16 @@
-import { NgModule }                  from '@angular/core';
-import { BrowserModule }             from '@angular/platform-browser';
-import { BrowserAnimationsModule   } from '@angular/platform-browser/animations';
-import { HttpClientModule  }         from '@angular/common/http';
-import { HttpModule   }              from '@angular/http';
-import { FormsModule }               from '@angular/forms';
-import { ClarityModule  }            from "@clr/angular";
-import { TranslateModule  }          from "@ngx-translate/core";
-import { NgSelectModule  }           from '@ng-select/ng-select';
-import { TreeModule }                from 'ng2-tree';
+import { NgModule }                                    from '@angular/core';
+import { BrowserModule }                               from '@angular/platform-browser';
+import { BrowserAnimationsModule   }                   from '@angular/platform-browser/animations';
+import { HttpClientModule  }                           from '@angular/common/http';
+import { HttpModule   }                                from '@angular/http';
+import { FormsModule }                                 from '@angular/forms';
+import { ClarityModule  }                              from "@clr/angular";
+import { TranslateModule  }                            from "@ngx-translate/core";
+import { NgSelectModule  }                             from '@ng-select/ng-select';
+import { TreeModule }                                  from 'ng2-tree';
+import { OwlDateTimeModule, OwlNativeDateTimeModule  } from 'ng-pick-datetime';
+import { OWL_DATE_TIME_LOCALE  }                       from 'ng-pick-datetime';
 
-// import { EJAngular2Module, EJTemplateDirective } from 'ej-angular2';
 import { EJ_GANTT_COMPONENTS }                      from 'ej-angular2/src/ej/gantt.component';
 import { EJ_TREEGRID_COMPONENTS }                   from 'ej-angular2/src/ej/treegrid.component';
 import { EJ_SCHEDULE_COMPONENTS }                   from 'ej-angular2/src/ej/schedule.component';
@@ -18,13 +19,14 @@ import { EJ_DATETIMEPICKER_COMPONENTS }             from 'ej-angular2/src/ej/dat
 import { EJ_DROPDOWNLIST_COMPONENTS }               from 'ej-angular2/src/ej/dropdownlist.component';
 import { EJ_KANBAN_COMPONENTS }                     from 'ej-angular2/src/ej/kanban.component';
 
+import { DashboardComponent }        from './dashboard/dashboard.component';
 import { QuestComponent }            from './quest/quest.component';
 import { QuestSaveComponent }        from './quest/save/save.component';
 import { QuestTeamListComponent }    from './quest/team-list/team-list.component';
 import { ProjectComponent }          from './project/project.component';
 import { ProjectGanttComponent }     from './project/gantt/gantt.component';
 import { ProjectSaveComponent }      from './project/save/save.component';
-import { ProjectFinishComponent }      from './project/finish/finish.component';
+import { ProjectFinishComponent }    from './project/finish/finish.component';
 import { TaskComponent }             from './task/task.component';
 import { TaskSaveComponent }         from './task/save/save.component';
 import { TaskListComponent }         from './task/list/list.component';
@@ -76,6 +78,7 @@ import { ErrorInfo  }     from '../../shared/error';
 
 @NgModule({
   declarations: [
+    DashboardComponent,
     QuestComponent,
     QuestSaveComponent,
     QuestTeamListComponent,
@@ -123,9 +126,14 @@ import { ErrorInfo  }     from '../../shared/error';
     TranslateModule,
     TreeModule,
     NgSelectModule,
-    // EJAngular2Module.forRoot(),
+    OwlDateTimeModule, 
+    OwlNativeDateTimeModule,
   ],
   providers: [ 
+    {
+      provide: OWL_DATE_TIME_LOCALE, 
+      useValue: 'cn'
+    },
     AreaService,
     ProjectService,
     TaskService,
