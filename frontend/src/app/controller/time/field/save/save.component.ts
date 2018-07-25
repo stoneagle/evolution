@@ -13,7 +13,7 @@ export class FieldSaveComponent implements OnInit {
   field: Field = new Field;
   modelOpened: boolean = false;
 
-  @Output() save = new EventEmitter<boolean>();
+  @Output() save = new EventEmitter<Field>();
 
   constructor(
     private fieldService: FieldService,
@@ -38,12 +38,12 @@ export class FieldSaveComponent implements OnInit {
     if (this.field.Id == null) {
       this.fieldService.Add(this.field).subscribe(res => {
         this.modelOpened = false;
-        this.save.emit(true);
+        this.save.emit(this.field);
       })
     } else {
       this.fieldService.Update(this.field).subscribe(res => {
         this.modelOpened = false;
-        this.save.emit(true);
+        this.save.emit(this.field);
       })
     }
   }

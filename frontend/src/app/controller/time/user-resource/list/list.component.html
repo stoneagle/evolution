@@ -36,7 +36,9 @@
       {{ 'TIME.RESOURCE.GENERAL.ID' | translate }}
     </ng-container>
   </clr-dg-column>
-  <clr-dg-column>
+  <clr-dg-column
+    [clrDgField]="'Name'"
+  >
     <ng-container *clrDgHideableColumn="{hidden: false}">
       {{ 'TIME.RESOURCE.RESOURCE.NAME' | translate }}
     </ng-container>
@@ -46,8 +48,19 @@
       {{ 'TIME.RESOURCE.RESOURCE.DESC' | translate }}
     </ng-container>
   </clr-dg-column>
-  <clr-dg-column>{{ 'TIME.RESOURCE.RESOURCE.AREA' | translate }}</clr-dg-column>
-  <clr-dg-column [clrDgSortBy]="timeComparator" >{{ 'TIME.RESOURCE.USER-RESOURCE.TIME' | translate }}</clr-dg-column>
+  <clr-dg-column>
+    <ng-container *clrDgHideableColumn="{hidden: false}">
+      {{ 'TIME.RESOURCE.RESOURCE.AREA' | translate }}
+    </ng-container>
+  </clr-dg-column>
+  <clr-dg-column 
+    [clrDgSortOrder]="preSorted"
+    [clrDgSortBy]="timeComparator" 
+  >
+    <ng-container *clrDgHideableColumn="{hidden: false}">
+      {{ 'TIME.RESOURCE.USER_RESOURCE.TIME' | translate }}
+    </ng-container>
+  </clr-dg-column>
 	<!-- <clr-dg-column>{{ 'TIME.RESOURCE.GENERAL.OPERATION' | translate }}</clr-dg-column> -->
 
   <clr-dg-row *ngFor="let userResource of userResources" [clrDgItem]="userResource">
@@ -67,7 +80,7 @@
 		<time-task-list *clrIfExpanded ngProjectAs="clr-dg-row-detail"></time-task-list>
   </clr-dg-row>
   <clr-dg-footer>
-    <clr-dg-pagination #pagination [clrDgPageSize]="pageSize" [(clrDgPage)]="currentPage" [clrDgTotalItems]="totalCount">
+    <clr-dg-pagination #pagination [clrDgPageSize]="pageSet.Size" [(clrDgPage)]="pageSet.Current" [clrDgTotalItems]="pageSet.Count">
       {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
       / {{pagination.totalItems}} {{ 'TIME.RESOURCE.USER_RESOURCE.CONCEPT' | translate }}
     </clr-dg-pagination>

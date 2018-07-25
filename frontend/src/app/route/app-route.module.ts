@@ -24,7 +24,7 @@ import { SignInComponent }                           from '../base/sign-in/sign-
 const routes: Routes = [
   { path: '', redirectTo: 'sign/login', pathMatch: 'full' }, 
   { 
-    path: 'flow', component: ShellComponent, 
+    path: 'quant', component: ShellComponent, 
     children:[
       { 
         path: '', 

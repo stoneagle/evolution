@@ -1,16 +1,50 @@
 <clr-datagrid  (clrDgRefresh)="load($event)">
-  <!-- <clr-dg-column>{{ 'TIME.RESOURCE.GENERAL.ID' | translate }}</clr-dg-column> -->
-  <clr-dg-column>{{ 'TIME.RESOURCE.TASK.CONCEPT' | translate }}</clr-dg-column>
-  <clr-dg-column>{{ 'TIME.RESOURCE.AREA.CONCEPT' | translate }}</clr-dg-column>
-  <clr-dg-column>{{ 'TIME.RESOURCE.RESOURCE.CONCEPT' | translate }}</clr-dg-column>
-  <clr-dg-column>{{ 'TIME.RESOURCE.ACTION.NAME' | translate }}</clr-dg-column>
-  <clr-dg-column>{{ 'TIME.RESOURCE.ACTION.STARTDATE' | translate }}</clr-dg-column>
-  <clr-dg-column>{{ 'TIME.RESOURCE.ACTION.ENDDATE' | translate }}</clr-dg-column>
-  <clr-dg-column>{{ 'TIME.RESOURCE.GENERAL.CREATED' | translate }}</clr-dg-column>
+  <clr-dg-column>
+    <ng-container *clrDgHideableColumn="{hidden: true}">
+      {{ 'TIME.RESOURCE.GENERAL.ID' | translate }}
+    </ng-container>
+  </clr-dg-column>
+  <clr-dg-column>
+    <ng-container *clrDgHideableColumn="{hidden: false}">
+      {{ 'TIME.RESOURCE.TASK.CONCEPT' | translate }}
+    </ng-container>
+  </clr-dg-column>
+  <clr-dg-column>
+    <ng-container *clrDgHideableColumn="{hidden: false}">
+      {{ 'TIME.RESOURCE.AREA.CONCEPT' | translate }}
+    </ng-container>
+  </clr-dg-column>
+  <clr-dg-column>
+    <ng-container *clrDgHideableColumn="{hidden: false}">
+      {{ 'TIME.RESOURCE.RESOURCE.CONCEPT' | translate }}
+    </ng-container>
+  </clr-dg-column>
+  <clr-dg-column
+    [clrDgField]="'Name'"
+  >
+    <ng-container *clrDgHideableColumn="{hidden: false}">
+      {{ 'TIME.RESOURCE.ACTION.NAME' | translate }}
+    </ng-container>
+  </clr-dg-column>
+  <clr-dg-column>
+    <ng-container *clrDgHideableColumn="{hidden: false}">
+      {{ 'TIME.RESOURCE.ACTION.STARTDATE' | translate }}
+    </ng-container>
+  </clr-dg-column>
+  <clr-dg-column>
+    <ng-container *clrDgHideableColumn="{hidden: false}">
+      {{ 'TIME.RESOURCE.ACTION.ENDDATE' | translate }}
+    </ng-container>
+  </clr-dg-column>
+  <clr-dg-column>
+    <ng-container *clrDgHideableColumn="{hidden: false}">
+      {{ 'TIME.RESOURCE.GENERAL.CREATED' | translate }}
+    </ng-container>
+  </clr-dg-column>
 	<!-- <clr-dg-column>{{ 'TIME.RESOURCE.GENERAL.OPERATION' | translate }}</clr-dg-column> -->
 
   <clr-dg-row *ngFor="let action of actions">
-    <!-- <clr-dg-cell>{{action.Id}}</clr-dg-cell> -->
+    <clr-dg-cell>{{action.Id}}</clr-dg-cell>
     <clr-dg-cell>{{action.Task.Name}}</clr-dg-cell>
     <clr-dg-cell>{{action.Area.Name}}</clr-dg-cell>
     <clr-dg-cell>{{action.Resource.Name}}</clr-dg-cell>
@@ -29,7 +63,7 @@
   </clr-dg-row>
 
   <clr-dg-footer>
-    <clr-dg-pagination #pagination [clrDgPageSize]="pageSize" [(clrDgPage)]="currentPage" [clrDgTotalItems]="totalCount">
+    <clr-dg-pagination #pagination [clrDgPageSize]="pageSet.Size" [(clrDgPage)]="pageSet.Current" [clrDgTotalItems]="pageSet.Count">
       {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
       / {{pagination.totalItems}} {{ 'TIME.RESOURCE.ACTION.CONCEPT' | translate }}
     </clr-dg-pagination>

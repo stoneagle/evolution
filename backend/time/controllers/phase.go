@@ -21,6 +21,7 @@ func (c *Phase) Router(router *gin.RouterGroup) {
 	phase.GET("/get/:id", c.One)
 	phase.POST("", c.Create)
 	phase.POST("/list", c.List)
+	phase.POST("/count", c.Count)
 	phase.PUT("/:id", c.Update)
 	phase.DELETE("/:id", c.Delete)
 }

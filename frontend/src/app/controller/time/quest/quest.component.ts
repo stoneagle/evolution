@@ -1,16 +1,23 @@
 import { Component, OnInit, ViewChild, Inject, forwardRef } from '@angular/core';
+import { Comparator, State, SortOrder}                      from "clarity-angular";
 
+import { PageSet }                           from '../../../model/base/basic';
 import { Quest, QuestTarget, QuestSettings } from '../../../model/time/quest';
 import { Project }                           from '../../../model/time/project';
 import { QuestService }                      from '../../../service/time/quest.service';
 import { ProjectService }                    from '../../../service/time/project.service';
+import { QuestTargetService }                from '../../../service/time/quest-target.service';
+import { MessageHandlerService  }            from '../../../service/base/message-handler.service';
+
 import { QuestSaveComponent }                from './save/save.component';
 import { QuestTeamListComponent }            from './team-list/team-list.component';
 import { ShellComponent }                    from '../../../base/shell/shell.component';
-import { QuestTargetService }                from '../../../service/time/quest-target.service';
-import { MessageHandlerService  }            from '../../../service/base/message-handler.service';
-import { ShareSettings }                     from '../../../shared/settings';
-import { ErrorInfo }                         from '../../../shared/error';
+
+import { ShareSettings }                                from '../../../shared/settings';
+import { ErrorInfo }                                    from '../../../shared/error';
+import { CustomComparator }                             from '../../../shared/utils';
+import { loadPageFilterSort, reloadState, deleteState } from '../../../shared/utils';
+import { PageSize }                                     from '../../../shared/const';
 
 @Component({
   selector: 'time-quest',
@@ -24,9 +31,15 @@ export class QuestComponent implements OnInit {
   questTeamListComponent: QuestTeamListComponent;
 
   quests: Quest[];
-  pageSize: number = 10;
-  totalCount: number = 0;
-  currentPage: number = 1;
+  preSorted = SortOrder.Desc;
+  currentState: State;
+  pageSet: PageSet = new PageSet();
+
+  statusOptions: Array<{key: number, value: number}>;
+  constraintOptions: Array<{key: number, value: number}>;
+  membersOptions: Array<{key: number, value: number}>;
+
+  modelListOpened: boolean = false;
 
   constructor(
     private errorInfo: ErrorInfo,
@@ -42,12 +55,35 @@ export class QuestComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.pageSize = 10;
-    this.refresh();
+    this.pageSet.Size = PageSize.Normal;
+    this.pageSet.Current = 1;
+    this.statusOptions = this.questSettings.StatusFilterOptions;
+    this.membersOptions = this.questSettings.MembersFilterOptions;
+    this.constraintOptions = this.questSettings.ConstraintFilterOptions;
   }
 
-  saved(saved: boolean): void {
-    if (saved) {
+  refresh() {
+    let state = reloadState(this.currentState, this.pageSet);
+    this.load(state);
+  }
+
+  load(state: State): void {
+    let quest = new Quest();
+    quest = loadPageFilterSort<Quest>(quest, state);
+    this.pageSet.Current = quest.Page.Current;
+    this.currentState = state;
+    this.questService.Count(quest).subscribe(count => {
+      this.pageSet.Count = count;
+      this.questService.List(quest).subscribe(res => {
+        this.quests = res;
+      })
+    })
+  }
+
+  saved(savedQuest: Quest): void {
+    if (savedQuest.Id) {
+      this.load(this.currentState);
+    } else {
       this.refresh();
     }
   }
@@ -62,31 +98,14 @@ export class QuestComponent implements OnInit {
 
   openTeamList(id: number): void {
     this.questTeamListComponent.New(id);
-  }
-
-  load(state: any): void {
-    if (state && state.page) {
-      this.refreshClassify(state.page.from, state.page.to + 1);
-    }
-  }
-
-  refresh() {
-    this.currentPage = 1;
-    this.refreshClassify(0, 10);
-  }
-
-  refreshClassify(from: number, to: number): void {
-    this.questService.List(null).subscribe(res => {
-      this.totalCount = res.length;
-      this.quests = res.slice(from, to);
-    })
+    this.modelListOpened = true;
   }
 
   exec(quest: Quest): void {
     quest.Status = this.questSettings.Status.Exec;
     quest.StartDate = new Date();
     this.questService.Update(quest).subscribe(res => {
-      this.refresh();
+      this.load(this.currentState);
     })
   }
 
@@ -104,7 +123,7 @@ export class QuestComponent implements OnInit {
       if (updateFlag) {
         quest.Status = this.questSettings.Status.Finish;
         this.questService.Update(quest).subscribe(res => {
-          this.refresh();
+          this.load(this.currentState);
         })
       } else {
         this.messageHandlerService.showWarning(
@@ -129,7 +148,7 @@ export class QuestComponent implements OnInit {
       } else {
         quest.Status = this.questSettings.Status.Fail;
         this.questService.Update(quest).subscribe(res => {
-          this.refresh();
+          this.load(this.currentState);
         })
       }
     })
@@ -147,7 +166,8 @@ export class QuestComponent implements OnInit {
         );
       } else {
         this.questService.Delete(quest.Id).subscribe(res => {
-          this.refresh();
+          let state = deleteState(this.pageSet, this.currentState, 1);
+          this.load(state);
         })
       }
     })

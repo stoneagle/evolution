@@ -28,6 +28,6 @@ export class AreaComponent implements OnInit {
 
   selectAreaNode($event): void {
     this.resourceListComponent.setFilterAreaId($event);
-    this.resourceListComponent.refreshClassify(0, this.resourceListComponent.pageSize);
+    this.resourceListComponent.refresh();
   }
 }

@@ -79,6 +79,14 @@ export class QuestSettings {
     4: N18.settings.TIME.RESOURCE.QUEST.STATUS_NAME.FAIL,
   }
 
+  public StatusFilterOptions = [
+    {key: 0, value: N18.settings.SYSTEM.RESOURCE.GENERAL.ALL },
+    {key: this.Status.Recruit, value:this.StatusInfo[this.Status.Recruit]},
+    {key: this.Status.Exec, value:this.StatusInfo[this.Status.Exec]},
+    {key: this.Status.Finish, value:this.StatusInfo[this.Status.Finish]},
+    {key: this.Status.Fail, value:this.StatusInfo[this.Status.Fail]},
+  ]
+
   public Members = {
     One: 1,
     Small: 5,
@@ -93,6 +101,14 @@ export class QuestSettings {
     100: N18.settings.TIME.RESOURCE.QUEST.MEMBERS_NAME.LARGE,
   }
 
+  public MembersFilterOptions = [
+    {key: 0, value: N18.settings.SYSTEM.RESOURCE.GENERAL.ALL },
+    {key: this.Members.One, value:this.MembersInfo[this.Members.One]},
+    {key: this.Members.Small, value:this.MembersInfo[this.Members.Small]},
+    {key: this.Members.Middle, value:this.MembersInfo[this.Members.Middle]},
+    {key: this.Members.Large, value:this.MembersInfo[this.Members.Large]},
+  ]
+
   public Constraint = {
     ImportantAndBusy: 1,
     Important: 2,
@@ -106,6 +122,14 @@ export class QuestSettings {
     3:N18.settings.TIME.RESOURCE.QUEST.CONSTRAINT_NAME.BUSY,
     4:N18.settings.TIME.RESOURCE.QUEST.CONSTRAINT_NAME.NORMAL,
   }
+
+  public ConstraintFilterOptions = [
+    {key: 0, value: N18.settings.SYSTEM.RESOURCE.GENERAL.ALL },
+    {key: this.Constraint.ImportantAndBusy, value:this.ConstraintInfo[this.Constraint.ImportantAndBusy]},
+    {key: this.Constraint.Important, value:this.ConstraintInfo[this.Constraint.Important]},
+    {key: this.Constraint.Busy, value:this.ConstraintInfo[this.Constraint.Busy]},
+    {key: this.Constraint.Normal, value:this.ConstraintInfo[this.Constraint.Normal]},
+  ]
 
   public TimeTableType = {
     Workday: 1,

@@ -1,16 +1,21 @@
-import { Component, OnInit, ViewChild, Input, Inject, forwardRef } from '@angular/core';
-import { Comparator, State }                                        from "clarity-angular";
+import { Component, OnInit, ViewChild, Input } from '@angular/core';
+import { Inject, forwardRef }                  from '@angular/core';
+import { Comparator, State, SortOrder}         from "clarity-angular";
 
-import { Area }                        from '../../../../model/time/area';
-import { Resource }                    from '../../../../model/time/resource';
-import { Phase }                       from '../../../../model/time/phase';
-import { SessionUser }                 from '../../../../model/base/sign';
-import { UserResource }                from '../../../../model/time/user-resource';
-import { AreaService }                 from '../../../../service/time/area.service';
-import { PhaseService }                from '../../../../service/time/phase.service';
-import { UserResourceService }         from '../../../../service/time/user-resource.service';
-import { SignService }                 from '../../../../service/system/sign.service';
-import { CustomComparator, doSorting } from '../../../../shared/utils';
+import { PageSet }             from '../../../../model/base/basic';
+import { Area }                from '../../../../model/time/area';
+import { Resource }            from '../../../../model/time/resource';
+import { Phase }               from '../../../../model/time/phase';
+import { SessionUser }         from '../../../../model/base/sign';
+import { UserResource }        from '../../../../model/time/user-resource';
+import { AreaService }         from '../../../../service/time/area.service';
+import { PhaseService }        from '../../../../service/time/phase.service';
+import { UserResourceService } from '../../../../service/time/user-resource.service';
+import { SignService }         from '../../../../service/system/sign.service';
+
+import { CustomComparator }                             from '../../../../shared/utils';
+import { loadPageFilterSort, reloadState, deleteState } from '../../../../shared/utils';
+import { PageSize }                                     from '../../../../shared/const';
 
 import { TaskListComponent } from '../../task/list/list.component';
 import { ShellComponent }    from '../../../../base/shell/shell.component';
@@ -28,16 +33,17 @@ export class UserResourceListComponent implements OnInit {
   fieldPhasesMap: Map<number, Phase[]> = new Map();
 
   @Input() initAllFlag: boolean = false;
-  filterArea: Area = new Area();
-  filterAreaSumTime: number = 0;
-  filterAreaPhase: Phase = new Phase();
-  currentState: State;
 
   timeComparator: Comparator<UserResource> = new CustomComparator<UserResource>("Time", "number");
+  preSorted = SortOrder.Desc;
 
-  pageSize: number = 10;
-  totalCount: number = 0;
-  currentPage: number = 1;
+  filterArea: Area = new Area();
+  filterAreaLeafIds: number [] = [];
+  filterAreaSumTime: number = 0;
+  filterAreaPhase: Phase = new Phase();
+
+  currentState: State;
+  pageSet: PageSet = new PageSet();
 
   constructor(
     private areaService: AreaService,
@@ -49,7 +55,7 @@ export class UserResourceListComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.pageSize = 10;
+    this.pageSet.Size = PageSize.Normal;
     this.phaseService.List(null).subscribe(res => {
       res.forEach((one, k) => {
         if (this.fieldPhasesMap.get(one.FieldId) == undefined) {
@@ -62,64 +68,64 @@ export class UserResourceListComponent implements OnInit {
     })
   }
 
+  refresh() {
+    let state = reloadState(this.currentState, this.pageSet);
+    this.load(state);
+  }
+
   changeFilterArea(areaId: number) {
     this.areaService.Get(areaId).subscribe(area => {
       this.filterArea = area;
-      this.refreshAll(0, this.pageSize);
+      this.areaService.ListAllLeaf(this.filterArea.Id).subscribe(areaIds => {
+        areaIds.push(this.filterArea.Id);
+        this.filterAreaLeafIds = areaIds;
+        this.refresh();
+      })
     })
   }
 
-  load(state: any): void {
-    this.currentState = state;
-    if (this.currentState && this.currentState.sort) {
-      this.refreshAll(0, this.pageSize)
-    }
-  }
-
-  refresh() {
-    this.currentPage = 1;
-    this.refreshAll(0, this.pageSize);
-  }
-
-  refreshAll(from: number, to: number): void {
+  load(state: State): void {
     if ((this.filterArea.Id == undefined) && (this.initAllFlag)) {
-      this.userResourceService.List(null).subscribe(res => {
-        this.totalCount = res.length;
-        this.userResources = res.slice(from, to);
+      let userResource = new UserResource();
+      userResource = loadPageFilterSort<UserResource>(userResource, state);
+      this.pageSet.Current = userResource.Page.Current;
+      this.currentState = state;
+      this.userResourceService.Count(userResource).subscribe(count => {
+        this.pageSet.Count = count;
+        this.userResourceService.List(userResource).subscribe(res => {
+          this.userResources = res;
+        })
       })
     } else if (this.filterArea.Id != undefined) {
       let userResource = new UserResource();
       userResource.UserId = this.shell.currentUser.Id;
       userResource.Resource.Area = new Area();
-      this.areaService.ListAllLeaf(this.filterArea.Id).subscribe(areaIds => {
-        areaIds.push(this.filterArea.Id);
-        userResource.Resource.Area.Ids = areaIds;
+      userResource.Resource.Area.Ids = this.filterAreaLeafIds;
+      userResource = loadPageFilterSort<UserResource>(userResource, state);
+      this.pageSet.Current = userResource.Page.Current;
+      this.currentState = state;
+      this.userResourceService.Count(userResource).subscribe(count => {
+        this.pageSet.Count = count;
         this.userResourceService.List(userResource).subscribe(res => {
-          this.filterAreaSumTime = 0;
-          res.forEach((one, k) => {
-            this.filterAreaSumTime += one.Time;
+          this.userResourceService.AreaSumTime(userResource).subscribe(sumTime => {
+            this.filterAreaSumTime = sumTime / 60;
+            let relateFieldPhaseArray = this.fieldPhasesMap.get(this.filterArea.FieldId);
+            let tmpPhase = new Phase();
+            for (let k in relateFieldPhaseArray) {
+              if (relateFieldPhaseArray[k].Threshold < this.filterAreaSumTime) {
+                continue
+              }
+              if (tmpPhase.Id == undefined) {
+                tmpPhase = relateFieldPhaseArray[k];
+                continue;
+              }
+              if (relateFieldPhaseArray[k].Threshold <= tmpPhase.Threshold) {
+                tmpPhase = relateFieldPhaseArray[k];
+              }
+            }
+            this.filterAreaPhase = tmpPhase;
+            this.userResources = res;
           })
-          this.filterAreaSumTime = this.filterAreaSumTime / 60;
-          let relateFieldPhaseArray = this.fieldPhasesMap.get(this.filterArea.FieldId);
-          let tmpPhase = new Phase();
-          for (let k in relateFieldPhaseArray) {
-            if (relateFieldPhaseArray[k].Threshold < this.filterAreaSumTime) {
-              continue
-            }
-            if (tmpPhase.Id == undefined) {
-              tmpPhase = relateFieldPhaseArray[k];
-              continue;
-            }
-            if (relateFieldPhaseArray[k].Threshold <= tmpPhase.Threshold) {
-              tmpPhase = relateFieldPhaseArray[k];
-            }
-          }
-          this.filterAreaPhase = tmpPhase;
-          this.totalCount = res.length;
-          if (this.currentState && this.currentState.sort) {
-            res = doSorting<UserResource>(res, this.currentState);
-          }
-          this.userResources = res.slice(from, to);
         })
       })
     }
@@ -128,4 +134,5 @@ export class UserResourceListComponent implements OnInit {
   listTasks(userResource: UserResource): void {
     this.taskListComponent.changeFilterResource(userResource.Resource);
   }
+
 }

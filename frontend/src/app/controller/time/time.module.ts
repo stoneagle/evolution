@@ -19,6 +19,7 @@ import { EJ_DATETIMEPICKER_COMPONENTS }             from 'ej-angular2/src/ej/dat
 import { EJ_DROPDOWNLIST_COMPONENTS }               from 'ej-angular2/src/ej/dropdownlist.component';
 import { EJ_KANBAN_COMPONENTS }                     from 'ej-angular2/src/ej/kanban.component';
 
+import { BaseComponent }             from './base/base.component';
 import { DashboardComponent }        from './dashboard/dashboard.component';
 import { QuestComponent }            from './quest/quest.component';
 import { QuestSaveComponent }        from './quest/save/save.component';
@@ -73,11 +74,14 @@ import { ProjectSettings  }    from '../../model/time/project';
 import { AreaSettings  }       from '../../model/time/area';
 import { SyncfusionSettings  } from '../../model/time/syncfusion';
 
-import { ShareSettings  } from '../../shared/settings';
-import { ErrorInfo  }     from '../../shared/error';
+import { ShareSettings  }                from '../../shared/settings';
+import { ShareFilterRadioComponent  }    from '../../shared/filter/radio';
+import { ShareFilterCheckboxComponent  } from '../../shared/filter/checkbox';
+import { ErrorInfo  }                    from '../../shared/error';
 
 @NgModule({
   declarations: [
+    BaseComponent,
     DashboardComponent,
     QuestComponent,
     QuestSaveComponent,
@@ -114,6 +118,8 @@ import { ErrorInfo  }     from '../../shared/error';
     EJ_DATEPICKER_COMPONENTS,
     EJ_KANBAN_COMPONENTS,
     EJ_DROPDOWNLIST_COMPONENTS,
+    ShareFilterRadioComponent,
+    ShareFilterCheckboxComponent,
     // EJTemplateDirective,
   ],
   imports: [   

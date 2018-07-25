@@ -5,15 +5,41 @@
   <clr-icon shape="refresh"></clr-icon>
 </span>
 <clr-datagrid  (clrDgRefresh)="load($event)">
-  <!-- <clr-dg-column>{{ 'TIME.RESOURCE.GENERAL.ID' | translate }}</clr-dg-column> -->
-  <clr-dg-column>{{ 'TIME.RESOURCE.COUNTRY.NAME' | translate }}</clr-dg-column>
-  <clr-dg-column>{{ 'TIME.RESOURCE.COUNTRY.ENNAME' | translate }}</clr-dg-column>
-  <clr-dg-column>{{ 'TIME.RESOURCE.GENERAL.CREATED' | translate }}</clr-dg-column>
-  <clr-dg-column>{{ 'TIME.RESOURCE.GENERAL.UPDATED' | translate }}</clr-dg-column>
-	<clr-dg-column>{{ 'TIME.RESOURCE.GENERAL.OPERATION' | translate }}</clr-dg-column>
+  <clr-dg-column>
+    <ng-container *clrDgHideableColumn="{hidden: true}">
+      {{ 'TIME.RESOURCE.GENERAL.ID' | translate }}
+    </ng-container>
+  </clr-dg-column>
+  <clr-dg-column
+    [clrDgField]="'Name'"
+  >
+    <ng-container *clrDgHideableColumn="{hidden: false}">
+      {{ 'TIME.RESOURCE.COUNTRY.NAME' | translate }}
+    </ng-container>
+  </clr-dg-column>
+  <clr-dg-column>
+    <ng-container *clrDgHideableColumn="{hidden: false}">
+      {{ 'TIME.RESOURCE.COUNTRY.ENNAME' | translate }}
+    </ng-container>
+  </clr-dg-column>
+  <clr-dg-column>
+    <ng-container *clrDgHideableColumn="{hidden: false}">
+      {{ 'TIME.RESOURCE.GENERAL.CREATED' | translate }}
+    </ng-container>
+  </clr-dg-column>
+  <clr-dg-column>
+    <ng-container *clrDgHideableColumn="{hidden: false}">
+      {{ 'TIME.RESOURCE.GENERAL.UPDATED' | translate }}
+    </ng-container>
+  </clr-dg-column>
+	<clr-dg-column>
+    <ng-container *clrDgHideableColumn="{hidden: false}">
+      {{ 'TIME.RESOURCE.GENERAL.OPERATION' | translate }}
+    </ng-container>
+  </clr-dg-column>
 
   <clr-dg-row *ngFor="let country of countries">
-    <!-- <clr-dg-cell>{{country.Id}}</clr-dg-cell> -->
+    <clr-dg-cell>{{country.Id}}</clr-dg-cell>
     <clr-dg-cell>{{country.Name}}</clr-dg-cell>
     <clr-dg-cell>{{country.EnName}}</clr-dg-cell>
     <clr-dg-cell>{{country.CreatedAt | date: 'yy-MM-dd HH:mm:ss'}}</clr-dg-cell>
@@ -33,7 +59,7 @@
   </clr-dg-row>
 
   <clr-dg-footer>
-    <clr-dg-pagination #pagination [clrDgPageSize]="pageSize" [(clrDgPage)]="currentPage" [clrDgTotalItems]="totalCount">
+    <clr-dg-pagination #pagination [clrDgPageSize]="pageSet.Size" [(clrDgPage)]="pageSet.Current" [clrDgTotalItems]="pageSet.Count">
       {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
       / {{pagination.totalItems}} {{ 'TIME.RESOURCE.COUNTRY.CONCEPT' | translate }}
     </clr-dg-pagination>

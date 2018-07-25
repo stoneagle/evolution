@@ -5,6 +5,18 @@ export const enum AlertType {
   SUCCESS
 }
 
+export const PageSize = {
+  Small: 5,
+  Normal: 10,
+  Big: 20,
+  Larget: 50,
+}
+
+export const FilterType = {
+  Radio: "filter-radio",
+  Checkbox: "filter-checkbox",
+} 
+
 export const dismissInterval = 10 * 1000;
 export const httpStatusCode = {
   "Unauthorized": 401,

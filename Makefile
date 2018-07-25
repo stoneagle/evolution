@@ -62,7 +62,7 @@ init-influxdb:
 
 # frontend
 run-ng:
-	cd frontend && ng serve --environment=dev
+	cd frontend && ng serve --environment=dev --poll=2000
 
 # grafana 
 init-plugin:

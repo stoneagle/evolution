@@ -39,6 +39,7 @@ export class ShareSettings {
       Signout: N18.settings.SYSTEM.PROCESS.SIGNOUT,
       Get: N18.settings.SYSTEM.PROCESS.GET,
       List: N18.settings.SYSTEM.PROCESS.LIST,
+      Count: N18.settings.SYSTEM.PROCESS.LIST,
       Sync: N18.settings.SYSTEM.PROCESS.SYNC,
       Create: N18.settings.SYSTEM.PROCESS.CREATE,
       Update: N18.settings.SYSTEM.PROCESS.UPDATE,

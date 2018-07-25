@@ -30,6 +30,7 @@ func (c *Area) Router(router *gin.RouterGroup) {
 	area.POST("/list/tree/all", c.ListAllTree)
 	area.POST("/list/parent/:fieldId", c.ListParent)
 	area.POST("/list", c.List)
+	area.POST("/count", c.Count)
 	area.POST("", c.Create)
 	area.PUT("/:id", c.Update)
 	area.DELETE("/:id", c.Delete)

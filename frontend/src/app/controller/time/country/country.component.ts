@@ -1,8 +1,14 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { Comparator, State, SortOrder}  from "clarity-angular";
 
+import { PageSet }              from '../../../model/base/basic';
 import { Country }              from '../../../model/time/country';
 import { CountryService }       from '../../../service/time/country.service';
 import { CountrySaveComponent } from './save/save.component';
+
+import { CustomComparator }                             from '../../../shared/utils';
+import { loadPageFilterSort, reloadState, deleteState } from '../../../shared/utils';
+import { PageSize }                                     from '../../../shared/const';
 
 @Component({
   selector: 'time-country',
@@ -14,22 +20,41 @@ export class CountryComponent implements OnInit {
   saveCountry: CountrySaveComponent;
 
   countries: Country[];
-
-  pageSize: number = 10;
-  totalCount: number = 0;
-  currentPage: number = 1;
+  preSorted = SortOrder.Desc;
+  currentState: State;
+  pageSet: PageSet = new PageSet();
 
   constructor(
     private countryService: CountryService,
   ) { }
 
   ngOnInit() {
-    this.pageSize = 10;
-    this.refresh();
+    this.pageSet.Size = PageSize.Normal;
+    this.pageSet.Current = 1;
   }
 
-  saved(saved: boolean): void {
-    if (saved) {
+  refresh() {
+    let state = reloadState(this.currentState, this.pageSet);
+    this.load(state);
+  }
+
+  load(state: any): void {
+    let country = new Country();
+    country = loadPageFilterSort<Country>(country, state);
+    this.pageSet.Current = country.Page.Current;
+    this.currentState = state;
+    this.countryService.Count(country).subscribe(count => {
+      this.pageSet.Count = count;
+      this.countryService.List(country).subscribe(res => {
+        this.countries = res;
+      })
+    })
+  }
+
+  saved(savedCountry: Country): void {
+    if (savedCountry.Id) {
+      this.load(this.currentState);
+    } else {
       this.refresh();
     }
   }
@@ -40,25 +65,8 @@ export class CountryComponent implements OnInit {
 
   delete(country: Country): void {
     this.countryService.Delete(country.Id).subscribe(res => {
-      this.refresh();
-    })
-  }
-
-  load(state: any): void {
-    if (state && state.page) {
-      this.refreshClassify(state.page.from, state.page.to + 1);
-    }
-  }
-
-  refresh() {
-    this.currentPage = 1;
-    this.refreshClassify(0, 10);
-  }
-
-  refreshClassify(from: number, to: number): void {
-    this.countryService.List(null).subscribe(res => {
-      this.totalCount = res.length;
-      this.countries = res.slice(from, to);
+      let state = deleteState(this.pageSet, this.currentState, 1);
+      this.load(state);
     })
   }
 }

@@ -107,9 +107,9 @@
         },
         "MEMBERS_NAME": {
           "ONE": "单人",
-          "SMALL": "小型5人",
-          "MIDDLE": "中型25人",
-          "LARGE": "大型100人"
+          "SMALL": "5人",
+          "MIDDLE": "25人",
+          "LARGE": "100人"
         },
         "CONSTRAINT_NAME": {
           "IMPORTANT_BUSY": "重要且紧急",
@@ -253,6 +253,7 @@
       },
       "GENERAL": {
         "CONCEPT": "通用",
+        "ALL": "全部",
         "ID": "序号",
         "OPERATION": "操作",
         "CREATED": "创建时间",
@@ -266,6 +267,7 @@
       "GET": "获取", 
       "LIST": "罗列", 
       "SYNC": "同步", 
+      "COUNT": "统计", 
       "CREATE": "添加", 
       "UPDATE": "更新",
       "DELETE": "删除",

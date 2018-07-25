@@ -16,7 +16,7 @@ import { QuantModule }                           from './controller/quant/quant.
 import { TimeModule }                            from './controller/time/time.module';
 import { SystemModule }                          from './controller/system/system.module';
 
-import { ShareSettings }         from './shared/settings';
+import { ShareSettings }              from './shared/settings';
 
 export function initializeApp(appConfig: AppConfig) {
   return () => appConfig.load();

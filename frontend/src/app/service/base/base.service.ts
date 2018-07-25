@@ -58,6 +58,20 @@ export class BaseService {
     )
   }
 
+  protected BasePostResp(params: any, url: string): Observable<Resp> {
+    this.operation = this.shareSettings.System.Process.Get;
+    return this.http.post<Resp>(url, JSON.stringify(params)).pipe(
+      catchError(this.handleError<Resp>()),
+      map(res => {
+        if (res && res.code == 0) {
+          return res;
+        } else {
+          this.handleResponse(res);
+        }
+      }),
+    )
+  }
+
   protected BaseList<T extends Serializable >(params: any, c: new (any) => T, url: string): Observable<T[]> {
     this.operation = this.shareSettings.System.Process.List;
     return this.http.post<Resp>(url, JSON.stringify(params)).pipe(
@@ -71,6 +85,21 @@ export class BaseService {
             }
           )
           return ret
+        } else {
+          this.handleResponse(res);
+        }
+      }),
+    )
+  }
+
+  public Count(params: any): Observable<number> {
+    let url = this.uri + "/count";
+    this.operation = this.shareSettings.System.Process.Count;
+    return this.http.post<Resp>(url, JSON.stringify(params)).pipe(
+      catchError(this.handleError<Resp>()),
+      map(res => {
+        if (res && res.code == 0) {
+          return res.data;
         } else {
           this.handleResponse(res);
         }

@@ -58,7 +58,7 @@ export class QuestSaveComponent implements OnInit {
   constraintMap      = this.questSettings.Constraint;
 
   modelOpened: boolean = false;
-  @Output() save = new EventEmitter<boolean>();
+  @Output() save = new EventEmitter<Quest>();
 
   ngOnInit() {
   }
@@ -153,7 +153,7 @@ export class QuestSaveComponent implements OnInit {
         this.saveQuestTarget(res.Id);
         this.saveQuestTeamFounder(res.Id, res.EndDate);
         this.modelOpened = false;
-        this.save.emit(true);
+        this.save.emit(this.quest);
       })
     } else {
       if (this.quest.Status != this.questSettings.Status.Recruit) {
@@ -162,7 +162,7 @@ export class QuestSaveComponent implements OnInit {
       this.questService.Update(this.quest).subscribe(res => {
         this.saveQuestTarget(this.quest.Id);
         this.modelOpened = false;
-        this.save.emit(true);
+        this.save.emit(this.quest);
       })
     }
   }

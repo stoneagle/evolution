@@ -8,7 +8,7 @@
       </a>
     </div>
     <div class="header-nav">
-      <a href="javascript:void(0);" (click)="changeNav('flow')" [ngClass]="nav=='flow' ? 'active nav-link' : 'nav-link'" ><span class="nav-text">{{ 'FLOW.TITLE' | translate }}</span></a>
+      <a href="javascript:void(0);" (click)="changeNav('quant')" [ngClass]="nav=='quant' ? 'active nav-link' : 'nav-link'" ><span class="nav-text">{{ 'QUANT.TITLE' | translate }}</span></a>
     </div>
     <div class="header-nav">
       <a href="javascript:void(0);" (click)="changeNav('time')" [ngClass]="nav=='time' ? 'active nav-link' : 'nav-link'" ><span class="nav-text">{{ 'TIME.TITLE' | translate }}</span></a>
@@ -38,25 +38,25 @@
       <router-outlet></router-outlet>
     </div>
     <!-- TODO nav组件整合 -->
-    <clr-vertical-nav *ngIf="(nav == 'flow')" [clrVerticalNavCollapsible]="true" [(clrVerticalNavCollapsed)]="collapsed">
+    <clr-vertical-nav *ngIf="(nav == 'quant')" [clrVerticalNavCollapsible]="true" [(clrVerticalNavCollapsed)]="collapsed">
       <clr-vertical-nav-group routerLinkActive="active">
         <clr-icon shape="bolt" clrVerticalNavIcon></clr-icon>
-        {{ 'FLOW.ASSETS.TYPE.STOCK' | translate }}
+        {{ 'QUANT.ASSETS.TYPE.STOCK' | translate }}
         <clr-vertical-nav-group-children>
-          <a href="#" routerLink="/flow/stock/pool" class="nav-link">
-            {{ 'FLOW.RESOURCE.POOL.CONCEPT' | translate }} 
+          <a href="#" routerLink="/quant/stock/pool" class="nav-link">
+            {{ 'QUANT.RESOURCE.POOL.CONCEPT' | translate }} 
           </a>
         </clr-vertical-nav-group-children>
       </clr-vertical-nav-group>
       <clr-vertical-nav-group routerLinkActive="active">
         <clr-icon shape="library" clrVerticalNavIcon></clr-icon>
-        {{ 'FLOW.ASSETS.TYPE.CONFIG' | translate }}
+        {{ 'QUANT.ASSETS.TYPE.CONFIG' | translate }}
         <clr-vertical-nav-group-children>
-          <a href="#" routerLink="/flow/config/classify" class="nav-link">
-            {{ 'FLOW.RESOURCE.CLASSIFY.CONCEPT' | translate }} 
+          <a href="#" routerLink="/quant/config/classify" class="nav-link">
+            {{ 'QUANT.RESOURCE.CLASSIFY.CONCEPT' | translate }} 
           </a>
-          <a href="#" routerLink="/flow/config/item" class="nav-link">
-            {{ 'FLOW.RESOURCE.ITEM.CONCEPT' | translate }} 
+          <a href="#" routerLink="/quant/config/item" class="nav-link">
+            {{ 'QUANT.RESOURCE.ITEM.CONCEPT' | translate }} 
           </a>
         </clr-vertical-nav-group-children>
       </clr-vertical-nav-group>

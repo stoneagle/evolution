@@ -20,6 +20,7 @@ func (c *QuestTimeTable) Router(router *gin.RouterGroup) {
 	questTimeTable.GET("/get/:id", c.One)
 	questTimeTable.POST("", c.Create)
 	questTimeTable.POST("/list", c.List)
+	questTimeTable.POST("/count", c.Count)
 	questTimeTable.PUT("/:id", c.Update)
 	questTimeTable.DELETE("/:id", c.Delete)
 }

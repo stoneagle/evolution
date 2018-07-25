@@ -17,7 +17,7 @@ export class ResourceSaveComponent implements OnInit {
 
   areaIds: number[];
   areas: Area[] = [];
-  @Output() save = new EventEmitter<boolean>();
+  @Output() save = new EventEmitter<Resource>();
 
   constructor(
     private resourceService: ResourceService,
@@ -58,12 +58,12 @@ export class ResourceSaveComponent implements OnInit {
     if (this.resource.Id == null) {
       this.resourceService.Add(this.resource).subscribe(res => {
         this.modelOpened = false;
-        this.save.emit(true);
+        this.save.emit(this.resource);
       })
     } else {
       this.resourceService.Update(this.resource).subscribe(res => {
         this.modelOpened = false;
-        this.save.emit(true);
+        this.save.emit(this.resource);
       })
     }
   }

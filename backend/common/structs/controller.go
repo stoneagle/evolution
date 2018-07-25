@@ -42,6 +42,7 @@ type ControllerGeneral interface {
 type GinBaseController interface {
 	ControllerGeneral
 	Init()
+	Count(ctx *gin.Context)
 	One(ctx *gin.Context)
 	List(ctx *gin.Context)
 	Create(ctx *gin.Context)
@@ -91,6 +92,19 @@ func (c *Controller) One(ctx *gin.Context) {
 		return
 	}
 	resp.Success(ctx, c.Model)
+}
+
+func (c *Controller) Count(ctx *gin.Context) {
+	if err := ctx.ShouldBindJSON(c.Model); err != nil {
+		resp.ErrorBusiness(ctx, resp.ErrorParams, fmt.Sprintf("%v resource json bind error", c.Resource), err)
+		return
+	}
+	count, err := c.Service.Count(c.Model)
+	if err != nil {
+		resp.ErrorBusiness(ctx, resp.ErrorDatabase, fmt.Sprintf("%v count fail", c.Resource), err)
+		return
+	}
+	resp.Success(ctx, count)
 }
 
 func (c *Controller) List(ctx *gin.Context) {

@@ -21,6 +21,7 @@ func (c *Quest) Router(router *gin.RouterGroup) {
 	quest.GET("/get/:id", c.One)
 	quest.POST("", c.Create)
 	quest.POST("/list", c.List)
+	quest.POST("/count", c.Count)
 	quest.PUT("/:id", c.Update)
 	quest.DELETE("/:id", c.Delete)
 }

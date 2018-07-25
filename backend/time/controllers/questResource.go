@@ -21,6 +21,7 @@ func (c *QuestResource) Router(router *gin.RouterGroup) {
 	questResource.GET("/get/:id", c.One)
 	questResource.POST("", c.Create)
 	questResource.POST("/list", c.List)
+	questResource.POST("/count", c.Count)
 	questResource.PUT("/:id", c.Update)
 	questResource.DELETE("/:id", c.Delete)
 }

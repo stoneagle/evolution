@@ -13,7 +13,7 @@ export class CountrySaveComponent implements OnInit {
   country: Country = new Country;
   modelOpened: boolean = false;
 
-  @Output() save = new EventEmitter<boolean>();
+  @Output() save = new EventEmitter<Country>();
 
   constructor(
     private countryService: CountryService,
@@ -38,12 +38,12 @@ export class CountrySaveComponent implements OnInit {
     if (this.country.Id == null) {
       this.countryService.Add(this.country).subscribe(res => {
         this.modelOpened = false;
-        this.save.emit(true);
+        this.save.emit(this.country);
       })
     } else {
       this.countryService.Update(this.country).subscribe(res => {
         this.modelOpened = false;
-        this.save.emit(true);
+        this.save.emit(this.country);
       })
     }
   }

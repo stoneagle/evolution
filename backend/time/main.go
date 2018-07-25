@@ -10,6 +10,7 @@ import (
 func newApp() *bootstrap.Bootstrapper {
 	app := bootstrap.New("time", "wuzhongyang@wzy.com")
 	app.Bootstrap()
+
 	app.Configure(database.Configure, route.Configure)
 	_, err := time.LoadLocation(app.Config.Time.System.Location)
 	if err != nil {

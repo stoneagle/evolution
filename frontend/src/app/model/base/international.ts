@@ -253,6 +253,7 @@ export interface International {
       }
       GENERAL: {
         CONCEPT: string
+        ALL: string
         ID: string
         OPERATION: string
         CREATED: string

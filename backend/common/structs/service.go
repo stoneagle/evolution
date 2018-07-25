@@ -12,6 +12,7 @@ import (
 type ServiceGeneral interface {
 	One(int, ModelGeneral) error
 	List(ModelGeneral, interface{}) error
+	Count(ModelGeneral) (int64, error)
 	Create(ModelGeneral) error
 	Update(int, ModelGeneral) error
 	UpdateByMap(string, int, map[string]interface{}) error
@@ -76,9 +77,40 @@ func (s *Service) One(id int, modelPtr ModelGeneral) (err error) {
 	return
 }
 
+func (s *Service) Count(modelPtr ModelGeneral) (count int64, err error) {
+	join := modelPtr.Join()
+	tableName := modelPtr.TableName()
+	session := s.Engine.Table(tableName)
+	if modelPtr.WithDeleted() {
+		session.Where(tableName + ".deleted_at IS NULL")
+	}
+	if join != nil {
+		links := join.Links()
+		for _, link := range links {
+			session.Join(link.Type.String(), link.Table, fmt.Sprintf("%s.%s = %s.%s", link.LeftTable, link.LeftField, link.RightTable, link.RightField))
+		}
+		modelPtr.BuildCondition(session)
+		count, err = session.Count()
+		if err != nil {
+			sql, args := session.LastSQL()
+			s.LogSql(sql, args, err)
+		}
+	} else {
+		modelPtr.BuildCondition(session)
+		count, err = session.Count()
+		if err != nil {
+			sql, args := session.LastSQL()
+			s.LogSql(sql, args, err)
+		}
+	}
+	return
+}
+
 func (s *Service) List(modelPtr ModelGeneral, modelsPtr interface{}) (err error) {
 	join := modelPtr.Join()
 	session := s.Engine.Table(modelPtr.TableName())
+	modelPtr.BuildPage(session)
+	modelPtr.BuildSort(session)
 	if !modelPtr.WithDeleted() {
 		session = session.Unscoped()
 	}

@@ -21,6 +21,7 @@ func (c *Project) Router(router *gin.RouterGroup) {
 	project.GET("/get/:id", c.One)
 	project.POST("", c.Create)
 	project.POST("/list", c.List)
+	project.POST("/count", c.Count)
 	project.PUT("/:id", c.Update)
 	project.DELETE("/:id", c.Delete)
 }

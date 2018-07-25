@@ -5,18 +5,71 @@
   <clr-icon shape="refresh"></clr-icon>
 </span>
 <clr-datagrid  (clrDgRefresh)="load($event)">
-  <!-- <clr-dg-column>{{ 'TIME.RESOURCE.GENERAL.ID' | translate }}</clr-dg-column> -->
-  <clr-dg-column>{{ 'TIME.RESOURCE.QUEST.NAME' | translate }}</clr-dg-column>
-  <clr-dg-column>{{ 'TIME.RESOURCE.QUEST.MEMBERS' | translate }}</clr-dg-column>
-  <clr-dg-column>{{ 'TIME.RESOURCE.QUEST.CONSTRAINT' | translate }}</clr-dg-column>
-  <clr-dg-column>{{ 'TIME.RESOURCE.QUEST.STATUS' | translate }}</clr-dg-column>
-  <clr-dg-column>{{ 'TIME.RESOURCE.QUEST.STARTDATE' | translate }}</clr-dg-column>
-  <clr-dg-column>{{ 'TIME.RESOURCE.QUEST.ENDDATE' | translate }}</clr-dg-column>
-  <clr-dg-column>{{ 'TIME.RESOURCE.GENERAL.CREATED' | translate }}</clr-dg-column>
-	<clr-dg-column>{{ 'TIME.RESOURCE.GENERAL.OPERATION' | translate }}</clr-dg-column>
+  <clr-dg-column
+    [clrDgField]="'Id'"
+    [clrDgSortOrder]="preSorted"
+  >
+    <ng-container *clrDgHideableColumn="{hidden: true}">
+    {{ 'TIME.RESOURCE.GENERAL.ID' | translate }}
+    </ng-container>
+  </clr-dg-column>
+  <clr-dg-column
+    [clrDgField]="'Name'"
+  >
+    <ng-container *clrDgHideableColumn="{hidden: false}">
+    {{ 'TIME.RESOURCE.QUEST.NAME' | translate }}
+    </ng-container>
+  </clr-dg-column>
+  <clr-dg-column>
+    <clr-dg-filter [clrDgFilter]="membersFilter">
+      <share-filter-radio #membersFilter [filterParamName]="'Members'" [items]="membersOptions">
+      </share-filter-radio>
+    </clr-dg-filter>
+    <ng-container *clrDgHideableColumn="{hidden: false}">
+    {{ 'TIME.RESOURCE.QUEST.MEMBERS' | translate }}
+    </ng-container>
+  </clr-dg-column>
+  <clr-dg-column>
+    <clr-dg-filter [clrDgFilter]="constraintFilter">
+      <share-filter-radio #constraintFilter [filterParamName]="'Constraint'" [items]="constraintOptions">
+      </share-filter-radio>
+    </clr-dg-filter>
+    <ng-container *clrDgHideableColumn="{hidden: false}">
+    {{ 'TIME.RESOURCE.QUEST.CONSTRAINT' | translate }}
+    </ng-container>
+  </clr-dg-column>
+  <clr-dg-column>
+    <clr-dg-filter [clrDgFilter]="statusFilter">
+      <share-filter-radio #statusFilter [filterParamName]="'Status'" [items]="statusOptions">
+      </share-filter-radio>
+    </clr-dg-filter>
+    <ng-container *clrDgHideableColumn="{hidden: false}">
+    {{ 'TIME.RESOURCE.QUEST.STATUS' | translate }}
+    </ng-container>
+  </clr-dg-column>
+  <clr-dg-column>
+    <ng-container *clrDgHideableColumn="{hidden: false}">
+    {{ 'TIME.RESOURCE.QUEST.STARTDATE' | translate }}
+    </ng-container>
+  </clr-dg-column>
+  <clr-dg-column>
+    <ng-container *clrDgHideableColumn="{hidden: false}">
+    {{ 'TIME.RESOURCE.QUEST.ENDDATE' | translate }}
+    </ng-container>
+  </clr-dg-column>
+  <clr-dg-column>
+    <ng-container *clrDgHideableColumn="{hidden: false}">
+    {{ 'TIME.RESOURCE.GENERAL.CREATED' | translate }}
+    </ng-container>
+  </clr-dg-column>
+	<clr-dg-column>
+    <ng-container *clrDgHideableColumn="{hidden: false}">
+    {{ 'TIME.RESOURCE.GENERAL.OPERATION' | translate }}
+    </ng-container>
+  </clr-dg-column>
 
   <clr-dg-row *ngFor="let quest of quests">
-    <!-- <clr-dg-cell>{{quest.Id}}</clr-dg-cell> -->
+    <clr-dg-cell>{{quest.Id}}</clr-dg-cell>
     <clr-dg-cell>{{quest.Name}}</clr-dg-cell>
     <clr-dg-cell>{{this.questSettings.MembersInfo[quest.Members]}}</clr-dg-cell>
     <clr-dg-cell>{{this.questSettings.ConstraintInfo[quest.Constraint]}}</clr-dg-cell>
@@ -55,7 +108,7 @@
   </clr-dg-row>
 
   <clr-dg-footer>
-    <clr-dg-pagination #pagination [clrDgPageSize]="pageSize" [(clrDgPage)]="currentPage" [clrDgTotalItems]="totalCount">
+    <clr-dg-pagination #pagination [clrDgPageSize]="pageSet.Size" [(clrDgPage)]="pageSet.Current" [clrDgTotalItems]="pageSet.Count">
       {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
       / {{pagination.totalItems}} {{ 'TIME.RESOURCE.QUEST.CONCEPT' | translate }}
     </clr-dg-pagination>
@@ -63,4 +116,12 @@
 </clr-datagrid>
 
 <time-quest-save (save)="saved($event)"></time-quest-save>
-<time-quest-team-list></time-quest-team-list>
+<clr-modal [(clrModalOpen)]="modelListOpened" [clrModalSize]="'xl'">
+  <h3 class="modal-title">{{ 'TIME.RESOURCE.QUEST_TEAM.CONCEPT' | translate }}</h3>
+    <div class="modal-body">
+      <time-quest-team-list></time-quest-team-list>
+    <div>
+      <button type="button" class="btn btn-primary" (click)="modelListOpened = false">{{ 'SYSTEM.PROCESS.CANCEL' | translate }}</button>
+    </div>
+  </div>
+</clr-modal>

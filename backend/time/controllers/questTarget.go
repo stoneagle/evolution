@@ -25,6 +25,7 @@ func (c *QuestTarget) Router(router *gin.RouterGroup) {
 	questTarget.POST("", c.Create)
 	questTarget.POST("/batch", c.BatchSave)
 	questTarget.POST("/list", c.List)
+	questTarget.POST("/count", c.Count)
 	questTarget.PUT("/:id", c.Update)
 	questTarget.DELETE("/:id", c.Delete)
 }

@@ -1,12 +1,20 @@
-import { Component, OnInit, Input, ViewChild, Inject, forwardRef } from '@angular/core';
+import { Component, OnInit, Input, ViewChild } from '@angular/core';
+import { Inject, forwardRef }                  from '@angular/core';
+import { Comparator, State, SortOrder}         from "clarity-angular";
 
+import { PageSet }     from '../../../../model/base/basic';
 import { Task }        from '../../../../model/time/task';
 import { Resource }    from '../../../../model/time/resource';
 import { SessionUser } from '../../../../model/base/sign';
+
 import { TaskService } from '../../../../service/time/task.service';
 import { SignService } from '../../../../service/system/sign.service';
 
 import { ShellComponent } from '../../../../base/shell/shell.component';
+
+import { CustomComparator }                             from '../../../../shared/utils';
+import { loadPageFilterSort, reloadState, deleteState } from '../../../../shared/utils';
+import { PageSize }                                     from '../../../../shared/const';
 
 @Component({
   selector: 'time-task-list',
@@ -15,12 +23,12 @@ import { ShellComponent } from '../../../../base/shell/shell.component';
 })
 export class TaskListComponent implements OnInit {
 
-  tasks: Task[];
-  pageSize: number = 10;
-  totalCount: number = 0;
-  currentPage: number = 1;
   filterResource: Resource = new Resource();
   currentUser: SessionUser = new SessionUser();
+  tasks: Task[];
+  preSorted = SortOrder.Desc;
+  currentState: State;
+  pageSet: PageSet = new PageSet();
 
   constructor(
     private signService: SignService,
@@ -30,38 +38,30 @@ export class TaskListComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.pageSize = 10;
+    this.pageSet.Size = PageSize.Normal;
+    this.pageSet.Current = 1;
   }
 
-  saved(saved: boolean): void {
-    if (saved) {
-      this.refresh();
-    }
+  refresh() {
+    let state = reloadState(this.currentState, this.pageSet);
+    this.load(state);
+  }
+
+  load(state: State): void {
+    let task = new Task();
+    task = loadPageFilterSort<Task>(task, state);
+    this.pageSet.Current = task.Page.Current;
+    this.currentState = state;
+    this.taskService.Count(task).subscribe(count => {
+      this.pageSet.Count = count;
+      this.taskService.List(task).subscribe(res => {
+        this.tasks = res;
+      })
+    })
   }
 
   changeFilterResource(resource: Resource): void {
     this.filterResource = resource;
     this.refresh();
-  }
-
-  load(state: any): void {
-    if (state && state.page) {
-      this.refreshClassify(state.page.from, state.page.to + 1);
-    }
-  }
-
-  refresh() {
-    this.currentPage = 1;
-    this.refreshClassify(0, 10);
-  }
-
-  refreshClassify(from: number, to: number): void {
-    let task = new Task();
-    task.UserId = this.shell.currentUser.Id
-    task.ResourceId = this.filterResource.Id
-    this.taskService.List(task).subscribe(res => {
-      this.totalCount = res.length;
-      this.tasks = res.slice(from, to);
-    })
   }
 }

@@ -23,6 +23,8 @@ const (
 type ModelGeneral interface {
 	TableName() string
 	Join() JoinGeneral
+	BuildPage(*xorm.Session)
+	BuildSort(*xorm.Session)
 	BuildCondition(*xorm.Session)
 	SlicePtr() interface{}
 	Hook() error
@@ -46,9 +48,22 @@ type JoinLinks struct {
 	RightField string
 }
 
+type Page struct {
+	Size    int    `xorm:"-" structs:"-" json:"Size,omitempty"`
+	Current int    `xorm:"-" structs:"-" json:"Current,omitempty"`
+	Order   string `xorm:"-" structs:"-" json:"Order,omitempty"`
+}
+
+type Sort struct {
+	By      string `xorm:"-" structs:"-" json:"By,omitempty"`
+	Reverse bool   `xorm:"-" structs:"-" json:"Reverse,omitempty"`
+}
+
 type Model struct {
 	CreatedAt time.Time `xorm:"created comment('创建时间')" structs:"created_at,omitempty"`
 	UpdatedAt time.Time `xorm:"updated comment('修改时间')" structs:"updated_at,omitempty"`
+	Page      *Page     `xorm:"-" structs:"-" json:"Page,omitempty"`
+	Sort      *Sort     `xorm:"-" structs:"-" json:"Sort,omitempty"`
 }
 
 type ModelWithId struct {
@@ -110,4 +125,21 @@ func (m *Model) Hook() error {
 
 func (m *Model) WithDeleted() bool {
 	return false
+}
+
+func (m *Model) BuildPage(session *xorm.Session) {
+	if (m.Page != nil) && (m.Page.Size > 0) {
+		start := (m.Page.Current - 1) * m.Page.Size
+		session = session.Limit(m.Page.Size, start)
+	}
+}
+
+func (m *Model) BuildSort(session *xorm.Session) {
+	if (m.Sort != nil) && (len(m.Sort.By) != 0) {
+		if m.Sort.Reverse {
+			session.Desc(m.Sort.By)
+		} else {
+			session.Asc(m.Sort.By)
+		}
+	}
 }

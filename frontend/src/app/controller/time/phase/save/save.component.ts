@@ -15,7 +15,7 @@ export class PhaseSaveComponent implements OnInit {
 
   @Input() currentList: Phase[] = [];
   @Input() currentFieldId: number;
-  @Output() save = new EventEmitter<boolean>();
+  @Output() save = new EventEmitter<Phase>();
 
   constructor(
     private phaseService: PhaseService,
@@ -42,12 +42,12 @@ export class PhaseSaveComponent implements OnInit {
     if (this.phase.Id == null) {
       this.phaseService.Add(this.phase).subscribe(res => {
         this.modelOpened = false;
-        this.save.emit(true);
+        this.save.emit(this.phase);
       })
     } else {
       this.phaseService.Update(this.phase).subscribe(res => {
         this.modelOpened = false;
-        this.save.emit(true);
+        this.save.emit(this.phase);
       })
     }
   }

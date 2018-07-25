@@ -24,6 +24,7 @@ func (c *Resource) Router(router *gin.RouterGroup) {
 	resource.GET("/list/areas/:id", c.ListAreas)
 	resource.POST("", c.Create)
 	resource.POST("/list", c.List)
+	resource.POST("/count", c.Count)
 	resource.POST("/list/leaf", c.ListGroupByLeaf)
 	resource.PUT("/:id", c.Update)
 	resource.DELETE("/:id", c.Delete)

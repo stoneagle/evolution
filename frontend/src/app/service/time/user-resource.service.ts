@@ -25,6 +25,12 @@ export class UserResourceService extends BaseService {
     }))
   }
   
+  AreaSumTime(userResource: UserResource): Observable<number> {
+    return this.BasePostResp(userResource, this.uri + `/list/time`).pipe(map(resp => {
+      return resp.data;
+    }))
+  }
+
   Get(id: number): Observable<UserResource> {
     return this.BaseGet<UserResource>(UserResource, this.uri + `/get/${id}`).pipe(map(userResource => {
       return userResource;

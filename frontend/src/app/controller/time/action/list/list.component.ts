@@ -1,11 +1,17 @@
 import { Component, OnInit, Input, ViewChild, Inject, forwardRef } from '@angular/core';
+import { Comparator, State, SortOrder}  from "clarity-angular";
 
+import { PageSet }       from '../../../../model/base/basic';
 import { Task }          from '../../../../model/time/task';
 import { Resource }      from '../../../../model/time/resource';
 import { Area }          from '../../../../model/time/area';
 import { Action }        from '../../../../model/time/action';
 import { TaskService }   from '../../../../service/time/task.service';
 import { ActionService } from '../../../../service/time/action.service';
+
+import { CustomComparator }                             from '../../../../shared/utils';
+import { loadPageFilterSort, reloadState, deleteState } from '../../../../shared/utils';
+import { PageSize }                                     from '../../../../shared/const';
 
 import { ShellComponent } from '../../../../base/shell/shell.component';
 
@@ -17,9 +23,10 @@ import { ShellComponent } from '../../../../base/shell/shell.component';
 export class ActionListComponent implements OnInit {
   actions: Action[] = [];
   filterAction: Action;
-  pageSize: number = 10;
-  totalCount: number = 0;
-  currentPage: number = 1;
+
+  preSorted = SortOrder.Desc;
+  currentState: State;
+  pageSet: PageSet = new PageSet();
 
   constructor(
     private taskService: TaskService,
@@ -29,31 +36,32 @@ export class ActionListComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.pageSize = 10;
+    this.pageSet.Size = PageSize.Small;
+    this.pageSet.Current = 1;
   }
 
   NewWithFilter(filterAction: Action) {
     this.filterAction = filterAction;
-    this.refreshClassify(0, 10);
+    this.refresh();
   }
 
   load(state: any): void {
-    if (state && state.page) {
-      this.refreshClassify(state.page.from, state.page.to + 1);
+    if (this.filterAction != undefined) {
+      let action = this.filterAction;
+      action = loadPageFilterSort<Action>(action, state);
+      this.pageSet.Current = action.Page.Current;
+      this.currentState = state;
+      this.actionService.Count(action).subscribe(count => {
+        this.pageSet.Count = count;
+        this.actionService.List(action).subscribe(res => {
+          this.actions = res;
+        })
+      })
     }
   }
 
   refresh() {
-    this.currentPage = 1;
-    this.refreshClassify(0, 10);
-  }
-
-  refreshClassify(from: number, to: number): void {
-    if (this.filterAction != undefined) {
-      this.actionService.List(this.filterAction).subscribe(res => {
-        this.totalCount = res.length;
-        this.actions = res.slice(from, to);
-      })
-    }
+    let state = reloadState(this.currentState, this.pageSet);
+    this.load(state);
   }
 }
