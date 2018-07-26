@@ -1,15 +1,15 @@
 app:
   mode: debug
-  log: /go/src/evolution/backend/logs
-  level: 3
+  log: /go/src/evolution/logs
+  level: 2
 quant:
   system:
     name: quant
-    host: http://quant-backend
+    host: 
     port: 8080 
     version: v1 
     prefix: evolution/quant
-    cors: ["http://evolution:8888"]
+    cors: [""]
     location: Asia/Shanghai
   redis:
     host: redis
@@ -18,27 +18,26 @@ quant:
     db: 0
   database:
     type: mysql
-    host: mysql
-    port: 3306
-    user: root
-    target: quant 
-    password: 123456
+    host: 
+    port: 
+    user: 
+    target:  
+    password: 
     maxIdle: 10 
     maxOpen: 5 
     showsql: True
-    reset: False 
     location: Asia/Shanghai
   rpc:
-    host: engine
-    port: 6666
+    host: 
+    port: 
 time:
   system:
     name: time
-    host: http://time-backend
+    host: 
     port: 8080 
     version: v1 
     prefix: evolution/time
-    cors: ["http://evolution:8888"]
+    cors: [""]
     location: Asia/Shanghai
   redis:
     host: redis
@@ -47,15 +46,14 @@ time:
     db: 0
   database:
     type: mysql
-    host: mysql
-    port: 3306
-    user: root
-    target: time
-    password: 123456
+    host: 
+    port: 
+    user: 
+    target: 
+    password: 
     maxIdle: 10 
     maxOpen: 5 
     showsql: True
-    reset: True 
     location: Asia/Shanghai
 system:
   auth:
@@ -63,11 +61,11 @@ system:
     session: "auth-session"
   system:
     name: system 
-    host: http://system-backend
+    host: 
     port: 8080 
     version: v1 
     prefix: evolution/system
-    cors: ["http://evolution:8888"]
+    cors: [""]
     location: Asia/Shanghai
   redis:
     host: redis
@@ -76,13 +74,12 @@ system:
     db: 0
   database:
     type: mysql
-    host: mysql
-    port: 3306
-    user: root
-    target: system 
-    password: 123456
+    host: 
+    port: 
+    user: 
+    target:  
+    password: 
     maxIdle: 10 
     maxOpen: 5 
     showsql: True
-    reset: False 
     location: Asia/Shanghai

@@ -1,10 +1,11 @@
-import { APP_INITIALIZER }                   from '@angular/core';
-import { NgModule }                          from '@angular/core';
-import { HttpClient, HTTP_INTERCEPTORS   }   from '@angular/common/http';
-import { TranslateModule, TranslateLoader  } from '@ngx-translate/core';
-import { TranslateHttpLoader  }              from '@ngx-translate/http-loader';
-import { ClarityModule  }                    from "@clr/angular";
-import { CookieModule }                      from 'ngx-cookie';
+import { APP_INITIALIZER }                        from '@angular/core';
+import { NgModule }                               from '@angular/core';
+import { HttpClient, HTTP_INTERCEPTORS   }        from '@angular/common/http';
+import { LocationStrategy, HashLocationStrategy } from '@angular/common';
+import { TranslateModule, TranslateLoader  }      from '@ngx-translate/core';
+import { TranslateHttpLoader  }                   from '@ngx-translate/http-loader';
+import { ClarityModule  }                         from "@clr/angular";
+import { CookieModule }                           from 'ngx-cookie';
 
 import { AppComponent }                          from './app.component';
 import { AppRouteModule }                        from './route/app-route.module';

@@ -36,7 +36,7 @@ func UserByName(name string) (user models.User, err error) {
 
 func UserList(condition models.User) (users []models.User, err error) {
 	conf := config.Get().System.System
-	url := conf.Host + "/" + conf.Prefix + "/" + conf.Version + "/user/list"
+	url := conf.Host + ":" + conf.Port + "/" + conf.Prefix + "/" + conf.Version + "/user/list"
 	params, err := json.Marshal(condition)
 	if err != nil {
 		return
@@ -58,7 +58,7 @@ func UserList(condition models.User) (users []models.User, err error) {
 
 func UserBAMap() (users map[string]string, err error) {
 	conf := config.Get().System.System
-	url := conf.Host + "/" + conf.Prefix + "/" + conf.Version + "/user/list"
+	url := conf.Host + ":" + conf.Port + "/" + conf.Prefix + "/" + conf.Version + "/user/list"
 	res, err := req.Exec(req.GetMethod, url, nil, 300*time.Millisecond)
 	var ret resp.Response
 	err = json.Unmarshal(res, &ret)

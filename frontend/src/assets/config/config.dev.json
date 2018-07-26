@@ -4,8 +4,8 @@
     "language": "zh-cn"
   },
   "apiServer": {
-    "endpoint": "http://192.168.0.119:8000/evolution",
-    "websocket": "ws://192.168.0.119:8000/evolution",
+    "endpoint": "http://evolution:8000/evolution",
+    "websocket": "ws://evolution:8000/evolution",
     "auth": {
       "type": "basic-auth-jwt",
       "session": "auth-session",

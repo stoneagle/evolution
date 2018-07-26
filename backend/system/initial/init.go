@@ -5,6 +5,7 @@ import (
 	"evolution/backend/system/models"
 	"fmt"
 	"io/ioutil"
+	"os"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -13,7 +14,11 @@ import (
 )
 
 func main() {
-	yamlFile, err := ioutil.ReadFile("../../config/.config.yaml")
+	configPath := os.Getenv("ConfigPath")
+	if configPath == "" {
+		configPath = "../../config/.config.yaml"
+	}
+	yamlFile, err := ioutil.ReadFile(configPath)
 	if err != nil {
 		panic(err)
 	}
@@ -22,10 +27,10 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	exec(conf.System.Database, conf.App.Mode)
+	exec(conf.System.Database)
 }
 
-func exec(dbConfig config.DBConf, mode string) {
+func exec(dbConfig config.DBConf) {
 	source := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True", dbConfig.User, dbConfig.Password, dbConfig.Host, dbConfig.Port, dbConfig.Target)
 
 	engine, err := xorm.NewEngine(dbConfig.Type, source)
@@ -39,7 +44,8 @@ func exec(dbConfig config.DBConf, mode string) {
 	engine.TZLocation = location
 	engine.StoreEngine("InnoDB")
 	engine.Charset("utf8")
-	if mode == "debug" {
+	if dbConfig.Reset {
+		fmt.Printf("reset table\r\n")
 		err = engine.DropTables(new(models.User))
 		if err != nil {
 			panic(err)

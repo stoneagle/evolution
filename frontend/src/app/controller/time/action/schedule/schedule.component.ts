@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, Output, ViewChild } from '@angular/core';
 import { EJ_SCHEDULE_COMPONENTS }                      from 'ej-angular2/src/ej/schedule.component';
-import { InternationalConfig as N18 }   from '../../../../service/base/international.service';
-import * as jsrender from 'jsrender'; 
+import { InternationalConfig as N18 }                  from '../../../../service/base/international.service';
+import * as jsrender                                   from 'jsrender';
 
 import { Action }              from '../../../../model/time/action';
 import { Field }              from '../../../../model/time/field';

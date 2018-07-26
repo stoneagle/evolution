@@ -37,27 +37,25 @@ func (b *Bootstrapper) Bootstrap() *Bootstrapper {
 	b.App.Use(middles.Recovery(middles.RecoveryHandler))
 
 	// cors must set in bootstrap
-	if b.Config.App.Mode == "debug" {
-		exposeHeaders := []string{
-			"Content-Length",
-		}
-		switch b.Config.System.Auth.Type {
-		case middles.TypeBAJwt:
-			exposeHeaders = append(exposeHeaders, middles.JwtTokenHeader)
-		}
-
-		b.App.Use(cors.New(cors.Config{
-			AllowHeaders:     []string{"Content-Type", "Access-Control-Allow-Origin", "Authorization"},
-			AllowMethods:     []string{"GET", "POST", "DELETE", "PUT", "PATCH"},
-			AllowCredentials: true,
-			AllowOrigins:     b.Config.Time.System.Cors,
-			ExposeHeaders:    exposeHeaders,
-			AllowOriginFunc: func(origin string) bool {
-				return origin == "http://localhost:8080"
-			},
-			MaxAge: 12 * time.Hour,
-		}))
+	exposeHeaders := []string{
+		"Content-Length",
 	}
+	switch b.Config.System.Auth.Type {
+	case middles.TypeBAJwt:
+		exposeHeaders = append(exposeHeaders, middles.JwtTokenHeader)
+	}
+
+	b.App.Use(cors.New(cors.Config{
+		AllowHeaders:     []string{"Content-Type", "Access-Control-Allow-Origin", "Authorization"},
+		AllowMethods:     []string{"GET", "POST", "DELETE", "PUT", "PATCH"},
+		AllowCredentials: true,
+		AllowOrigins:     b.Config.Time.System.Cors,
+		ExposeHeaders:    exposeHeaders,
+		AllowOriginFunc: func(origin string) bool {
+			return origin == "http://localhost:8080"
+		},
+		MaxAge: 12 * time.Hour,
+	}))
 	return b
 }
 

@@ -40,3 +40,7 @@ func (m *User) Transfer(slicePtr interface{}) *[]User {
 	ret := slicePtr.(*[]User)
 	return ret
 }
+
+func (m *User) WithDeleted() bool {
+	return true
+}

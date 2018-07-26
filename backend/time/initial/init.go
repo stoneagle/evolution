@@ -5,6 +5,7 @@ import (
 	"evolution/backend/time/models"
 	"fmt"
 	"io/ioutil"
+	"os"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -13,7 +14,11 @@ import (
 )
 
 func main() {
-	yamlFile, err := ioutil.ReadFile("../../config/.config.yaml")
+	configPath := os.Getenv("ConfigPath")
+	if configPath == "" {
+		configPath = "../../config/.config.yaml"
+	}
+	yamlFile, err := ioutil.ReadFile(configPath)
 	if err != nil {
 		panic(err)
 	}
@@ -22,10 +27,10 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	exec(conf.Time.Database, conf.App.Mode)
+	exec(conf.Time.Database)
 }
 
-func exec(dbConfig config.DBConf, mode string) {
+func exec(dbConfig config.DBConf) {
 	source := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True", dbConfig.User, dbConfig.Password, dbConfig.Host, dbConfig.Port, dbConfig.Target)
 
 	engine, err := xorm.NewEngine(dbConfig.Type, source)
@@ -39,7 +44,8 @@ func exec(dbConfig config.DBConf, mode string) {
 	engine.TZLocation = location
 	engine.StoreEngine("InnoDB")
 	engine.Charset("utf8")
-	if mode == "debug" {
+	if dbConfig.Reset {
+		fmt.Printf("reset table\r\n")
 		err = engine.DropTables(new(models.Area), new(models.Country), new(models.Field), new(models.Resource), new(models.Phase), new(models.UserResource), new(models.Quest), new(models.QuestTeam), new(models.QuestTarget), new(models.Project), new(models.Task), new(models.Action), new(models.MapAreaResource))
 		if err != nil {
 			panic(err)

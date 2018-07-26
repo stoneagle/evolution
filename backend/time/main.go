@@ -21,5 +21,5 @@ func newApp() *bootstrap.Bootstrapper {
 
 func main() {
 	app := newApp()
-	app.Listen(":8080")
+	app.Listen(":" + app.Config.Time.System.Port)
 }

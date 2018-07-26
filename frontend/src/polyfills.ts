@@ -80,5 +80,3 @@ import 'zone.js/dist/zone';  // Included with Angular CLI.
 import * as jquery from 'jquery';
 window['jQuery'] = jquery;
 window['$'] = jquery;
-import 'jsrender'; 
-import '../node_modules/syncfusion-javascript/Content/ej/web/material/ej.web.all.min.css';

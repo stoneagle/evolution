@@ -3,10 +3,12 @@
 logs
 grafana/plugins/**/node_modules
 grafana/sessions
+release/*
 
 ## hack
 hack/swarm/.env
 hack/dockerfile/hdf5/
+hack/release/config/.*
 
 ## backend
 backend/vendor

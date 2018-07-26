@@ -35,12 +35,14 @@ type DBConf struct {
 	MaxIdle  int
 	MaxOpen  int
 	Showsql  bool
+	Reset    bool
 	Location string
 }
 
 type System struct {
 	Name     string
 	Host     string
+	Port     string
 	Version  string
 	Prefix   string
 	Cors     []string

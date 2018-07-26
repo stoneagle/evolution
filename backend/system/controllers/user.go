@@ -21,6 +21,7 @@ func (c *User) Router(router *gin.RouterGroup) {
 	user.GET("/get/:id", c.One)
 	user.POST("", c.Create)
 	user.POST("/list", c.List)
+	user.POST("/count", c.Count)
 	user.PUT("/:id", c.Update)
 	user.DELETE("/:id", c.Delete)
 }

@@ -36,19 +36,17 @@ func (b *Bootstrapper) Bootstrap() *Bootstrapper {
 	b.App.Use(gin.Recovery())
 	b.App.Use(middles.Recovery(middles.RecoveryHandler))
 	// cors must set in bootstrap
-	if b.Config.App.Mode == "debug" {
-		b.App.Use(cors.New(cors.Config{
-			AllowHeaders:     []string{"Content-Type", "Access-Control-Allow-Origin", "Authorization"},
-			AllowMethods:     []string{"GET", "POST", "DELETE", "PUT", "PATCH"},
-			AllowCredentials: true,
-			AllowOrigins:     b.Config.Time.System.Cors,
-			ExposeHeaders:    []string{"Content-Length"},
-			AllowOriginFunc: func(origin string) bool {
-				return origin == "http://localhost:8080"
-			},
-			MaxAge: 12 * time.Hour,
-		}))
-	}
+	b.App.Use(cors.New(cors.Config{
+		AllowHeaders:     []string{"Content-Type", "Access-Control-Allow-Origin", "Authorization"},
+		AllowMethods:     []string{"GET", "POST", "DELETE", "PUT", "PATCH"},
+		AllowCredentials: true,
+		AllowOrigins:     b.Config.Time.System.Cors,
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowOriginFunc: func(origin string) bool {
+			return origin == "http://localhost:8080"
+		},
+		MaxAge: 12 * time.Hour,
+	}))
 	return b
 }
 
