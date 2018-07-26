@@ -1,0 +1,85 @@
+# 组合
+matrix:
+  PROJ:
+    - evolution
+  GOVERSION:
+    - 1.10
+  PREFIX_REGISTRY:
+    - stoneagle
+  RELEASE_DIR:
+    - release
+  PWD:
+    - /go/src/evolution
+  USERNAME:
+    - wuzhongyang 
+
+workspace:
+  base: /go/src
+  path: ${PROJ} 
+
+clone:
+  git:
+    image: plugins/git
+    # 没有 submodules 时可以关闭改选项
+    recursive: false
+    # 推荐使用较浅的深度，加快源码下载速度
+    depth: 1
+
+# 条件分支 master
+branches: [ master, develop, release ]
+
+pipeline:
+  # 使用 cache 插件恢复缓存的 vendor 目录
+  restore-vendor-cache:
+	  group: backend-vendor 
+    image: drillster/drone-volume-cache
+    restore: true
+    mount:
+      - ./backend/vendor
+    volumes:
+      # 这里使用了 volumes 属性，需要开启仓库受信任选项
+      - /home/${USERNAME}/drone/${PROJ}/vendor:/cache
+  vendor:
+	  group: backend-vendor 
+    image: golang:${GOVERSION}
+    environment:
+      - http_proxy=http://127.0.0.1:8118
+      - https_proxy=http://127.0.0.1:8118
+    volumes:
+			- ${PWD}/backend:/go/src/${PROJ}/backend
+    when:
+      branch: [master, develop]
+    commands:
+      - curl https://glide.sh/get | sh
+      - cd backend && glide update 
+  rebuild-cache:
+    image: drillster/drone-volume-cache
+    rebuild: true
+    mount:
+      - ./backend/vendor
+    volumes:
+      # 这里使用了 volumes 属性，需要开启仓库受信任选项
+      - /home/${USERNAME}/drone/${PROJ}/vendor:/cache
+  # time:
+	  # group: build
+  #   image: golang:${GOVERSION}
+  #   # pull: true
+  #   environment:
+  #     - CGO_ENABLED:0
+  #   when:
+  #     branch: master
+  #   volumes:
+			# - ${PWD}/${RELEASE_DIR}:/tmp/${RELEASE_DIR}
+			# - ${PWD}/backend:/go/src/${PROJ}/backend 
+  #   # when:
+  #   #   status: [ success, failure ]
+  #   # secrets: [key1, key2]
+  #   commands:
+  #     - mkdir ${RELEASE_DIR}
+  #     - cd /go/src/${PROJ}/backend/time
+		  # - go build -o /tmp/${RELEASE_DIR}/time -a -tags netgo -installsuffix netgo -ldflags '-w'
+  #     - cd /go/src/${PROJ}/backend/time/initial
+		  # - go build -o /tmp/${RELEASE_DIR}/time-init-db -a -tags netgo -installsuffix netgo -ldflags '-w'
+  # publish:
+  #   image: plugins/docker
+  #   repo: octocat/hello-world
