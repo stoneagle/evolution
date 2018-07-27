@@ -123,8 +123,6 @@ pipeline:
     image: golang:${GOVERSION}
     environment:
       - CGO_ENABLED:0
-    volumes:
-      - ${WORKPATH}:/go/src
     when:
       event: tag
     commands:
