@@ -25,7 +25,7 @@ workspace:
   base: ${WORKPATH} 
   path: ${PROJ} 
 
-branches: [ master, develop ]
+branches: [ master, develop, feature/* , release/* ]
 
 pipeline:
   git-push-master:
@@ -46,6 +46,15 @@ pipeline:
     local_ref: develop 
     when:
       branch: develop 
+  git-push-feature:
+    group: sync 
+    image: appleboy/drone-git-push
+    remote: git@github.com:stoneagle/evolution.git 
+    secrets: [ GIT_PUSH_SSH_KEY ]
+    branch: ${DRONE_COMMIT_BRANCH}
+    local_ref: ${DRONE_COMMIT_BRANCH}
+    when:
+      branch: feature/* 
 
   restore-vendor-cache:
     group: prepare-cache
@@ -55,6 +64,8 @@ pipeline:
       - ./backend/vendor
     when:
       event: tag
+      branch:
+        include: [ master, release/* ]
     volumes:
       - /home/${USERNAME}/drone/cache/${PROJ}:/cache
   restore-modules-cache:
@@ -65,6 +76,8 @@ pipeline:
       - ./frontend/node_modules
     when:
       event: tag
+      branch:
+        include: [ master, release/* ]
     volumes:
       - /home/${USERNAME}/drone/cache/${PROJ}:/cache
   vendor:
@@ -75,6 +88,8 @@ pipeline:
       - https_proxy=http://127.0.0.1:8118
     when:
       event: tag
+      branch:
+        include: [ master, release/* ]
     network_mode: host
     volumes:
       - ${WORKPATH}/${PROJ}/backend:${GOPATH}/${PROJ}/backend
@@ -88,6 +103,8 @@ pipeline:
       - https_proxy=http://127.0.0.1:8118
     when:
       event: tag
+      branch:
+        include: [ master, release/* ]
     network_mode: host
     volumes:
       - ${WORKPATH}/${PROJ}/frontend:${GOPATH}/${PROJ}/frontend
@@ -99,6 +116,8 @@ pipeline:
     rebuild: true
     when:
       event: tag
+      branch:
+        include: [ master, release/* ]
     mount:
       - ./backend/vendor
     volumes:
@@ -109,6 +128,8 @@ pipeline:
     rebuild: true
     when:
       event: tag
+      branch:
+        include: [ master, release/* ]
     mount:
       - ./frontend/node_modules
     volumes:
@@ -124,6 +145,8 @@ pipeline:
       - ${WORKPATH}/${PROJ}/backend:${GOPATH}/${PROJ}/backend 
     when:
       event: tag
+      branch:
+        include: [ master, release/* ]
     commands:
       - make check-release 
       - cd ${GOPATH}/${PROJ}/backend/time
@@ -140,6 +163,8 @@ pipeline:
       - ${WORKPATH}/${PROJ}/backend:${GOPATH}/${PROJ}/backend 
     when:
       event: tag
+      branch:
+        include: [ master, release/* ]
     commands:
       - make check-release 
       - cd ${GOPATH}/${PROJ}/backend/system
@@ -154,6 +179,8 @@ pipeline:
       - ${WORKPATH}/${PROJ}/frontend:/tmp/frontend 
     when:
       event: tag
+      branch:
+        include: [ master, release/* ]
     commands:
       - cd /tmp/frontend && ng build --environment=prod 
        
@@ -166,6 +193,8 @@ pipeline:
     tags: "${DRONE_TAG}"
     when:
       event: tag
+      branch:
+        include: [ master, release/* ]
   system-build:
     group: image 
     image: plugins/docker
@@ -175,6 +204,8 @@ pipeline:
     tags: "${DRONE_TAG}"
     when:
       event: tag
+      branch:
+        include: [ master, release/* ]
   frontend-build:
     group: image 
     image: plugins/docker
@@ -184,3 +215,5 @@ pipeline:
     tags: "${DRONE_TAG}"
     when:
       event: tag
+      branch:
+        include: [ master, release/* ]
