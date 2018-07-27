@@ -14,7 +14,7 @@ matrix:
   RELEASE_DIR:
     - release
 
-# 使用该配置，无法获取到相关代码 
+# use clone-plugin can not pass build 
 # clone:
 #   git:
 #     image: plugins/git
@@ -25,9 +25,10 @@ workspace:
   base: ${WORKPATH} 
   path: ${PROJ} 
 
-branches: [ master, develop, feature/* , release/* ]
+branches: [ master, develop, feature/* , release/* , refs/tags/* ]
 
 pipeline:
+  # sync code to git 
   git-push-master:
     group: sync 
     image: appleboy/drone-git-push
@@ -56,6 +57,7 @@ pipeline:
     when:
       branch: feature/* 
 
+  # prepare cache 
   restore-vendor-cache:
     group: prepare-cache
     image: drillster/drone-volume-cache
@@ -64,8 +66,6 @@ pipeline:
       - ./backend/vendor
     when:
       event: tag
-      branch:
-        include: [ master, release/* ]
     volumes:
       - /home/${USERNAME}/drone/cache/${PROJ}:/cache
   restore-modules-cache:
@@ -76,8 +76,6 @@ pipeline:
       - ./frontend/node_modules
     when:
       event: tag
-      branch:
-        include: [ master, release/* ]
     volumes:
       - /home/${USERNAME}/drone/cache/${PROJ}:/cache
   vendor:
@@ -88,8 +86,6 @@ pipeline:
       - https_proxy=http://127.0.0.1:8118
     when:
       event: tag
-      branch:
-        include: [ master, release/* ]
     network_mode: host
     volumes:
       - ${WORKPATH}/${PROJ}/backend:${GOPATH}/${PROJ}/backend
@@ -103,8 +99,6 @@ pipeline:
       - https_proxy=http://127.0.0.1:8118
     when:
       event: tag
-      branch:
-        include: [ master, release/* ]
     network_mode: host
     volumes:
       - ${WORKPATH}/${PROJ}/frontend:${GOPATH}/${PROJ}/frontend
@@ -116,8 +110,6 @@ pipeline:
     rebuild: true
     when:
       event: tag
-      branch:
-        include: [ master, release/* ]
     mount:
       - ./backend/vendor
     volumes:
@@ -128,13 +120,12 @@ pipeline:
     rebuild: true
     when:
       event: tag
-      branch:
-        include: [ master, release/* ]
     mount:
       - ./frontend/node_modules
     volumes:
       - /home/${USERNAME}/drone/cache/${PROJ}:/cache
 
+  # build service 
   time:
     group: service
     image: golang:${GOVERSION}
@@ -145,8 +136,6 @@ pipeline:
       - ${WORKPATH}/${PROJ}/backend:${GOPATH}/${PROJ}/backend 
     when:
       event: tag
-      branch:
-        include: [ master, release/* ]
     commands:
       - make check-release 
       - cd ${GOPATH}/${PROJ}/backend/time
@@ -163,8 +152,6 @@ pipeline:
       - ${WORKPATH}/${PROJ}/backend:${GOPATH}/${PROJ}/backend 
     when:
       event: tag
-      branch:
-        include: [ master, release/* ]
     commands:
       - make check-release 
       - cd ${GOPATH}/${PROJ}/backend/system
@@ -179,11 +166,10 @@ pipeline:
       - ${WORKPATH}/${PROJ}/frontend:/tmp/frontend 
     when:
       event: tag
-      branch:
-        include: [ master, release/* ]
     commands:
       - cd /tmp/frontend && ng build --environment=prod 
        
+  # build image
   time-build:
     group: image 
     image: plugins/docker
@@ -193,8 +179,6 @@ pipeline:
     tags: "${DRONE_TAG}"
     when:
       event: tag
-      branch:
-        include: [ master, release/* ]
   system-build:
     group: image 
     image: plugins/docker
@@ -204,8 +188,6 @@ pipeline:
     tags: "${DRONE_TAG}"
     when:
       event: tag
-      branch:
-        include: [ master, release/* ]
   frontend-build:
     group: image 
     image: plugins/docker
@@ -215,5 +197,3 @@ pipeline:
     tags: "${DRONE_TAG}"
     when:
       event: tag
-      branch:
-        include: [ master, release/* ]
