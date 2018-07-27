@@ -14,6 +14,13 @@ matrix:
   RELEASE_DIR:
     - release
 
+# 使用该配置，无法获取到相关代码 
+# clone:
+#   git:
+#     image: plugins/git
+#     recursive: false
+#     depth: 1
+
 workspace:
   base: ${WORKPATH} 
   path: ${PROJ} 
@@ -21,51 +28,33 @@ workspace:
 branches: [ master, develop, release ]
 
 pipeline:
-  git-ls:
-    image: alpine/git 
+  git-push-master:
+    group: sync 
+    image: appleboy/drone-git-push
+    remote: git@github.com:stoneagle/evolution.git 
+    secrets: [ GIT_PUSH_SSH_KEY ]
+    branch: master
+    local_ref: master
     when:
-      branch: develop 
-    volumes:
-      - ${WORKPATH}/${PROJ}:${GOPATH}/${PROJ}
-    commands:
-      - cd ${GOPATH}
-      - ls
-      - cd ${GOPATH}/${PROJ}
-      - ls 
-  # git-push-master:
-  #   group: sync 
-  #   image: appleboy/drone-git-push
-  #   remote: git@github.com:stoneagle/evolution.git 
-  #   secrets: [ GIT_PUSH_SSH_KEY ]
-  #   force: true
-  #   commit: true
-  #   commit_message: ${DRONE_COMMIT_MESSAGE}
-  #   branch: master
-  #   local_ref: master
-  #   when:
-  #     branch: master
+      branch: master
   git-push-develop:
     group: sync 
     image: appleboy/drone-git-push
     remote: git@github.com:stoneagle/evolution.git 
     secrets: [ GIT_PUSH_SSH_KEY ]
-    # force: true
     branch: develop 
     local_ref: develop 
     when:
       branch: develop 
-  # git-push-release:
-  #   group: sync 
-  #   image: appleboy/drone-git-push
-  #   remote: git@github.com:stoneagle/evolution.git 
-  #   secrets: [ GIT_PUSH_SSH_KEY ]
-  #   force: true
-  #   commit: true
-  #   commit_message: ${DRONE_COMMIT_MESSAGE}
-  #   branch: release 
-  #   local_ref: release 
-  #   when:
-  #     branch: release 
+  git-push-release:
+    group: sync 
+    image: appleboy/drone-git-push
+    remote: git@github.com:stoneagle/evolution.git 
+    secrets: [ GIT_PUSH_SSH_KEY ]
+    branch: release 
+    local_ref: release 
+    when:
+      branch: release 
 
   restore-vendor-cache:
     group: prepare-cache
