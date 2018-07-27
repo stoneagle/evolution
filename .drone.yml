@@ -6,7 +6,7 @@ matrix:
   CACHEPATH:
     - /tmp/drone/cache
   WORKPATH:
-    - /tmp/drone/src
+    - /go/src
   GOVERSION:
     - 1.10
   RELEASE_DIR:
@@ -76,7 +76,7 @@ pipeline:
       event: tag
     volumes:
       - ${CACHEPATH}:/cache
-  vendor:
+  vendor-prepare:
     image: instrumentisto/glide 
     group: prepare
     environment:
@@ -87,7 +87,7 @@ pipeline:
     network_mode: host
     commands:
       - cd ${WORKPATH}/${PROJ}/backend && glide update 
-  modules:
+  modules-prepare:
     image: mkenney/npm:node-8-alpine 
     group: prepare
     when:
@@ -118,7 +118,7 @@ pipeline:
       - ${CACHEPATH}:/cache
 
   # build service 
-  time:
+  time-service:
     group: service
     image: golang:${GOVERSION}
     environment:
@@ -131,7 +131,7 @@ pipeline:
       - go build -o ${WORKPATH}/${RELEASE_DIR}/time -a -tags netgo -installsuffix netgo -ldflags '-w'
       - cd ${WORKPATH}/${PROJ}/backend/time/initial
       - go build -o ${WORKPATH}/${RELEASE_DIR}/time-init-db -a -tags netgo -installsuffix netgo -ldflags '-w'
-  system:
+  system-service:
     group: service
     image: golang:${GOVERSION}
     environment:
@@ -144,7 +144,7 @@ pipeline:
       - go build -o ${WORKPATH}/${RELEASE_DIR}/system -a -tags netgo -installsuffix netgo -ldflags '-w'
       - cd ${WORKPATH}/${PROJ}/backend/system/initial
       - go build -o ${WORKPATH}/${RELEASE_DIR}/system-init-db -a -tags netgo -installsuffix netgo -ldflags '-w'
-  frontend:
+  frontend-service:
     group: service
     image: alexsuch/angular-cli:6.0.5
     when:
