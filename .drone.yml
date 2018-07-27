@@ -4,7 +4,7 @@ matrix:
   PROJ:
     - evolution
   CACHEPATH:
-    - /home/wuzhongyang/drone/cache
+    - /tmp/drone/cache
   WORKPATH:
     - /tmp/drone/src
   GOVERSION:
@@ -88,7 +88,7 @@ pipeline:
   #   commands:
   #     - cd ${WORKPATH}/${PROJ}/backend && glide update 
   modules:
-    image: alexsuch/angular-cli:6.0.5
+    image: mkenney/npm:node-8-alpine 
     group: prepare
     when:
       event: tag
@@ -144,13 +144,13 @@ pipeline:
   #     - go build -o ${WORKPATH}/${RELEASE_DIR}/system -a -tags netgo -installsuffix netgo -ldflags '-w'
   #     - cd ${WORKPATH}/${PROJ}/backend/system/initial
   #     - go build -o ${WORKPATH}/${RELEASE_DIR}/system-init-db -a -tags netgo -installsuffix netgo -ldflags '-w'
-  frontend:
-    group: service
-    image: alexsuch/angular-cli:6.0.5
-    when:
-      event: tag
-    commands:
-      - cd ${WORKPATH}/${PROJ}/frontend && ng build --environment=prod 
+  # frontend:
+  #   group: service
+  #   image: alexsuch/angular-cli:6.0.5
+  #   when:
+  #     event: tag
+  #   commands:
+  #     - cd ${WORKPATH}/${PROJ}/frontend && ng build --environment=prod 
        
   # build image
   # time-build:
@@ -171,12 +171,12 @@ pipeline:
   #   tags: "${DRONE_TAG}"
   #   when:
   #     event: tag
-  frontend-build:
-    group: image 
-    image: plugins/docker
-    repo: ${REGISTRY}/${PROJ}-frontend
-    dockerfile: ${WORKPATH}/${PROJ}/hack/release/Dockerfile.frontend
-    secrets: [ DOCKER_USERNAME, DOCKER_PASSWORD ]
-    tags: "${DRONE_TAG}"
-    when:
-      event: tag
+  # frontend-build:
+  #   group: image 
+  #   image: plugins/docker
+  #   repo: ${REGISTRY}/${PROJ}-frontend
+  #   dockerfile: ${WORKPATH}/${PROJ}/hack/release/Dockerfile.frontend
+  #   secrets: [ DOCKER_USERNAME, DOCKER_PASSWORD ]
+  #   tags: "${DRONE_TAG}"
+  #   when:
+  #     event: tag
