@@ -1,5 +1,5 @@
 hash: 3a370f467a5349ac82d098c14be2340f9f4f873e4e2cd83b0bf77d4e4fd3ab57
-updated: 2018-07-26T06:13:46.159391441+08:00
+updated: 2018-07-26T12:23:34.520379087Z
 imports:
 - name: git.apache.org/thrift.git
   version: 327ebb6c2b6df8bf075da02ef45a2a034e9b79ba
@@ -9,7 +9,7 @@ imports:
 - name: github.com/araddon/dateparse
   version: 42dbd9f872ebcc2d9bb8a5bf541984c9e1e50f8e
 - name: github.com/boj/redistore
-  version: 0cd55584b172cefd31c4cb84e2904585d898c7b2
+  version: 82b86d293eb292dd6949fadc09388c47f095dc54
 - name: github.com/davecgh/go-spew
   version: 346938d642f2ec3594ed81d874461961cd0faa76
   subpackages:
@@ -18,11 +18,6 @@ imports:
   version: 06ea1031745cb8b3dab3f6a236daf2b0aa468b7e
 - name: github.com/fatih/structs
   version: a720dfa8df582c51dee1b36feabb906bde1588bd
-- name: github.com/garyburd/redigo
-  version: 569eae59ada904ea8db7a225c2b47165af08735a
-  subpackages:
-  - internal
-  - redis
 - name: github.com/gin-contrib/cors
   version: cf4846e6a636a76237a28d9286f163c132e841bc
 - name: github.com/gin-contrib/sse
@@ -59,16 +54,21 @@ imports:
   version: 93b26e6a70e37abb14f2f88194949312b0592a84
   subpackages:
   - proto
+- name: github.com/gomodule/redigo
+  version: 2cd21d9966bf7ff9ae091419744f0b3fb0fecace
+  subpackages:
+  - internal
+  - redis
 - name: github.com/gorilla/context
   version: 08b5f424b9271eedf6f9f0ce86cb9396ed337a42
 - name: github.com/gorilla/securecookie
   version: 78f3d318a8bf316cda921f25e96fd0b441c5173d
 - name: github.com/gorilla/sessions
-  version: f61c3ec2cf65d69e7efedfd4d060fe128882c951
+  version: 03b6f63cc43ef9c7240a635a5e22b13180e822b8
 - name: github.com/gorilla/websocket
   version: ea4d1f681babbce9545c9c5f3d5194a789c89f5b
 - name: github.com/influxdata/influxdb
-  version: 62ab18a0f43ee342b84debaaae5486b8b2d8682c
+  version: c5340f1bcdad0da8a1089c36fb32d18975b3e38e
   subpackages:
   - client/v2
 - name: github.com/jinzhu/now

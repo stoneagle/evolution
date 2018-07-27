@@ -1,0 +1,10 @@
+FROM busybox 
+
+COPY ./release/time /go/src/evolution/time
+COPY ./release/time-init-db /go/src/evolution/time-init-db
+RUN mkdir /go/src/evolution/logs && mkdir /go/src/evolution/config
+
+ENV ConfigPath ./config/config.yaml
+ADD https://github.com/golang/go/raw/master/lib/time/zoneinfo.zip /usr/local/go/lib/time/zoneinfo.zip
+WORKDIR /go/src/evolution
+CMD ["./time"]

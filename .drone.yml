@@ -1,85 +1,204 @@
-# 组合
 matrix:
-  PROJ:
-    - evolution
-  GOVERSION:
-    - 1.10
-  PREFIX_REGISTRY:
+  REGISTRY:
     - stoneagle
-  RELEASE_DIR:
-    - release
-  PWD:
-    - /go/src/evolution
+  GOPATH:
+    - /go/src 
   USERNAME:
     - wuzhongyang 
+  PROJ:
+    - evolution
+  WORKPATH:
+    - /drone/src
+  GOVERSION:
+    - 1.10
+  RELEASE_DIR:
+    - release
 
 workspace:
-  base: /go/src
+  base: ${WORKPATH} 
   path: ${PROJ} 
 
 clone:
   git:
     image: plugins/git
-    # 没有 submodules 时可以关闭改选项
     recursive: false
-    # 推荐使用较浅的深度，加快源码下载速度
     depth: 1
 
-# 条件分支 master
 branches: [ master, develop, release ]
 
 pipeline:
-  # 使用 cache 插件恢复缓存的 vendor 目录
+  git-push-master:
+    group: sync 
+    image: appleboy/drone-git-push
+    remote: git@github.com:stoneagle/evolution.git 
+    branch: master
+    local_ref: master
+    when:
+      branch: master
+  git-push-develop:
+    group: sync 
+    image: appleboy/drone-git-push
+    remote: git@github.com:stoneagle/evolution.git 
+    branch: develop 
+    local_ref: develop 
+    when:
+      branch: develop 
+  git-push-release:
+    group: sync 
+    image: appleboy/drone-git-push
+    remote: git@github.com:stoneagle/evolution.git 
+    branch: release 
+    local_ref: release 
+    when:
+      branch: release 
+
   restore-vendor-cache:
-	  group: backend-vendor 
+    group: prepare-cache
     image: drillster/drone-volume-cache
     restore: true
     mount:
       - ./backend/vendor
+    when:
+      event: tag
+      branch: release
     volumes:
-      # 这里使用了 volumes 属性，需要开启仓库受信任选项
-      - /home/${USERNAME}/drone/${PROJ}/vendor:/cache
+      - /home/${USERNAME}/drone/${PROJ}:/cache
+  restore-modules-cache:
+    group: prepare-cache
+    image: drillster/drone-volume-cache
+    restore: true
+    mount:
+      - ./frontend/node_modules
+    when:
+      event: tag
+      branch: release
+    volumes:
+      - /home/${USERNAME}/drone/${PROJ}:/cache
   vendor:
-	  group: backend-vendor 
-    image: golang:${GOVERSION}
+    image: instrumentisto/glide 
+    group: prepare
     environment:
       - http_proxy=http://127.0.0.1:8118
       - https_proxy=http://127.0.0.1:8118
-    volumes:
-			- ${PWD}/backend:/go/src/${PROJ}/backend
     when:
-      branch: [master, develop]
+      event: tag
+      branch: release
+    network_mode: host
+    volumes:
+      - ${WORKPATH}/${PROJ}/backend:${GOPATH}/${PROJ}/backend
     commands:
-      - curl https://glide.sh/get | sh
-      - cd backend && glide update 
-  rebuild-cache:
+      - cd ${GOPATH}/${PROJ}/backend && glide update 
+  modules:
+    image: alexsuch/angular-cli:6.0.5
+    group: prepare
+    environment:
+      - http_proxy=http://127.0.0.1:8118
+      - https_proxy=http://127.0.0.1:8118
+    when:
+      event: tag
+      branch: release
+    network_mode: host
+    volumes:
+      - ${WORKPATH}/${PROJ}/frontend:${GOPATH}/${PROJ}/frontend
+    commands:
+      - cd ${GOPATH}/${PROJ}/frontend && npm install 
+  rebuild-vendor-cache:
+    group: rebuild-cache 
     image: drillster/drone-volume-cache
     rebuild: true
+    when:
+      event: tag
+      branch: release
     mount:
       - ./backend/vendor
     volumes:
-      # 这里使用了 volumes 属性，需要开启仓库受信任选项
-      - /home/${USERNAME}/drone/${PROJ}/vendor:/cache
-  # time:
-	  # group: build
-  #   image: golang:${GOVERSION}
-  #   # pull: true
-  #   environment:
-  #     - CGO_ENABLED:0
-  #   when:
-  #     branch: master
-  #   volumes:
-			# - ${PWD}/${RELEASE_DIR}:/tmp/${RELEASE_DIR}
-			# - ${PWD}/backend:/go/src/${PROJ}/backend 
-  #   # when:
-  #   #   status: [ success, failure ]
-  #   # secrets: [key1, key2]
-  #   commands:
-  #     - mkdir ${RELEASE_DIR}
-  #     - cd /go/src/${PROJ}/backend/time
-		  # - go build -o /tmp/${RELEASE_DIR}/time -a -tags netgo -installsuffix netgo -ldflags '-w'
-  #     - cd /go/src/${PROJ}/backend/time/initial
-		  # - go build -o /tmp/${RELEASE_DIR}/time-init-db -a -tags netgo -installsuffix netgo -ldflags '-w'
-  # publish:
-  #   image: plugins/docker
-  #   repo: octocat/hello-world
+      - /home/${USERNAME}/drone/${PROJ}:/cache
+  rebuild-modules-cache:
+    group: rebuild-cache
+    image: drillster/drone-volume-cache
+    rebuild: true
+    when:
+      event: tag
+      branch: release
+    mount:
+      - ./frontend/node_modules
+    volumes:
+      - /home/${USERNAME}/drone/${PROJ}:/cache
+
+  time:
+    group: service
+    image: golang:${GOVERSION}
+    environment:
+      - CGO_ENABLED:0
+    volumes:
+      - ${WORKPATH}/${PROJ}/${RELEASE_DIR}:${GOPATH}/${RELEASE_DIR}
+      - ${WORKPATH}/${PROJ}/backend:${GOPATH}/${PROJ}/backend 
+    when:
+      event: tag
+      branch: release
+    commands:
+      - make check-release 
+      - cd ${GOPATH}/${PROJ}/backend/time
+      - go build -o ${GOPATH}/${RELEASE_DIR}/time -a -tags netgo -installsuffix netgo -ldflags '-w'
+      - cd ${GOPATH}/${PROJ}/backend/time/initial
+      - go build -o ${GOPATH}/${RELEASE_DIR}/time-init-db -a -tags netgo -installsuffix netgo -ldflags '-w'
+  system:
+    group: service
+    image: golang:${GOVERSION}
+    environment:
+      - CGO_ENABLED:0
+    volumes:
+      - ${WORKPATH}/${PROJ}/${RELEASE_DIR}:${GOPATH}/${RELEASE_DIR}
+      - ${WORKPATH}/${PROJ}/backend:${GOPATH}/${PROJ}/backend 
+    when:
+      event: tag
+      branch: release
+    commands:
+      - make check-release 
+      - cd ${GOPATH}/${PROJ}/backend/system
+      - go build -o ${GOPATH}/${RELEASE_DIR}/system -a -tags netgo -installsuffix netgo -ldflags '-w'
+      - cd ${GOPATH}/${PROJ}/backend/system/initial
+      - go build -o ${GOPATH}/${RELEASE_DIR}/system-init-db -a -tags netgo -installsuffix netgo -ldflags '-w'
+  frontend:
+    group: service
+    image: alexsuch/angular-cli:6.0.5
+    volumes:
+      - ${WORKPATH}/${PROJ}/${RELEASE_DIR}:/tmp/${RELEASE_DIR}
+      - ${WORKPATH}/${PROJ}/frontend:/tmp/frontend 
+    when:
+      event: tag
+      branch: release
+    commands:
+      - cd /tmp/frontend && ng build --environment=prod 
+       
+  time-build:
+    group: image 
+    image: plugins/docker
+    repo: ${REGISTRY}/${PROJ}-time
+    dockerfile: ${WORKPATH}/${PROJ}/hack/release/Dockerfile.time
+    secrets: [ DOCKER_USERNAME, DOCKER_PASSWORD ]
+    tags: "${DRONE_TAG}"
+    when:
+      event: tag
+      branch: release
+  system-build:
+    group: image 
+    image: plugins/docker
+    repo: ${REGISTRY}/${PROJ}-system
+    dockerfile: ${WORKPATH}/${PROJ}/hack/release/Dockerfile.system
+    secrets: [ DOCKER_USERNAME, DOCKER_PASSWORD ]
+    tags: "${DRONE_TAG}"
+    when:
+      event: tag
+      branch: release
+  frontend-build:
+    group: image 
+    image: plugins/docker
+    repo: ${REGISTRY}/${PROJ}-frontend
+    dockerfile: ${WORKPATH}/${PROJ}/hack/release/Dockerfile.frontend
+    secrets: [ DOCKER_USERNAME, DOCKER_PASSWORD ]
+    tags: "${DRONE_TAG}"
+    when:
+      event: tag
+      branch: release
+

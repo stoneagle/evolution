@@ -1,41 +1,25 @@
 .PHONY: run-web, stop-web rm-web
 
 PWD := $(shell pwd)
+DIRNAME := $(shell dirname "$(PWD)")
 USERNAME := $(shell id -nu)
 USER := $(shell id -u)
 GROUP := $(shell id -g)
-DATE := $(shell date "+%F")
 PROJ := evolution
-PREFIX_THRIFT = /tmp/thrift
+PREFIX_THRIFT := /tmp/thrift
 PREFIX_REGISTRY := stoneagle
 PREFIX_DEVELOP := $(PREFIX_REGISTRY)/develop
-PREFIX_RELEASE := $(PREFIX_REGISTRY)/$(PROJ)
-# TAG_RELEASE := $(shell git describe --tags `git rev-list --tags --max-count=1`) 
-TAG_RELEASE := v0.0.1 
 RELEASE_DIR = release
 SYS_TIME = time
-SYS_QUANT = quant
-SYS_SYSTEM = system
 GOVERSION = 1.10
 
 # SYSTEM can be quant/time/system/envoy
 run:
-	make stop-test && make rm-test && \
 	cd hack/swarm && docker-compose -f docker-compose-$(SYSTEM).yml -p "$(PROJ)-$(USER)-$(SYSTEM)" up $(PARAMS)
 stop:
 	cd hack/swarm && docker-compose -f docker-compose-$(SYSTEM).yml -p "$(PROJ)-$(USER)-$(SYSTEM)" stop 
 rm:
 	cd hack/swarm && docker-compose -f docker-compose-$(SYSTEM).yml -p "$(PROJ)-$(USER)-$(SYSTEM)" rm 
-
-run-test:
-	make stop SYSTEM=time && make rm SYSTEM=time && \
-	make stop SYSTEM=system && make rm SYSTEM=system && \
-	make stop SYSTEM=quant && make rm SYSTEM=quant && \
-	cd hack/swarm && docker-compose -f docker-compose-test.yml -p "$(PROJ)-$(USER)-test" up $(PARAMS)
-stop-test:
-	cd hack/swarm && docker-compose -f docker-compose-test.yml -p "$(PROJ)-$(USER)-test" stop 
-rm-test:
-	cd hack/swarm && docker-compose -f docker-compose-test.yml -p "$(PROJ)-$(USER)-test" rm 
 
 # SYSTEM can be quant/time/system
 init-db:
@@ -54,14 +38,6 @@ init-influxdb:
 		influxdb:1.5.3 /init-influxdb.sh
 
 # build
-## prepare golang vendor need proxy
-prepare: prepare-backend prepare-frontend
-
-build: check-release 
-	make build-backend SYSTEM=time && \
-	make build-backend SYSTEM=system && \
-	make build-frontend
-
 check-release:
 ifeq "$(wildcard $(RELEASE_DIR))" ""
 	echo "release directory not existed, make it"
@@ -69,47 +45,6 @@ ifeq "$(wildcard $(RELEASE_DIR))" ""
 else
 	echo "release directory existed"
 endif
-
-prepare-backend:
-	cd backend && glide update
-
-build-backend: 
-	docker run -it --rm \
-		-u $(USER):$(GROUP) \
-		-e CGO_ENABLED:0 \
-		-v $(PWD)/$(RELEASE_DIR):/tmp/$(RELEASE_DIR) \
-		-v $(PWD)/backend:/go/src/$(PROJ)/backend \
-		-w /go/src/$(PROJ)/backend/$(SYSTEM) \
-		golang:$(GOVERSION) \
-		go build -o /tmp/$(RELEASE_DIR)/$(SYSTEM) \
-		-a -tags netgo -installsuffix netgo -ldflags '-w' && \
-	docker run -it --rm \
-		-u $(USER):$(GROUP) \
-		-e CGO_ENABLED:0 \
-		-v $(PWD)/$(RELEASE_DIR):/tmp/$(RELEASE_DIR) \
-		-v $(PWD)/backend:/go/src/$(PROJ)/backend \
-		-w /go/src/$(PROJ)/backend/$(SYSTEM)/initial \
-		golang:$(GOVERSION) \
-		go build -o /tmp/$(RELEASE_DIR)/$(SYSTEM)-init-db \
-		-a -tags netgo -installsuffix netgo -ldflags '-w' && \
-	cp ./hack/release/Dockerfile.backend ./hack/release/Dockerfile && \
-	sed -i "s:PROJ:$(PROJ):g" ./hack/release/Dockerfile && \
-	sed -i "s:SYSTEM:$(SYSTEM):g" ./hack/release/Dockerfile && \
-	docker build -f ./hack/release/Dockerfile -t $(PREFIX_RELEASE)-$(SYSTEM):$(TAG_RELEASE) . && \
-	rm ./hack/release/Dockerfile
-
-prepare-frontend:
-	cd frontend && npm install
-
-build-frontend:
-	docker run -it --rm \
-		-u $(USER):$(GROUP) \
-		-v $(PWD)/$(RELEASE_DIR):/tmp/$(RELEASE_DIR) \
-		-v $(PWD)/frontend:/tmp/frontend \
-		-w /tmp/frontend \
-		alexsuch/angular-cli:6.0.5 \
-		ng build --environment=prod && \
-	docker build -f ./hack/release/Dockerfile.frontend -t $(PREFIX_RELEASE)-frontend:$(TAG_RELEASE) .
 
 # frontend
 run-frontend:
@@ -143,3 +78,17 @@ thrift-python:
 # engine
 build-engine-basic:
 	cd ./hack/dockerfile && docker build -f ./Dockerfile.engine -t $(PREFIX_DEVELOP):quant-engine . --network=host
+
+# drone
+local-drone:
+	REGISTRY=$(PREFIX_REGISTRY) \
+	GOPATH=/go/src \
+	USERNAME=$(USERNAME) \
+	PROJ=$(PROJ) \
+	WORKPATH=$(DIRNAME) \
+	GOVERSION=$(GOVERSION) \
+	RELEASE_DIR=$(RELEASE_DIR) \
+	DOCKER_USERNAME=username \
+	DOCKER_PASSWORD=password \
+	drone exec \
+		--build-event "tag"
