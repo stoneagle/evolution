@@ -58,16 +58,16 @@ pipeline:
       branch: feature/* 
 
   # prepare cache 
-  restore-vendor-cache:
-    group: prepare-cache
-    image: drillster/drone-volume-cache
-    restore: true
-    mount:
-      - ./backend/vendor
-    when:
-      event: tag
-    volumes:
-      - /home/${USERNAME}/drone/cache/${PROJ}:/cache
+  # restore-vendor-cache:
+  #   group: prepare-cache
+  #   image: drillster/drone-volume-cache
+  #   restore: true
+  #   mount:
+  #     - ./backend/vendor
+  #   when:
+  #     event: tag
+  #   volumes:
+  #     - /home/${USERNAME}/drone/cache/${PROJ}:/cache
   restore-modules-cache:
     group: prepare-cache
     image: drillster/drone-volume-cache
@@ -78,19 +78,19 @@ pipeline:
       event: tag
     volumes:
       - /home/${USERNAME}/drone/cache/${PROJ}:/cache
-  vendor:
-    image: instrumentisto/glide 
-    group: prepare
-    environment:
-      - http_proxy=http://127.0.0.1:8118
-      - https_proxy=http://127.0.0.1:8118
-    when:
-      event: tag
-    network_mode: host
-    volumes:
-      - ${WORKPATH}/${PROJ}/backend:${GOPATH}/${PROJ}/backend
-    commands:
-      - cd ${GOPATH}/${PROJ}/backend && glide update 
+  # vendor:
+  #   image: instrumentisto/glide 
+  #   group: prepare
+  #   environment:
+  #     - http_proxy=http://127.0.0.1:8118
+  #     - https_proxy=http://127.0.0.1:8118
+  #   when:
+  #     event: tag
+  #   network_mode: host
+  #   volumes:
+  #     - ${WORKPATH}/${PROJ}/backend:${GOPATH}/${PROJ}/backend
+  #   commands:
+  #     - cd ${GOPATH}/${PROJ}/backend && glide update 
   modules:
     image: alexsuch/angular-cli:6.0.5
     group: prepare
@@ -104,16 +104,16 @@ pipeline:
       - ${WORKPATH}/${PROJ}/frontend:${GOPATH}/${PROJ}/frontend
     commands:
       - cd ${GOPATH}/${PROJ}/frontend && npm install 
-  rebuild-vendor-cache:
-    group: rebuild-cache 
-    image: drillster/drone-volume-cache
-    rebuild: true
-    when:
-      event: tag
-    mount:
-      - ./backend/vendor
-    volumes:
-      - /home/${USERNAME}/drone/cache/${PROJ}:/cache
+  # rebuild-vendor-cache:
+  #   group: rebuild-cache 
+  #   image: drillster/drone-volume-cache
+  #   rebuild: true
+  #   when:
+  #     event: tag
+  #   mount:
+  #     - ./backend/vendor
+  #   volumes:
+  #     - /home/${USERNAME}/drone/cache/${PROJ}:/cache
   rebuild-modules-cache:
     group: rebuild-cache
     image: drillster/drone-volume-cache
@@ -126,38 +126,38 @@ pipeline:
       - /home/${USERNAME}/drone/cache/${PROJ}:/cache
 
   # build service 
-  time:
-    group: service
-    image: golang:${GOVERSION}
-    environment:
-      - CGO_ENABLED:0
-    volumes:
-      - ${WORKPATH}/${PROJ}/${RELEASE_DIR}:${GOPATH}/${RELEASE_DIR}
-      - ${WORKPATH}/${PROJ}/backend:${GOPATH}/${PROJ}/backend 
-    when:
-      event: tag
-    commands:
-      - make check-release 
-      - cd ${GOPATH}/${PROJ}/backend/time
-      - go build -o ${GOPATH}/${RELEASE_DIR}/time -a -tags netgo -installsuffix netgo -ldflags '-w'
-      - cd ${GOPATH}/${PROJ}/backend/time/initial
-      - go build -o ${GOPATH}/${RELEASE_DIR}/time-init-db -a -tags netgo -installsuffix netgo -ldflags '-w'
-  system:
-    group: service
-    image: golang:${GOVERSION}
-    environment:
-      - CGO_ENABLED:0
-    volumes:
-      - ${WORKPATH}/${PROJ}/${RELEASE_DIR}:${GOPATH}/${RELEASE_DIR}
-      - ${WORKPATH}/${PROJ}/backend:${GOPATH}/${PROJ}/backend 
-    when:
-      event: tag
-    commands:
-      - make check-release 
-      - cd ${GOPATH}/${PROJ}/backend/system
-      - go build -o ${GOPATH}/${RELEASE_DIR}/system -a -tags netgo -installsuffix netgo -ldflags '-w'
-      - cd ${GOPATH}/${PROJ}/backend/system/initial
-      - go build -o ${GOPATH}/${RELEASE_DIR}/system-init-db -a -tags netgo -installsuffix netgo -ldflags '-w'
+  # time:
+  #   group: service
+  #   image: golang:${GOVERSION}
+  #   environment:
+  #     - CGO_ENABLED:0
+  #   volumes:
+  #     - ${WORKPATH}/${PROJ}/${RELEASE_DIR}:${GOPATH}/${RELEASE_DIR}
+  #     - ${WORKPATH}/${PROJ}/backend:${GOPATH}/${PROJ}/backend 
+  #   when:
+  #     event: tag
+  #   commands:
+  #     - make check-release 
+  #     - cd ${GOPATH}/${PROJ}/backend/time
+  #     - go build -o ${GOPATH}/${RELEASE_DIR}/time -a -tags netgo -installsuffix netgo -ldflags '-w'
+  #     - cd ${GOPATH}/${PROJ}/backend/time/initial
+  #     - go build -o ${GOPATH}/${RELEASE_DIR}/time-init-db -a -tags netgo -installsuffix netgo -ldflags '-w'
+  # system:
+  #   group: service
+  #   image: golang:${GOVERSION}
+  #   environment:
+  #     - CGO_ENABLED:0
+  #   volumes:
+  #     - ${WORKPATH}/${PROJ}/${RELEASE_DIR}:${GOPATH}/${RELEASE_DIR}
+  #     - ${WORKPATH}/${PROJ}/backend:${GOPATH}/${PROJ}/backend 
+  #   when:
+  #     event: tag
+  #   commands:
+  #     - make check-release 
+  #     - cd ${GOPATH}/${PROJ}/backend/system
+  #     - go build -o ${GOPATH}/${RELEASE_DIR}/system -a -tags netgo -installsuffix netgo -ldflags '-w'
+  #     - cd ${GOPATH}/${PROJ}/backend/system/initial
+  #     - go build -o ${GOPATH}/${RELEASE_DIR}/system-init-db -a -tags netgo -installsuffix netgo -ldflags '-w'
   frontend:
     group: service
     image: alexsuch/angular-cli:6.0.5
@@ -170,24 +170,24 @@ pipeline:
       - cd /tmp/frontend && ng build --environment=prod 
        
   # build image
-  time-build:
-    group: image 
-    image: plugins/docker
-    repo: ${REGISTRY}/${PROJ}-time
-    dockerfile: ${WORKPATH}/${PROJ}/hack/release/Dockerfile.time
-    secrets: [ DOCKER_USERNAME, DOCKER_PASSWORD ]
-    tags: "${DRONE_TAG}"
-    when:
-      event: tag
-  system-build:
-    group: image 
-    image: plugins/docker
-    repo: ${REGISTRY}/${PROJ}-system
-    dockerfile: ${WORKPATH}/${PROJ}/hack/release/Dockerfile.system
-    secrets: [ DOCKER_USERNAME, DOCKER_PASSWORD ]
-    tags: "${DRONE_TAG}"
-    when:
-      event: tag
+  # time-build:
+  #   group: image 
+  #   image: plugins/docker
+  #   repo: ${REGISTRY}/${PROJ}-time
+  #   dockerfile: ${WORKPATH}/${PROJ}/hack/release/Dockerfile.time
+  #   secrets: [ DOCKER_USERNAME, DOCKER_PASSWORD ]
+  #   tags: "${DRONE_TAG}"
+  #   when:
+  #     event: tag
+  # system-build:
+  #   group: image 
+  #   image: plugins/docker
+  #   repo: ${REGISTRY}/${PROJ}-system
+  #   dockerfile: ${WORKPATH}/${PROJ}/hack/release/Dockerfile.system
+  #   secrets: [ DOCKER_USERNAME, DOCKER_PASSWORD ]
+  #   tags: "${DRONE_TAG}"
+  #   when:
+  #     event: tag
   frontend-build:
     group: image 
     image: plugins/docker
