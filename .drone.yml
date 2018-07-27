@@ -27,6 +27,17 @@ clone:
 branches: [ master, develop, release ]
 
 pipeline:
+  git-ls:
+    image: alpine/git 
+    when:
+      branch: develop 
+    volumes:
+      - ${WORKPATH}/${PROJ}:${GOPATH}/${PROJ}
+    commands:
+      - cd ${GOPATH}
+      - ls
+      - cd ${GOPATH}/${PROJ}
+      - ls 
   # git-push-master:
   #   group: sync 
   #   image: appleboy/drone-git-push
