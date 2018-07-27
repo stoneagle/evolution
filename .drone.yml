@@ -18,15 +18,14 @@ workspace:
   base: ${WORKPATH} 
   path: ${PROJ} 
 
-clone:
-  git:
-    image: plugins/git
-    recursive: false
-    depth: 1
-
 branches: [ master, develop, release ]
 
 pipeline:
+  clone:
+    git:
+      image: plugins/git
+      recursive: false
+      depth: 1
   git-ls:
     image: alpine/git 
     when:
