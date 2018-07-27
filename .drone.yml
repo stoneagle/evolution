@@ -31,6 +31,7 @@ pipeline:
     group: sync 
     image: appleboy/drone-git-push
     remote: git@github.com:stoneagle/evolution.git 
+    secrets: [ GIT_PUSH_SSH_KEY ]
     branch: master
     local_ref: master
     when:
@@ -39,6 +40,7 @@ pipeline:
     group: sync 
     image: appleboy/drone-git-push
     remote: git@github.com:stoneagle/evolution.git 
+    secrets: [ GIT_PUSH_SSH_KEY ]
     branch: develop 
     local_ref: develop 
     when:
@@ -47,6 +49,7 @@ pipeline:
     group: sync 
     image: appleboy/drone-git-push
     remote: git@github.com:stoneagle/evolution.git 
+    secrets: [ GIT_PUSH_SSH_KEY ]
     branch: release 
     local_ref: release 
     when:
