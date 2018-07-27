@@ -91,4 +91,5 @@ local-drone:
 	DOCKER_USERNAME=username \
 	DOCKER_PASSWORD=password \
 	drone exec \
-		--build-event "tag"
+		--build-event "tag" \
+		--commit-branch "release"

@@ -8,7 +8,7 @@ matrix:
   PROJ:
     - evolution
   WORKPATH:
-    - /drone/src
+    - /home/wuzhongyang/drone/src
   GOVERSION:
     - 1.10
   RELEASE_DIR:
@@ -27,42 +27,40 @@ clone:
 branches: [ master, develop, release ]
 
 pipeline:
-  git-push-master:
-    group: sync 
-    image: appleboy/drone-git-push
-    remote: git@github.com:stoneagle/evolution.git 
-    secrets: [ GIT_PUSH_SSH_KEY ]
-    force: true
-    commit: true
-    commit_message: ${DRONE_COMMIT_MESSAGE}
-    branch: master
-    local_ref: master
-    when:
-      branch: master
+  # git-push-master:
+  #   group: sync 
+  #   image: appleboy/drone-git-push
+  #   remote: git@github.com:stoneagle/evolution.git 
+  #   secrets: [ GIT_PUSH_SSH_KEY ]
+  #   force: true
+  #   commit: true
+  #   commit_message: ${DRONE_COMMIT_MESSAGE}
+  #   branch: master
+  #   local_ref: master
+  #   when:
+  #     branch: master
   git-push-develop:
     group: sync 
     image: appleboy/drone-git-push
     remote: git@github.com:stoneagle/evolution.git 
     secrets: [ GIT_PUSH_SSH_KEY ]
-    force: true
-    commit: true
-    commit_message: ${DRONE_COMMIT_MESSAGE}
+    # force: true
     branch: develop 
     local_ref: develop 
     when:
       branch: develop 
-  git-push-release:
-    group: sync 
-    image: appleboy/drone-git-push
-    remote: git@github.com:stoneagle/evolution.git 
-    secrets: [ GIT_PUSH_SSH_KEY ]
-    force: true
-    commit: true
-    commit_message: ${DRONE_COMMIT_MESSAGE}
-    branch: release 
-    local_ref: release 
-    when:
-      branch: release 
+  # git-push-release:
+  #   group: sync 
+  #   image: appleboy/drone-git-push
+  #   remote: git@github.com:stoneagle/evolution.git 
+  #   secrets: [ GIT_PUSH_SSH_KEY ]
+  #   force: true
+  #   commit: true
+  #   commit_message: ${DRONE_COMMIT_MESSAGE}
+  #   branch: release 
+  #   local_ref: release 
+  #   when:
+  #     branch: release 
 
   restore-vendor-cache:
     group: prepare-cache
@@ -74,7 +72,7 @@ pipeline:
       event: tag
       branch: release
     volumes:
-      - /home/${USERNAME}/drone/${PROJ}:/cache
+      - /home/${USERNAME}/drone/cache/${PROJ}:/cache
   restore-modules-cache:
     group: prepare-cache
     image: drillster/drone-volume-cache
@@ -85,7 +83,7 @@ pipeline:
       event: tag
       branch: release
     volumes:
-      - /home/${USERNAME}/drone/${PROJ}:/cache
+      - /home/${USERNAME}/drone/cache/${PROJ}:/cache
   vendor:
     image: instrumentisto/glide 
     group: prepare
@@ -124,7 +122,7 @@ pipeline:
     mount:
       - ./backend/vendor
     volumes:
-      - /home/${USERNAME}/drone/${PROJ}:/cache
+      - /home/${USERNAME}/drone/cache/${PROJ}:/cache
   rebuild-modules-cache:
     group: rebuild-cache
     image: drillster/drone-volume-cache
@@ -135,7 +133,7 @@ pipeline:
     mount:
       - ./frontend/node_modules
     volumes:
-      - /home/${USERNAME}/drone/${PROJ}:/cache
+      - /home/${USERNAME}/drone/cache/${PROJ}:/cache
 
   time:
     group: service
@@ -213,4 +211,3 @@ pipeline:
     when:
       event: tag
       branch: release
-
