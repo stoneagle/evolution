@@ -8,7 +8,7 @@ matrix:
   PROJ:
     - evolution
   WORKPATH:
-    - /home/wuzhongyang/drone/src
+    - /tmp/drone/src
   GOVERSION:
     - 1.10
   RELEASE_DIR:
@@ -68,16 +68,17 @@ pipeline:
   #     event: tag
   #   volumes:
   #     - /home/${USERNAME}/drone/cache/${PROJ}:/cache
-  # restore-modules-cache:
-  #   group: prepare-cache
-  #   image: drillster/drone-volume-cache
-  #   restore: true
-  #   mount:
-  #     - ${WORKPATH}/${PROJ}/frontend/node_modules
-  #   when:
-  #     event: tag
-  #   volumes:
-  #     - /home/${USERNAME}/drone/cache/${PROJ}:/cache
+  restore-modules-cache:
+    group: prepare-cache
+    image: drillster/drone-volume-cache
+    restore: true
+    mount:
+      - ./frontend/node_modules
+    when:
+      event: tag
+    volumes:
+      - /tmp/drone/cache/${PROJ}:/cache
+      # - /home/${USERNAME}/drone/cache/${PROJ}:/cache
   # vendor:
   #   image: instrumentisto/glide 
   #   group: prepare
@@ -100,10 +101,10 @@ pipeline:
     when:
       event: tag
     network_mode: host
-    volumes:
-      - ${WORKPATH}/${PROJ}/frontend:${GOPATH}/${PROJ}/frontend
+    # volumes:
+    #   - ${WORKPATH}/${PROJ}/frontend:${GOPATH}/${PROJ}/frontend
     commands:
-      - cd ${GOPATH}/${PROJ}/frontend && npm install 
+      - cd ${WORKPATH}/${PROJ}/frontend && npm install 
   # rebuild-vendor-cache:
   #   group: rebuild-cache 
   #   image: drillster/drone-volume-cache
@@ -114,16 +115,16 @@ pipeline:
   #     - ./backend/vendor
   #   volumes:
   #     - /home/${USERNAME}/drone/cache/${PROJ}:/cache
-  # rebuild-modules-cache:
-  #   group: rebuild-cache
-  #   image: drillster/drone-volume-cache
-  #   rebuild: true
-  #   when:
-  #     event: tag
-  #   mount:
-  #     - ${WORKPATH}/${PROJ}/frontend/node_modules
-  #   volumes:
-  #     - /home/${USERNAME}/drone/cache/${PROJ}:/cache
+  rebuild-modules-cache:
+    group: rebuild-cache
+    image: drillster/drone-volume-cache
+    rebuild: true
+    when:
+      event: tag
+    mount:
+      - ./frontend/node_modules
+    volumes:
+      - /tmp/drone/cache/${PROJ}:/cache
 
   # build service 
   # time:
@@ -161,13 +162,13 @@ pipeline:
   frontend:
     group: service
     image: alexsuch/angular-cli:6.0.5
-    volumes:
-      - ${WORKPATH}/${PROJ}/${RELEASE_DIR}:/tmp/${RELEASE_DIR}
-      - ${WORKPATH}/${PROJ}/frontend:/tmp/frontend 
+    # volumes:
+    #   - ${WORKPATH}/${PROJ}/${RELEASE_DIR}:/tmp/${RELEASE_DIR}
+    #   - ${WORKPATH}/${PROJ}/frontend:/tmp/frontend 
     when:
       event: tag
     commands:
-      - cd /tmp/frontend && ng build --environment=prod 
+      - cd ${WORKPATH}/${PROJ}/frontend && ng build --environment=prod 
        
   # build image
   # time-build:
