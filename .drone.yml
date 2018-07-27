@@ -25,7 +25,7 @@ workspace:
   base: ${WORKPATH} 
   path: ${PROJ} 
 
-branches: [ master, develop, release ]
+branches: [ master, develop ]
 
 pipeline:
   git-push-master:
@@ -46,15 +46,6 @@ pipeline:
     local_ref: develop 
     when:
       branch: develop 
-  git-push-release:
-    group: sync 
-    image: appleboy/drone-git-push
-    remote: git@github.com:stoneagle/evolution.git 
-    secrets: [ GIT_PUSH_SSH_KEY ]
-    branch: release 
-    local_ref: release 
-    when:
-      branch: release 
 
   restore-vendor-cache:
     group: prepare-cache
