@@ -1,12 +1,10 @@
 matrix:
   REGISTRY:
     - stoneagle
-  GOPATH:
-    - /go/src 
-  USERNAME:
-    - wuzhongyang 
   PROJ:
     - evolution
+  CACHEPATH:
+    - /home/wuzhongyang/drone/cache
   WORKPATH:
     - /tmp/drone/src
   GOVERSION:
@@ -67,7 +65,7 @@ pipeline:
   #   when:
   #     event: tag
   #   volumes:
-  #     - /home/${USERNAME}/drone/cache/${PROJ}:/cache
+  #     - ${CACHEPATH}/${PROJ}:/cache
   restore-modules-cache:
     group: prepare-cache
     image: drillster/drone-volume-cache
@@ -77,8 +75,7 @@ pipeline:
     when:
       event: tag
     volumes:
-      - /tmp/drone/cache/${PROJ}:/cache
-      # - /home/${USERNAME}/drone/cache/${PROJ}:/cache
+      - ${CACHEPATH}/${PROJ}:/cache
   # vendor:
   #   image: instrumentisto/glide 
   #   group: prepare
@@ -88,22 +85,16 @@ pipeline:
   #   when:
   #     event: tag
   #   network_mode: host
-  #   volumes:
-  #     - ${WORKPATH}/${PROJ}/backend:${GOPATH}/${PROJ}/backend
   #   commands:
-  #     - cd ${GOPATH}/${PROJ}/backend && glide update 
+  #     - cd ${WORKPATH}/${PROJ}/backend && glide update 
   modules:
     image: alexsuch/angular-cli:6.0.5
     group: prepare
-    environment:
-      - http_proxy=http://127.0.0.1:8118
-      - https_proxy=http://127.0.0.1:8118
     when:
       event: tag
     network_mode: host
-    # volumes:
-    #   - ${WORKPATH}/${PROJ}/frontend:${GOPATH}/${PROJ}/frontend
     commands:
+      - npm config set registry https://registry.npm.taobao.org
       - cd ${WORKPATH}/${PROJ}/frontend && npm install 
   # rebuild-vendor-cache:
   #   group: rebuild-cache 
@@ -114,7 +105,7 @@ pipeline:
   #   mount:
   #     - ./backend/vendor
   #   volumes:
-  #     - /home/${USERNAME}/drone/cache/${PROJ}:/cache
+  #     - ${CACHEPATH}/${PROJ}:/cache
   rebuild-modules-cache:
     group: rebuild-cache
     image: drillster/drone-volume-cache
@@ -124,7 +115,7 @@ pipeline:
     mount:
       - ./frontend/node_modules
     volumes:
-      - /tmp/drone/cache/${PROJ}:/cache
+      - ${CACHEPATH}/${PROJ}:/cache
 
   # build service 
   # time:
@@ -132,39 +123,30 @@ pipeline:
   #   image: golang:${GOVERSION}
   #   environment:
   #     - CGO_ENABLED:0
-  #   volumes:
-  #     - ${WORKPATH}/${PROJ}/${RELEASE_DIR}:${GOPATH}/${RELEASE_DIR}
-  #     - ${WORKPATH}/${PROJ}/backend:${GOPATH}/${PROJ}/backend 
   #   when:
   #     event: tag
   #   commands:
   #     - make check-release 
-  #     - cd ${GOPATH}/${PROJ}/backend/time
-  #     - go build -o ${GOPATH}/${RELEASE_DIR}/time -a -tags netgo -installsuffix netgo -ldflags '-w'
-  #     - cd ${GOPATH}/${PROJ}/backend/time/initial
-  #     - go build -o ${GOPATH}/${RELEASE_DIR}/time-init-db -a -tags netgo -installsuffix netgo -ldflags '-w'
+  #     - cd ${WORKPATH}/${PROJ}/backend/time
+  #     - go build -o ${WORKPATH}/${RELEASE_DIR}/time -a -tags netgo -installsuffix netgo -ldflags '-w'
+  #     - cd ${WORKPATH}/${PROJ}/backend/time/initial
+  #     - go build -o ${WORKPATH}/${RELEASE_DIR}/time-init-db -a -tags netgo -installsuffix netgo -ldflags '-w'
   # system:
   #   group: service
   #   image: golang:${GOVERSION}
   #   environment:
   #     - CGO_ENABLED:0
-  #   volumes:
-  #     - ${WORKPATH}/${PROJ}/${RELEASE_DIR}:${GOPATH}/${RELEASE_DIR}
-  #     - ${WORKPATH}/${PROJ}/backend:${GOPATH}/${PROJ}/backend 
   #   when:
   #     event: tag
   #   commands:
   #     - make check-release 
-  #     - cd ${GOPATH}/${PROJ}/backend/system
-  #     - go build -o ${GOPATH}/${RELEASE_DIR}/system -a -tags netgo -installsuffix netgo -ldflags '-w'
-  #     - cd ${GOPATH}/${PROJ}/backend/system/initial
-  #     - go build -o ${GOPATH}/${RELEASE_DIR}/system-init-db -a -tags netgo -installsuffix netgo -ldflags '-w'
+  #     - cd ${WORKPATH}/${PROJ}/backend/system
+  #     - go build -o ${WORKPATH}/${RELEASE_DIR}/system -a -tags netgo -installsuffix netgo -ldflags '-w'
+  #     - cd ${WORKPATH}/${PROJ}/backend/system/initial
+  #     - go build -o ${WORKPATH}/${RELEASE_DIR}/system-init-db -a -tags netgo -installsuffix netgo -ldflags '-w'
   frontend:
     group: service
     image: alexsuch/angular-cli:6.0.5
-    # volumes:
-    #   - ${WORKPATH}/${PROJ}/${RELEASE_DIR}:/tmp/${RELEASE_DIR}
-    #   - ${WORKPATH}/${PROJ}/frontend:/tmp/frontend 
     when:
       event: tag
     commands:
