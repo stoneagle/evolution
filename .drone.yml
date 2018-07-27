@@ -68,16 +68,16 @@ pipeline:
   #     event: tag
   #   volumes:
   #     - /home/${USERNAME}/drone/cache/${PROJ}:/cache
-  restore-modules-cache:
-    group: prepare-cache
-    image: drillster/drone-volume-cache
-    restore: true
-    mount:
-      - ./frontend/node_modules
-    when:
-      event: tag
-    volumes:
-      - /home/${USERNAME}/drone/cache/${PROJ}:/cache
+  # restore-modules-cache:
+  #   group: prepare-cache
+  #   image: drillster/drone-volume-cache
+  #   restore: true
+  #   mount:
+  #     - ${WORKPATH}/${PROJ}/frontend/node_modules
+  #   when:
+  #     event: tag
+  #   volumes:
+  #     - /home/${USERNAME}/drone/cache/${PROJ}:/cache
   # vendor:
   #   image: instrumentisto/glide 
   #   group: prepare
@@ -114,16 +114,16 @@ pipeline:
   #     - ./backend/vendor
   #   volumes:
   #     - /home/${USERNAME}/drone/cache/${PROJ}:/cache
-  rebuild-modules-cache:
-    group: rebuild-cache
-    image: drillster/drone-volume-cache
-    rebuild: true
-    when:
-      event: tag
-    mount:
-      - ./frontend/node_modules
-    volumes:
-      - /home/${USERNAME}/drone/cache/${PROJ}:/cache
+  # rebuild-modules-cache:
+  #   group: rebuild-cache
+  #   image: drillster/drone-volume-cache
+  #   rebuild: true
+  #   when:
+  #     event: tag
+  #   mount:
+  #     - ${WORKPATH}/${PROJ}/frontend/node_modules
+  #   volumes:
+  #     - /home/${USERNAME}/drone/cache/${PROJ}:/cache
 
   # build service 
   # time:
