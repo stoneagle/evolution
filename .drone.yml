@@ -64,7 +64,6 @@ pipeline:
       - ./backend/vendor
     when:
       event: tag
-      branch: release
     volumes:
       - /home/${USERNAME}/drone/cache/${PROJ}:/cache
   restore-modules-cache:
@@ -75,7 +74,6 @@ pipeline:
       - ./frontend/node_modules
     when:
       event: tag
-      branch: release
     volumes:
       - /home/${USERNAME}/drone/cache/${PROJ}:/cache
   vendor:
@@ -86,7 +84,6 @@ pipeline:
       - https_proxy=http://127.0.0.1:8118
     when:
       event: tag
-      branch: release
     network_mode: host
     volumes:
       - ${WORKPATH}/${PROJ}/backend:${GOPATH}/${PROJ}/backend
@@ -100,7 +97,6 @@ pipeline:
       - https_proxy=http://127.0.0.1:8118
     when:
       event: tag
-      branch: release
     network_mode: host
     volumes:
       - ${WORKPATH}/${PROJ}/frontend:${GOPATH}/${PROJ}/frontend
@@ -112,7 +108,6 @@ pipeline:
     rebuild: true
     when:
       event: tag
-      branch: release
     mount:
       - ./backend/vendor
     volumes:
@@ -123,7 +118,6 @@ pipeline:
     rebuild: true
     when:
       event: tag
-      branch: release
     mount:
       - ./frontend/node_modules
     volumes:
@@ -139,7 +133,6 @@ pipeline:
       - ${WORKPATH}/${PROJ}/backend:${GOPATH}/${PROJ}/backend 
     when:
       event: tag
-      branch: release
     commands:
       - make check-release 
       - cd ${GOPATH}/${PROJ}/backend/time
@@ -156,7 +149,6 @@ pipeline:
       - ${WORKPATH}/${PROJ}/backend:${GOPATH}/${PROJ}/backend 
     when:
       event: tag
-      branch: release
     commands:
       - make check-release 
       - cd ${GOPATH}/${PROJ}/backend/system
@@ -171,7 +163,6 @@ pipeline:
       - ${WORKPATH}/${PROJ}/frontend:/tmp/frontend 
     when:
       event: tag
-      branch: release
     commands:
       - cd /tmp/frontend && ng build --environment=prod 
        
@@ -184,7 +175,6 @@ pipeline:
     tags: "${DRONE_TAG}"
     when:
       event: tag
-      branch: release
   system-build:
     group: image 
     image: plugins/docker
@@ -194,7 +184,6 @@ pipeline:
     tags: "${DRONE_TAG}"
     when:
       event: tag
-      branch: release
   frontend-build:
     group: image 
     image: plugins/docker
@@ -204,4 +193,3 @@ pipeline:
     tags: "${DRONE_TAG}"
     when:
       event: tag
-      branch: release
