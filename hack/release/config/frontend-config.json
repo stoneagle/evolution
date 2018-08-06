@@ -4,8 +4,8 @@
     "language": "zh-cn"
   },
   "apiServer": {
-    "endpoint": "http://fireseed.cn:30888/evolution",
-    "websocket": "ws://fireseed.cn:30888/evolution",
+    "endpoint": "http://fireseed.cn:30888",
+    "websocket": "ws://fireseed.cn:30888",
     "auth": {
       "type": "basic-auth-jwt",
       "session": "auth-session",

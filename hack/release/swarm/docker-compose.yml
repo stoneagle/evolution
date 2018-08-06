@@ -4,7 +4,7 @@ services:
     image: ${DEVELOP_PREFIX}:envoy
     container_name: ${PROJECT_NAME}-${DEV_USER}-envoy
     volumes:
-      - ../config/envoy.yaml:/etc/frontend-envoy.yaml
+      - ../config/envoy.yaml:/etc/front-envoy.yaml
     ports:
       - "${ENVOY_PORT}:80"
     networks:
@@ -33,12 +33,11 @@ services:
       - "${SYSTEM_PORT}"
     networks:
       - default
-  frontend:
+  evolution-frontend:
     image: ${RELEASE_PREFIX}-frontend:${RELEASE_TAG}
-    container_name: ${PROJECT_NAME}-${DEV_USER}-system-frontend-test
+    container_name: ${PROJECT_NAME}-${DEV_USER}-frontend
     volumes:
       - ../config/.frontend-config.json:/www/assets/config/.config.prod.json
-      - ../config/.frontend-config.json:/www/assets/config/config.prod.json
     expose:
       - "${FRONT_PORT}" 
     networks:
