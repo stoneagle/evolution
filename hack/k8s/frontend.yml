@@ -1,0 +1,81 @@
+# ------------------- envoy ConfigMap ------------------- #
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: evolution-frontend-config
+  namespace: default 
+data:
+  .config.prod.json: |-
+    {
+      "app": {     
+        "name": "evolution",
+        "language": "zh-cn"
+      },
+      "apiServer": {
+        "endpoint": "http://fireseed:30888/evolution",
+        "websocket": "ws://fireseed:30888/evolution",
+        "auth": {
+          "type": "basic-auth-jwt",
+          "session": "auth-session",
+          "token": "auth-token",
+          "jwt": "JwtToken"
+        },
+        "prefix": {
+          "quant": "/quant/v1",
+          "time": "/time/v1",
+          "system": "/system/v1"
+        }
+      }
+    }
+
+---
+# ------------------- Frontend Deployment ------------------- #
+kind: Deployment
+apiVersion: apps/v1beta2
+metadata:
+  labels:
+    k8s-app: evolution-frontend
+  name: evolution-frontend
+  namespace: default
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      k8s-app: evolution-frontend
+  template:
+    metadata:
+      labels:
+        k8s-app: evolution-frontend
+    spec:
+      containers:
+      - name: frontend 
+        image: stoneagle/evolution-frontend:v0.0.1-alpha1
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: frontend-config-volume
+          mountPath: /www/assets/config
+      volumes:
+      - name: frontend-config-volume
+        configMap:
+          name: evolution-frontend-config
+      tolerations:
+      - key: node-role.kubernetes.io/master
+        effect: NoSchedule
+
+---
+# ------------------- Frontend Service ------------------- #
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    k8s-app: evolution-frontend
+  name: evolution-frontend
+  namespace: default 
+spec:
+  ports:
+    - port: 80
+      targetPort: 80
+  selector:
+    k8s-app: evolution-frontend

@@ -1,3 +1,4 @@
+# ------------------- envoy ConfigMap ------------------- #
 kind: ConfigMap
 apiVersion: v1
 metadata:
@@ -25,21 +26,20 @@ data:
                   - "*"
                   routes:
                   - match:
-                      prefix: "/quant"
+                      prefix: "/evolution/quant"
                     route:
                       cluster: quant 
                   - match:
-                      prefix: "/time"
+                      prefix: "/evolution/time"
                     route:
                       cluster: time 
                   - match:
-                      prefix: "/system"
+                      prefix: "/evolution/system"
                     route:
                       cluster: system 
                   - match:
-                      prefix: "/frontend"
+                      prefix: "/"
                     route:
-                      prefix_rewrite: "/"
                       cluster: frontend 
               http_filters:
               - name: envoy.router
@@ -76,10 +76,84 @@ data:
         hosts:
         - socket_address:
             address: evolution-frontend.default.svc.cluster.local
-            port_value: 80
+            port_value: 80 
     admin:
       access_log_path: "/dev/null"
       address:
         socket_address:
           address: 0.0.0.0
           port_value: 8081
+
+---
+# ------------------- Envoy Deployment ------------------- #
+kind: Deployment
+apiVersion: apps/v1beta2
+metadata:
+  labels:
+    k8s-app: evolution-envoy
+  name: evolution-envoy
+  namespace: default
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      k8s-app: evolution-envoy
+  template:
+    metadata:
+      labels:
+        k8s-app: evolution-envoy
+    spec:
+      containers:
+      - name: envoy
+        image: stoneagle/develop:envoy
+        command:
+          - envoy 
+          - -c 
+          - /etc/evolution-envoy.yaml 
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: envoy-config-volume
+          mountPath: /etc/evolution-envoy.yaml
+          subPath: evolution-envoy.yaml
+      volumes:
+      - name: envoy-config-volume
+        configMap:
+          name: evolution-envoy-config
+      tolerations:
+      - key: node-role.kubernetes.io/master
+        effect: NoSchedule
+
+---
+# ------------------- Envoy Service ------------------- #
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    k8s-app: evolution-envoy
+  name: evolution-envoy
+  namespace: default 
+spec:
+  ports:
+    - port: 80
+      targetPort: 80
+  selector:
+    k8s-app: evolution-envoy
+
+# ------------------------------------------------------------
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    k8s-app: evolution-envoy
+  name: evolution-envoy-external
+  namespace: default 
+spec:
+  ports:
+    - port: 80 
+      targetPort: 80 
+      nodePort: 30888
+  type: NodePort
+  selector:
+    k8s-app: evolution-envoy

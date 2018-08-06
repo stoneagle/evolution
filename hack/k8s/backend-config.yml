@@ -16,7 +16,7 @@ data:
         port: 8080
         version: v1 
         prefix: quant
-        cors: ["http://basic/evolution/frontend:30080"]
+        cors: ["http://fireseed.cn:30888"]
         location: Asia/Shanghai
       redis:
         host: kubernetes-redis.kube-public.svc.cluster.local
@@ -45,7 +45,7 @@ data:
         port: 8080 
         version: v1 
         prefix: time
-        cors: ["http://basic/evolution/frontend:30080"]
+        cors: ["http://fireseed.cn:30888"]
         location: Asia/Shanghai
       redis:
         host: kubernetes-redis.kube-public.svc.cluster.local
@@ -74,7 +74,7 @@ data:
         port: 8080 
         version: v1 
         prefix: system
-        cors: ["http://basic/evolution/frontend:30080"]
+        cors: ["http://fireseed.cn:30888"]
         location: Asia/Shanghai
       redis:
         host: kubernetes-redis.kube-public.svc.cluster.local
