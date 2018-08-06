@@ -1,0 +1,95 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: evolution-backend-config
+  namespace: default 
+data:
+  config.yaml: |-
+    app:
+      mode: release 
+      log: /go/src/evolution/logs
+      level: 3
+    quant:
+      system:
+        name: quant
+        host: http://evolution-quant.default.svc.cluster.local
+        port: 8080
+        version: v1 
+        prefix: quant
+        cors: ["http://basic/evolution/frontend:30080"]
+        location: Asia/Shanghai
+      redis:
+        host: kubernetes-redis.kube-public.svc.cluster.local
+        port: 6379
+        password: 
+        db: 0
+      database:
+        type: mysql
+        host: kubernetes-mysql.kube-public.svc.cluster.local
+        port: 3306
+        user: root
+        target: quant
+        password: 
+        maxIdle: 10 
+        maxOpen: 5 
+        showsql: False
+        reset: False
+        location: Asia/Shanghai
+      rpc:
+        host: evolution-engine.default.svc.cluster.local
+        port: 6666
+    time:
+      system:
+        name: time
+        host: http://evolution-time.default.svc.cluster.local
+        port: 8080 
+        version: v1 
+        prefix: time
+        cors: ["http://basic/evolution/frontend:30080"]
+        location: Asia/Shanghai
+      redis:
+        host: kubernetes-redis.kube-public.svc.cluster.local
+        port: 6379
+        password: 
+        db: 0
+      database:
+        type: mysql
+        host: kubernetes-mysql.kube-public.svc.cluster.local
+        port: 3306
+        user: root
+        target: time
+        password: 
+        maxIdle: 10 
+        maxOpen: 5 
+        showsql: False 
+        reset: False 
+        location: Asia/Shanghai
+    system:
+      auth:
+        type: "BAJwt"
+        session: "auth-session"
+      system:
+        name: system 
+        host: http://evolution-system.default.svc.cluster.local
+        port: 8080 
+        version: v1 
+        prefix: system
+        cors: ["http://basic/evolution/frontend:30080"]
+        location: Asia/Shanghai
+      redis:
+        host: kubernetes-redis.kube-public.svc.cluster.local
+        port: 6379
+        password: 
+        db: 0
+      database:
+        type: mysql
+        host: kubernetes-mysql.kube-public.svc.cluster.local
+        port: 3306
+        user: root
+        target: system 
+        password: 
+        maxIdle: 10 
+        maxOpen: 5 
+        showsql: False
+        reset: False
+        location: Asia/Shanghai

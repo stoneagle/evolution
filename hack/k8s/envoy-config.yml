@@ -1,0 +1,85 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: evolution-envoy-config
+  namespace: default 
+data:
+  evolution-envoy.yaml: |-
+    static_resources:
+      listeners:
+      - address:
+          socket_address:
+            address: 0.0.0.0
+            port_value: 80
+        filter_chains:
+        - filters:
+          - name: envoy.http_connection_manager
+            config:
+              codec_type: auto
+              stat_prefix: ingress_http
+              route_config:
+                name: backend_route 
+                virtual_hosts:
+                - name: quant 
+                  domains:
+                  - "*"
+                  routes:
+                  - match:
+                      prefix: "/quant"
+                    route:
+                      cluster: quant 
+                  - match:
+                      prefix: "/time"
+                    route:
+                      cluster: time 
+                  - match:
+                      prefix: "/system"
+                    route:
+                      cluster: system 
+                  - match:
+                      prefix: "/frontend"
+                    route:
+                      prefix_rewrite: "/"
+                      cluster: frontend 
+              http_filters:
+              - name: envoy.router
+                config: {}
+      clusters:
+      - name: quant
+        connect_timeout: 0.5s
+        type: strict_dns
+        lb_policy: round_robin
+        hosts:
+        - socket_address:
+            address: evolution-quant.default.svc.cluster.local
+            port_value: 8080
+      - name: time 
+        connect_timeout: 0.5s
+        type: strict_dns
+        lb_policy: round_robin
+        hosts:
+        - socket_address:
+            address: evolution-time.default.svc.cluster.local
+            port_value: 8080
+      - name: system
+        connect_timeout: 0.5s
+        type: strict_dns
+        lb_policy: round_robin
+        hosts:
+        - socket_address:
+            address: evolution-system.default.svc.cluster.local
+            port_value: 8080
+      - name: frontend 
+        connect_timeout: 0.5s
+        type: strict_dns
+        lb_policy: round_robin
+        hosts:
+        - socket_address:
+            address: evolution-frontend.default.svc.cluster.local
+            port_value: 80
+    admin:
+      access_log_path: "/dev/null"
+      address:
+        socket_address:
+          address: 0.0.0.0
+          port_value: 8081
