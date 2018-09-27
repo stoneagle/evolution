@@ -1,0 +1,5 @@
+FROM busybox 
+run mkdir /www 
+COPY ./release/frontend /www
+expose 80
+CMD ["httpd", "-f", "-p", "80", "-h", "/www"]

@@ -1,0 +1,21 @@
+{
+  "app": {     
+    "name": "evolution",
+    "language": "zh-cn"
+  },
+  "apiServer": {
+    "endpoint": "http://fireseed.cn:30888",
+    "websocket": "ws://fireseed.cn:30888",
+    "auth": {
+      "type": "basic-auth-jwt",
+      "session": "auth-session",
+      "token": "auth-token",
+      "jwt": "JwtToken"
+    },
+    "prefix": {
+      "quant": "/quant/v1",
+      "time": "/time/v1",
+      "system": "/system/v1"
+    }
+  }
+}

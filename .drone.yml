@@ -1,0 +1,185 @@
+matrix:
+  REGISTRY:
+    - stoneagle
+  PROJ:
+    - evolution
+  CACHEPATH:
+    - /tmp/drone/cache
+  WORKPATH:
+    - /go/src
+  GOVERSION:
+    - 1.10
+  RELEASE_DIR:
+    - release
+
+# use clone-plugin can not pass build 
+# clone:
+#   git:
+#     image: plugins/git
+#     recursive: false
+#     depth: 1
+
+workspace:
+  base: ${WORKPATH} 
+  path: ${PROJ} 
+
+branches: [ master, develop, feature/* , refs/tags/* ]
+
+pipeline:
+  # sync code to git 
+  git-push-master:
+    group: sync 
+    image: appleboy/drone-git-push
+    remote: git@github.com:stoneagle/evolution.git 
+    secrets: [ GIT_PUSH_SSH_KEY ]
+    branch: master
+    local_ref: master
+    when:
+      branch: master
+  git-push-develop:
+    group: sync 
+    image: appleboy/drone-git-push
+    remote: git@github.com:stoneagle/evolution.git 
+    secrets: [ GIT_PUSH_SSH_KEY ]
+    branch: develop 
+    local_ref: develop 
+    when:
+      branch: develop 
+  git-push-feature:
+    group: sync 
+    image: appleboy/drone-git-push
+    remote: git@github.com:stoneagle/evolution.git 
+    secrets: [ GIT_PUSH_SSH_KEY ]
+    branch: ${DRONE_COMMIT_BRANCH}
+    local_ref: ${DRONE_COMMIT_BRANCH}
+    when:
+      branch: feature/* 
+
+  # prepare cache 
+  restore-vendor-cache:
+    group: prepare-cache
+    image: drillster/drone-volume-cache
+    restore: true
+    mount:
+      - ./backend/vendor
+    when:
+      event: tag
+    volumes:
+      - ${CACHEPATH}:/cache
+  restore-modules-cache:
+    group: prepare-cache
+    image: drillster/drone-volume-cache
+    restore: true
+    mount:
+      - ./frontend/node_modules
+    when:
+      event: tag
+    volumes:
+      - ${CACHEPATH}:/cache
+  vendor-prepare:
+    image: instrumentisto/glide 
+    group: prepare
+    environment:
+      - http_proxy=http://127.0.0.1:8118
+      - https_proxy=http://127.0.0.1:8118
+    when:
+      event: tag
+    network_mode: host
+    commands:
+      - cd ${WORKPATH}/${PROJ}/backend && glide update 
+  modules-prepare:
+    image: mkenney/npm:node-8-alpine 
+    group: prepare
+    when:
+      event: tag
+    network_mode: host
+    commands:
+      - npm config set registry https://registry.npm.taobao.org
+      - cd ${WORKPATH}/${PROJ}/frontend && npm install 
+  rebuild-vendor-cache:
+    group: rebuild-cache 
+    image: drillster/drone-volume-cache
+    rebuild: true
+    when:
+      event: tag
+    mount:
+      - ./backend/vendor
+    volumes:
+      - ${CACHEPATH}:/cache
+  rebuild-modules-cache:
+    group: rebuild-cache
+    image: drillster/drone-volume-cache
+    rebuild: true
+    when:
+      event: tag
+    mount:
+      - ./frontend/node_modules
+    volumes:
+      - ${CACHEPATH}:/cache
+
+  # build service 
+  time-service:
+    group: service
+    image: golang:${GOVERSION}
+    environment:
+      - CGO_ENABLED:0
+    when:
+      event: tag
+    commands:
+      - make check-release 
+      - cd ${WORKPATH}/${PROJ}/backend/time
+      - go build -o ${WORKPATH}/${PROJ}/${RELEASE_DIR}/time -a -tags netgo -installsuffix netgo -ldflags '-w'
+      - cd ${WORKPATH}/${PROJ}/backend/time/initial
+      - go build -o ${WORKPATH}/${PROJ}/${RELEASE_DIR}/time-init-db -a -tags netgo -installsuffix netgo -ldflags '-w'
+  system-service:
+    group: service
+    image: golang:${GOVERSION}
+    environment:
+      - CGO_ENABLED:0
+    when:
+      event: tag
+    commands:
+      - make check-release 
+      - cd ${WORKPATH}/${PROJ}/backend/system
+      - go build -o ${WORKPATH}/${PROJ}/${RELEASE_DIR}/system -a -tags netgo -installsuffix netgo -ldflags '-w'
+      - cd ${WORKPATH}/${PROJ}/backend/system/initial
+      - go build -o ${WORKPATH}/${PROJ}/${RELEASE_DIR}/system-init-db -a -tags netgo -installsuffix netgo -ldflags '-w'
+  frontend-service:
+    group: service
+    image: alexsuch/angular-cli:6.0.5
+    when:
+      event: tag
+    commands:
+      - cd ${WORKPATH}/${PROJ}/frontend && ng build --environment=prod 
+       
+  # build image
+  time-build:
+    group: image 
+    image: plugins/docker
+    repo: ${REGISTRY}/${PROJ}-time
+    dockerfile: ${WORKPATH}/${PROJ}/hack/release/Dockerfile.time
+    context: ${WORKPATH}/${PROJ}
+    secrets: [ DOCKER_USERNAME, DOCKER_PASSWORD ]
+    tags: "${DRONE_TAG}"
+    when:
+      event: tag
+  system-build:
+    group: image 
+    image: plugins/docker
+    repo: ${REGISTRY}/${PROJ}-system
+    dockerfile: ${WORKPATH}/${PROJ}/hack/release/Dockerfile.system
+    context: ${WORKPATH}/${PROJ}
+    secrets: [ DOCKER_USERNAME, DOCKER_PASSWORD ]
+    tags: "${DRONE_TAG}"
+    when:
+      event: tag
+  frontend-build:
+    group: image 
+    image: plugins/docker
+    repo: ${REGISTRY}/${PROJ}-frontend
+    dockerfile: ${WORKPATH}/${PROJ}/hack/release/Dockerfile.frontend
+    context: ${WORKPATH}/${PROJ}
+    secrets: [ DOCKER_USERNAME, DOCKER_PASSWORD ]
+    tags: "${DRONE_TAG}"
+    when:
+      event: tag

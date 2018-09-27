@@ -1,0 +1,29 @@
+<div class="login-wrapper">
+    <form class="login" #loginForm="ngForm" (ngSubmit)="submit()">
+        <label class="title">
+            <h3 class="welcome">Welcome to</h3>
+            {{CompanyName}}
+        </label>
+        <div class="login-group">
+            <!-- <div class="auth-source select"> -->
+            <!--     <select [(ngModel)]="atype" name="atype" id="atype"> -->
+            <!--         <option value="local">Local</option> -->
+            <!--         <option value="admin">Admin</option> -->
+            <!--     </select> -->
+            <!-- </div> -->
+            <input [(ngModel)]="username" name="username" class="username" type="text" id="login_username" placeholder="{{ 'SYSTEM.RESOURCE.USER.NAME' | translate }}">
+            <input [(ngModel)]="password" name="password" class="password" type="password" id="login_password" placeholder="{{ 'SYSTEM.RESOURCE.USER.PASSWORD' | translate }}">
+            <!-- <div class="checkbox"> -->
+            <!--     <input type="checkbox" id="rememberme"> -->
+            <!--     <label for="rememberme"> -->
+            <!--         Remember me -->
+            <!--     </label> -->
+            <!-- </div> -->
+            <!-- <div class="error active"> -->
+            <!--     Invalid user name or password -->
+            <!-- </div> -->
+            <button type="submit" class="btn btn-primary">{{ 'SYSTEM.PROCESS.SIGNIN' | translate }}</button>
+            <!-- <a href="javascript://" class="signup">Sign up for a Company ID</a> -->
+        </div>
+    </form>
+</div>

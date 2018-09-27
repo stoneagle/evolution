@@ -1,0 +1,30 @@
+<clr-tabs>
+	<clr-tab *ngFor="let key of getKeys(fieldMap)">
+		<button (click)="changeField(key)" clrTabLink>{{ fieldMap.get(key) }}</button>
+    <clr-tab-content *clrIfActive="key == this.firstFieldId">
+      <div class="row">
+        <div class="col-xs-6">
+          <ej-treegrid 
+            id="TreeGridArea" 
+            sizeSettings.height="330px" 
+            sizeSettings.width="400px" 
+            [columns]="treeColumns" 
+            [dataSource]="treeGridData" 
+            [treeColumnIndex]="treeColumnIndex"
+            idMapping="Id" 
+            parentIdMapping="Parent"
+						childMapping="Children" 
+            expandStateMapping="IsExpanded"
+						[enableLoadOnDemand]="true" 
+						[enableVirtualization]="true"
+            (recordDoubleClick)="selectAreaInfo($event)"
+          >
+          </ej-treegrid>
+        </div>
+        <div class="col-xs-6">
+          <ng-content></ng-content>
+        </div>
+      </div>
+    </clr-tab-content>
+  </clr-tab>
+</clr-tabs>

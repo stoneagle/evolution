@@ -1,0 +1,14 @@
+bs4
+requests
+pandas
+lxml
+html5lib
+xlrd
+tables
+h5py
+TA-Lib
+influxdb
+wxpy
+pillow
+thrift
+watchdog

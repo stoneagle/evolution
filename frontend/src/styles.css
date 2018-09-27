@@ -1,0 +1,14 @@
+#GanttContainer_ColumnVisibility {
+  padding-top: 2px;
+  padding-bottom: 0px;
+}
+.gantt-show-finish:before {
+  content: "\e901";
+}
+.gantt-hide-finish:before {
+  content: "\e900";
+}
+
+.cdk-overlay-container {
+  z-index: 1500; 
+}

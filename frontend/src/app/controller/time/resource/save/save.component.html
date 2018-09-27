@@ -1,0 +1,39 @@
+<clr-modal [(clrModalOpen)]="modelOpened">
+  <h3 class="modal-title" *ngIf="(resource.Id)">
+    {{ 'SYSTEM.PROCESS.UPDATE' | translate }}{{ 'TIME.RESOURCE.RESOURCE.CONCEPT' | translate }}
+  </h3>
+  <h3 class="modal-title" *ngIf="!(resource.Id)">
+    {{ 'SYSTEM.PROCESS.CREATE' | translate }}{{ 'TIME.RESOURCE.RESOURCE.CONCEPT' | translate }}
+  </h3>
+  <div class="modal-body">
+    <form #addForm="ngForm" (ngSubmit)="Submit()">
+      <div class="form-group">
+        <label for="areaName">{{ 'TIME.RESOURCE.RESOURCE.AREA' | translate }}</label>
+        <ng-select 
+          [(ngModel)]="areaIds"
+          [items]="areas"
+          bindLabel="Name"
+          bindValue="Id"
+          [multiple]="true"
+          id="AreaIds"
+          name="AreaIds"
+        >
+        </ng-select>
+      </div> 
+      <div class="form-group">
+        <label for="name">{{ 'TIME.RESOURCE.RESOURCE.NAME' | translate }}</label>
+        <input type="text" class="form-control" id="Name" required [(ngModel)]="resource.Name" name="Name" >
+      </div> 
+      <div class="form-group">
+        <label for="desc">{{ 'TIME.RESOURCE.RESOURCE.DESC' | translate }}</label>
+        <input type="text" class="form-control" id="Desc" required [(ngModel)]="resource.Desc" name="Desc" >
+      </div> 
+      <div class="form-group">
+        <label for="year">{{ 'TIME.RESOURCE.RESOURCE.YEAR' | translate }}</label>
+        <input type="number" class="form-control" id="Year" required [(ngModel)]="resource.Year" name="Year" >
+      </div> 
+      <button type="submit" class="btn btn-success">{{ 'SYSTEM.PROCESS.SUBMIT' | translate }}</button>
+      <button type="button" class="btn btn-primary" (click)="modelOpened = false">{{ 'SYSTEM.PROCESS.CANCEL' | translate }}</button>
+    </form>
+  </div>     
+</clr-modal>   

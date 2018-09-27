@@ -1,0 +1,73 @@
+{
+  "APP": {
+    "TITLE": "evolution"
+  },
+  "FLOW": {
+    "ASSETS": {
+      "TYPE": {
+        "STOCK": "stock",
+        "EXCHANGE": "exchange",
+        "CONFIG": "config"
+      }
+    },
+    "RESOURCE": {
+      "POOL": {
+        "CONCEPT": "pool",
+        "NAME": "name",
+        "STATUS": "status",
+        "STRATEGY": "strategy"
+      },
+      "ITEM": {
+        "CONCEPT": "item",
+        "CODE": "code",
+        "NAME": "name",
+        "STATUS": "status"
+      },
+      "CLASSIFY": {
+        "CONCEPT": "classify",
+        "NAME": "name",
+        "TAG": "tag"
+      },
+      "CONFIG": {
+        "CONCEPT": "config",
+        "ASSET": "assets",
+        "TYPE": "type",
+        "MAIN": "main",
+        "SUB": "sub"
+      },
+      "GENERAL": {
+        "CONCEPT": "general",
+        "ID": "id",
+        "OPERATION": "operation",
+        "CREATED": "created",
+        "UPDATED": "updated",
+        "DELETED": "deleted"
+      }
+    }
+  },
+  "SYSTEM": {
+    "USER": {
+      "NAME": "name",
+      "SIGNIN": "sign-in",
+      "SIGNOUT": "sign-out"
+    },
+    "PROCESS": { 
+      "GET": "get", 
+      "LIST": "list", 
+      "SYNC": "sync", 
+      "CREATE": "create", 
+      "UPDATE": "update",
+      "DELETE": "delete",
+      "SUBMIT": "submit",
+      "CANCEL": "cancel",
+      "ROLLBACK": "rollback"
+    },
+    "RESULT": {
+      "SUCCESS": "success",
+      "EXEC": "exec",
+      "FAIL": "fail",
+      "EXCEPTION": "exception",
+      "UNKNOWN": "unknown"
+    }
+  }
+}

@@ -1,0 +1,55 @@
+<div style="height:100%;">
+  <ej-schedule 
+    id="ActionSchedule" 
+    width="100%" 
+    [height]="scheduleHeight" 
+    cellHeight="12.5px" 
+    currentView="week" 
+    timeMode="24"
+    timeZone="UTC +04:00" 
+    [timeScale.enable]="true" 
+    [timeScale.majorSlot]="60" 
+    [timeScale.minorSlotCount]="4"
+    [currentDate]=currentDate
+    [currentView]="currentView"
+    [views]="scheduleViews"
+    [appointmentSettings]=scheduleSettings
+    [appointmentTemplateId]="'#time-schedule-app-template'"
+    [categorizeSettings]="scheduleCategorySettings"
+    [enableLoadOnDemand]="true"
+    [showAppointmentNavigator]="true"
+    [showOverflowButton]="false"
+    locale="zh-CN" 
+
+    [tooltipSettings]="scheduleTooltipSettings"
+
+    contextMenuSettings.enable=true 
+    [contextMenuSettings.menuItems]=scheduleMenuItems
+
+    (beforeContextMenuOpen)="onContextMenuOpen($event)"
+    [showQuickWindow]="false"
+    [showAllDayRow]="false"
+
+    (beforeAppointmentRemove)="actionDelete($event)"
+    (menuItemClick)="onMenuItemClick($event)"
+    (cellClick)="disable($event)"
+    (cellDoubleClick)="disable($event)"
+    [enableAppointmentResize]="true"
+    (resizeStop)="updateTimeRange($event)"
+    (dragStop)="updateTimeRange($event)"
+    (appointmentWindowOpen)="actionShow($event)"
+    (actionComplete)="actionComplete($event)"
+  >
+  </ej-schedule>
+</div>
+
+<clr-modal [(clrModalOpen)]="modelListOpened" [clrModalSize]="'xl'">
+  <h3 class="modal-title">
+    {{ 'SYSTEM.PROCESS.LIST' | translate }}{{ 'TIME.RESOURCE.ACTION.CONCEPT' | translate }}
+  </h3>
+  <div class="modal-body">
+    <time-action-list></time-action-list>
+    <button type="button" class="btn btn-primary" (click)="modelListOpened = false">{{ 'SYSTEM.PROCESS.CANCEL' | translate }}</button>
+  </div>
+</clr-modal>   
+<time-action-save (save)="actionSaved($event)"></time-action-save>

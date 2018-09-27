@@ -1,0 +1,17 @@
+# Docker Compose运行项目名
+PROJECT_NAME=evolution
+# id -u
+DEV_UID=
+# 开发者账号
+DEV_USER=
+# 仓库前缀 
+REGISTRY_PREFIX=
+RELEASE_PREFIX=
+RELEASE_TAG=
+# 开发使用的端口
+FRONT_PORT=
+QUANT_PORT=
+TIME_PORT=
+SYSTEM_PORT=
+ENGINE_PORT=
+GRAFANA_PORT=

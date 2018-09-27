@@ -1,0 +1,53 @@
+version: '2'
+services:
+  evolution-redis:
+    image: redis:3.2
+    container_name: ${PROJECT_NAME}-${DEV_USER}-redis
+    networks:
+      - default
+  evolution-envoy:
+    image: ${DEVELOP_PREFIX}:envoy
+    container_name: ${PROJECT_NAME}-${DEV_USER}-envoy
+    volumes:
+      - ../config/envoy.yaml:/etc/front-envoy.yaml
+    ports:
+      - "${ENVOY_PORT}:80"
+    networks:
+      - default
+  evolution-time:
+    environment:
+      - ConfigPath=./config/config.yaml
+    image: ${RELEASE_PREFIX}-time:${RELEASE_TAG}
+    container_name: ${PROJECT_NAME}-${DEV_USER}-time
+    volumes:
+      - ../config/.backend-config.yaml:/go/src/evolution/config/config.yaml
+    command: /bin/sh -c "./time-init-db && ./time"
+    expose:
+      - "${TIME_PORT}"
+    networks:
+      - default
+  evolution-system:
+    environment:
+      - ConfigPath=./config/config.yaml
+    image: ${RELEASE_PREFIX}-system:${RELEASE_TAG}
+    container_name: ${PROJECT_NAME}-${DEV_USER}-system
+    volumes:
+      - ../config/.backend-config.yaml:/go/src/evolution/config/config.yaml
+    command: /bin/sh -c "./system-init-db && ./system"
+    expose:
+      - "${SYSTEM_PORT}"
+    networks:
+      - default
+  evolution-frontend:
+    image: ${RELEASE_PREFIX}-frontend:${RELEASE_TAG}
+    container_name: ${PROJECT_NAME}-${DEV_USER}-frontend
+    volumes:
+      - ../config/.frontend-config.json:/www/assets/config/.config.prod.json
+    expose:
+      - "${FRONT_PORT}" 
+    networks:
+      - default
+networks:
+  default:
+    external:
+      name: ${DEV_USER}

@@ -1,0 +1,45 @@
+<button class="btn btn-primary" (click)="openSaveModel()">
+  {{ "SYSTEM.PROCESS.CREATE" | translate }}
+</button>
+<span class="refresh-btn" (click)="refresh()">
+  <clr-icon shape="refresh"></clr-icon>
+</span>
+<clr-datagrid  (clrDgRefresh)="load($event)">
+  <!-- <clr-dg-column>{{ 'SYSTEM.RESOURCE.GENERAL.ID' | translate }}</clr-dg-column> -->
+  <clr-dg-column>{{ 'SYSTEM.RESOURCE.USER.NAME' | translate }}</clr-dg-column>
+  <clr-dg-column>{{ 'SYSTEM.RESOURCE.USER.EMAIL' | translate }}</clr-dg-column>
+  <clr-dg-column>{{ 'SYSTEM.RESOURCE.USER.PASSWORD' | translate }}</clr-dg-column>
+  <clr-dg-column>{{ 'SYSTEM.RESOURCE.GENERAL.CREATED' | translate }}</clr-dg-column>
+  <clr-dg-column>{{ 'SYSTEM.RESOURCE.GENERAL.UPDATED' | translate }}</clr-dg-column>
+	<clr-dg-column>{{ 'SYSTEM.RESOURCE.GENERAL.OPERATION' | translate }}</clr-dg-column>
+
+  <clr-dg-row *ngFor="let user of users">
+    <!-- <clr-dg-cell>{{user.Id}}</clr-dg-cell> -->
+    <clr-dg-cell>{{user.Name}}</clr-dg-cell>
+    <clr-dg-cell>{{user.Email}}</clr-dg-cell>
+    <clr-dg-cell>{{user.Password}}</clr-dg-cell>
+    <clr-dg-cell>{{user.CreatedAt | date: 'yy-MM-dd HH:mm:ss'}}</clr-dg-cell>
+    <clr-dg-cell>{{user.UpdatedAt | date: 'yy-MM-dd HH:mm:ss'}}</clr-dg-cell>
+    <clr-dg-cell>
+      <div class="btn-group btn-primary btn-icon">
+        <button (click)="openSaveModel(user.Id)" class="btn">
+          <clr-icon shape="wrench"></clr-icon>
+          <span class="clr-icon-title"></span>
+        </button>
+        <button (click)="delete(user)" class="btn btn-danger">
+          <clr-icon shape="trash"></clr-icon>
+          <span class="clr-icon-title"></span>
+        </button>
+      </div>
+    </clr-dg-cell>  
+  </clr-dg-row>
+
+  <clr-dg-footer>
+    <clr-dg-pagination #pagination [clrDgPageSize]="pageSize" [(clrDgPage)]="currentPage" [clrDgTotalItems]="totalCount">
+      {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
+      / {{pagination.totalItems}} {{ 'SYSTEM.RESOURCE.USER.CONCEPT' | translate }}
+    </clr-dg-pagination>
+  </clr-dg-footer>
+</clr-datagrid>
+
+<system-user-save (save)="saved($event)"></system-user-save>

@@ -1,0 +1,53 @@
+<button class="btn btn-primary" (click)="openSaveModel()">
+  {{ "SYSTEM.PROCESS.CREATE" | translate }}
+</button>
+<span class="refresh-btn" (click)="refresh()">
+  <clr-icon shape="refresh"></clr-icon>
+</span>
+<clr-datagrid (clrDgRefresh)="load($event)">
+  <!-- <clr-dg-column>{{ 'QUANT.RESOURCE.GENERAL.ID' | translate }}</clr-dg-column> -->
+  <clr-dg-column>{{ 'QUANT.RESOURCE.POOL.NAME' | translate }}</clr-dg-column>
+  <clr-dg-column>{{ 'QUANT.RESOURCE.POOL.STATUS' | translate }}</clr-dg-column>
+  <clr-dg-column>{{ 'QUANT.RESOURCE.POOL.STRATEGY' | translate }}</clr-dg-column>
+  <clr-dg-column>{{ 'QUANT.RESOURCE.CONFIG.ASSET' | translate }}</clr-dg-column>
+  <clr-dg-column>{{ 'QUANT.RESOURCE.CONFIG.TYPE' | translate }}</clr-dg-column>
+  <clr-dg-column>{{ 'QUANT.RESOURCE.GENERAL.CREATED' | translate }}</clr-dg-column>
+  <clr-dg-column>{{ 'QUANT.RESOURCE.GENERAL.UPDATED' | translate }}</clr-dg-column>
+	<clr-dg-column>{{ 'QUANT.RESOURCE.GENERAL.OPERATION' | translate }}</clr-dg-column>
+
+  <clr-dg-row *ngFor="let pool of pools">
+      <!-- <clr-dg-cell>{{pool.Id}}</clr-dg-cell> -->
+      <clr-dg-cell>{{pool.Name}}</clr-dg-cell>
+      <clr-dg-cell>{{pool.Status}}</clr-dg-cell>
+      <clr-dg-cell>{{pool.Strategy}}</clr-dg-cell>
+      <clr-dg-cell>{{pool.Asset}}</clr-dg-cell>
+      <clr-dg-cell>{{pool.Type}}</clr-dg-cell>
+      <clr-dg-cell>{{pool.CreatedAt | date: 'yy-MM-dd HH:mm:ss'}}</clr-dg-cell>
+      <clr-dg-cell>{{pool.UpdatedAt | date: 'yy-MM-dd HH:mm:ss'}}</clr-dg-cell>
+      <clr-dg-cell>
+        <div class="btn-group btn-primary btn-icon">
+          <button (click)="openSaveModel(pool.Id)" class="btn">
+            <clr-icon shape="wrench"></clr-icon>
+            <span class="clr-icon-title"></span>
+          </button>
+          <button (click)="enterItemList(pool.Id)" class="btn">
+            <clr-icon shape="view-list"></clr-icon>
+            <span class="clr-icon-title"></span>
+          </button>
+          <button (click)="delete(pool)" class="btn btn-danger">
+            <clr-icon shape="trash"></clr-icon>
+            <span class="clr-icon-title"></span>
+          </button>
+        </div>
+      </clr-dg-cell>  
+  </clr-dg-row>
+
+  <clr-dg-footer>
+    <clr-dg-pagination #pagination [clrDgPageSize]="pageSize" [(clrDgPage)]="currentPage" [clrDgTotalItems]="totalCount">
+      {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
+      / {{pagination.totalItems}} {{ 'QUANT.RESOURCE.POOL.CONCEPT' | translate }}
+    </clr-dg-pagination>
+  </clr-dg-footer>
+</clr-datagrid>
+
+<quant-pool-save (save)="saved($event)"></quant-pool-save>

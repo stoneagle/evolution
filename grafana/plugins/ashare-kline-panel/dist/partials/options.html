@@ -1,0 +1,54 @@
+<div class="editor-row options-tab">
+  <div class="section gf-form-group">
+    <h5 class="section-heading">容器</h5>
+    <div class="gf-form">
+      <label class="gf-form-label width-8">类别</label>
+      <div class="gf-form-select-wrapper width-8">
+        <select
+          class="gf-form-input"
+          ng-model="ctrl.panel.echartsType"
+          ng-options="n for n in ctrl.echartsTypeOptions"
+          ng-change="ctrl.render()"
+        />
+      </div>
+    </div>
+    <div class="gf-form-inline">
+      <div class="gf-form">
+        <label class="gf-form-label width-8">图表名称</label>
+        <input
+          type="text" class="gf-form-input width-7"
+          ng-model="ctrl.panel.echartsName"
+          ng-change="ctrl.render()"
+          ng-model-onblur
+        />
+      </div>
+    </div>
+    <div class="gf-form-inline">
+      <div class="gf-form">
+        <label class="gf-form-label width-8">图表ID</label>
+        <input
+          type="text" class="gf-form-input width-7"
+          ng-model="ctrl.panel.echartsID"
+          ng-change="ctrl.render()"
+          ng-model-onblur
+        />
+      </div>
+    </div>
+  </div>
+  <div class="section gf-form-group">
+    <h5 class="section-heading">配置</h5>
+    <div class="gf-form-inline"></div>
+    <div class="gf-form">
+      <label class="gf-form-label width-8">X轴缩放比例</label>
+      <input
+        type="number"
+        class="gf-form-input width-7"
+        placeholder="auto" data-placement="right"
+        bs-tooltip="'图表下方初始展现比例'"
+        ng-model="ctrl.panel.optionsXAxisStart"
+        ng-change="ctrl.render()"
+        ng-model-onblur
+      />
+    </div>
+	</div>
+</div>

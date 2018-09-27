@@ -1,0 +1,51 @@
+<button class="btn btn-primary" (click)="openSyncModel()">
+  {{ "SYSTEM.PROCESS.SYNC" | translate }}
+</button>
+<span class="refresh-btn" (click)="refresh()">
+  <clr-icon shape="refresh"></clr-icon>
+</span>
+<clr-datagrid  (clrDgRefresh)="load($event)">
+  <!-- <clr-dg-column>{{ 'QUANT.RESOURCE.GENERAL.ID' | translate }}</clr-dg-column> -->
+  <clr-dg-column>{{ 'QUANT.RESOURCE.CLASSIFY.NAME' | translate }}</clr-dg-column>
+  <clr-dg-column>{{ 'QUANT.RESOURCE.CLASSIFY.TAG' | translate }}</clr-dg-column>
+  <clr-dg-column>{{ 'QUANT.RESOURCE.CONFIG.ASSET' | translate }}</clr-dg-column>
+  <clr-dg-column>{{ 'QUANT.RESOURCE.CONFIG.TYPE' | translate }}</clr-dg-column>
+  <clr-dg-column>{{ 'QUANT.RESOURCE.CONFIG.MAIN' | translate }}</clr-dg-column>
+  <clr-dg-column>{{ 'QUANT.RESOURCE.CONFIG.SUB' | translate }}</clr-dg-column>
+  <clr-dg-column>{{ 'QUANT.RESOURCE.GENERAL.CREATED' | translate }}</clr-dg-column>
+  <clr-dg-column>{{ 'QUANT.RESOURCE.GENERAL.UPDATED' | translate }}</clr-dg-column>
+	<clr-dg-column>{{ 'QUANT.RESOURCE.GENERAL.OPERATION' | translate }}</clr-dg-column>
+
+  <clr-dg-row *ngFor="let classify of classifys">
+    <!-- <clr-dg-cell>{{classify.Id}}</clr-dg-cell> -->
+    <clr-dg-cell>{{classify.Name}}</clr-dg-cell>
+    <clr-dg-cell>{{classify.Tag}}</clr-dg-cell>
+    <clr-dg-cell>{{classify.Asset}}</clr-dg-cell>
+    <clr-dg-cell>{{classify.Type}}</clr-dg-cell>
+    <clr-dg-cell>{{classify.Main}}</clr-dg-cell>
+    <clr-dg-cell>{{classify.Sub}}</clr-dg-cell>
+    <clr-dg-cell>{{classify.CreatedAt | date: 'yy-MM-dd HH:mm:ss'}}</clr-dg-cell>
+    <clr-dg-cell>{{classify.UpdatedAt | date: 'yy-MM-dd HH:mm:ss'}}</clr-dg-cell>
+    <clr-dg-cell>
+      <div class="btn-group btn-primary btn-icon">
+        <button (click)="syncItem(classify)" class="btn">
+          <clr-icon shape="sync"></clr-icon>
+          <span class="clr-icon-title"></span>
+        </button>
+        <!-- <button (click)="delete(classify)" class="btn btn-danger"> -->
+        <!--   <clr-icon shape="trash"></clr-icon> -->
+        <!--   <span class="clr-icon-title"></span> -->
+        <!-- </button> -->
+      </div>
+    </clr-dg-cell>  
+  </clr-dg-row>
+
+  <clr-dg-footer>
+    <clr-dg-pagination #pagination [clrDgPageSize]="pageSize" [(clrDgPage)]="currentPage" [clrDgTotalItems]="totalCount">
+      {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
+      / {{pagination.totalItems}} {{ 'QUANT.RESOURCE.CLASSIFY.CONCEPT' | translate }}
+    </clr-dg-pagination>
+  </clr-dg-footer>
+</clr-datagrid>
+
+<quant-config-asset-source (sync)="Sync($event)" [modelOpened]="syncModelOpened" ></quant-config-asset-source>

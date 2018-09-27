@@ -1,0 +1,23 @@
+<clr-modal [(clrModalOpen)]="modelOpened">
+    <h3 class="modal-title">
+      {{ 'SYSTEM.PROCESS.FINISH' | translate }}{{ 'TIME.RESOURCE.PROJECT.CONCEPT' | translate }}
+    </h3>
+    <div class="modal-body">
+      <form #addForm="ngForm" (ngSubmit)="Submit()">
+        <div class="form-group">
+          <label for="Name">{{ 'TIME.RESOURCE.PROJECT.CONCEPT' | translate }}</label>
+          <input type="text" class="form-control" id="Name" readonly name="Name" value="{{project.Name}}" />
+        </div> 
+        <div class="form-group">
+          <label for="finishTarget">{{ 'TIME.RESOURCE.QUEST_TARGET.CONCEPT' | translate }}</label>
+          <clr-checkbox 
+            id="finishTarget" 
+            name="finishTarget" 
+            [(clrChecked)]="finishTarget"
+          ></clr-checkbox>
+        </div>
+        <button type="submit" class="btn btn-success">{{ 'SYSTEM.PROCESS.SUBMIT' | translate }}</button>
+        <button type="button" class="btn btn-primary" (click)="modelOpened = false">{{ 'SYSTEM.PROCESS.CANCEL' | translate }}</button>
+      </form>
+    </div>     
+</clr-modal>   

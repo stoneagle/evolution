@@ -1,0 +1,30 @@
+## project
+*.swp
+logs
+grafana/plugins/**/node_modules
+grafana/sessions
+release/*
+
+## hack
+hack/swarm/.env
+hack/dockerfile/hdf5/
+hack/release/config/.*
+
+## backend
+backend/vendor
+backend/logs
+backend/quant/quant
+backend/time/time
+backend/system/system
+backend/config/.config.yaml
+backend/time/models/transfer/.config.yaml
+
+## engine
+__init__.py
+**/__init__.py
+**/__init__.pyc
+**/__pycache__/
+
+## frontend
+frontend/src/assets/config/.config.dev.json
+frontend/src/assets/config/.config.prod.json
