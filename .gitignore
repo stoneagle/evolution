@@ -6,6 +6,7 @@ grafana/sessions
 release/*
 
 ## hack
+hack/database/*
 hack/swarm/.env
 hack/dockerfile/hdf5/
 hack/release/config/.*

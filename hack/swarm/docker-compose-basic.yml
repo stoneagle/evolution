@@ -1,0 +1,33 @@
+version: '2'
+services:
+  evolution-redis:
+    image: redis:3.2
+    container_name: ${PROJECT_NAME}-${DEV_USER}-redis
+    networks:
+      - default
+  evolution-mysql:
+    environment:
+      - MYSQL_ROOT_PASSWORD=123456
+    image: mysql:8.0.11
+    container_name: ${PROJECT_NAME}-${DEV_USER}-mysql
+    volumes:
+      - ../config/mysql.cnf:/etc/mysql/my.cnf
+      - ../database/mysql-8.0.11:/var/lib/mysql
+    ports:
+      - "${MYSQL_PORT}:3306"
+    networks:
+      - default
+  evolution-envoy:
+    image: ${DEVELOP_PREFIX}:envoy
+    container_name: ${PROJECT_NAME}-${DEV_USER}-envoy
+    command: envoy -c /etc/evolution-envoy.yaml --service-cluster evolution-envoy
+    volumes:
+      - ./envoy.yaml:/etc/evolution-envoy.yaml
+    ports:
+      - "${ENVOY_PORT}:80"
+    networks:
+      - default
+networks:
+  default:
+    external:
+      name: ${DEV_USER}
