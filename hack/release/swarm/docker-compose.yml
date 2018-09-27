@@ -1,5 +1,10 @@
 version: '2'
 services:
+  evolution-redis:
+    image: redis:3.2
+    container_name: ${PROJECT_NAME}-${DEV_USER}-redis
+    networks:
+      - default
   evolution-envoy:
     image: ${DEVELOP_PREFIX}:envoy
     container_name: ${PROJECT_NAME}-${DEV_USER}-envoy
