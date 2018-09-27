@@ -1,0 +1,51 @@
+---
+# ------------------- Deploy ------------------- #
+kind: Deployment
+apiVersion: apps/v1beta2
+metadata:
+  labels:
+    k8s-app: evolution-time
+  name: evolution-time
+  namespace: default
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      k8s-app: evolution-time
+  template:
+    metadata:
+      labels:
+        k8s-app: evolution-time
+    spec:
+      containers:
+      - name: time 
+        image: stoneagle/evolution-time:v0.0.1-alpha1
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+        - name: config-volume
+          mountPath: /go/src/evolution/config
+      volumes:
+      - name: config-volume
+        configMap:
+          name: evolution-backend-config
+      tolerations:
+      - key: node-role.kubernetes.io/master
+        effect: NoSchedule
+
+---
+# ------------------- Service ------------------- #
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    k8s-app: evolution-time
+  name: evolution-time
+  namespace: default 
+spec:
+  ports:
+    - port: 8080
+      targetPort: 8080
+  selector:
+    k8s-app: evolution-time

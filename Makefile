@@ -21,6 +21,13 @@ stop:
 rm:
 	cd hack/swarm && docker-compose -f docker-compose-$(SYSTEM).yml -p "$(PROJ)-$(USER)-$(SYSTEM)" rm 
 
+release:
+	cd hack/release/swarm && docker-compose up -d
+release-stop:
+	cd hack/release/swarm && docker-compose stop 
+release-rm:
+	cd hack/release/swarm && docker-compose rm
+
 # SYSTEM can be quant/time/system
 init-db:
 	docker exec -w /go/src/evolution/backend/$(SYSTEM)/initial -it $(PROJ)-$(USERNAME)-$(SYSTEM)-backend go run init.go 
