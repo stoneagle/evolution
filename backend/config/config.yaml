@@ -55,7 +55,7 @@ time:
     maxIdle: 10 
     maxOpen: 5 
     showsql: True
-    reset: True 
+    reset: False 
     location: Asia/Shanghai
 system:
   auth:

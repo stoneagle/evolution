@@ -22,7 +22,9 @@ rm:
 	cd hack/swarm && docker-compose -f docker-compose-$(SYSTEM).yml -p "$(PROJ)-$(USER)-$(SYSTEM)" rm 
 
 test-run:
-	cd hack/release/swarm && docker-compose up -d
+	cd hack/release/swarm && docker-compose up
+test-run-db:
+	cd hack/release/swarm && docker-compose -f docker-compose-mysql.yaml -p "evolution-mysql" up
 test-stop:
 	cd hack/release/swarm && docker-compose stop 
 test-rm:
