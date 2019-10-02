@@ -52,7 +52,7 @@ func (b *Bootstrapper) Bootstrap() *Bootstrapper {
 		AllowOrigins:     b.Config.Time.System.Cors,
 		ExposeHeaders:    exposeHeaders,
 		AllowOriginFunc: func(origin string) bool {
-			return origin == "http://localhost:8080"
+			return origin == "http://localhost:8000"
 		},
 		MaxAge: 12 * time.Hour,
 	}))
