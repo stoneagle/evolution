@@ -3,16 +3,16 @@ import { EJ_DATETIMEPICKER_COMPONENTS }                                       fr
 import { EJ_DROPDOWNLIST_COMPONENTS }                                         from 'ej-angular2/src/ej/dropdownlist.component';
 import { EJ_SCHEDULE_COMPONENTS }                                             from 'ej-angular2/src/ej/schedule.component';
 
-import { QuestTeam }       from '../../../../model/time/quest';
-import { Task }            from '../../../../model/time/task';
-import { Action }          from '../../../../model/time/action';
-import { Project }         from '../../../../model/time/project';
-import { SessionUser }     from '../../../../model/base/sign';
-import { ActionService  }  from '../../../../service/time/action.service';
-import { TaskService  }    from '../../../../service/time/task.service';
-import { ProjectService  } from '../../../../service/time/project.service';
-import { SignService  }    from '../../../../service/system/sign.service';
-import { ShellComponent }  from '../../../../base/shell/shell.component';
+import { QuestTeam }          from '../../../../model/time/quest';
+import { Task, TaskSettings } from '../../../../model/time/task';
+import { Action }             from '../../../../model/time/action';
+import { Project }            from '../../../../model/time/project';
+import { SessionUser }        from '../../../../model/base/sign';
+import { ActionService  }     from '../../../../service/time/action.service';
+import { TaskService  }       from '../../../../service/time/task.service';
+import { ProjectService  }    from '../../../../service/time/project.service';
+import { SignService  }       from '../../../../service/system/sign.service';
+import { ShellComponent }     from '../../../../base/shell/shell.component';
 
 @Component({
   selector: 'time-action-save',
@@ -31,6 +31,7 @@ export class ActionSaveComponent implements OnInit {
 
   constructor(
     private taskService: TaskService,
+    private taskSettings: TaskSettings,
     private projectService: ProjectService,
     private signService: SignService,
     private actionService: ActionService,
@@ -46,6 +47,11 @@ export class ActionSaveComponent implements OnInit {
 
   initTasks(userId: number): void {
     this.taskService.ListByUser(userId).subscribe(tasks => {
+      tasks.forEach( (item, index) => {
+        if (item.Status == this.taskSettings.Status.Done) {
+          tasks.splice(index, 1);
+        }
+      });
       this.tasks = tasks;
     })
   }
@@ -98,14 +104,28 @@ export class ActionSaveComponent implements OnInit {
     this.action.Time = time / 1000 / 60;
     if (this.action.Id == null) {
       this.actionService.Add(this.action).subscribe(res => {
+        this.UpdateTaskStatus(this.action.Task)
         this.action.Id = res.Id;
         this.save.emit(this.action);
         this.modelOpened = false;
       })
     } else {
       this.actionService.Update(this.action).subscribe(res => {
+        this.UpdateTaskStatus(this.action.Task)
         this.save.emit(this.action);
         this.modelOpened = false;
+      })
+    }
+  }
+
+  UpdateTaskStatus(task: Task): void {
+    if (task.Status != this.taskSettings.Status.Done) {
+      return;
+    }
+    if (task.Status != this.taskSettings.Status.Progress) {
+      task.Status = this.taskSettings.Status.Progress;
+      this.taskService.Update(task).subscribe(res => {
+        return;
       })
     }
   }

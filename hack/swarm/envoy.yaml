@@ -26,10 +26,6 @@ static_resources:
                 route:
                   cluster: time 
               - match:
-                  prefix: "/evolution/engine"
-                route:
-                  cluster: engine 
-              - match:
                   prefix: "/evolution/system"
                 route:
                   cluster: system 
@@ -43,7 +39,7 @@ static_resources:
     lb_policy: round_robin
     hosts:
     - socket_address:
-        address: quant-backend
+        address: evolution-quant
         port_value: 8080
   - name: time 
     connect_timeout: 0.5s
@@ -51,7 +47,7 @@ static_resources:
     lb_policy: round_robin
     hosts:
     - socket_address:
-        address: time-backend
+        address: evolution-time
         port_value: 8080
   - name: engine 
     connect_timeout: 0.5s
@@ -59,7 +55,7 @@ static_resources:
     lb_policy: round_robin
     hosts:
     - socket_address:
-        address: quant-engine
+        address: evolution-engine
         port_value: 6666
   - name: system
     connect_timeout: 0.5s
@@ -67,7 +63,7 @@ static_resources:
     lb_policy: round_robin
     hosts:
     - socket_address:
-        address: system-backend
+        address: evolution-system
         port_value: 8080
 admin:
   access_log_path: "/dev/null"

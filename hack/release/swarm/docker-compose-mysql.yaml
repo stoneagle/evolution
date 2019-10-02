@@ -1,0 +1,16 @@
+version: '2'
+services:
+  evolution-mysql:
+    environment:
+      - MYSQL_ROOT_PASSWORD=123456
+    image: mysql:8.0.13
+    container_name: ${PROJECT_NAME}-${DEV_USER}-mysql
+    volumes:
+      - ../../config/mysql.cnf:/etc/mysql/my.cnf
+      - ../../database/mysql:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    expose:
+      - "3306"
+    networks:
+      - default

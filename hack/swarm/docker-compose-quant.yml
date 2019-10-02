@@ -1,7 +1,7 @@
 version: '2'
 services:
-  quant-backend:
-    image: ${REGISTRY_PREFIX}:golang-beego-1.10 
+  evolution-quant:
+    image: ${DEVELOP_PREFIX}:golang-beego-1.10 
     container_name: ${PROJECT_NAME}-${DEV_USER}-quant-backend
     volumes:
       # 挂载项目代码目录
@@ -14,10 +14,10 @@ services:
       - "${QUANT_PORT}"
     networks:
       - default
-  quant-engine:
+  evolution-engine:
     environment:
       - PYTHONUNBUFFERED=0
-    image: ${REGISTRY_PREFIX}:quant-engine
+    image: ${DEVELOP_PREFIX}:quant-engine
     container_name: ${PROJECT_NAME}-${DEV_USER}-quant-engine
     volumes:
       # 挂载项目代码目录
