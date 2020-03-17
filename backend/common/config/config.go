@@ -64,6 +64,15 @@ type Conf struct {
 			Port string
 		}
 	}
+	Ashare struct {
+		Auth struct {
+			Type    string
+			Session string
+		}
+		System   System
+		Redis    RedisConf
+		Database DBConf
+	}
 	Time struct {
 		System   System
 		Redis    RedisConf

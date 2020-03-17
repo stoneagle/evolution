@@ -26,6 +26,10 @@ static_resources:
                 route:
                   cluster: time 
               - match:
+                  prefix: "/evolution/ashare"
+                route:
+                  cluster: ashare 
+              - match:
                   prefix: "/evolution/system"
                 route:
                   cluster: system 
@@ -48,6 +52,14 @@ static_resources:
     hosts:
     - socket_address:
         address: evolution-time
+        port_value: 8080
+  - name: ashare 
+    connect_timeout: 0.5s
+    type: strict_dns
+    lb_policy: round_robin
+    hosts:
+    - socket_address:
+        address: evolution-ashare
         port_value: 8080
   - name: engine 
     connect_timeout: 0.5s

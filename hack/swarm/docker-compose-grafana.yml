@@ -1,13 +1,14 @@
 version: '2'
 services:
   grafana:
-    image: grafana/grafana:4.6.2-1000
-    container_name: ${COMPOSE_PROJECT_NAME}-${DEV_USER}-grafana
+    image: grafana/grafana:6.4.1
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=123456
+    container_name: ${PROJECT_NAME}-${DEV_USER}-grafana
     volumes:
-      - ./config/grafana.ini:/etc/grafana/grafana.ini
-      - ../grafana:/var/lib/grafana
+      - ../database/grafana:/var/lib/grafana
     ports:
-      - "${DEV_GRAFANA}:3000"
+      - "${GRAFANA_PORT}:3000"
 networks:
   default:
     external:

@@ -13,7 +13,7 @@ RELEASE_DIR = release
 SYS_TIME = time
 GOVERSION = 1.10
 
-# SYSTEM can be quant/time/system/basic
+# SYSTEM can be quant/time/ashare/system/basic/grafana
 run:
 	cd hack/swarm && docker-compose -f docker-compose-$(SYSTEM).yml -p "$(PROJ)-$(USER)-$(SYSTEM)" up $(PARAMS)
 stop:
@@ -32,7 +32,7 @@ test-rm:
 
 # SYSTEM can be quant/time/system
 init-db:
-	docker exec -w /go/src/evolution/backend/$(SYSTEM)/initial -it $(PROJ)-$(USERNAME)-$(SYSTEM)-backend go run init.go 
+	docker exec -w /go/src/evolution/backend/$(SYSTEM)/initial -it $(PROJ)-$(USERNAME)-$(SYSTEM)-backend go run init.go
 
 # transfer
 transfer-time-db:

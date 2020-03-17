@@ -1,0 +1,7 @@
+mysql:
+  host: localhost
+  user: root
+  passwd: "123456"
+  db: ashare
+tushare:
+  token: 04c6ea41a4482f1e5e7a3eb9b21fa52a786cb1676ee9feca902abfe8
