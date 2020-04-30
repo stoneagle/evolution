@@ -33,7 +33,7 @@
     "core-js": "^2.4.1",
     "daypilot-pro-angular": "https://npm.daypilot.org/daypilot-pro-angular/trial/2018.2.3324.tar.gz",
     "ej-angular2": "^16.2.41",
-    "jquery": "^3.3.1",
+    "jquery": "^3.5.0",
     "jsrender": "^0.9.90",
     "ng-pick-datetime": "^5.2.6",
     "ng2-tree": "^2.0.0-rc.11",
